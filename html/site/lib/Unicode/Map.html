@@ -1,0 +1,328 @@
+<HTML>
+<HEAD>
+<TITLE>V0.112 - maps charsets from and to utf16 unicode</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;V0.112 - maps charsets from and to utf16 unicode</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#conversion methods">CONVERSION METHODS</A></LI>
+	<LI><A HREF="#warnings">WARNINGS</A></LI>
+	<LI><A HREF="#maintainance methods">MAINTAINANCE METHODS</A></LI>
+	<LI><A HREF="#deprecated methods">DEPRECATED METHODS</A></LI>
+	<LI><A HREF="#binary mappings">BINARY MAPPINGS</A></LI>
+	<LI><A HREF="#to be done">TO BE DONE</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Unicode::Map V0.112 - maps charsets from and to utf16 unicode</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>use Unicode::Map();</P>
+<P><EM>$Map</EM> = new Unicode::Map(``ISO-8859-1'');</P>
+<P><EM>$utf16</EM> = <EM>$Map</EM> -&gt; to_unicode (``Hello world!'');
+  =&gt; $utf16 == ``\0H\0e\0l\0l\0o\0 \0w\0o\0r\0l\0d\0!''</P>
+<P><EM>$locale</EM> = <EM>$Map</EM> -&gt; from_unicode (<EM>$utf16</EM>);
+  =&gt; $locale == ``Hello world!''</P>
+<P>A more detailed description below.</P>
+<P>2do: short note about perl's Unicode perspectives.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module converts strings from and to 2-byte Unicode UCS2 format. 
+All mappings happen via 2 byte UTF16 encodings, not via 1 byte UTF8
+encoding. To transform these use Unicode::String.</P>
+<P>For historical reasons this module coexists with Unicode::Map8.
+Please use Unicode::Map8 unless you need to care for two byte character
+sets, e.g. chinese GB2312. Anyway, if you stick to the basic 
+functionality (see documentation) you can use both modules equivalently.</P>
+<P>Practically this module will disappear from earth sooner or later as 
+Unicode mapping support needs somehow to get into perl's core. If you 
+like to work on this field please don't hesitate contacting Gisle Aas!</P>
+<P>This module can't deal directly with utf8. Use Unicode::String to convert
+utf8 to utf16 and vice versa.</P>
+<P>Character mapping is according to the data of binary mapfiles in Unicode::Map 
+hierarchy. Binary mapfiles can also be created with this module, enabling you
+to install own specific character sets. Refer to mkmapfile or file REGISTRY in the Unicode::Map hierarchy.</P>
+<P>
+<HR>
+<H1><A NAME="conversion methods">CONVERSION METHODS</A></H1>
+<P>Probably these are the only methods you will need from this module. Their
+usage is compatible with Unicode::Map8.</P>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+<EM>$Map</EM> = new Unicode::Map(``GB2312-80'')
+<P>Returns a new Map object for GB2312-80 encoding.</P>
+<P></P>
+<DT><STRONG><A NAME="item_from_unicode">from_unicode</A></STRONG><BR>
+<DD>
+<EM>$dest</EM> = <EM>$Map</EM> -&gt; from_unicode (<EM>$src</EM>)
+<P>Creates a string in locale charset representation from utf16 encoded
+string <EM>$src</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_to_unicode">to_unicode</A></STRONG><BR>
+<DD>
+<EM>$dest</EM>   = <EM>$Map</EM> -&gt; to_unicode (<EM>$src</EM>)
+<P>Creates a string in utf16 representation from <EM>$src</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_to8">to8</A></STRONG><BR>
+<DD>
+Alias for <EM>from_unicode</EM>. For compatibility with Unicode::Map8
+<P></P>
+<DT><STRONG><A NAME="item_to16">to16</A></STRONG><BR>
+<DD>
+Alias for <EM>to_unicode</EM>. For compatibility with Unicode::Map8
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="warnings">WARNINGS</A></H1>
+<P>You can demand Unicode::Map to issue warnings at deprecated or incompatible 
+usage with the constants WARN_DEFAULT, WARN_DEPRECATION or WARN_COMPATIBILITY.
+The latter both can be ored together.</P>
+<DL>
+<DT><STRONG><A NAME="item_No_special_warnings%3A">No special warnings:</A></STRONG><BR>
+<DD>
+$Unicode::Map::WARNINGS = Unicode::Map::WARN_DEFAULT
+<P></P>
+<DT><STRONG><A NAME="item_Warnings_for_deprecated_usage%3A">Warnings for deprecated usage:</A></STRONG><BR>
+<DD>
+$Unicode::Map::WARNINGS = Unicode::Map::WARN_DEPRECATION
+<P></P>
+<DT><STRONG><A NAME="item_Warnings_for_incompatible_usage%3A">Warnings for incompatible usage:</A></STRONG><BR>
+<DD>
+$Unicode::Map::WARNINGS = Unicode::Map::WARN_COMPATIBILITY
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="maintainance methods">MAINTAINANCE METHODS</A></H1>
+<P><EM>Note:</EM> These methods are solely for the maintainance of Unicode::Map.
+Using any of these methods will lead to programs incompatible with
+Unicode::Map8.</P>
+<DL>
+<DT><STRONG><A NAME="item_alias">alias</A></STRONG><BR>
+<DD>
+<EM>@list</EM> = <EM>$Map</EM> -&gt; alias (<EM>$csid</EM>)
+<P>Returns a list of alias names of character set <EM>$csid</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_mapping">mapping</A></STRONG><BR>
+<DD>
+<EM>$path</EM> = <EM>$Map</EM> -&gt; mapping (<EM>$csid</EM>)
+<P>Returns the absolute path of binary character mapping for character set 
+<EM>$csid</EM> according to REGISTRY file of Unicode::Map.</P>
+<P></P>
+<DT><STRONG><A NAME="item_id">id</A></STRONG><BR>
+<DD>
+<EM>$real_id</EM>||<CODE>&quot;&quot;</CODE> = <EM>$Map</EM> -&gt; id (<EM>$test_id</EM>)
+<P>Returns a valid character set identifier <EM>$real_id</EM>, if <EM>$test_id</EM> is
+a valid character set name or alias name according to REGISTRY file of 
+Unicode::Map.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ids">ids</A></STRONG><BR>
+<DD>
+<EM>@ids</EM> = <EM>$Map</EM> -&gt; <A HREF="#item_ids"><CODE>ids()</CODE></A>
+<P>Returns a list of all character set names defined in REGISTRY file.</P>
+<P></P>
+<DT><STRONG><A NAME="item_read_text_mapping">read_text_mapping</A></STRONG><BR>
+<DD>
+<CODE>1</CODE>||<CODE>0</CODE> = <EM>$Map</EM> -&gt; read_text_mapping (<EM>$csid</EM>, <EM>$path</EM>, <EM>$style</EM>)
+<P>Read a text mapping of style <EM>$style</EM> named <EM>$csid</EM> from filename <EM>$path</EM>.
+The mapping then can be saved to a file with method: write_binary_mapping.
+&lt;$style&gt; can be:</P>
+<PRE>
+ style          description</PRE>
+<PRE>
+ &quot;unicode&quot;    A text mapping as of <A HREF="ftp://ftp.unicode.org/MAPPINGS/">ftp://ftp.unicode.org/MAPPINGS/</A>
+ &quot;&quot;           Same as &quot;unicode&quot;
+ &quot;reverse&quot;    Similar to unicode, but both columns are switched
+ &quot;keld&quot;       A text mapping as of <A HREF="ftp://dkuug.dk/i18n/charmaps/">ftp://dkuug.dk/i18n/charmaps/</A></PRE>
+<P></P>
+<DT><STRONG><A NAME="item_src">src</A></STRONG><BR>
+<DD>
+<EM>$path</EM> = <EM>$Map</EM> -&gt; src (<EM>$csid</EM>)
+<P>Returns the path of textual character mapping for character set <EM>$csid</EM> 
+according to REGISTRY file of Unicode::Map.</P>
+<P></P>
+<DT><STRONG><A NAME="item_style">style</A></STRONG><BR>
+<DD>
+<EM>$path</EM> = <EM>$Map</EM> -&gt; style (<EM>$csid</EM>)
+<P>Returns the style of textual character mapping for character set <EM>$csid</EM> 
+according to REGISTRY file of Unicode::Map.</P>
+<P></P>
+<DT><STRONG><A NAME="item_write_binary_mapping">write_binary_mapping</A></STRONG><BR>
+<DD>
+<CODE>1</CODE>||<CODE>0</CODE> = <EM>$Map</EM> -&gt; write_binary_mapping (<EM>$csid</EM>, <EM>$path</EM>)
+<P>Stores a mapping that has been loaded via method read_text_mapping in
+file <EM>$path</EM>.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="deprecated methods">DEPRECATED METHODS</A></H1>
+<P>Some functionality is no longer promoted.</P>
+<DL>
+<DT><STRONG><A NAME="item_noise">noise</A></STRONG><BR>
+<DD>
+Deprecated! Don't use any longer.
+<P></P>
+<DT><STRONG><A NAME="item_reverse_unicode">reverse_unicode</A></STRONG><BR>
+<DD>
+Deprecated! Use Unicode::String::byteswap instead.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="binary mappings">BINARY MAPPINGS</A></H1>
+<P>Structure of binary Mapfiles</P>
+<P>Unicode character mapping tables have sequences of sequential key and
+sequential value codes. This property is used to crunch the maps easily. 
+n (0&lt;n&lt;256) sequential characters are represented as a bytecount n and
+the first character code key_start. For these subsequences the according 
+value sequences are crunched together, also. The value 0 is used to start
+an extended information block (that is just partially implemented, though).</P>
+<P>One could think of two ways to make a binary mapfile. First method would 
+be first to write a list of all key codes, and then to write a list of all 
+value codes. Second method, used here, appends to all partial key code lists
+the according crunched value code lists. This makes value codes a little bit
+closer to key codes.</P>
+<P><STRONG>Note: the file format is still in a very liquid state. Neither rely on
+that it will stay as this, nor that the description is bugless, nor that
+all features are implemented.</STRONG></P>
+<P>STRUCTURE:</P>
+<DL>
+<DT><STRONG><A NAME="item_%3Cmain%3E%3A">&lt;main&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   offset  structure     value</PRE>
+<PRE>
+   0x00    word          0x27b8   (magic)
+   0x02    @(&lt;extended&gt; || &lt;submapping&gt;)</PRE>
+<P>The mapfile ends with extended mode &lt;end&gt; in main stream.</P>
+<DT><STRONG><A NAME="item_%3Csubmapping%3E%3A">&lt;submapping&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   0x00    byte != 0     charsize1 (bits)
+   0x01    byte          n1 number of chars for one entry
+   0x02    byte          charsize2 (bits)
+   0x03    byte          n2 number of chars for one entry
+   0x04    @(&lt;extended&gt; || &lt;key_seq&gt; || &lt;key_val_seq)</PRE>
+<PRE>
+   bs1=int((charsize1+7)/8), bs2=int((charsize2+7)/8)</PRE>
+<P>One submapping ends when &lt;mapend&gt; entry occurs.</P>
+<DT><STRONG><A NAME="item_%3Ckey_val_seq%3E%3A">&lt;key_val_seq&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   0x00    size=0|1|2|4  n, number of sequential characters 
+   size    bs1           key1
+   +bs1    bs2           value1
+   +bs2    bs1           key2
+   +bs1    bs2           value2
+   ...</PRE>
+<P>key_val_seq ends, if either file ends (n = infinite mode) or n pairs are
+read.</P>
+<DT><STRONG><A NAME="item_%3Ckey_seq%3E%3A">&lt;key_seq&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   0x00    byte          n, number of sequential characters 
+   0x01    bs1           key_start, first character of sequence
+   1+bs1   @(&lt;extended&gt; || &lt;val_seq&gt;)</PRE>
+<P>A key sequence starts with a byte count telling how long the sequence
+is. It is followed by the key start code. After this comes a list of 
+value sequences. The list of value sequences ends, if <CODE>sum(m)</CODE> equals n.</P>
+<DT><STRONG><A NAME="item_%3Cval_seq%3E%3A">&lt;val_seq&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   0x00    byte          m, number of sequential characters
+   0x01    bs2           val_start, first character of sequence</PRE>
+<DT><STRONG><A NAME="item_%3Cextended%3E%3A">&lt;extended&gt;:</A></STRONG><BR>
+<DD>
+<PRE>
+   0x00    byte          0
+   0x01    byte          ftype
+   0x02    byte          fsize, size of following structure
+   0x03    fsize bytes   something</PRE>
+<P>For future extensions or private use one can insert here 1..255 byte long 
+streams. ftype can have values 30..255, values 0..29 are reserved. Modi
+are not fully defined now and could change. They will be explained later.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="to be done">TO BE DONE</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2D">-</A></STRONG><BR>
+<DD>
+Something clever, when a character has no translation.
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+Direct charset -&gt; charset mapping.
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+Better performance.
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+Support for mappings according to RFC 1345.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<DL>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+File <CODE>REGISTRY</CODE> and binary mappings in directory <CODE>Unicode/Map</CODE> of your
+perl library path
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+recode(1), map(1), mkmapfile(1), Unicode::Map(3), Unicode::Map8(3),
+Unicode::String(3), Unicode::CharName(3), <CODE>mirrorMappings(1)</CODE>
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+RFC 1345
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+Mappings at Unicode consortium <A HREF="ftp://ftp.unicode.org/MAPPINGS/">ftp://ftp.unicode.org/MAPPINGS/</A>
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+Registrated Internet character sets <A HREF="ftp://dkuug.dk/i18n/charmaps/">ftp://dkuug.dk/i18n/charmaps/</A>
+<P></P>
+<DT><STRONG>-</STRONG><BR>
+<DD>
+2do: more references
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Martin Schwartz &lt;<EM><A HREF="mailto:martin@nacho.de">martin@nacho.de</A></EM>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;V0.112 - maps charsets from and to utf16 unicode</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

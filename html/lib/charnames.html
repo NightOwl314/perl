@@ -1,0 +1,119 @@
+
+<HTML>
+<HEAD>
+<TITLE>charnames - define character names for C<\N{named}> string literal escape.</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;charnames - define character names for C<\N{named}> string literal escape.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#custom translators">CUSTOM TRANSLATORS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>charnames - define character names for <CODE>\N{named}</CODE> string literal escape.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use charnames ':full';
+  print &quot;\N{GREEK SMALL LETTER SIGMA} is called sigma.\n&quot;;</PRE>
+<PRE>
+  use charnames ':short';
+  print &quot;\N{greek:Sigma} is an upper-case sigma.\n&quot;;</PRE>
+<PRE>
+  use charnames qw(cyrillic greek);
+  print &quot;\N{sigma} is Greek sigma, and \N{be} is Cyrillic b.\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Pragma <CODE>use charnames</CODE> supports arguments <CODE>:full</CODE>, <CODE>:short</CODE> and
+script names.  If <CODE>:full</CODE> is present, for expansion of
+<CODE>\N{CHARNAME}}</CODE> string <CODE>CHARNAME</CODE> is first looked in the list of
+standard Unicode names of chars.  If <CODE>:short</CODE> is present, and
+<CODE>CHARNAME</CODE> has the form <CODE>SCRIPT:CNAME</CODE>, then <CODE>CNAME</CODE> is looked up
+as a letter in script <CODE>SCRIPT</CODE>.  If pragma <CODE>use charnames</CODE> is used
+with script name arguments, then for <CODE>\N{CHARNAME}}</CODE> the name
+<CODE>CHARNAME</CODE> is looked up as a letter in the given scripts (in the
+specified order).</P>
+<P>For lookup of <CODE>CHARNAME</CODE> inside a given script <CODE>SCRIPTNAME</CODE>
+this pragma looks for the names</P>
+<PRE>
+  SCRIPTNAME CAPITAL LETTER CHARNAME
+  SCRIPTNAME SMALL LETTER CHARNAME
+  SCRIPTNAME LETTER CHARNAME</PRE>
+<P>in the table of standard Unicode names.  If <CODE>CHARNAME</CODE> is lowercase,
+then the <CODE>CAPITAL</CODE> variant is ignored, otherwise the <CODE>SMALL</CODE> variant is
+ignored.</P>
+<P>
+<HR>
+<H1><A NAME="custom translators">CUSTOM TRANSLATORS</A></H1>
+<P>The mechanism of translation of <CODE>\N{...}</CODE> escapes is general and not
+hardwired into <EM>charnames.pm</EM>.  A module can install custom
+translations (inside the scope which <A HREF="../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>s the module) with the
+following magic incantation:</P>
+<PRE>
+    use charnames ();           # for $charnames::hint_bits
+    sub import {
+        shift;
+        $^H |= $charnames::hint_bits;
+        $^H{charnames} = \&amp;translator;
+    }</PRE>
+<P>Here <CODE>translator()</CODE> is a subroutine which takes <CODE>CHARNAME</CODE> as an
+argument, and returns text to insert into the string instead of the
+<CODE>\N{CHARNAME}</CODE> escape.  Since the text to insert should be different
+in <CODE>bytes</CODE> mode and out of it, the function should check the current
+state of <CODE>bytes</CODE>-flag as in:</P>
+<PRE>
+    use bytes ();                       # for $bytes::hint_bits
+    sub translator {
+        if ($^H &amp; $bytes::hint_bits) {
+            return bytes_translator(@_);
+        }
+        else {
+            return utf8_translator(@_);
+        }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Since evaluation of the translation function happens in a middle of
+compilation (of a string literal), the translation function should not
+do any <A HREF="../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>s or <A HREF="../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>s.  This restriction should be lifted in
+a future version of Perl.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;charnames - define character names for C<\N{named}> string literal escape.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

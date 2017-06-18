@@ -1,0 +1,141 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::Installed - Inventory management of installed modules</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Installed - Inventory management of installed modules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::Installed - Inventory management of installed modules</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+   use ExtUtils::Installed;
+   my ($inst) = ExtUtils::Installed-&gt;new();
+   my (@modules) = $inst-&gt;modules();
+   my (@missing) = $inst-&gt;validate(&quot;DBI&quot;);
+   my $all_files = $inst-&gt;files(&quot;DBI&quot;);
+   my $files_below_usr_local = $inst-&gt;files(&quot;DBI&quot;, &quot;all&quot;, &quot;/usr/local&quot;);
+   my $all_dirs = $inst-&gt;directories(&quot;DBI&quot;);
+   my $dirs_below_usr_local = $inst-&gt;directory_tree(&quot;DBI&quot;, &quot;prog&quot;);
+   my $packlist = $inst-&gt;packlist(&quot;DBI&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>ExtUtils::Installed  provides a standard way to find out what core and module
+files have been installed.  It uses the information stored in .packlist files
+created during installation to provide this information.  In addition it
+provides facilities to classify the installed files and to extract directory
+information from the .packlist files.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>The <A HREF="#item_new"><CODE>new()</CODE></A> function searches for all the installed .packlists on the system, and
+stores their contents. The .packlists can be queried with the functions
+described below.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+This takes no parameters, and searches for all the installed .packlists on the
+system.  The packlists are read using the ExtUtils::packlist module.
+<P></P>
+<DT><STRONG><A NAME="item_modules"><CODE>modules()</CODE></A></STRONG><BR>
+<DD>
+This returns a list of the names of all the installed modules.  The perl 'core'
+is given the special name 'Perl'.
+<P></P>
+<DT><STRONG><A NAME="item_files"><CODE>files()</CODE></A></STRONG><BR>
+<DD>
+This takes one mandatory parameter, the name of a module.  It returns a list of
+all the filenames from the package.  To obtain a list of core perl files, use
+the module name 'Perl'.  Additional parameters are allowed.  The first is one
+of the strings ``prog'', ``man'' or ``all'', to select either just program files,
+just manual files or all files.  The remaining parameters are a list of
+directories. The filenames returned will be restricted to those under the
+specified directories.
+<P></P>
+<DT><STRONG><A NAME="item_directories"><CODE>directories()</CODE></A></STRONG><BR>
+<DD>
+This takes one mandatory parameter, the name of a module.  It returns a list of
+all the directories from the package.  Additional parameters are allowed.  The
+first is one of the strings ``prog'', ``man'' or ``all'', to select either just
+program directories, just manual directories or all directories.  The remaining
+parameters are a list of directories. The directories returned will be
+restricted to those under the specified directories.  This method returns only
+the leaf directories that contain files from the specified module.
+<P></P>
+<DT><STRONG><A NAME="item_directory_tree"><CODE>directory_tree()</CODE></A></STRONG><BR>
+<DD>
+This is identical in operation to directory(), except that it includes all the
+intermediate directories back up to the specified directories.
+<P></P>
+<DT><STRONG><A NAME="item_validate"><CODE>validate()</CODE></A></STRONG><BR>
+<DD>
+This takes one mandatory parameter, the name of a module.  It checks that all
+the files listed in the modules .packlist actually exist, and returns a list of
+any missing files.  If an optional second argument which evaluates to true is
+given any missing files will be removed from the .packlist
+<P></P>
+<DT><STRONG><A NAME="item_packlist"><CODE>packlist()</CODE></A></STRONG><BR>
+<DD>
+This returns the ExtUtils::Packlist object for the specified module.
+<P></P>
+<DT><STRONG><A NAME="item_version"><CODE>version()</CODE></A></STRONG><BR>
+<DD>
+This returns the version number for the specified module.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<P>See the example in <A HREF="../../lib/ExtUtils/Packlist.html">the ExtUtils::Packlist manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Alan Burlison &lt;<A HREF="mailto:Alan.Burlison@uk.sun.com">Alan.Burlison@uk.sun.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Installed - Inventory management of installed modules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

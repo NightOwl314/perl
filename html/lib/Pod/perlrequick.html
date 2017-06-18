@@ -1,0 +1,482 @@
+<HTML>
+<HEAD>
+<TITLE>perlrequick - Perl regular expressions quick start</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlrequick - Perl regular expressions quick start</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#the guide">The Guide</A></LI>
+	<UL>
+
+		<LI><A HREF="#simple word matching">Simple word matching</A></LI>
+		<LI><A HREF="#using character classes">Using character classes</A></LI>
+		<LI><A HREF="#matching this or that">Matching this or that</A></LI>
+		<LI><A HREF="#grouping things and hierarchical matching">Grouping things and hierarchical matching</A></LI>
+		<LI><A HREF="#extracting matches">Extracting matches</A></LI>
+		<LI><A HREF="#matching repetitions">Matching repetitions</A></LI>
+		<LI><A HREF="#more matching">More matching</A></LI>
+		<LI><A HREF="#search and replace">Search and replace</A></LI>
+		<LI><A HREF="#the split operator">The split operator</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author and copyright">AUTHOR AND COPYRIGHT</A></LI>
+	<UL>
+
+		<LI><A HREF="#acknowledgments">Acknowledgments</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlrequick - Perl regular expressions quick start</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This page covers the very basics of understanding, creating and
+using regular expressions ('regexes') in Perl.</P>
+<P>
+<HR>
+<H1><A NAME="the guide">The Guide</A></H1>
+<P>
+<H2><A NAME="simple word matching">Simple word matching</A></H2>
+<P>The simplest regex is simply a word, or more generally, a string of
+characters.  A regex consisting of a word matches any string that
+contains that word:</P>
+<PRE>
+    &quot;Hello World&quot; =~ /World/;  # matches</PRE>
+<P>In this statement, <CODE>World</CODE> is a regex and the <CODE>//</CODE> enclosing
+<CODE>/World/</CODE> tells perl to search a string for a match.  The operator
+<CODE>=~</CODE> associates the string with the regex match and produces a true
+value if the regex matched, or false if the regex did not match.  In
+our case, <CODE>World</CODE> matches the second word in <CODE>&quot;Hello World&quot;</CODE>, so the
+expression is true.  This idea has several variations.</P>
+<P>Expressions like this are useful in conditionals:</P>
+<PRE>
+    print &quot;It matches\n&quot; if &quot;Hello World&quot; =~ /World/;</PRE>
+<P>The sense of the match can be reversed by using <CODE>!~</CODE> operator:</P>
+<PRE>
+    print &quot;It doesn't match\n&quot; if &quot;Hello World&quot; !~ /World/;</PRE>
+<P>The literal string in the regex can be replaced by a variable:</P>
+<PRE>
+    $greeting = &quot;World&quot;;
+    print &quot;It matches\n&quot; if &quot;Hello World&quot; =~ /$greeting/;</PRE>
+<P>If you're matching against <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A>, the <CODE>$_ =~</CODE> part can be omitted:</P>
+<PRE>
+    $_ = &quot;Hello World&quot;;
+    print &quot;It matches\n&quot; if /World/;</PRE>
+<P>Finally, the <CODE>//</CODE> default delimiters for a match can be changed to
+arbitrary delimiters by putting an <CODE>'m'</CODE> out front:</P>
+<PRE>
+    &quot;Hello World&quot; =~ m!World!;   # matches, delimited by '!'
+    &quot;Hello World&quot; =~ m{World};   # matches, note the matching '{}'
+    &quot;/usr/bin/perl&quot; =~ m&quot;/perl&quot;; # matches after '/usr/bin',
+                                 # '/' becomes an ordinary char</PRE>
+<P>Regexes must match a part of the string <EM>exactly</EM> in order for the
+statement to be true:</P>
+<PRE>
+    &quot;Hello World&quot; =~ /world/;  # doesn't match, case sensitive
+    &quot;Hello World&quot; =~ /o W/;    # matches, ' ' is an ordinary char
+    &quot;Hello World&quot; =~ /World /; # doesn't match, no ' ' at end</PRE>
+<P>perl will always match at the earliest possible point in the string:</P>
+<PRE>
+    &quot;Hello World&quot; =~ /o/;       # matches 'o' in 'Hello'
+    &quot;That hat is red&quot; =~ /hat/; # matches 'hat' in 'That'</PRE>
+<P>Not all characters can be used 'as is' in a match.  Some characters,
+called <STRONG>metacharacters</STRONG>, are reserved for use in regex notation.
+The metacharacters are</P>
+<PRE>
+    {}[]()^$.|*+?\</PRE>
+<P>A metacharacter can be matched by putting a backslash before it:</P>
+<PRE>
+    &quot;2+2=4&quot; =~ /2+2/;    # doesn't match, + is a metacharacter
+    &quot;2+2=4&quot; =~ /2\+2/;   # matches, \+ is treated like an ordinary +
+    'C:\WIN32' =~ /C:\\WIN/;                       # matches
+    &quot;/usr/bin/perl&quot; =~ /\/usr\/local\/bin\/perl/;  # matches</PRE>
+<P>In the last regex, the forward slash <CODE>'/'</CODE> is also backslashed,
+because it is used to delimit the regex.</P>
+<P>Non-printable ASCII characters are represented by <STRONG>escape sequences</STRONG>.
+Common examples are <CODE>\t</CODE> for a tab, <CODE>\n</CODE> for a newline, and <CODE>\r</CODE>
+for a carriage return.  Arbitrary bytes are represented by octal
+escape sequences, e.g., <CODE>\033</CODE>, or hexadecimal escape sequences,
+e.g., <CODE>\x1B</CODE>:</P>
+<PRE>
+    &quot;1000\t2000&quot; =~ m(0\t2)        # matches
+    &quot;cat&quot;        =~ /\143\x61\x74/ # matches, but a weird way to spell cat</PRE>
+<P>Regexes are treated mostly as double quoted strings, so variable
+substitution works:</P>
+<PRE>
+    $foo = 'house';
+    'cathouse' =~ /cat$foo/;   # matches
+    'housecat' =~ /${foo}cat/; # matches</PRE>
+<P>With all of the regexes above, if the regex matched anywhere in the
+string, it was considered a match.  To specify <EM>where</EM> it should
+match, we would use the <STRONG>anchor</STRONG> metacharacters <CODE>^</CODE> and <CODE>$</CODE>.  The
+anchor <CODE>^</CODE> means match at the beginning of the string and the anchor
+<CODE>$</CODE> means match at the end of the string, or before a newline at the
+end of the string.  Some examples:</P>
+<PRE>
+    &quot;housekeeper&quot; =~ /keeper/;         # matches
+    &quot;housekeeper&quot; =~ /^keeper/;        # doesn't match
+    &quot;housekeeper&quot; =~ /keeper$/;        # matches
+    &quot;housekeeper\n&quot; =~ /keeper$/;      # matches
+    &quot;housekeeper&quot; =~ /^housekeeper$/;  # matches</PRE>
+<P>
+<H2><A NAME="using character classes">Using character classes</A></H2>
+<P>A <STRONG>character class</STRONG> allows a set of possible characters, rather than
+just a single character, to match at a particular point in a regex.
+Character classes are denoted by brackets <CODE>[...]</CODE>, with the set of
+characters to be possibly matched inside.  Here are some examples:</P>
+<PRE>
+    /cat/;            # matches 'cat'
+    /[bcr]at/;        # matches 'bat', 'cat', or 'rat'
+    &quot;abc&quot; =~ /[cab]/; # matches 'a'</PRE>
+<P>In the last statement, even though <CODE>'c'</CODE> is the first character in
+the class, the earliest point at which the regex can match is <CODE>'a'</CODE>.</P>
+<PRE>
+    /[yY][eE][sS]/; # match 'yes' in a case-insensitive way
+                    # 'yes', 'Yes', 'YES', etc.
+    /yes/i;         # also match 'yes' in a case-insensitive way</PRE>
+<P>The last example shows a match with an <CODE>'i'</CODE> <STRONG>modifier</STRONG>, which makes
+the match case-insensitive.</P>
+<P>Character classes also have ordinary and special characters, but the
+sets of ordinary and special characters inside a character class are
+different than those outside a character class.  The special
+characters for a character class are <CODE>-]\^$</CODE> and are matched using an
+escape:</P>
+<PRE>
+   /[\]c]def/; # matches ']def' or 'cdef'
+   $x = 'bcr';
+   /[$x]at/;   # matches 'bat, 'cat', or 'rat'
+   /[\$x]at/;  # matches '$at' or 'xat'
+   /[\\$x]at/; # matches '\at', 'bat, 'cat', or 'rat'</PRE>
+<P>The special character <CODE>'-'</CODE> acts as a range operator within character
+classes, so that the unwieldy <CODE>[0123456789]</CODE> and <CODE>[abc...xyz]</CODE>
+become the svelte <CODE>[0-9]</CODE> and <CODE>[a-z]</CODE>:</P>
+<PRE>
+    /item[0-9]/;  # matches 'item0' or ... or 'item9'
+    /[0-9a-fA-F]/;  # matches a hexadecimal digit</PRE>
+<P>If <CODE>'-'</CODE> is the first or last character in a character class, it is
+treated as an ordinary character.</P>
+<P>The special character <CODE>^</CODE> in the first position of a character class
+denotes a <STRONG>negated character class</STRONG>, which matches any character but
+those in the brackets.  Both <CODE>[...]</CODE> and <CODE>[^...]</CODE> must match a
+character, or the match fails.  Then</P>
+<PRE>
+    /[^a]at/;  # doesn't match 'aat' or 'at', but matches
+               # all other 'bat', 'cat, '0at', '%at', etc.
+    /[^0-9]/;  # matches a non-numeric character
+    /[a^]at/;  # matches 'aat' or '^at'; here '^' is ordinary</PRE>
+<P>Perl has several abbreviations for common character classes:</P>
+<UL>
+<LI>
+\d is a digit and represents [0-9]
+<P></P>
+<LI>
+\s is a whitespace character and represents [\ \t\r\n\f]
+<P></P>
+<LI>
+\w is a word character (alphanumeric or _) and represents [0-9a-zA-Z_]
+<P></P>
+<LI>
+\D is a negated \d; it represents any character but a digit [^0-9]
+<P></P>
+<LI>
+\S is a negated \s; it represents any non-whitespace character [^\s]
+<P></P>
+<LI>
+\W is a negated \w; it represents any non-word character [^\w]
+<P></P>
+<LI>
+The period '.' matches any character but ``\n''
+<P></P></UL>
+<P>The <CODE>\d\s\w\D\S\W</CODE> abbreviations can be used both inside and outside
+of character classes.  Here are some in use:</P>
+<PRE>
+    /\d\d:\d\d:\d\d/; # matches a hh:mm:ss time format
+    /[\d\s]/;         # matches any digit or whitespace character
+    /\w\W\w/;         # matches a word char, followed by a
+                      # non-word char, followed by a word char
+    /..rt/;           # matches any two chars, followed by 'rt'
+    /end\./;          # matches 'end.'
+    /end[.]/;         # same thing, matches 'end.'</PRE>
+<P>The <STRONG>word&nbsp;anchor</STRONG>&nbsp; <CODE>\b</CODE> matches a boundary between a word
+character and a non-word character <CODE>\w\W</CODE> or <CODE>\W\w</CODE>:</P>
+<PRE>
+    $x = &quot;Housecat catenates house and cat&quot;;
+    $x =~ /\bcat/;  # matches cat in 'catenates'
+    $x =~ /cat\b/;  # matches cat in 'housecat'
+    $x =~ /\bcat\b/;  # matches 'cat' at end of string</PRE>
+<P>In the last example, the end of the string is considered a word
+boundary.</P>
+<P>
+<H2><A NAME="matching this or that">Matching this or that</A></H2>
+<P>We can match match different character strings with the <STRONG>alternation</STRONG>
+metacharacter <CODE>'|'</CODE>.  To match <CODE>dog</CODE> or <CODE>cat</CODE>, we form the regex
+<CODE>dog|cat</CODE>.  As before, perl will try to match the regex at the
+earliest possible point in the string.  At each character position,
+perl will first try to match the the first alternative, <CODE>dog</CODE>.  If
+<CODE>dog</CODE> doesn't match, perl will then try the next alternative, <CODE>cat</CODE>.
+If <CODE>cat</CODE> doesn't match either, then the match fails and perl moves to
+the next position in the string.  Some examples:</P>
+<PRE>
+    &quot;cats and dogs&quot; =~ /cat|dog|bird/;  # matches &quot;cat&quot;
+    &quot;cats and dogs&quot; =~ /dog|cat|bird/;  # matches &quot;cat&quot;</PRE>
+<P>Even though <CODE>dog</CODE> is the first alternative in the second regex,
+<CODE>cat</CODE> is able to match earlier in the string.</P>
+<PRE>
+    &quot;cats&quot;          =~ /c|ca|cat|cats/; # matches &quot;c&quot;
+    &quot;cats&quot;          =~ /cats|cat|ca|c/; # matches &quot;cats&quot;</PRE>
+<P>At a given character position, the first alternative that allows the
+regex match to succeed wil be the one that matches. Here, all the
+alternatives match at the first string position, so th first matches.</P>
+<P>
+<H2><A NAME="grouping things and hierarchical matching">Grouping things and hierarchical matching</A></H2>
+<P>The <STRONG>grouping</STRONG> metacharacters <CODE>()</CODE> allow a part of a regex to be
+treated as a single unit.  Parts of a regex are grouped by enclosing
+them in parentheses.  The regex <CODE>house(cat|keeper)</CODE> means match
+<CODE>house</CODE> followed by either <CODE>cat</CODE> or <CODE>keeper</CODE>.  Some more examples
+are</P>
+<PRE>
+    /(a|b)b/;    # matches 'ab' or 'bb'
+    /(^a|b)c/;   # matches 'ac' at start of string or 'bc' anywhere</PRE>
+<PRE>
+    /house(cat|)/;  # matches either 'housecat' or 'house'
+    /house(cat(s|)|)/;  # matches either 'housecats' or 'housecat' or
+                        # 'house'.  Note groups can be nested.</PRE>
+<PRE>
+    &quot;20&quot; =~ /(19|20|)\d\d/;  # matches the null alternative '()\d\d',
+                             # because '20\d\d' can't match</PRE>
+<P>
+<H2><A NAME="extracting matches">Extracting matches</A></H2>
+<P>The grouping metacharacters <CODE>()</CODE> also allow the extraction of the
+parts of a string that matched.  For each grouping, the part that
+matched inside goes into the special variables <CODE>$1</CODE>, <CODE>$2</CODE>, etc.
+They can be used just as ordinary variables:</P>
+<PRE>
+    # extract hours, minutes, seconds
+    $time =~ /(\d\d):(\d\d):(\d\d)/;  # match hh:mm:ss format
+    $hours = $1;
+    $minutes = $2;
+    $seconds = $3;</PRE>
+<P>In list context, a match <CODE>/regex/</CODE> with groupings will return the
+list of matched values <CODE>($1,$2,...)</CODE>.  So we could rewrite it as</P>
+<PRE>
+    ($hours, $minutes, $second) = ($time =~ /(\d\d):(\d\d):(\d\d)/);</PRE>
+<P>If the groupings in a regex are nested, <CODE>$1</CODE> gets the group with the
+leftmost opening parenthesis, <CODE>$2</CODE> the next opening parenthesis,
+etc.  For example, here is a complex regex and the matching variables
+indicated below it:</P>
+<PRE>
+    /(ab(cd|ef)((gi)|j))/;
+     1  2      34</PRE>
+<P>Associated with the matching variables <CODE>$1</CODE>, <CODE>$2</CODE>, ... are
+the <STRONG>backreferences</STRONG> <CODE>\1</CODE>, <CODE>\2</CODE>, ...  Backreferences are
+matching variables that can be used <EM>inside</EM> a regex:</P>
+<PRE>
+    /(\w\w\w)\s\1/; # find sequences like 'the the' in string</PRE>
+<P><CODE>$1</CODE>, <CODE>$2</CODE>, ... should only be used outside of a regex, and <CODE>\1</CODE>,
+<CODE>\2</CODE>, ... only inside a regex.</P>
+<P>
+<H2><A NAME="matching repetitions">Matching repetitions</A></H2>
+<P>The <STRONG>quantifier</STRONG> metacharacters <CODE>?</CODE>, <CODE>*</CODE>, <CODE>+</CODE>, and <CODE>{}</CODE> allow us
+to determine the number of repeats of a portion of a regex we
+consider to be a match.  Quantifiers are put immediately after the
+character, character class, or grouping that we want to specify.  They
+have the following meanings:</P>
+<UL>
+<LI>
+<CODE>a?</CODE> = match 'a' 1 or 0 times
+<P></P>
+<LI>
+<CODE>a*</CODE> = match 'a' 0 or more times, i.e., any number of times
+<P></P>
+<LI>
+<CODE>a+</CODE> = match 'a' 1 or more times, i.e., at least once
+<P></P>
+<LI>
+<CODE>a{n,m}</CODE> = match at least <A HREF="../../lib/Pod/perlguts.html#item_n"><CODE>n</CODE></A> times, but not more than <CODE>m</CODE>
+times.
+<P></P>
+<LI>
+<CODE>a{n,}</CODE> = match at least <A HREF="../../lib/Pod/perlguts.html#item_n"><CODE>n</CODE></A> or more times
+<P></P>
+<LI>
+<CODE>a{n}</CODE> = match exactly <A HREF="../../lib/Pod/perlguts.html#item_n"><CODE>n</CODE></A> times
+<P></P></UL>
+<P>Here are some examples:</P>
+<PRE>
+    /[a-z]+\s+\d*/;  # match a lowercase word, at least some space, and
+                     # any number of digits
+    /(\w+)\s+\1/;    # match doubled words of arbitrary length
+    $year =~ /\d{2,4}/;  # make sure year is at least 2 but not more
+                         # than 4 digits
+    $year =~ /\d{4}|\d{2}/;    # better match; throw out 3 digit dates</PRE>
+<P>These quantifiers will try to match as much of the string as possible,
+while still allowing the regex to match.  So we have</P>
+<PRE>
+    $x = 'the cat in the hat';
+    $x =~ /^(.*)(at)(.*)$/; # matches,
+                            # $1 = 'the cat in the h'
+                            # $2 = 'at'
+                            # $3 = ''   (0 matches)</PRE>
+<P>The first quantifier <CODE>.*</CODE> grabs as much of the string as possible
+while still having the regex match. The second quantifier <CODE>.*</CODE> has
+no string left to it, so it matches 0 times.</P>
+<P>
+<H2><A NAME="more matching">More matching</A></H2>
+<P>There are a few more things you might want to know about matching
+operators.  In the code</P>
+<PRE>
+    $pattern = 'Seuss';
+    while (&lt;&gt;) {
+        print if /$pattern/;
+    }</PRE>
+<P>perl has to re-evaluate <CODE>$pattern</CODE> each time through the loop.  If
+<CODE>$pattern</CODE> won't be changing, use the <CODE>//o</CODE> modifier, to only
+perform variable substitutions once.  If you don't want any
+substitutions at all, use the special delimiter <CODE>m''</CODE>:</P>
+<PRE>
+    $pattern = 'Seuss';
+    m'$pattern'; # matches '$pattern', not 'Seuss'</PRE>
+<P>The global modifier <CODE>//g</CODE> allows the matching operator to match
+within a string as many times as possible.  In scalar context,
+successive matches against a string will have <CODE>//g</CODE> jump from match
+to match, keeping track of position in the string as it goes along.
+You can get or set the position with the <A HREF="../../lib/Pod/perlfunc.html#item_pos"><CODE>pos()</CODE></A> function.
+For example,</P>
+<PRE>
+    $x = &quot;cat dog house&quot;; # 3 words
+    while ($x =~ /(\w+)/g) {
+        print &quot;Word is $1, ends at position &quot;, pos $x, &quot;\n&quot;;
+    }</PRE>
+<P>prints</P>
+<PRE>
+    Word is cat, ends at position 3
+    Word is dog, ends at position 7
+    Word is house, ends at position 13</PRE>
+<P>A failed match or changing the target string resets the position.  If
+you don't want the position reset after failure to match, add the
+<CODE>//c</CODE>, as in <CODE>/regex/gc</CODE>.</P>
+<P>In list context, <CODE>//g</CODE> returns a list of matched groupings, or if
+there are no groupings, a list of matches to the whole regex.  So</P>
+<PRE>
+    @words = ($x =~ /(\w+)/g);  # matches,
+                                # $word[0] = 'cat'
+                                # $word[1] = 'dog'
+                                # $word[2] = 'house'</PRE>
+<P>
+<H2><A NAME="search and replace">Search and replace</A></H2>
+<P>Search and replace is performed using <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s/regex/replacement/modifiers</CODE></A>.
+The <CODE>replacement</CODE> is a Perl double quoted string that replaces in the
+string whatever is matched with the <CODE>regex</CODE>.  The operator <CODE>=~</CODE> is
+also used here to associate a string with <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///</CODE></A>.  If matching
+against <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A>, the <CODE>$_&nbsp;=~</CODE>&nbsp; can be dropped.  If there is a match,
+<A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///</CODE></A> returns the number of substitutions made, otherwise it returns
+false.  Here are a few examples:</P>
+<PRE>
+    $x = &quot;Time to feed the cat!&quot;;
+    $x =~ s/cat/hacker/;   # $x contains &quot;Time to feed the hacker!&quot;
+    $y = &quot;'quoted words'&quot;;
+    $y =~ s/^'(.*)'$/$1/;  # strip single quotes,
+                           # $y contains &quot;quoted words&quot;</PRE>
+<P>With the <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///</CODE></A> operator, the matched variables <CODE>$1</CODE>, <CODE>$2</CODE>, etc.
+are immediately available for use in the replacement expression. With
+the global modifier, <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///g</CODE></A> will search and replace all occurrences
+of the regex in the string:</P>
+<PRE>
+    $x = &quot;I batted 4 for 4&quot;;
+    $x =~ s/4/four/;   # $x contains &quot;I batted four for 4&quot;
+    $x = &quot;I batted 4 for 4&quot;;
+    $x =~ s/4/four/g;  # $x contains &quot;I batted four for four&quot;</PRE>
+<P>The evaluation modifier <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///e</CODE></A> wraps an <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval{...}</CODE></A> around the
+replacement string and the evaluated result is substituted for the
+matched substring.  Some examples:</P>
+<PRE>
+    # reverse all the words in a string
+    $x = &quot;the cat in the hat&quot;;
+    $x =~ s/(\w+)/reverse $1/ge;   # $x contains &quot;eht tac ni eht tah&quot;</PRE>
+<PRE>
+    # convert percentage to decimal
+    $x = &quot;A 39% hit rate&quot;;
+    $x =~ s!(\d+)%!$1/100!e;       # $x contains &quot;A 0.39 hit rate&quot;</PRE>
+<P>The last example shows that <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///</CODE></A> can use other delimiters, such as
+<CODE>s!!!</CODE> and <A HREF="../../lib/Pod/perlguts.html#item_s"><CODE>s{}{}</CODE></A>, and even <CODE>s{}//</CODE>.  If single quotes are used
+<CODE>s'''</CODE>, then the regex and replacement are treated as single quoted
+strings.</P>
+<P>
+<H2><A NAME="the split operator">The split operator</A></H2>
+<P><CODE>split /regex/, string</CODE> splits <CODE>string</CODE> into a list of substrings
+and returns that list.  The regex determines the character sequence
+that <CODE>string</CODE> is split with respect to.  For example, to split a
+string into words, use</P>
+<PRE>
+    $x = &quot;Calvin and Hobbes&quot;;
+    @word = split /\s+/, $x;  # $word[0] = 'Calvin'
+                              # $word[1] = 'and'
+                              # $word[2] = 'Hobbes'</PRE>
+<P>To extract a comma-delimited list of numbers, use</P>
+<PRE>
+    $x = &quot;1.618,2.718,   3.142&quot;;
+    @const = split /,\s*/, $x;  # $const[0] = '1.618'
+                                # $const[1] = '2.718'
+                                # $const[2] = '3.142'</PRE>
+<P>If the empty regex <CODE>//</CODE> is used, the string is split into individual
+characters.  If the regex has groupings, then list produced contains
+the matched substrings from the groupings as well:</P>
+<PRE>
+    $x = &quot;/usr/bin&quot;;
+    @parts = split m!(/)!, $x;  # $parts[0] = ''
+                                # $parts[1] = '/'
+                                # $parts[2] = 'usr'
+                                # $parts[3] = '/'
+                                # $parts[4] = 'bin'</PRE>
+<P>Since the first character of $x matched the regex, <A HREF="../../lib/Pod/perlfunc.html#item_split"><CODE>split</CODE></A> prepended
+an empty initial element to the list.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>None.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>This is just a quick start guide.  For a more in-depth tutorial on
+regexes, see <A HREF="../../lib/Pod/perlretut.html">the perlretut manpage</A> and for the reference page, see <A HREF="../../lib/Pod/perlre.html">the perlre manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="author and copyright">AUTHOR AND COPYRIGHT</A></H1>
+<P>Copyright (c) 2000 Mark Kvale
+All rights reserved.</P>
+<P>This document may be distributed under the same terms as Perl itself.</P>
+<P>
+<H2><A NAME="acknowledgments">Acknowledgments</A></H2>
+<P>The author would like to thank Mark-Jason Dominus, Tom Christiansen,
+Ilya Zakharevich, Brad Hughes, and Mike Giroux for all their helpful
+comments.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlrequick - Perl regular expressions quick start</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

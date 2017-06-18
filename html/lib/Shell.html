@@ -1,0 +1,125 @@
+
+<HTML>
+<HEAD>
+<TITLE>Shell - run shell commands transparently within perl</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Shell - run shell commands transparently within perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#object oriented syntax">OBJECT ORIENTED SYNTAX</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Shell - run shell commands transparently within perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>See below.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+  Date: Thu, 22 Sep 94 16:18:16 -0700
+  Message-Id: &lt;9409222318.AA17072@scalpel.netlabs.com&gt;
+  To: perl5-porters@isu.edu
+  From: Larry Wall &lt;lwall@scalpel.netlabs.com&gt;
+  Subject: a new module I just wrote</PRE>
+<P>Here's one that'll whack your mind a little out.</P>
+<PRE>
+    #!/usr/bin/perl</PRE>
+<PRE>
+    use Shell;</PRE>
+<PRE>
+    $foo = echo(&quot;howdy&quot;, &quot;&lt;funny&gt;&quot;, &quot;world&quot;);
+    print $foo;</PRE>
+<PRE>
+    $passwd = cat(&quot;&lt;/etc/passwd&quot;);
+    print $passwd;</PRE>
+<PRE>
+    sub ps;
+    print ps -ww;</PRE>
+<PRE>
+    cp(&quot;/etc/passwd&quot;, &quot;/tmp/passwd&quot;);</PRE>
+<P>That's maybe too gonzo.  It actually exports an AUTOLOAD to the current
+package (and uncovered a bug in Beta 3, by the way).  Maybe the usual
+usage should be</P>
+<PRE>
+    use Shell qw(echo cat ps cp);</PRE>
+<P>Larry</P>
+<P>If you set $Shell::capture_stderr to 1, the module will attempt to
+capture the STDERR of the process as well.</P>
+<P>The module now should work on Win32.</P>
+<PRE>
+ Jenda</PRE>
+<P>There seemed to be a problem where all arguments to a shell command were
+quoted before being executed.  As in the following example:</P>
+<PRE>
+ cat('&lt;/etc/passwd');
+ ls('*.pl');</PRE>
+<P>really turned into:</P>
+<PRE>
+ cat '&lt;/etc/passwd'
+ ls '*.pl'</PRE>
+<P>instead of:</P>
+<PRE>
+  cat &lt;/etc/passwd
+  ls *.pl</PRE>
+<P>and of course, this is wrong.</P>
+<P>I have fixed this bug, it was brought up by Wolfgang Laun [ID 20000326.008]</P>
+<P>Casey</P>
+<P>
+<H2><A NAME="object oriented syntax">OBJECT ORIENTED SYNTAX</A></H2>
+<P>Shell now has an OO interface.  Good for namespace conservation 
+and shell representation.</P>
+<PRE>
+ use Shell;
+ my $sh = Shell-&gt;new;
+ print $sh-&gt;ls;</PRE>
+<P>Casey</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Larry Wall</P>
+<P>Changes by <A HREF="mailto:Jenda@Krynicky.cz">Jenda@Krynicky.cz</A> and Dave Cottle &lt;<A HREF="mailto:d.cottle@csc.canterbury.ac.nz">d.cottle@csc.canterbury.ac.nz</A>&gt;</P>
+<P>Changes and bug fixes by Casey Tweten &lt;<A HREF="mailto:crt@kiski.net">crt@kiski.net</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Shell - run shell commands transparently within perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

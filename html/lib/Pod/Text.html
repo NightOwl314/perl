@@ -1,0 +1,195 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::Text - Convert POD data to formatted ASCII text</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Text - Convert POD data to formatted ASCII text</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#restrictions">RESTRICTIONS</A></LI>
+	<LI><A HREF="#notes">NOTES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Text - Convert POD data to formatted ASCII text</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::Text;
+    my $parser = Pod::Text-&gt;new (sentence =&gt; 0, width =&gt; 78);</PRE>
+<PRE>
+    # Read POD from STDIN and write to STDOUT.
+    $parser-&gt;parse_from_filehandle;</PRE>
+<PRE>
+    # Read POD from file.pod and write to file.txt.
+    $parser-&gt;parse_from_file ('file.pod', 'file.txt');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Pod::Text is a module that can convert documentation in the POD format (the
+preferred language for documenting Perl) into formatted ASCII.  It uses no
+special formatting controls or codes whatsoever, and its output is therefore
+suitable for nearly any device.</P>
+<P>As a derived class from Pod::Parser, Pod::Text supports the same methods and
+interfaces.  See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A> for all the details; briefly, one creates a
+new parser with <CODE>Pod::Text-&gt;new()</CODE> and then calls either
+<CODE>parse_from_filehandle()</CODE> or parse_from_file().</P>
+<P><CODE>new()</CODE> can take options, in the form of key/value pairs, that control the
+behavior of the parser.  The currently recognized options are:</P>
+<DL>
+<DT><STRONG><A NAME="item_alt">alt</A></STRONG><BR>
+<DD>
+If set to a true value, selects an alternate output format that, among other
+things, uses a different heading style and marks <CODE>=item</CODE> entries with a
+colon in the left margin.  Defaults to false.
+<P></P>
+<DT><STRONG><A NAME="item_indent">indent</A></STRONG><BR>
+<DD>
+The number of spaces to indent regular text, and the default indentation for
+<CODE>=over</CODE> blocks.  Defaults to 4.
+<P></P>
+<DT><STRONG><A NAME="item_loose">loose</A></STRONG><BR>
+<DD>
+If set to a true value, a blank line is printed after a <CODE>=head1</CODE> heading.
+If set to false (the default), no blank line is printed after <CODE>=head1</CODE>,
+although one is still printed after <CODE>=head2</CODE>.  This is the default because
+it's the expected formatting for manual pages; if you're formatting
+arbitrary text documents, setting this to true may result in more pleasing
+output.
+<P></P>
+<DT><STRONG><A NAME="item_quotes">quotes</A></STRONG><BR>
+<DD>
+Sets the quote marks used to surround C&lt;&gt; text.  If the value is a
+single character, it is used as both the left and right quote; if it is two
+characters, the first character is used as the left quote and the second as
+the right quoted; and if it is four characters, the first two are used as
+the left quote and the second two as the right quote.
+<P>This may also be set to the special value <CODE>none</CODE>, in which case no quote
+marks are added around C&lt;&gt; text.</P>
+<P></P>
+<DT><STRONG><A NAME="item_sentence">sentence</A></STRONG><BR>
+<DD>
+If set to a true value, Pod::Text will assume that each sentence ends in two
+spaces, and will try to preserve that spacing.  If set to false, all
+consecutive whitespace in non-verbatim paragraphs is compressed into a
+single space.  Defaults to true.
+<P></P>
+<DT><STRONG><A NAME="item_width">width</A></STRONG><BR>
+<DD>
+The column at which to wrap text on the right-hand side.  Defaults to 76.
+<P></P></DL>
+<P>The standard Pod::Parser method <CODE>parse_from_filehandle()</CODE> takes up to two
+arguments, the first being the file handle to read POD from and the second
+being the file handle to write the formatted output to.  The first defaults
+to STDIN if not given, and the second defaults to STDOUT.  The method
+<CODE>parse_from_file()</CODE> is almost identical, except that its two arguments are the
+input and output disk files instead.  See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A> for the specific
+details.</P>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Bizarre_space_in_item">Bizarre space in item</A></STRONG><BR>
+<DD>
+(W) Something has gone wrong in internal <CODE>=item</CODE> processing.  This message
+indicates a bug in Pod::Text; you should never see it.
+<P></P>
+<DT><STRONG><A NAME="item_Can%27t_open_%25s_for_reading%3A_%25s">Can't open %s for reading: %s</A></STRONG><BR>
+<DD>
+(F) Pod::Text was invoked via the compatibility mode <CODE>pod2text()</CODE> interface
+and the input file it was given could not be opened.
+<P></P>
+<DT><STRONG><A NAME="item_Invalid_quote_specification_%22%25s%22">Invalid quote specification ``%s''</A></STRONG><BR>
+<DD>
+(F) The quote specification given (the quotes option to the constructor) was
+invalid.  A quote specification must be one, two, or four characters long.
+<P></P>
+<DT><STRONG><A NAME="item_%s:%d:">%s:%d: Unknown command paragraph ``%s''.</A></STRONG><BR>
+<DD>
+(W) The POD source contained a non-standard command paragraph (something of
+the form <CODE>=command args</CODE>) that Pod::Man didn't know about.  It was ignored.
+<P></P>
+<DT><STRONG><A NAME="item_Unknown_escape%3A_%25s">Unknown escape: %s</A></STRONG><BR>
+<DD>
+(W) The POD source contained an <CODE>E&lt;&gt;</CODE> escape that Pod::Text didn't
+know about.
+<P></P>
+<DT><STRONG><A NAME="item_Unknown_sequence%3A_%25s">Unknown sequence: %s</A></STRONG><BR>
+<DD>
+(W) The POD source contained a non-standard internal sequence (something of
+the form <CODE>X&lt;&gt;</CODE>) that Pod::Text didn't know about.
+<P></P>
+<DT><STRONG><A NAME="item_Unmatched_%3Dback">Unmatched =back</A></STRONG><BR>
+<DD>
+(W) Pod::Text encountered a <CODE>=back</CODE> command that didn't correspond to an
+<CODE>=over</CODE> command.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="restrictions">RESTRICTIONS</A></H1>
+<P>Embedded Ctrl-As (octal 001) in the input will be mapped to spaces on
+output, due to an internal implementation detail.</P>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<P>This is a replacement for an earlier Pod::Text module written by Tom
+Christiansen.  It has a revamped interface, since it now uses Pod::Parser,
+but an interface roughly compatible with the old Pod::Text::pod2text()
+function is still available.  Please change to the new calling convention,
+though.</P>
+<P>The original Pod::Text contained code to do formatting via termcap
+sequences, although it wasn't turned on by default and it was problematic to
+get it to work at all.  This rewrite doesn't even try to do that, but a
+subclass of it does.  Look for <A HREF="../../lib/Pod/Text/Termcap.html">Pod::Text::Termcap</A>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Pod/Parser.html">Pod::Parser</A>, <A HREF="../../lib/Pod/Text/Termcap.html">Pod::Text::Termcap</A>,
+<CODE>pod2text(1)</CODE></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Russ Allbery &lt;<A HREF="mailto:rra@stanford.edu">rra@stanford.edu</A>&gt;, based <EM>very</EM> heavily on the
+original Pod::Text by Tom Christiansen &lt;<A HREF="mailto:tchrist@mox.perl.com">tchrist@mox.perl.com</A>&gt; and
+its conversion to Pod::Parser by Brad Appleton
+&lt;<A HREF="mailto:bradapp@enteract.com">bradapp@enteract.com</A>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Text - Convert POD data to formatted ASCII text</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

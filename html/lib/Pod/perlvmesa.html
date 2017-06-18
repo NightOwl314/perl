@@ -1,0 +1,161 @@
+<HTML>
+<HEAD>
+<TITLE>README.vmesa - building and installing Perl for VM/ESA.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.vmesa - building and installing Perl for VM/ESA.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#unpacking">Unpacking</A></LI>
+		<LI><A HREF="#setup and utilities">Setup and utilities</A></LI>
+		<LI><A HREF="#configure">Configure</A></LI>
+		<LI><A HREF="#testing anomalies">testing anomalies</A></LI>
+		<LI><A HREF="#usage hints">Usage Hints</A></LI>
+	</UL>
+
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<UL>
+
+		<LI><A HREF="#mailing list">Mailing list</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>README.vmesa - building and installing Perl for VM/ESA.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document will help you Configure, build, test and install Perl
+on VM/ESA.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a fully ported perl for VM/ESA 2.3.0.  It may work on
+other versions, but that's the one we've tested it on.</P>
+<P>If you've downloaded the binary distribution, it needs to be
+installed below /usr/local.  Source code distributions have an
+automated `make install` step that means you do not need to extract
+the source code below /usr/local (though that is where it will be
+installed by default).  You may need to worry about the networking
+configuration files discussed in the last bullet below.</P>
+<P>
+<H2><A NAME="unpacking">Unpacking</A></H2>
+<P>To extract an ASCII tar archive on VM/ESA, try this:</P>
+<PRE>
+   pax -o to=IBM-1047,from=ISO8859-1 -r &lt; latest.tar</PRE>
+<P>
+<H2><A NAME="setup and utilities">Setup and utilities</A></H2>
+<P>GNU make for VM/ESA, which may be required for the build of perl,
+is available from:</P>
+<PRE>
+  <A HREF="http://pucc.princeton.edu/~neale/vmoe.html">http://pucc.princeton.edu/~neale/vmoe.html</A></PRE>
+<P>
+<H2><A NAME="configure">Configure</A></H2>
+<P>Once you've unpacked the distribution, run Configure (see INSTALL for
+full discussion of the Configure options), and then run make, then
+``make test'' then ``make install'' (this last step may require UID=0
+privileges).</P>
+<P>There is a ``hints'' file for vmesa that specifies the correct values
+for most things.  Some things to watch out for are:</P>
+<UL>
+<LI>
+this port does support dynamic loading but it's not had much testing
+<P></P>
+<LI>
+<PRE>
+
+Don't turn on the compiler optimization flag &quot;-O&quot;.  There's
+a bug in the compiler (APAR PQ18812) that generates some bad code
+the optimizer is on.</PRE>
+<LI>
+<PRE>
+
+As VM/ESA doesn't fully support the fork() API programs relying on
+this call will not work. I've replaced fork()/exec() with spawn()
+and the standalone exec() with spawn(). This has a side effect when
+opening unnamed pipes in a shell script: there is no child process
+generated under.</PRE>
+<LI>
+At the moment the hints file for VM/ESA basically bypasses all of the
+automatic configuration process.  This is because Configure relies on:
+1. The header files living in the Byte File System (you could put the
+there if you want); 2. The C preprocessor including the #include 
+statements in the preprocessor output (.i) file.
+<P></P></UL>
+<P>
+<H2><A NAME="testing anomalies">testing anomalies</A></H2>
+<P>The `make test` step runs a Perl Verification Procedure, usually before
+installation.  As the 5.6.1 kit was was being assembled
+the following ``failures'' were known to appear on some machines
+during `make test` (mostly due to ASCII vs. EBCDIC conflicts),
+your results may differ:</P>
+<P>[the list of failures being compiled]</P>
+<P>
+<H2><A NAME="usage hints">Usage Hints</A></H2>
+<PRE>
+
+When using perl on VM/ESA please keep in mind that the EBCDIC and ASCII
+character sets are different.  Perl builtin functions that may behave
+differently under EBCDIC are mentioned in the <A HREF="../../lib/Pod/perlport.html">perlport</A>.pod document.</PRE>
+<P>OpenEdition (UNIX System Services) does not (yet) support the #! means
+of script invocation.
+See:</P>
+<PRE>
+    head `whence perldoc`</PRE>
+<P>for an example of how to use the ``eval exec'' trick to ask the shell to
+have perl run your scripts for you.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Neale Ferguson.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>INSTALL</EM>, <A HREF="../../lib/Pod/perlport.html">the perlport manpage</A>, <A HREF="../../lib/Pod/perlebcdic.html">the perlebcdic manpage</A>.</P>
+<P>
+<H2><A NAME="mailing list">Mailing list</A></H2>
+<P>If you are interested in the VM and OS/390 ports of perl then see the
+perl-mvs mailing list: The Perl Institute (http://www.perl.org/)
+maintains a mailing list of interest to all folks building and/or
+using perl on EBCDIC platforms.  To subscribe, send a message of:</P>
+<PRE>
+    subscribe perl-mvs</PRE>
+<P>to <A HREF="mailto:majordomo@perl.org.">majordomo@perl.org.</A></P>
+<PRE>
+   See also:</PRE>
+<PRE>
+    <A HREF="http://lists.perl.org/showlist.cgi?name=perl-mvs">http://lists.perl.org/showlist.cgi?name=perl-mvs</A></PRE>
+<P>There are web archives of the mailing list at:</P>
+<PRE>
+    <A HREF="http://www.xray.mpe.mpg.de/mailing-lists/perl-mvs/">http://www.xray.mpe.mpg.de/mailing-lists/perl-mvs/</A>
+    <A HREF="http://archive.develooper.com/perl-mvs@perl.org/">http://archive.develooper.com/perl-mvs@perl.org/</A></PRE>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.vmesa - building and installing Perl for VM/ESA.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

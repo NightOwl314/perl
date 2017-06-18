@@ -1,0 +1,497 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::FTP - FTP Client class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::FTP - FTP Client class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#overview">OVERVIEW</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods for the adventurous">Methods for the adventurous</A></LI>
+	</UL>
+
+	<LI><A HREF="#the dataconn class">THE dataconn CLASS</A></LI>
+	<LI><A HREF="#unimplemented">UNIMPLEMENTED</A></LI>
+	<LI><A HREF="#reporting bugs">REPORTING BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::FTP - FTP Client class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::FTP;
+</PRE>
+<PRE>
+
+    $ftp = Net::FTP-&gt;new(&quot;some.host.name&quot;, Debug =&gt; 0);
+    $ftp-&gt;login(&quot;anonymous&quot;,'me@here.there');
+    $ftp-&gt;cwd(&quot;/pub&quot;);
+    $ftp-&gt;get(&quot;that.file&quot;);
+    $ftp-&gt;quit;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::FTP</CODE> is a class implementing a simple FTP client in Perl as
+described in RFC959.  It provides wrappers for a subset of the RFC959
+commands.</P>
+<P>
+<HR>
+<H1><A NAME="overview">OVERVIEW</A></H1>
+<P>FTP stands for File Transfer Protocol.  It is a way of transferring
+files between networked machines.  The protocol defines a client
+(whose commands are provided by this module) and a server (not
+implemented in this module).  Communication is always initiated by the
+client, and the server responds with a message and a status code (and
+sometimes with data).</P>
+<P>The FTP protocol allows files to be sent to or fetched from the
+server.  Each transfer involves a <STRONG>local file</STRONG> (on the client) and a
+<STRONG>remote file</STRONG> (on the server).  In this module, the same file name
+will be used for both local and remote if only one is specified.  This
+means that transferring remote file <CODE>/path/to/file</CODE> will try to put
+that file in <CODE>/path/to/file</CODE> locally, unless you specify a local file
+name.</P>
+<P>The protocol also defines several standard <STRONG>translations</STRONG> which the
+file can undergo during transfer.  These are ASCII, EBCDIC, binary,
+and byte.  ASCII is the default type, and indicates that the sender of
+files will translate the ends of lines to a standard representation
+which the receiver will then translate back into their local
+representation.  EBCDIC indicates the file being transferred is in
+EBCDIC format.  Binary (also known as image) format sends the data as
+a contiguous bit stream.  Byte format transfers the data as bytes, the
+values of which remain the same regardless of differences in byte size
+between the two machines (in theory - in practice you should only use
+this if you really know what you're doing).</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new (HOST [,OPTIONS])</A></STRONG><BR>
+<DD>
+This is the constructor for a new Net::FTP object. <CODE>HOST</CODE> is the
+name of the remote host to which a FTP connection is required.
+<P><CODE>OPTIONS</CODE> are passed in a hash like fashion, using key and value pairs.
+Possible options are:</P>
+<P><STRONG>Firewall</STRONG> - The name of a machine which acts as a FTP firewall. This can be
+overridden by an environment variable <CODE>FTP_FIREWALL</CODE>. If specified, and the
+given host cannot be directly connected to, then the
+connection is made to the firewall machine and the string <CODE>@hostname</CODE> is
+appended to the login identifier. This kind of setup is also refered to
+as a ftp proxy.</P>
+<P><STRONG>BlockSize</STRONG> - This is the block size that Net::FTP will use when doing
+transfers. (defaults to 10240)</P>
+<P><STRONG>Port</STRONG> - The port number to connect to on the remote machine for the
+FTP connection</P>
+<P><STRONG>Timeout</STRONG> - Set a timeout value (defaults to 120)</P>
+<P><STRONG>Debug</STRONG> - debug level (see the debug method in <A HREF="../../../site/lib/Net/Cmd.html">the Net::Cmd manpage</A>)</P>
+<P><STRONG>Passive</STRONG> - If set to a non-zero value then all data transfers will be done
+using passive mode. This is not usually required except for some <EM>dumb</EM>
+servers, and some firewall configurations. This can also be set by the
+environment variable <CODE>FTP_PASSIVE</CODE>.</P>
+<P><STRONG>Hash</STRONG> - If TRUE, print hash marks (#) on STDERR every 1024 bytes.  This
+simply invokes the <A HREF="#item_hash"><CODE>hash()</CODE></A> method for you, so that hash marks are displayed
+for all transfers.  You can, of course, call <A HREF="#item_hash"><CODE>hash()</CODE></A> explicitly whenever
+you'd like.</P>
+<P>If the constructor fails undef will be returned and an error message will
+be in $@</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>Unless otherwise stated all methods return either a <EM>true</EM> or <EM>false</EM>
+value, with <EM>true</EM> meaning that the operation was a success. When a method
+states that it returns a value, failure will be returned as <EM>undef</EM> or an
+empty list.</P>
+<DL>
+<DT><STRONG><A NAME="item_login">login ([LOGIN [,PASSWORD [, ACCOUNT] ] ])</A></STRONG><BR>
+<DD>
+Log into the remote FTP server with the given login information. If
+no arguments are given then the <CODE>Net::FTP</CODE> uses the <CODE>Net::Netrc</CODE>
+package to lookup the login information for the connected host.
+If no information is found then a login of <EM>anonymous</EM> is used.
+If no password is given and the login is <EM>anonymous</EM> then the users
+Email address will be used for a password.
+<P>If the connection is via a firewall then the <A HREF="#item_authorize"><CODE>authorize</CODE></A> method will
+be called with no arguments.</P>
+<P></P>
+<DT><STRONG><A NAME="item_authorize">authorize ( [AUTH [, RESP]])</A></STRONG><BR>
+<DD>
+This is a protocol used by some firewall ftp proxies. It is used
+to authorise the user to send data out.  If both arguments are not specified
+then <A HREF="#item_authorize"><CODE>authorize</CODE></A> uses <CODE>Net::Netrc</CODE> to do a lookup.
+<P></P>
+<DT><STRONG><A NAME="item_site">site (ARGS)</A></STRONG><BR>
+<DD>
+Send a SITE command to the remote server and wait for a response.
+<P>Returns most significant digit of the response code.</P>
+<P></P>
+<DT><STRONG><A NAME="item_type">type (TYPE [, ARGS])</A></STRONG><BR>
+<DD>
+This method will send the TYPE command to the remote FTP server
+to change the type of data transfer. The return value is the previous
+value.
+<P></P>
+<DT><STRONG><A NAME="item_ascii">ascii ([ARGS]) <CODE>binary([ARGS])</CODE> <CODE>ebcdic([ARGS])</CODE> <CODE>byte([ARGS])</CODE></A></STRONG><BR>
+<DD>
+Synonyms for <A HREF="#item_type"><CODE>type</CODE></A> with the first arguments set correctly
+<P><STRONG>NOTE</STRONG> ebcdic and byte are not fully supported.</P>
+<P></P>
+<DT><STRONG><A NAME="item_rename">rename ( OLDNAME, NEWNAME )</A></STRONG><BR>
+<DD>
+Rename a file on the remote FTP server from <CODE>OLDNAME</CODE> to <CODE>NEWNAME</CODE>. This
+is done by sending the RNFR and RNTO commands.
+<P></P>
+<DT><STRONG><A NAME="item_delete">delete ( FILENAME )</A></STRONG><BR>
+<DD>
+Send a request to the server to delete <CODE>FILENAME</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_cwd">cwd ( [ DIR ] )</A></STRONG><BR>
+<DD>
+Attempt to change directory to the directory given in <CODE>$dir</CODE>.  If
+<CODE>$dir</CODE> is <CODE>&quot;..&quot;</CODE>, the FTP <CODE>CDUP</CODE> command is used to attempt to
+move up one directory. If no directory is given then an attempt is made
+to change the directory to the root directory.
+<P></P>
+<DT><STRONG><A NAME="item_cdup">cdup ()</A></STRONG><BR>
+<DD>
+Change directory to the parent of the current directory.
+<P></P>
+<DT><STRONG><A NAME="item_pwd">pwd ()</A></STRONG><BR>
+<DD>
+Returns the full pathname of the current directory.
+<P></P>
+<DT><STRONG><A NAME="item_rmdir">rmdir ( DIR )</A></STRONG><BR>
+<DD>
+Remove the directory with the name <CODE>DIR</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_mkdir">mkdir ( DIR [, RECURSE ])</A></STRONG><BR>
+<DD>
+Create a new directory with the name <CODE>DIR</CODE>. If <CODE>RECURSE</CODE> is <EM>true</EM> then
+<A HREF="#item_mkdir"><CODE>mkdir</CODE></A> will attempt to create all the directories in the given path.
+<P>Returns the full pathname to the new directory.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ls">ls ( [ DIR ] )</A></STRONG><BR>
+<DD>
+Get a directory listing of <CODE>DIR</CODE>, or the current directory.
+<P>In an array context, returns a list of lines returned from the server. In
+a scalar context, returns a reference to a list.</P>
+<P></P>
+<DT><STRONG><A NAME="item_dir">dir ( [ DIR ] )</A></STRONG><BR>
+<DD>
+Get a directory listing of <CODE>DIR</CODE>, or the current directory in long format.
+<P>In an array context, returns a list of lines returned from the server. In
+a scalar context, returns a reference to a list.</P>
+<P></P>
+<DT><STRONG><A NAME="item_get">get ( REMOTE_FILE [, LOCAL_FILE [, WHERE]] )</A></STRONG><BR>
+<DD>
+Get <CODE>REMOTE_FILE</CODE> from the server and store locally. <CODE>LOCAL_FILE</CODE> may be
+a filename or a filehandle. If not specified the the file will be stored in
+the current directory with the same leafname as the remote file.
+<P>If <CODE>WHERE</CODE> is given then the first <CODE>WHERE</CODE> bytes of the file will
+not be transfered, and the remaining bytes will be appended to
+the local file if it already exists.</P>
+<P>Returns <CODE>LOCAL_FILE</CODE>, or the generated local file name if <CODE>LOCAL_FILE</CODE>
+is not given.</P>
+<P></P>
+<DT><STRONG><A NAME="item_put">put ( LOCAL_FILE [, REMOTE_FILE ] )</A></STRONG><BR>
+<DD>
+Put a file on the remote server. <CODE>LOCAL_FILE</CODE> may be a name or a filehandle.
+If <CODE>LOCAL_FILE</CODE> is a filehandle then <CODE>REMOTE_FILE</CODE> must be specified. If
+<CODE>REMOTE_FILE</CODE> is not specified then the file will be stored in the current
+directory with the same leafname as <CODE>LOCAL_FILE</CODE>.
+<P>Returns <CODE>REMOTE_FILE</CODE>, or the generated remote filename if <CODE>REMOTE_FILE</CODE>
+is not given.</P>
+<P><STRONG>NOTE</STRONG>: If for some reason the transfer does not complete and an error is
+returned then the contents that had been transfered will not be remove
+automatically.</P>
+<P></P>
+<DT><STRONG><A NAME="item_put_unique">put_unique ( LOCAL_FILE [, REMOTE_FILE ] )</A></STRONG><BR>
+<DD>
+Same as put but uses the <CODE>STOU</CODE> command.
+<P>Returns the name of the file on the server.</P>
+<P></P>
+<DT><STRONG><A NAME="item_append">append ( LOCAL_FILE [, REMOTE_FILE ] )</A></STRONG><BR>
+<DD>
+Same as put but appends to the file on the remote server.
+<P>Returns <CODE>REMOTE_FILE</CODE>, or the generated remote filename if <CODE>REMOTE_FILE</CODE>
+is not given.</P>
+<P></P>
+<DT><STRONG><A NAME="item_unique_name">unique_name ()</A></STRONG><BR>
+<DD>
+Returns the name of the last file stored on the server using the
+<CODE>STOU</CODE> command.
+<P></P>
+<DT><STRONG><A NAME="item_mdtm">mdtm ( FILE )</A></STRONG><BR>
+<DD>
+Returns the <EM>modification time</EM> of the given file
+<P></P>
+<DT><STRONG><A NAME="item_size">size ( FILE )</A></STRONG><BR>
+<DD>
+Returns the size in bytes for the given file as stored on the remote server.
+<P><STRONG>NOTE</STRONG>: The size reported is the size of the stored file on the remote server.
+If the file is subsequently transfered from the server in ASCII mode
+and the remote server and local machine have different ideas about
+``End Of Line'' then the size of file on the local machine after transfer
+may be different.</P>
+<P></P>
+<DT><STRONG><A NAME="item_supported">supported ( CMD )</A></STRONG><BR>
+<DD>
+Returns TRUE if the remote server supports the given command.
+<P></P>
+<DT><STRONG><A NAME="item_hash">hash ( [FILEHANDLE_GLOB_REF],[ BYTES_PER_HASH_MARK] )</A></STRONG><BR>
+<DD>
+Called without parameters, or with the first argument false, hash marks
+are suppressed.  If the first argument is true but not a reference to a 
+file handle glob, then \*STDERR is used.  The second argument is the number
+of bytes per hash mark printed, and defaults to 1024.  In all cases the
+return value is a reference to an array of two:  the filehandle glob reference
+and the bytes per hash mark.
+<P></P></DL>
+<P>The following methods can return different results depending on
+how they are called. If the user explicitly calls either
+of the <A HREF="#item_pasv"><CODE>pasv</CODE></A> or <A HREF="#item_port"><CODE>port</CODE></A> methods then these methods will
+return a <EM>true</EM> or <EM>false</EM> value. If the user does not
+call either of these methods then the result will be a
+reference to a <CODE>Net::FTP::dataconn</CODE> based object.</P>
+<DL>
+<DT><STRONG><A NAME="item_nlst">nlst ( [ DIR ] )</A></STRONG><BR>
+<DD>
+Send a <CODE>NLST</CODE> command to the server, with an optional parameter.
+<P></P>
+<DT><STRONG><A NAME="item_list">list ( [ DIR ] )</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_nlst"><CODE>nlst</CODE></A> but using the <CODE>LIST</CODE> command
+<P></P>
+<DT><STRONG><A NAME="item_retr">retr ( FILE )</A></STRONG><BR>
+<DD>
+Begin the retrieval of a file called <CODE>FILE</CODE> from the remote server.
+<P></P>
+<DT><STRONG><A NAME="item_stor">stor ( FILE )</A></STRONG><BR>
+<DD>
+Tell the server that you wish to store a file. <CODE>FILE</CODE> is the
+name of the new file that should be created.
+<P></P>
+<DT><STRONG><A NAME="item_stou">stou ( FILE )</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_stor"><CODE>stor</CODE></A> but using the <CODE>STOU</CODE> command. The name of the unique
+file which was created on the server will be available via the <A HREF="#item_unique_name"><CODE>unique_name</CODE></A>
+method after the data connection has been closed.
+<P></P>
+<DT><STRONG><A NAME="item_appe">appe ( FILE )</A></STRONG><BR>
+<DD>
+Tell the server that we want to append some data to the end of a file
+called <CODE>FILE</CODE>. If this file does not exist then create it.
+<P></P></DL>
+<P>If for some reason you want to have complete control over the data connection,
+this includes generating it and calling the <CODE>response</CODE> method when required,
+then the user can use these methods to do so.</P>
+<P>However calling these methods only affects the use of the methods above that
+can return a data connection. They have no effect on methods <A HREF="#item_get"><CODE>get</CODE></A>, <A HREF="#item_put"><CODE>put</CODE></A>,
+<A HREF="#item_put_unique"><CODE>put_unique</CODE></A> and those that do not require data connections.</P>
+<DL>
+<DT><STRONG><A NAME="item_port">port ( [ PORT ] )</A></STRONG><BR>
+<DD>
+Send a <CODE>PORT</CODE> command to the server. If <CODE>PORT</CODE> is specified then it is sent
+to the server. If not the a listen socket is created and the correct information
+sent to the server.
+<P></P>
+<DT><STRONG><A NAME="item_pasv">pasv ()</A></STRONG><BR>
+<DD>
+Tell the server to go into passive mode. Returns the text that represents the
+port on which the server is listening, this text is in a suitable form to
+sent to another ftp server using the <A HREF="#item_port"><CODE>port</CODE></A> method.
+<P></P></DL>
+<P>The following methods can be used to transfer files between two remote
+servers, providing that these two servers can connect directly to each other.</P>
+<DL>
+<DT><STRONG><A NAME="item_pasv_xfer">pasv_xfer ( SRC_FILE, DEST_SERVER [, DEST_FILE ] )</A></STRONG><BR>
+<DD>
+This method will do a file transfer between two remote ftp servers. If
+<CODE>DEST_FILE</CODE> is omitted then the leaf name of <CODE>SRC_FILE</CODE> will be used.
+<P></P>
+<DT><STRONG><A NAME="item_pasv_xfer_unique">pasv_xfer_unique ( SRC_FILE, DEST_SERVER [, DEST_FILE ] )</A></STRONG><BR>
+<DD>
+Like <A HREF="#item_pasv_xfer"><CODE>pasv_xfer</CODE></A> but the file is stored on the remote server using
+the STOU command.
+<P></P>
+<DT><STRONG><A NAME="item_pasv_wait">pasv_wait ( NON_PASV_SERVER )</A></STRONG><BR>
+<DD>
+This method can be used to wait for a transfer to complete between a passive
+server and a non-passive server. The method should be called on the passive
+server with the <CODE>Net::FTP</CODE> object for the non-passive server passed as an
+argument.
+<P></P>
+<DT><STRONG><A NAME="item_abort">abort ()</A></STRONG><BR>
+<DD>
+Abort the current data transfer.
+<P></P>
+<DT><STRONG><A NAME="item_quit">quit ()</A></STRONG><BR>
+<DD>
+Send the QUIT command to the remote FTP server and close the socket connection.
+<P></P></DL>
+<P>
+<H2><A NAME="methods for the adventurous">Methods for the adventurous</A></H2>
+<P><CODE>Net::FTP</CODE> inherits from <CODE>Net::Cmd</CODE> so methods defined in <CODE>Net::Cmd</CODE> may
+be used to send commands to the remote FTP server.</P>
+<DL>
+<DT><STRONG><A NAME="item_quot">quot (CMD [,ARGS])</A></STRONG><BR>
+<DD>
+Send a command, that Net::FTP does not directly support, to the remote
+server and wait for a response.
+<P>Returns most significant digit of the response code.</P>
+<P><STRONG>WARNING</STRONG> This call should only be used on commands that do not require
+data connections. Misuse of this method can hang the connection.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="the dataconn class">THE dataconn CLASS</A></H1>
+<P>Some of the methods defined in <CODE>Net::FTP</CODE> return an object which will
+be derived from this class.The dataconn class itself is derived from
+the <CODE>IO::Socket::INET</CODE> class, so any normal IO operations can be performed.
+However the following methods are defined in the dataconn class and IO should
+be performed using these.</P>
+<DL>
+<DT><STRONG><A NAME="item_read">read ( BUFFER, SIZE [, TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Read <CODE>SIZE</CODE> bytes of data from the server and place it into <CODE>BUFFER</CODE>, also
+performing any &lt;CRLF&gt; translation necessary. <CODE>TIMEOUT</CODE> is optional, if not
+given the the timeout value from the command connection will be used.
+<P>Returns the number of bytes read before any &lt;CRLF&gt; translation.</P>
+<P></P>
+<DT><STRONG><A NAME="item_write">write ( BUFFER, SIZE [, TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Write <CODE>SIZE</CODE> bytes of data from <CODE>BUFFER</CODE> to the server, also
+performing any &lt;CRLF&gt; translation necessary. <CODE>TIMEOUT</CODE> is optional, if not
+given the the timeout value from the command connection will be used.
+<P>Returns the number of bytes written before any &lt;CRLF&gt; translation.</P>
+<P></P>
+<DT><STRONG>abort ()</STRONG><BR>
+<DD>
+Abort the current data transfer.
+<P></P>
+<DT><STRONG><A NAME="item_close">close ()</A></STRONG><BR>
+<DD>
+Close the data connection and get a response from the FTP server. Returns
+<EM>true</EM> if the connection was closed successfully and the first digit of
+the response from the server was a '2'.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="unimplemented">UNIMPLEMENTED</A></H1>
+<P>The following RFC959 commands have not been implemented:</P>
+<DL>
+<DT><STRONG><A NAME="item_ALLO"><STRONG>ALLO</STRONG></A></STRONG><BR>
+<DD>
+Allocates storage for the file to be transferred.
+<P></P>
+<DT><STRONG><A NAME="item_SMNT"><STRONG>SMNT</STRONG></A></STRONG><BR>
+<DD>
+Mount a different file system structure without changing login or
+accounting information.
+<P></P>
+<DT><STRONG><A NAME="item_HELP"><STRONG>HELP</STRONG></A></STRONG><BR>
+<DD>
+Ask the server for ``helpful information'' (that's what the RFC says) on
+the commands it accepts.
+<P></P>
+<DT><STRONG><A NAME="item_MODE"><STRONG>MODE</STRONG></A></STRONG><BR>
+<DD>
+Specifies transfer mode (stream, block or compressed) for file to be
+transferred.
+<P></P>
+<DT><STRONG><A NAME="item_SYST"><STRONG>SYST</STRONG></A></STRONG><BR>
+<DD>
+Request remote server system identification.
+<P></P>
+<DT><STRONG><A NAME="item_STAT"><STRONG>STAT</STRONG></A></STRONG><BR>
+<DD>
+Request remote server status.
+<P></P>
+<DT><STRONG><A NAME="item_STRU"><STRONG>STRU</STRONG></A></STRONG><BR>
+<DD>
+Specifies file structure for file to be transferred.
+<P></P>
+<DT><STRONG><A NAME="item_REIN"><STRONG>REIN</STRONG></A></STRONG><BR>
+<DD>
+Reinitialize the connection, flushing all I/O and account information.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="reporting bugs">REPORTING BUGS</A></H1>
+<P>When reporting bugs/problems please include as much information as possible.
+It may be difficult for me to reproduce the problem as almost every setup
+is different.</P>
+<P>A small script which yields the problem will probably be of help. It would
+also be useful if this script was run with the extra options <CODE>Debug =</CODE> 1&gt;
+passed to the constructor, and the output sent with the bug report. If you
+cannot include a small script then please include a Debug trace from a
+run of your program which does yield the problem.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/Net/Netrc.html">the Net::Netrc manpage</A>
+<A HREF="../../../site/lib/Net/Cmd.html">the Net::Cmd manpage</A></P>
+<P>ftp(1), ftpd(8), RFC 959
+<A HREF="http://www.cis.ohio-state.edu/htbin/rfc/rfc959.html">http://www.cis.ohio-state.edu/htbin/rfc/rfc959.html</A></P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Henry Gabryjelski &lt;<A HREF="mailto:henryg@WPI.EDU">henryg@WPI.EDU</A>&gt; - for the suggestion of creating directories
+recursively.</P>
+<P>Nathan Torkington &lt;<A HREF="mailto:gnat@frii.com">gnat@frii.com</A>&gt; - for some input on the documentation.</P>
+<P>Roderick Schertler &lt;<A HREF="mailto:roderick@gate.net">roderick@gate.net</A>&gt; - for various inputs</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::FTP - FTP Client class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,120 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Poll - Object interface to system poll call</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Poll - Object interface to system poll call</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Poll - Object interface to system poll call</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::Poll qw(POLLRDNORM POLLWRNORM POLLIN POLLHUP);</PRE>
+<PRE>
+    $poll = new IO::Poll;</PRE>
+<PRE>
+    $poll-&gt;mask($input_handle =&gt; POLLIN);
+    $poll-&gt;mask($output_handle =&gt; POLLOUT);</PRE>
+<PRE>
+    $poll-&gt;poll($timeout);</PRE>
+<PRE>
+    $ev = $poll-&gt;events($input);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::Poll</CODE> is a simple interface to the system level poll routine.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_mask">mask ( IO [, EVENT_MASK ] )</A></STRONG><BR>
+<DD>
+If EVENT_MASK is given, then, if EVENT_MASK is non-zero, IO is added to the
+list of file descriptors and the next call to poll will check for
+any event specified in EVENT_MASK. If EVENT_MASK is zero then IO will be
+removed from the list of file descriptors.
+<P>If EVENT_MASK is not given then the return value will be the current
+event mask value for IO.</P>
+<P></P>
+<DT><STRONG><A NAME="item_poll">poll ( [ TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Call the system level poll routine. If TIMEOUT is not specified then the
+call will block. Returns the number of handles which had events
+happen, or -1 on error.
+<P></P>
+<DT><STRONG><A NAME="item_events">events ( IO )</A></STRONG><BR>
+<DD>
+Returns the event mask which represents the events that happend on IO
+during the last call to <A HREF="#item_poll"><CODE>poll</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_remove">remove ( IO )</A></STRONG><BR>
+<DD>
+Remove IO from the list of file descriptors for the next poll.
+<P></P>
+<DT><STRONG><A NAME="item_handles">handles( [ EVENT_MASK ] )</A></STRONG><BR>
+<DD>
+Returns a list of handles. If EVENT_MASK is not given then a list of all
+handles known will be returned. If EVENT_MASK is given then a list
+of handles will be returned which had one of the events specified by
+EVENT_MASK happen during the last call ti <A HREF="#item_poll"><CODE>poll</CODE></A>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="#item_poll">poll(2)</A>, <A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>, <A HREF="../../lib/IO/Select.html">the IO::Select manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr. Currently maintained by the Perl Porters.  Please report all
+bugs to &lt;<A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-8 Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Poll - Object interface to system poll call</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

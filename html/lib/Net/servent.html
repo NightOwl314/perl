@@ -1,0 +1,112 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::servent - by-name interface to Perl's built-in getserv* functions</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::servent - by-name interface to Perl's built-in getserv* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::servent - by-name interface to Perl's built-in getserv*() functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Net::servent;
+ $s = getservbyname(shift || 'ftp') || die &quot;no service&quot;;
+ printf &quot;port for %s is %s, aliases are %s\n&quot;,
+    $s-&gt;name, $s-&gt;port, &quot;@{$s-&gt;aliases}&quot;;</PRE>
+<PRE>
+ use Net::servent qw(:FIELDS);
+ getservbyname(shift || 'ftp') || die &quot;no service&quot;;
+ print &quot;port for $s_name is $s_port, aliases are @s_aliases\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module's default exports override the core getservent(),
+getservbyname(), and
+<CODE>getnetbyport()</CODE> functions, replacing them with versions that return
+``Net::servent'' objects.  They take default second arguments of ``tcp''.  This object has methods that return the similarly
+named structure field name from the C's servent structure from <EM>netdb.h</EM>;
+namely name, aliases, port, and proto.  The aliases
+method returns an array reference, the rest scalars.</P>
+<P>You may also import all the structure fields directly into your namespace
+as regular variables using the :FIELDS import tag.  (Note that this still
+overrides your core functions.)  Access these fields as variables named
+with a preceding <CODE>n_</CODE>.  Thus, <CODE>$serv_obj-&gt;name()</CODE> corresponds to
+$s_name if you import the fields.  Array references are available as
+regular array variables, so for example <CODE>@{ $serv_obj-&gt;aliases()
+}</CODE> would be simply @s_aliases.</P>
+<P>The <CODE>getserv()</CODE> function is a simple front-end that forwards a numeric
+argument to getservbyport(), and the rest to getservbyname().</P>
+<P>To access this functionality without the core overrides,
+pass the <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> an empty import list, and then access
+function functions with their full qualified names.
+On the other hand, the built-ins are still available
+via the <CODE>CORE::</CODE> pseudo-package.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+ use Net::servent qw(:FIELDS);</PRE>
+<PRE>
+ while (@ARGV) {
+     my ($service, $proto) = ((split m!/!, shift), 'tcp');
+     my $valet = getserv($service, $proto);
+     unless ($valet) {
+         warn &quot;$0: No service: $service/$proto\n&quot;
+         next;
+     }
+     printf &quot;service $service/$proto is port %d\n&quot;, $valet-&gt;port;
+     print &quot;alias are @s_aliases\n&quot; if @s_aliases;
+ }</PRE>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>While this class is currently implemented using the Class::Struct
+module to build a struct-like class, you shouldn't rely upon this.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::servent - by-name interface to Perl's built-in getserv* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

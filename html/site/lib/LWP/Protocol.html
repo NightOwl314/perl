@@ -1,0 +1,144 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP::Protocol - Base class for LWP protocols</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::Protocol - Base class for LWP protocols</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP::Protocol - Base class for LWP protocols</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ package LWP::Protocol::foo;
+ require LWP::Protocol;
+ @ISA=qw(LWP::Protocol);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class is used a the base class for all protocol implementations
+supported by the LWP library.</P>
+<P>When creating an instance of this class using
+<A HREF="#item_create"><CODE>LWP::Protocol::create($url)</CODE></A>, and you get an initialised subclass
+appropriate for that access method. In other words, the
+LWP::Protocol::create() function calls the constructor for one of its
+subclasses.</P>
+<P>All derived LWP::Protocol classes need to override the <A HREF="#item_request"><CODE>request()</CODE></A>
+method which is used to service a request. The overridden method can
+make use of the <A HREF="#item_collect"><CODE>collect()</CODE></A> function to collect together chunks of data
+as it is received.</P>
+<P>The following methods and functions are provided:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$prot = LWP::Protocol-&gt;<CODE>new()</CODE></A></STRONG><BR>
+<DD>
+The LWP::Protocol constructor is inherited by subclasses. As this is a
+virtual base class this method should <STRONG>not</STRONG> be called directly.
+<P></P>
+<DT><STRONG><A NAME="item_create">$prot = LWP::Protocol::create($url)</A></STRONG><BR>
+<DD>
+Create an object of the class implementing the protocol to handle the
+given scheme. This is a function, not a method. It is more an object
+factory than a constructor. This is the function user agents should
+use to access protocols.
+<P></P>
+<DT><STRONG><A NAME="item_implementor">$class = LWP::Protocol::implementor($scheme, [$class])</A></STRONG><BR>
+<DD>
+Get and/or set implementor class for a scheme.  Returns '' if the
+specified scheme is not supported.
+<P></P>
+<DT><STRONG><A NAME="item_request">$prot-&gt;<CODE>request(...)</CODE></A></STRONG><BR>
+<DD>
+<PRE>
+ $response = $protocol-&gt;request($request, $proxy, undef);
+ $response = $protocol-&gt;request($request, $proxy, '/tmp/sss');
+ $response = $protocol-&gt;request($request, $proxy, \&amp;callback, 1024);</PRE>
+<P>Dispactches a request over the protocol, and returns a response
+object. This method needs to be overridden in subclasses.  Referer to
+<A HREF="../../../site/lib/LWP/UserAgent.html">the LWP::UserAgent manpage</A> for description of the arguments.</P>
+<DT><STRONG><A NAME="item_timeout">$prot-&gt;<CODE>timeout($seconds)</CODE></A></STRONG><BR>
+<DD>
+Get and set the timeout value in seconds
+<P></P>
+<DT><STRONG><A NAME="item_parse_head">$prot-&gt;<CODE>parse_head($yesno)</CODE></A></STRONG><BR>
+<DD>
+Should we initialize response headers from the &lt;head&gt; section of HTML
+documents.
+<P></P>
+<DT><STRONG><A NAME="item_collect">$prot-&gt;collect($arg, $response, $collector)</A></STRONG><BR>
+<DD>
+Called to collect the content of a request, and process it
+appropriately into a scalar, file, or by calling a callback.  If $arg
+is undefined, then the content is stored within the $response.  If
+$arg is a simple scalar, then $arg is interpreted as a file name and
+the content is written to this file.  If $arg is a reference to a
+routine, then content is passed to this routine.
+<P>The $collector is a routine that will be called and which is
+reponsible for returning pieces (as ref to scalar) of the content to
+process.  The $collector signals EOF by returning a reference to an
+empty sting.</P>
+<P>The return value from <A HREF="#item_collect"><CODE>collect()</CODE></A> is the $response object reference.</P>
+<P><STRONG>Note:</STRONG> We will only use the callback or file argument if
+$response-&gt;is_success().  This avoids sendig content data for
+redirects and authentization responses to the callback which would be
+confusing.</P>
+<P></P>
+<DT><STRONG><A NAME="item_collect_once">$prot-&gt;collect_once($arg, $response, $content)</A></STRONG><BR>
+<DD>
+Can be called when the whole response content is available as
+$content.  This will invoke <A HREF="#item_collect"><CODE>collect()</CODE></A> with a collector callback that
+returns a reference to $content the first time and an empty string the
+next.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Inspect the <EM>LWP/Protocol/file.pm</EM> and <EM>LWP/Protocol/http.pm</EM> files
+for examples of usage.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::Protocol - Base class for LWP protocols</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

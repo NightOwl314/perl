@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>encoding - allows you to write your script in non-ascii or non-utf8</title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;encoding - allows you to write your script in non-ascii or non-utf8</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#caveats">CAVEATS</a></li>
+	<ul>
+
+		<li><a href="#not_scoped">NOT SCOPED</a></li>
+		<li><a href="#do_not_mix_multiple_encodings">DO NOT MIX MULTIPLE ENCODINGS</a></li>
+		<li><a href="#tr///_with_ranges_remain_unaffected">tr/// with ranges remain unaffected</a></li>
+		<ul>
+
+			<li><a href="#workaround_to_tr///;">workaround to tr///;</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#nonascii_identifiers_and_filter_option">Non-ASCII Identifiers and Filter option</a></li>
+	<li><a href="#example__greekperl">EXAMPLE - Greekperl</a></li>
+	<li><a href="#known_problems">KNOWN PROBLEMS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>encoding - allows you to write your script in non-ascii or non-utf8</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use encoding &quot;greek&quot;;  # Perl like Greek to you?
+  use encoding &quot;euc-jp&quot;; # Jperl!</pre>
+<pre>
+  # or you can even do this if your shell supports your native encoding</pre>
+<pre>
+  perl -Mencoding=latin2 -e '...' # Feeling centrally European?
+  perl -Mencoding=euc-kr -e '...' # Or Korean?</pre>
+<pre>
+  # more control</pre>
+<pre>
+  # A simple euc-cn =&gt; utf-8 converter
+  use encoding &quot;euc-cn&quot;, STDOUT =&gt; &quot;utf8&quot;;  while(&lt;&gt;){print};</pre>
+<pre>
+  # &quot;no encoding;&quot; supported (but not scoped!)
+  no encoding;</pre>
+<pre>
+  # an alternate way, Filter
+  use encoding &quot;euc-jp&quot;, Filter=&gt;1;
+  use utf8;
+  # now you can use kanji identifiers -- in euc-jp!</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>Let's start with a bit of history: Perl 5.6.0 introduced Unicode
+support.  You could apply <a href="../lib/Pod/perlvar.html#item_substr"><code>substr()</code></a> and regexes even to complex CJK
+characters -- so long as the script was written in UTF-8.  But back
+then, text editors that supported UTF-8 were still rare and many users
+instead chose to write scripts in legacy encodings, giving up a whole
+new feature of Perl 5.6.</p>
+<p>Rewind to the future: starting from perl 5.8.0 with the <strong>encoding</strong>
+pragma, you can write your script in any encoding you like (so long
+as the <code>Encode</code> module supports it) and still enjoy Unicode support.
+You can write code in EUC-JP as follows:</p>
+<pre>
+  my $Rakuda = &quot;\xF1\xD1\xF1\xCC&quot;; # Camel in Kanji
+               #&lt;-char-&gt;&lt;-char-&gt;   # 4 octets
+  s/\bCamel\b/$Rakuda/;</pre>
+<p>And with <code>use encoding &quot;euc-jp&quot;</code> in effect, it is the same thing as
+the code in UTF-8:</p>
+<pre>
+  my $Rakuda = &quot;\x{99F1}\x{99DD}&quot;; # two Unicode Characters
+  s/\bCamel\b/$Rakuda/;</pre>
+<p>The <strong>encoding</strong> pragma also modifies the filehandle disciplines of
+STDIN and STDOUT to the specified encoding.  Therefore,</p>
+<pre>
+  use encoding &quot;euc-jp&quot;;
+  my $message = &quot;Camel is the symbol of perl.\n&quot;;
+  my $Rakuda = &quot;\xF1\xD1\xF1\xCC&quot;; # Camel in Kanji
+  $message =~ s/\bCamel\b/$Rakuda/;
+  print $message;</pre>
+<p>Will print ``\xF1\xD1\xF1\xCC is the symbol of perl.\n'',
+not ``\x{99F1}\x{99DD} is the symbol of perl.\n''.</p>
+<p>You can override this by giving extra arguments; see below.</p>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<dl>
+<dt><strong><a name="item_use_encoding_%5bencname%5d_%3b">use encoding [<em>ENCNAME</em>] ;</a></strong><br />
+</dt>
+<dd>
+Sets the script encoding to <em>ENCNAME</em>. Filehandle disciplines of
+STDIN and STDOUT are set to ``:encoding(<em>ENCNAME</em>)''.  Note that STDERR
+will not be changed.
+</dd>
+<dd>
+<p>If no encoding is specified, the environment variable <a href="../lib/Pod/perlrun.html#item_perl_encoding">PERL_ENCODING</a>
+is consulted.  If no encoding can be found, the error <code>Unknown encoding
+'I&lt;ENCNAME&gt;'</code> will be thrown.</p>
+</dd>
+<dd>
+<p>Note that non-STD file handles remain unaffected.  Use <code>use open</code> or
+<a href="../lib/Pod/perlfunc.html#item_binmode"><code>binmode</code></a> to change disciplines of those.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_use_encoding_encname_%5b_stdin_%3d%3e_encname_in_%">use encoding <em>ENCNAME</em> [ STDIN =&gt; <em>ENCNAME_IN</em> ...] ;</a></strong><br />
+</dt>
+<dd>
+You can also individually set encodings of STDIN and STDOUT via the
+<code>STDIN =&gt; ENCNAME</code> form.  In this case, you cannot omit the
+first <em>ENCNAME</em>.  <code>STDIN =&gt; undef</code> turns the IO transcoding
+completely off.
+</dd>
+<p></p>
+<dt><strong><a name="item_no_encoding%3b">no encoding;</a></strong><br />
+</dt>
+<dd>
+Unsets the script encoding. The disciplines of STDIN, STDOUT are
+reset to ``:raw'' (the default unprocessed raw stream of bytes).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="caveats">CAVEATS</a></h1>
+<p>
+</p>
+<h2><a name="not_scoped">NOT SCOPED</a></h2>
+<p>The pragma is a per script, not a per block lexical.  Only the last
+<code>use encoding</code> or <code>no encoding</code> matters, and it affects 
+<strong>the whole script</strong>.  However, the &lt;no encoding&gt; pragma is supported and 
+<strong>use encoding</strong> can appear as many times as you want in a given script. 
+The multiple use of this pragma is discouraged.</p>
+<p>Because of this nature, the use of this pragma inside the module is
+strongly discouraged (because the influence of this pragma lasts not
+only for the module but the script that uses).  But if you have to,
+make sure you say <code>no encoding</code> at the end of the module so you
+contain the influence of the pragma within the module.</p>
+<p>
+</p>
+<h2><a name="do_not_mix_multiple_encodings">DO NOT MIX MULTIPLE ENCODINGS</a></h2>
+<p>Notice that only literals (string or regular expression) having only
+legacy code points are affected: if you mix data like this</p>
+<pre>
+        \xDF\x{100}</pre>
+<p>the data is assumed to be in (Latin 1 and) Unicode, not in your native
+encoding.  In other words, this will match in ``greek'':</p>
+<pre>
+        &quot;\xDF&quot; =~ /\x{3af}/</pre>
+<p>but this will not</p>
+<pre>
+        &quot;\xDF\x{100}&quot; =~ /\x{3af}\x{100}/</pre>
+<p>since the <code>\xDF</code> (ISO 8859-7 GREEK SMALL LETTER IOTA WITH TONOS) on
+the left will <strong>not</strong> be upgraded to <code>\x{3af}</code> (Unicode GREEK SMALL
+LETTER IOTA WITH TONOS) because of the <code>\x{100}</code> on the left.  You
+should not be mixing your legacy data and Unicode in the same string.</p>
+<p>This pragma also affects encoding of the 0x80..0xFF code point range:
+normally characters in that range are left as eight-bit bytes (unless
+they are combined with characters with code points 0x100 or larger,
+in which case all characters need to become UTF-8 encoded), but if
+the <code>encoding</code> pragma is present, even the 0x80..0xFF range always
+gets UTF-8 encoded.</p>
+<p>After all, the best thing about this pragma is that you don't have to
+resort to \x{....} just to spell your name in a native encoding.
+So feel free to put your strings in your encoding in quotes and
+regexes.</p>
+<p>
+</p>
+<h2><a name="tr///_with_ranges_remain_unaffected">tr/// with ranges remain unaffected</a></h2>
+<p>The <strong>encoding</strong> pragma works by decoding string literals in
+<a href="../lib/Pod/perlfunc.html#item_q/"><code>q//,qq//,qr//,qw///, qx//</code></a> and so forth.  As of perl 5.8.0, this
+does not apply to <a href="../lib/Pod/perlfunc.html#item_tr/"><code>tr///</code></a>.  Therefore,</p>
+<pre>
+  use encoding 'euc-jp';
+  #....
+  $kana =~ tr/\xA4\xA1-\xA4\xF3/\xA5\xA1-\xA5\xF3/;
+  #           -------- -------- -------- --------</pre>
+<p>Does not work as</p>
+<pre>
+  $kana =~ tr/\x{3041}-\x{3093}/\x{30a1}-\x{30f3}/;</pre>
+<dl>
+<dt><strong><a name="item_legend_of_characters_above">Legend of characters above</a></strong><br />
+</dt>
+<dd>
+<pre>
+  utf8     euc-jp   charnames::viacode()
+  -----------------------------------------
+  \x{3041} \xA4\xA1 HIRAGANA LETTER SMALL A
+  \x{3093} \xA4\xF3 HIRAGANA LETTER N
+  \x{30a1} \xA5\xA1 KATAKANA LETTER SMALL A
+  \x{30f3} \xA5\xF3 KATAKANA LETTER N</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="workaround_to_tr///;">workaround to tr///;</a></h3>
+<p>You can, however, achieve the same as simply as follows;</p>
+<pre>
+  use encoding 'euc-jp';
+  # ....
+  eval qq{ \$kana =~ tr/\xA4\xA1-\xA4\xF3/\xA5\xA1-\xA5\xF3/ };</pre>
+<p>Note the <a href="../lib/Pod/perlfunc.html#item_tr/"><code>tr//</code></a> expression is surronded by <code>qq{}</code>.  The idea behind
+is the same as classic idiom that makes <a href="../lib/Pod/perlfunc.html#item_tr/"><code>tr///</code></a> 'interpolate'.</p>
+<pre>
+   tr/$from/$to/;            # wrong!
+   eval qq{ tr/$from/$to/ }; # workaround.</pre>
+<p>Nevertheless, in case of <strong>encoding</strong> pragma even <a href="../lib/Pod/perlfunc.html#item_q/"><code>q//</code></a> is affected so
+<a href="../lib/Pod/perlfunc.html#item_tr/"><code>tr///</code></a> not being decoded was obviously against the will of Perl5
+Porters.  In future version of perl, this counter-intuitive behaviour
+of <a href="../lib/Pod/perlfunc.html#item_tr/"><code>tr///</code></a> will be fixed so <code>eval qq{}</code> trick will be unneccesary.</p>
+<p>
+</p>
+<hr />
+<h1><a name="nonascii_identifiers_and_filter_option">Non-ASCII Identifiers and Filter option</a></h1>
+<p>The magic of <code>use encoding</code> is not applied to the names of
+identifiers.  In order to make <code>${&quot;\x{4eba}&quot;}++</code> ($human++, where human
+is a single Han ideograph) work, you still need to write your script
+in UTF-8 or use a source filter.</p>
+<p>In other words, the same restriction as with Jperl applies.</p>
+<p>If you dare to experiment, however, you can try the Filter option.</p>
+<dl>
+<dt><strong><a name="item_use_encoding_encname_filter%3d%3e1%3b">use encoding <em>ENCNAME</em> Filter=&gt;1;</a></strong><br />
+</dt>
+<dd>
+This turns the encoding pragma into a source filter.  While the default
+approach just decodes interpolated literals (in <code>qq()</code> and qr()), this
+will apply a source filter to the entire source code.  In this case,
+STDIN and STDOUT remain untouched.
+</dd>
+<p></p></dl>
+<p>What does this mean?  Your source code behaves as if it is written in
+UTF-8.  So even if your editor only supports Shift_JIS, for example,
+you can still try examples in Chapter 15 of <code>Programming Perl, 3rd
+Ed.</code>.  For instance, you can use UTF-8 identifiers.</p>
+<p>This option is significantly slower and (as of this writing) non-ASCII
+identifiers are not very stable WITHOUT this option and with the
+source code written in UTF-8.</p>
+<p>To make your script in legacy encoding work with minimum effort,
+do not use Filter=&gt;1.</p>
+<p>
+</p>
+<hr />
+<h1><a name="example__greekperl">EXAMPLE - Greekperl</a></h1>
+<pre>
+    use encoding &quot;iso 8859-7&quot;;</pre>
+<pre>
+    # \xDF in ISO 8859-7 (Greek) is \x{3af} in Unicode.</pre>
+<pre>
+    $a = &quot;\xDF&quot;;
+    $b = &quot;\x{100}&quot;;</pre>
+<pre>
+    printf &quot;%#x\n&quot;, ord($a); # will print 0x3af, not 0xdf</pre>
+<pre>
+    $c = $a . $b;</pre>
+<pre>
+    # $c will be &quot;\x{3af}\x{100}&quot;, not &quot;\x{df}\x{100}&quot;.</pre>
+<pre>
+    # chr() is affected, and ...</pre>
+<pre>
+    print &quot;mega\n&quot;  if ord(chr(0xdf)) == 0x3af;</pre>
+<pre>
+    # ... ord() is affected by the encoding pragma ...</pre>
+<pre>
+    print &quot;tera\n&quot; if ord(pack(&quot;C&quot;, 0xdf)) == 0x3af;</pre>
+<pre>
+    # ... as are eq and cmp ...</pre>
+<pre>
+    print &quot;peta\n&quot; if &quot;\x{3af}&quot; eq  pack(&quot;C&quot;, 0xdf);
+    print &quot;exa\n&quot;  if &quot;\x{3af}&quot; cmp pack(&quot;C&quot;, 0xdf) == 0;</pre>
+<pre>
+    # ... but pack/unpack C are not affected, in case you still
+    # want to go back to your native encoding</pre>
+<pre>
+    print &quot;zetta\n&quot; if unpack(&quot;C&quot;, (pack(&quot;C&quot;, 0xdf))) == 0xdf;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="known_problems">KNOWN PROBLEMS</a></h1>
+<p>For native multibyte encodings (either fixed or variable length),
+the current implementation of the regular expressions may introduce
+recoding errors for regular expression literals longer than 127 bytes.</p>
+<p>The encoding pragma is not supported on EBCDIC platforms.
+(Porters who are willing and able to remove this limitation are
+welcome.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../lib/Pod/perlunicode.html">the perlunicode manpage</a>, <a href="../lib/Encode.html">the Encode manpage</a>, <a href="../lib/open.html">the open manpage</a>, <a href="../lib/Filter/Util/Call.html">the Filter::Util::Call manpage</a>,</p>
+<p>Ch. 15 of <code>Programming Perl (3rd Edition)</code>
+by Larry Wall, Tom Christiansen, Jon Orwant;
+O'Reilly &amp; Associates; ISBN 0-596-00027-8</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;encoding - allows you to write your script in non-ascii or non-utf8</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

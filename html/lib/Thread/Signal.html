@@ -1,0 +1,74 @@
+
+<HTML>
+<HEAD>
+<TITLE>Thread::Signal - Start a thread which runs signal handlers reliably</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Signal - Start a thread which runs signal handlers reliably</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Thread::Signal - Start a thread which runs signal handlers reliably</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Thread::Signal;</PRE>
+<PRE>
+    $SIG{HUP} = \&amp;some_handler;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>Thread::Signal</CODE> module starts up a special signal handler thread.
+All signals to the process are delivered to it and it runs the
+associated <CODE>$SIG{FOO}</CODE> handlers for them. Without this module,
+signals arriving at inopportune moments (such as when perl's internals
+are in the middle of updating critical structures) cause the perl
+code of the handler to be run unsafely which can cause memory corruption
+or worse.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This module changes the semantics of signal handling slightly in that
+the signal handler is run separately from the main thread (and in
+parallel with it). This means that tricks such as calling <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A> from
+a signal handler behave differently (and, in particular, can't be
+used to exit directly from a system call).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Signal - Start a thread which runs signal handlers reliably</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

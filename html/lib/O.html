@@ -1,0 +1,105 @@
+
+<HTML>
+<HEAD>
+<TITLE>O - Generic interface to Perl Compiler backends</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;O - Generic interface to Perl Compiler backends</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#conventions">CONVENTIONS</A></LI>
+	<LI><A HREF="#implementation">IMPLEMENTATION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>O - Generic interface to Perl Compiler backends</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        perl -MO=Backend[,OPTIONS] foo.pl</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is the module that is used as a frontend to the Perl Compiler.</P>
+<P>
+<HR>
+<H1><A NAME="conventions">CONVENTIONS</A></H1>
+<P>Most compiler backends use the following conventions: OPTIONS
+consists of a comma-separated list of words (no white-space).
+The <A HREF="../lib/Pod/perlrun.html#item_%2Dv"><CODE>-v</CODE></A> option usually puts the backend into verbose mode.
+The <CODE>-ofile</CODE> option generates output to <STRONG>file</STRONG> instead of
+stdout. The <CODE>-D</CODE> option followed by various letters turns on
+various internal debugging flags. See the documentation for the
+desired backend (named <CODE>B::Backend</CODE> for the example above) to
+find out about that backend.</P>
+<P>
+<HR>
+<H1><A NAME="implementation">IMPLEMENTATION</A></H1>
+<P>This section is only necessary for those who want to write a
+compiler backend module that can be used via this module.</P>
+<P>The command-line mentioned in the SYNOPSIS section corresponds to
+the Perl code</P>
+<PRE>
+    use O (&quot;Backend&quot;, OPTIONS);</PRE>
+<P>The <A HREF="../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A> function which that calls loads in the appropriate
+<CODE>B::Backend</CODE> module and calls the <CODE>compile</CODE> function in that
+package, passing it OPTIONS. That function is expected to return
+a sub reference which we'll call CALLBACK. Next, the ``compile-only''
+flag is switched on (equivalent to the command-line option <A HREF="../lib/Pod/perlrun.html#item_%2Dc"><CODE>-c</CODE></A>)
+and a CHECK block is registered which calls CALLBACK. Thus the main
+Perl program mentioned on the command-line is read in, parsed and
+compiled into internal syntax tree form. Since the <A HREF="../lib/Pod/perlrun.html#item_%2Dc"><CODE>-c</CODE></A> flag is
+set, the program does not start running (excepting BEGIN blocks of
+course) but the CALLBACK function registered by the compiler
+backend is called.</P>
+<P>In summary, a compiler backend module should be called ``B::Foo''
+for some foo and live in the appropriate directory for that name.
+It should define a function called <CODE>compile</CODE>. When the user types</P>
+<PRE>
+    perl -MO=Foo,OPTIONS foo.pl</PRE>
+<P>that function is called and is passed those OPTIONS (split on
+commas). It should return a sub ref to the main compilation function.
+After the user's program is loaded and parsed, that returned sub ref
+is invoked which can then go ahead and do the compilation, usually by
+making use of the <CODE>B</CODE> module's functionality.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Malcolm Beattie, <CODE>mbeattie@sable.ox.ac.uk</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;O - Generic interface to Perl Compiler backends</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

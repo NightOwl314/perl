@@ -1,0 +1,363 @@
+
+<HTML>
+<HEAD>
+<TITLE>UDDI::Lite - Library for UDDI clients in Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;UDDI::Lite - Library for UDDI clients in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#overview of classes and packages">OVERVIEW OF CLASSES AND PACKAGES</A></LI>
+	<UL>
+
+		<LI><A HREF="#uddi::lite">UDDI::Lite</A></LI>
+		<LI><A HREF="#uddi::data">UDDI::Data</A></LI>
+		<LI><A HREF="#autodispatching">AUTODISPATCHING</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs and limitations">BUGS AND LIMITATIONS</A></LI>
+	<LI><A HREF="#availability">AVAILABILITY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>UDDI::Lite - Library for UDDI clients in Perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use UDDI::Lite;
+  print UDDI::Lite
+    -&gt; proxy('<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>')
+    -&gt; find_business(name =&gt; 'old')
+    -&gt; result
+    -&gt; businessInfos-&gt;businessInfo-&gt;serviceInfos-&gt;serviceInfo-&gt;name;</PRE>
+<P>The same code with autodispatch:</P>
+<PRE>
+  use UDDI::Lite +autodispatch =&gt; 
+    proxy =&gt; '<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>'
+  ;</PRE>
+<PRE>
+  print find_business(name =&gt; 'old')
+    -&gt; businessInfos-&gt;businessInfo-&gt;serviceInfos-&gt;serviceInfo-&gt;name;</PRE>
+<P>Or with importing:</P>
+<PRE>
+  use UDDI::Lite 
+    'UDDI::Lite' =&gt; [':inquire'],
+    proxy =&gt; '<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>'
+  ;</PRE>
+<PRE>
+  print find_business(name =&gt; 'old')
+    -&gt; businessInfos-&gt;businessInfo-&gt;serviceInfos-&gt;serviceInfo-&gt;name;</PRE>
+<P>Publishing API:</P>
+<PRE>
+  use UDDI::Lite 
+    import =&gt; ['UDDI::Data'], 
+    import =&gt; ['UDDI::Lite'],
+    proxy =&gt; &quot;https://some.server.com/endpoint_fot_publishing_API&quot;;</PRE>
+<PRE>
+  my $auth = get_authToken({userID =&gt; 'USERID', cred =&gt; 'CRED'})-&gt;authInfo;
+  my $busent = with businessEntity =&gt;
+    name(&quot;Contoso Manufacturing&quot;), 
+    description(&quot;We make components for business&quot;),
+    businessKey(''),
+    businessServices with businessService =&gt;
+      name(&quot;Buy components&quot;), 
+      description(&quot;Bindings for buying our components&quot;),
+      serviceKey(''),
+      bindingTemplates with bindingTemplate =&gt;
+        description(&quot;BASDA invoices over HTTP post&quot;),
+        accessPoint('<A HREF="http://www.contoso.com/buy.asp">http://www.contoso.com/buy.asp</A>'),
+        bindingKey(''),
+        tModelInstanceDetails with tModelInstanceInfo =&gt;
+          description('some tModel'),
+          tModelKey('UUID:C1ACF26D-9672-4404-9D70-39B756E62AB4')
+  ;
+  print save_business($auth, $busent)-&gt;businessEntity-&gt;businessKey;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>UDDI::Lite for Perl is a collection of Perl modules which provides a 
+simple and lightweight interface to the Universal Description, Discovery
+and Integration (UDDI) server.</P>
+<P>To learn more about UDDI, visit <A HREF="http://www.uddi.org/.">http://www.uddi.org/.</A></P>
+<P>The main features of the library are:</P>
+<UL>
+<LI>
+Supports both inquiry and publishing API
+<P></P>
+<LI>
+Builded on top of SOAP::Lite module, hence inherited syntax and features
+<P></P>
+<LI>
+Supports easy-to-use interface with convinient access to (sub)elements
+and attributes
+<P></P>
+<LI>
+Supports HTTPS protocol
+<P></P>
+<LI>
+Supports SMTP protocol
+<P></P>
+<LI>
+Supports Basic/Digest server authentication
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="overview of classes and packages">OVERVIEW OF CLASSES AND PACKAGES</A></H1>
+<P>This table should give you a quick overview of the classes provided by the
+library.</P>
+<PRE>
+ UDDI::Lite.pm
+ -- UDDI::Lite         -- Main class provides all logic
+ -- UDDI::Data         -- Provides extensions for serialization architecture
+ -- UDDI::Serializer   -- Serializes data structures to UDDI/SOAP package
+ -- UDDI::Deserializer -- Deserializes result into objects
+ -- UDDI::SOM          -- Provides access to deserialized object tree</PRE>
+<P>
+<H2><A NAME="uddi::lite">UDDI::Lite</A></H2>
+<P>All methods that UDDI::Lite gives you access to can be used for both
+setting and retrieving values. If you provide no parameters, you'll
+get current value, and if you'll provide parameter(s), new value
+will be assigned and method will return object (if not stated something
+else). This is suitable for stacking these calls like:</P>
+<PRE>
+  $uddi = UDDI::Lite
+    -&gt; on_debug(sub{print@_})
+    -&gt; proxy('<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>')
+  ;</PRE>
+<P>Order is insignificant and you may call <CODE>new()</CODE> method first. If you
+don't do it, UDDI::Lite will do it for you. However, <CODE>new()</CODE> method
+gives you additional syntax:</P>
+<PRE>
+  $uddi = new UDDI::Lite
+    on_debug =&gt; sub {print@_},
+    proxy =&gt; '<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>'
+  ;</PRE>
+<P><CODE>new()</CODE> accepts hash with method names and values, and will call 
+appropriate method with passed value.</P>
+<P>Since <CODE>new()</CODE> is optional it won't be mentioned anymore.</P>
+<P>Other available methods inherited from SOAP::Lite and most usable are:</P>
+<DL>
+<DT><STRONG><A NAME="item_proxy"><CODE>proxy()</CODE></A></STRONG><BR>
+<DD>
+Shortcut for <A HREF="#item_proxy"><CODE>transport-&gt;proxy()</CODE></A>. This lets you specify an endpoint and 
+also loads the required module at the same time. It is required for dispatching SOAP 
+calls. The name of the module will be defined depending on the protocol 
+specific for the endpoint. SOAP::Lite will do the rest work.
+<P></P>
+<DT><STRONG><A NAME="item_namespace"><CODE>namespace()</CODE></A></STRONG><BR>
+<DD>
+Shortcut for <A HREF="#item_namespace"><CODE>serializer-&gt;namespace()</CODE></A>. Lets you specify default
+namespace for generated envelope. 'SOAP-ENV' by default.
+<P></P>
+<DT><STRONG><A NAME="item_on_fault"><CODE>on_fault()</CODE></A></STRONG><BR>
+<DD>
+Lets you specify handler for on_fault event. Default behavior is die 
+on transport error and does nothing on others. You can change this 
+behavior globally or locally, for particular object.
+<P></P>
+<DT><STRONG><A NAME="item_on_debug"><CODE>on_debug()</CODE></A></STRONG><BR>
+<DD>
+Lets you specify handler for on_debug event. Default behavior is do 
+nothing. Use +trace/+debug option for UDDI::Lite instead.
+<P></P></DL>
+<P>
+<H2><A NAME="uddi::data">UDDI::Data</A></H2>
+<P>You can use this class if you want to specify value and name for UDDI 
+elements. 
+For example, <CODE>UDDI::Data-&gt;name('businessInfo')-&gt;value(123)</CODE> will 
+be serialized to <CODE>&lt;businessInfo&gt;123&lt;/businessInfo&gt;</CODE>, as 
+well as <CODE>UDDI::Data-</CODE>name(businessInfo =&gt; 123)&gt;.</P>
+<P>If you want to provide names for your parameters you can either specify</P>
+<PRE>
+  find_business(name =&gt; 'old')</PRE>
+<P>or do it with UDDI::Data:</P>
+<PRE>
+  find_business(UDDI::Data-&gt;name(name =&gt; 'old'))</PRE>
+<P>Later has some advantages: it'll work on any level, so you can do:</P>
+<PRE>
+  find_business(UDDI::Data-&gt;name(name =&gt; UDDI::Data-&gt;name(subname =&gt; 'old')))</PRE>
+<P>and also you can create arrays with this syntax:
+</P>
+<PRE>
+
+  find_business(UDDI::Data-&gt;name(name =&gt; 
+    [UDDI::Data-&gt;name(subname1 =&gt; 'name1'), 
+     UDDI::Data-&gt;name(subname2 =&gt; 'name2')]))</PRE>
+<P>will be serialized into:</P>
+<PRE>
+  &lt;find_business xmlns=&quot;urn:uddi-org:api&quot; generic=&quot;1.0&quot;&gt;
+    &lt;name&gt;
+      &lt;subname1&gt;name1&lt;/subname1&gt;
+      &lt;subname2&gt;name2&lt;/subname2&gt;
+    &lt;/name&gt;
+  &lt;/find_business&gt;</PRE>
+<P>For standard elements more convinient syntax is available:</P>
+<PRE>
+  find_business(
+    findQualifiers(findQualifier('sortByNameAsc',
+                                 'caseSensitiveMatch')),
+    name('M')
+  )</PRE>
+<P>and
+</P>
+<PRE>
+
+  find_business(
+    findQualifiers([findQualifier('sortByNameAsc'), 
+                    findQualifier('caseSensitiveMatch')]), 
+    name('M')
+  )</PRE>
+<P>both will generate:</P>
+<PRE>
+  &lt;SOAP-ENV:Envelope 
+    xmlns:SOAP-ENV=&quot;<A HREF="http://schemas.xmlsoap.org/soap/envelope/&quot">http://schemas.xmlsoap.org/soap/envelope/&quot</A>;&gt;
+    &lt;SOAP-ENV:Body&gt;
+      &lt;find_business xmlns=&quot;urn:uddi-org:api&quot; generic=&quot;1.0&quot;&gt;
+        &lt;findQualifiers&gt;
+          &lt;findQualifier&gt;sortByNameAsc&lt;/findQualifier&gt;
+          &lt;findQualifier&gt;caseSensitiveMatch&lt;/findQualifier&gt;
+        &lt;/findQualifiers&gt;
+        &lt;name&gt;M&lt;/name&gt;
+      &lt;/find_business&gt;
+    &lt;/SOAP-ENV:Body&gt;
+  &lt;/SOAP-ENV:Envelope&gt;</PRE>
+<P>You can use ANY valid combinations (according to ``UDDI Programmer's 
+API Specification''). If you try to generate something unusual, like 
+<CODE>name(name('myname'))</CODE>, you'll get:</P>
+<PRE>
+  Don't know what to do with 'name' and 'name' elements ....</PRE>
+<P>If you REALLY need to do it, use <CODE>UDDI::Data</CODE> syntax described above.</P>
+<P>As special case you can pass hash as the first parameter of method
+call and values of this hash will be added as attributes to top element:</P>
+<PRE>
+  find_business({maxRows =&gt; 10}, UDDI::Data-&gt;name(name =&gt; old))</PRE>
+<P>gives you</P>
+<PRE>
+  &lt;find_business xmlns=&quot;urn:uddi-org:api&quot; generic=&quot;1.0&quot; maxRows=&quot;10&quot;&gt;
+    ....
+  &lt;/find_business&gt;</PRE>
+<P>You can also pass back parameters exactly as you get it from method call
+(like you probably want to do with authInfo).</P>
+<P>You can get access to attributes and elements through the same interface:</P>
+<PRE>
+  my $list = find_business(name =&gt; old);
+  my $bis = $list-&gt;businessInfos;
+  for ($bis-&gt;businessInfo) {
+    my $s = $_-&gt;serviceInfos-&gt;serviceInfo;
+    print $s-&gt;name,        # element
+          $s-&gt;businessKey, # attribute
+          &quot;\n&quot;;
+  }</PRE>
+<P>To match advantages provided by <CODE>with</CODE> operator available in other 
+languages (like VB) we provide similar functionality that adds you 
+flexibility:</P>
+<PRE>
+    with findQualifiers =&gt; 
+      findQualifier =&gt; 'sortByNameAsc',
+      findQualifier =&gt; 'caseSensitiveMatch'</PRE>
+<P>is the same as:</P>
+<PRE>
+    with(findQualifiers =&gt; 
+      findQualifier('sortByNameAsc'),
+      findQualifier('caseSensitiveMatch'),
+    )</PRE>
+<P>and:</P>
+<PRE>
+    findQualifiers-&gt;with( 
+      findQualifier('sortByNameAsc'),
+      findQualifier('caseSensitiveMatch'),
+    )</PRE>
+<P>will all generate the same code as mentioned above:</P>
+<PRE>
+    findQualifiers(findQualifier('sortByNameAsc',
+                                 'caseSensitiveMatch')),</PRE>
+<P>Advantage of <CODE>with</CODE> syntax is the you can specify both attributes and 
+elements through the same interface. First argument is element where all 
+other elements and attributes will be attached. Provided examples and 
+tests cover different syntaxes.</P>
+<P>
+<H2><A NAME="autodispatching">AUTODISPATCHING</A></H2>
+<P>UDDI::Lite provides autodispatching feature that lets you create 
+code that looks similar for local and remote access.</P>
+<P>For example:</P>
+<PRE>
+  use UDDI::Lite +autodispatch =&gt; 
+    proxy =&gt; '<A HREF="http://uddi.microsoft.com/inquire">http://uddi.microsoft.com/inquire</A>';</PRE>
+<P>tells autodispatch all UDDI calls to 
+'http://uddi.microsoft.com/inquire'. All subsequent calls can look 
+like:</P>
+<PRE>
+  find_business(name =&gt; 'old');
+  find_business(UDDI::Data-&gt;name(name =&gt; 'old'));
+  find_business(name('old'));</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs and limitations">BUGS AND LIMITATIONS</A></H1>
+<UL>
+<LI>
+Interface is still subject to change.
+<P></P>
+<LI>
+Though HTTPS/SSL is supported you should specify it yourself (with 
+<A HREF="#item_proxy"><CODE>proxy</CODE></A> or <CODE>endpoint</CODE>) for publishing API calls.
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="availability">AVAILABILITY</A></H1>
+<P>For now UDDI::Lite is distributed as part of SOAP::Lite package.
+You can download it from ( <A HREF="http://soaplite.com/">http://soaplite.com/</A> ) 
+or from CPAN ( <A HREF="http://search.cpan.org/search?dist=SOAP-Lite">http://search.cpan.org/search?dist=SOAP-Lite</A> ).</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/SOAP/Lite.html">the SOAP::Lite manpage</A> ( <A HREF="http://search.cpan.org/search?dist=SOAP-Lite">http://search.cpan.org/search?dist=SOAP-Lite</A> )
+<EM>UDDI</EM> ( <A HREF="http://search.cpan.org/search?dist=UDDI">http://search.cpan.org/search?dist=UDDI</A> )</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2000-2001 Paul Kulchenko. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Kulchenko (<A HREF="mailto:paulclinger@yahoo.com">paulclinger@yahoo.com</A>)</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;UDDI::Lite - Library for UDDI clients in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

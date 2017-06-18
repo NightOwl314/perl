@@ -1,0 +1,71 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP::MemberMixin - Member access mixin class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::MemberMixin - Member access mixin class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP::MemberMixin - Member access mixin class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ package Foo;
+ require LWP::MemberMixin;
+ @ISA=qw(LWP::MemberMixin);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A mixin class to get methods that provide easy access to member
+variables in the %$self.
+Ideally there should be better Perl langauge support for this.</P>
+<P>There is only one method provided:</P>
+<DL>
+<DT><STRONG><A NAME="item__elem">_elem($elem [, $val])</A></STRONG><BR>
+<DD>
+Internal method to get/set the value of member variable
+<CODE>$elem</CODE>. If <CODE>$val</CODE> is defined it is used as the new value
+for the member variable.  If it is undefined the current
+value is not touched. In both cases the previous value of
+the member variable is returned.
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::MemberMixin - Member access mixin class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

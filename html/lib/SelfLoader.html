@@ -1,0 +1,217 @@
+
+<HTML>
+<HEAD>
+<TITLE>SelfLoader - load functions only on demand</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SelfLoader - load functions only on demand</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the __data__ token">The __DATA__ token</A></LI>
+		<LI><A HREF="#selfloader autoloading">SelfLoader autoloading</A></LI>
+		<LI><A HREF="#autoloading and package lexicals">Autoloading and package lexicals</A></LI>
+		<LI><A HREF="#selfloader and autoloader">SelfLoader and AutoLoader</A></LI>
+		<LI><A HREF="#__data__, __end__, and the foobar::data filehandle.">__DATA__, __END__, and the FOOBAR::DATA filehandle.</A></LI>
+		<LI><A HREF="#classes and inherited methods.">Classes and inherited methods.</A></LI>
+	</UL>
+
+	<LI><A HREF="#multiple packages and fully qualified subroutine names">Multiple packages and fully qualified subroutine names</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SelfLoader - load functions only on demand</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    package FOOBAR;
+    use SelfLoader;</PRE>
+<PRE>
+    ... (initializing code)</PRE>
+<PRE>
+    __DATA__
+    sub {....</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module tells its users that functions in the FOOBAR package are to be
+autoloaded from after the <CODE>__DATA__</CODE> token.  See also
+<A HREF="../lib/Pod/perlsub.html#autoloading">Autoloading in the perlsub manpage</A>.</P>
+<P>
+<H2><A NAME="the __data__ token">The __DATA__ token</A></H2>
+<P>The <CODE>__DATA__</CODE> token tells the perl compiler that the perl code
+for compilation is finished. Everything after the <CODE>__DATA__</CODE> token
+is available for reading via the filehandle FOOBAR::DATA,
+where FOOBAR is the name of the current package when the <CODE>__DATA__</CODE>
+token is reached. This works just the same as <CODE>__END__</CODE> does in
+package 'main', but for other modules data after <CODE>__END__</CODE> is not
+automatically retrievable, whereas data after <CODE>__DATA__</CODE> is.
+The <CODE>__DATA__</CODE> token is not recognized in versions of perl prior to
+5.001m.</P>
+<P>Note that it is possible to have <CODE>__DATA__</CODE> tokens in the same package
+in multiple files, and that the last <CODE>__DATA__</CODE> token in a given
+package that is encountered by the compiler is the one accessible
+by the filehandle. This also applies to <CODE>__END__</CODE> and main, i.e. if
+the 'main' program has an <CODE>__END__</CODE>, but a module 'require'd (_not_ 'use'd)
+by that program has a 'package main;' declaration followed by an '<CODE>__DATA__</CODE>',
+then the <CODE>DATA</CODE> filehandle is set to access the data after the <CODE>__DATA__</CODE>
+in the module, _not_ the data after the <CODE>__END__</CODE> token in the 'main'
+program, since the compiler encounters the 'require'd file later.</P>
+<P>
+<H2><A NAME="selfloader autoloading">SelfLoader autoloading</A></H2>
+<P>The <STRONG>SelfLoader</STRONG> works by the user placing the <CODE>__DATA__</CODE>
+token <EM>after</EM> perl code which needs to be compiled and
+run at 'require' time, but <EM>before</EM> subroutine declarations
+that can be loaded in later - usually because they may never
+be called.</P>
+<P>The <STRONG>SelfLoader</STRONG> will read from the FOOBAR::DATA filehandle to
+load in the data after <CODE>__DATA__</CODE>, and load in any subroutine
+when it is called. The costs are the one-time parsing of the
+data after <CODE>__DATA__</CODE>, and a load delay for the _first_
+call of any autoloaded function. The benefits (hopefully)
+are a speeded up compilation phase, with no need to load
+functions which are never used.</P>
+<P>The <STRONG>SelfLoader</STRONG> will stop reading from <CODE>__DATA__</CODE> if
+it encounters the <CODE>__END__</CODE> token - just as you would expect.
+If the <CODE>__END__</CODE> token is present, and is followed by the
+token DATA, then the <STRONG>SelfLoader</STRONG> leaves the FOOBAR::DATA
+filehandle open on the line after that token.</P>
+<P>The <STRONG>SelfLoader</STRONG> exports the <CODE>AUTOLOAD</CODE> subroutine to the
+package using the <STRONG>SelfLoader</STRONG>, and this loads the called
+subroutine when it is first called.</P>
+<P>There is no advantage to putting subroutines which will _always_
+be called after the <CODE>__DATA__</CODE> token.</P>
+<P>
+<H2><A NAME="autoloading and package lexicals">Autoloading and package lexicals</A></H2>
+<P>A 'my $pack_lexical' statement makes the variable $pack_lexical
+local _only_ to the file up to the <CODE>__DATA__</CODE> token. Subroutines
+declared elsewhere _cannot_ see these types of variables,
+just as if you declared subroutines in the package but in another
+file, they cannot see these variables.</P>
+<P>So specifically, autoloaded functions cannot see package
+lexicals (this applies to both the <STRONG>SelfLoader</STRONG> and the Autoloader).
+The <CODE>vars</CODE> pragma provides an alternative to defining package-level
+globals that will be visible to autoloaded routines. See the documentation
+on <STRONG>vars</STRONG> in the pragma section of <A HREF="../lib/Pod/perlmod.html">the perlmod manpage</A>.</P>
+<P>
+<H2><A NAME="selfloader and autoloader">SelfLoader and AutoLoader</A></H2>
+<P>The <STRONG>SelfLoader</STRONG> can replace the AutoLoader - just change 'use AutoLoader'
+to 'use SelfLoader' (though note that the <STRONG>SelfLoader</STRONG> exports
+the AUTOLOAD function - but if you have your own AUTOLOAD and
+are using the AutoLoader too, you probably know what you're doing),
+and the <CODE>__END__</CODE> token to <CODE>__DATA__</CODE>. You will need perl version 5.001m
+or later to use this (version 5.001 with all patches up to patch m).</P>
+<P>There is no need to inherit from the <STRONG>SelfLoader</STRONG>.</P>
+<P>The <STRONG>SelfLoader</STRONG> works similarly to the AutoLoader, but picks up the
+subs from after the <CODE>__DATA__</CODE> instead of in the 'lib/auto' directory.
+There is a maintenance gain in not needing to run AutoSplit on the module
+at installation, and a runtime gain in not needing to keep opening and
+closing files to load subs. There is a runtime loss in needing
+to parse the code after the <CODE>__DATA__</CODE>. Details of the <STRONG>AutoLoader</STRONG> and
+another view of these distinctions can be found in that module's
+documentation.</P>
+<P>
+<H2><A NAME="__data__, __end__, and the foobar::data filehandle.">__DATA__, __END__, and the FOOBAR::DATA filehandle.</A></H2>
+<P>This section is only relevant if you want to use
+the <CODE>FOOBAR::DATA</CODE> together with the <STRONG>SelfLoader</STRONG>.</P>
+<P>Data after the <CODE>__DATA__</CODE> token in a module is read using the
+FOOBAR::DATA filehandle. <CODE>__END__</CODE> can still be used to denote the end
+of the <CODE>__DATA__</CODE> section if followed by the token DATA - this is supported
+by the <STRONG>SelfLoader</STRONG>. The <CODE>FOOBAR::DATA</CODE> filehandle is left open if an
+<CODE>__END__</CODE> followed by a DATA is found, with the filehandle positioned at
+the start of the line after the <CODE>__END__</CODE> token. If no <CODE>__END__</CODE> token is
+present, or an <CODE>__END__</CODE> token with no DATA token on the same line, then
+the filehandle is closed.</P>
+<P>The <STRONG>SelfLoader</STRONG> reads from wherever the current
+position of the <CODE>FOOBAR::DATA</CODE> filehandle is, until the
+EOF or <CODE>__END__</CODE>. This means that if you want to use
+that filehandle (and ONLY if you want to), you should either</P>
+<P>1. Put all your subroutine declarations immediately after
+the <CODE>__DATA__</CODE> token and put your own data after those
+declarations, using the <CODE>__END__</CODE> token to mark the end
+of subroutine declarations. You must also ensure that the <STRONG>SelfLoader</STRONG>
+reads first by  calling 'SelfLoader-&gt;load_stubs();', or by using a
+function which is selfloaded;</P>
+<P>or</P>
+<P>2. You should read the <CODE>FOOBAR::DATA</CODE> filehandle first, leaving
+the handle open and positioned at the first line of subroutine
+declarations.</P>
+<P>You could conceivably do both.</P>
+<P>
+<H2><A NAME="classes and inherited methods.">Classes and inherited methods.</A></H2>
+<P>For modules which are not classes, this section is not relevant.
+This section is only relevant if you have methods which could
+be inherited.</P>
+<P>A subroutine stub (or forward declaration) looks like</P>
+<PRE>
+  sub stub;</PRE>
+<P>i.e. it is a subroutine declaration without the body of the
+subroutine. For modules which are not classes, there is no real
+need for stubs as far as autoloading is concerned.</P>
+<P>For modules which ARE classes, and need to handle inherited methods,
+stubs are needed to ensure that the method inheritance mechanism works
+properly. You can load the stubs into the module at 'require' time, by
+adding the statement 'SelfLoader-&gt;load_stubs();' to the module to do
+this.</P>
+<P>The alternative is to put the stubs in before the <CODE>__DATA__</CODE> token BEFORE
+releasing the module, and for this purpose the <CODE>Devel::SelfStubber</CODE>
+module is available.  However this does require the extra step of ensuring
+that the stubs are in the module. If this is done I strongly recommend
+that this is done BEFORE releasing the module - it should NOT be done
+at install time in general.</P>
+<P>
+<HR>
+<H1><A NAME="multiple packages and fully qualified subroutine names">Multiple packages and fully qualified subroutine names</A></H1>
+<P>Subroutines in multiple packages within the same file are supported - but you
+should note that this requires exporting the <CODE>SelfLoader::AUTOLOAD</CODE> to
+every package which requires it. This is done automatically by the
+<STRONG>SelfLoader</STRONG> when it first loads the subs into the cache, but you should
+really specify it in the initialization before the <CODE>__DATA__</CODE> by putting
+a 'use SelfLoader' statement in each package.</P>
+<P>Fully qualified subroutine names are also supported. For example,</P>
+<PRE>
+   __DATA__
+   sub foo::bar {23}
+   package baz;
+   sub dob {32}</PRE>
+<P>will all be loaded correctly by the <STRONG>SelfLoader</STRONG>, and the <STRONG>SelfLoader</STRONG>
+will ensure that the packages 'foo' and 'baz' correctly have the
+<STRONG>SelfLoader</STRONG> <CODE>AUTOLOAD</CODE> method when the data after <CODE>__DATA__</CODE> is first
+parsed.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SelfLoader - load functions only on demand</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

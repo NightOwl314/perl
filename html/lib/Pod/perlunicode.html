@@ -1,0 +1,250 @@
+<HTML>
+<HEAD>
+<TITLE>perlunicode - Unicode support in Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlunicode - Unicode support in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#important caveat">Important Caveat</A></LI>
+		<LI><A HREF="#byte and character semantics">Byte and Character semantics</A></LI>
+		<LI><A HREF="#effects of character semantics">Effects of character semantics</A></LI>
+		<LI><A HREF="#character encodings for input and output">Character encodings for input and output</A></LI>
+	</UL>
+
+	<LI><A HREF="#caveats">CAVEATS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlunicode - Unicode support in Perl (EXPERIMENTAL, subject to change)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="important caveat">Important Caveat</A></H2>
+<PRE>
+    WARNING:  As of the 5.6.1 release, the implementation of Unicode
+    support in Perl is incomplete, and continues to be highly experimental.</PRE>
+<P>The following areas need further work.  They are being rapidly addressed
+in the 5.7.x development branch.</P>
+<DL>
+<DT><STRONG><A NAME="item_Input_and_Output_Disciplines">Input and Output Disciplines</A></STRONG><BR>
+<DD>
+There is currently no easy way to mark data read from a file or other
+external source as being utf8.  This will be one of the major areas of
+focus in the near future.
+<P></P>
+<DT><STRONG><A NAME="item_Regular_Expressions">Regular Expressions</A></STRONG><BR>
+<DD>
+The existing regular expression compiler does not produce polymorphic
+opcodes.  This means that the determination on whether to match Unicode
+characters is made when the pattern is compiled, based on whether the
+pattern contains Unicode characters, and not when the matching happens
+at run time.  This needs to be changed to adaptively match Unicode if
+the string to be matched is Unicode.
+<P></P>
+<DT><STRONG><A NAME="item_use_utf8_still_needed_to_enable_a_few_features"><CODE>use utf8</CODE> still needed to enable a few features</A></STRONG><BR>
+<DD>
+The <CODE>utf8</CODE> pragma implements the tables used for Unicode support.  These
+tables are automatically loaded on demand, so the <CODE>utf8</CODE> pragma need not
+normally be used.
+<P>However, as a compatibility measure, this pragma must be explicitly used
+to enable recognition of UTF-8 encoded literals and identifiers in the
+source text.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="byte and character semantics">Byte and Character semantics</A></H2>
+<P>Beginning with version 5.6, Perl uses logically wide characters to
+represent strings internally.  This internal representation of strings
+uses the UTF-8 encoding.</P>
+<P>In future, Perl-level operations can be expected to work with characters
+rather than bytes, in general.</P>
+<P>However, as strictly an interim compatibility measure, Perl v5.6 aims to
+provide a safe migration path from byte semantics to character semantics
+for programs.  For operations where Perl can unambiguously decide that the
+input data is characters, Perl now switches to character semantics.
+For operations where this determination cannot be made without additional
+information from the user, Perl decides in favor of compatibility, and
+chooses to use byte semantics.</P>
+<P>This behavior preserves compatibility with earlier versions of Perl,
+which allowed byte semantics in Perl operations, but only as long as
+none of the program's inputs are marked as being as source of Unicode
+character data.  Such data may come from filehandles, from calls to
+external programs, from information provided by the system (such as %ENV),
+or from literals and constants in the source text.</P>
+<P>If the <A HREF="../../lib/Pod/perlrun.html#item_%2DC"><CODE>-C</CODE></A> command line switch is used, (or the ${^WIDE_SYSTEM_CALLS}
+global flag is set to <CODE>1</CODE>), all system calls will use the
+corresponding wide character APIs.  This is currently only implemented
+on Windows.</P>
+<P>Regardless of the above, the <CODE>bytes</CODE> pragma can always be used to force
+byte semantics in a particular lexical scope.  See <A HREF="../../lib/bytes.html">the bytes manpage</A>.</P>
+<P>The <CODE>utf8</CODE> pragma is primarily a compatibility device that enables
+recognition of UTF-8 in literals encountered by the parser.  It may also
+be used for enabling some of the more experimental Unicode support features.
+Note that this pragma is only required until a future version of Perl
+in which character semantics will become the default.  This pragma may
+then become a no-op.  See <A HREF="../../lib/utf8.html">the utf8 manpage</A>.</P>
+<P>Unless mentioned otherwise, Perl operators will use character semantics
+when they are dealing with Unicode data, and byte semantics otherwise.
+Thus, character semantics for these operations apply transparently; if
+the input data came from a Unicode source (for example, by adding a
+character encoding discipline to the filehandle whence it came, or a
+literal UTF-8 string constant in the program), character semantics
+apply; otherwise, byte semantics are in effect.  To force byte semantics
+on Unicode data, the <CODE>bytes</CODE> pragma should be used.</P>
+<P>Under character semantics, many operations that formerly operated on
+bytes change to operating on characters.  For ASCII data this makes
+no difference, because UTF-8 stores ASCII in single bytes, but for
+any character greater than <A HREF="../../lib/Pod/perlfunc.html#item_chr"><CODE>chr(127)</CODE></A>, the character may be stored in
+a sequence of two or more bytes, all of which have the high bit set.
+But by and large, the user need not worry about this, because Perl
+hides it from the user.  A character in Perl is logically just a number
+ranging from 0 to 2**32 or so.  Larger characters encode to longer
+sequences of bytes internally, but again, this is just an internal
+detail which is hidden at the Perl level.</P>
+<P>
+<H2><A NAME="effects of character semantics">Effects of character semantics</A></H2>
+<P>Character semantics have the following effects:</P>
+<UL>
+<LI>
+Strings and patterns may contain characters that have an ordinal value
+larger than 255.
+<P>Presuming you use a Unicode editor to edit your program, such characters
+will typically occur directly within the literal strings as UTF-8
+characters, but you can also specify a particular character with an
+extension of the <CODE>\x</CODE> notation.  UTF-8 characters are specified by
+putting the hexadecimal code within curlies after the <CODE>\x</CODE>.  For instance,
+a Unicode smiley face is <CODE>\x{263A}</CODE>.</P>
+<P></P>
+<LI>
+Identifiers within the Perl script may contain Unicode alphanumeric
+characters, including ideographs.  (You are currently on your own when
+it comes to using the canonical forms of characters--Perl doesn't (yet)
+attempt to canonicalize variable names for you.)
+<P></P>
+<LI>
+Regular expressions match characters instead of bytes.  For instance,
+``.'' matches a character instead of a byte.  (However, the <CODE>\C</CODE> pattern
+is provided to force a match a single byte (``<CODE>char</CODE>'' in C, hence
+<CODE>\C</CODE>).)
+<P></P>
+<LI>
+Character classes in regular expressions match characters instead of
+bytes, and match against the character properties specified in the
+Unicode properties database.  So <CODE>\w</CODE> can be used to match an ideograph,
+for instance.
+<P></P>
+<LI>
+Named Unicode properties and block ranges make be used as character
+classes via the new <CODE>\p{}</CODE> (matches property) and <CODE>\P{}</CODE> (doesn't
+match property) constructs.  For instance, <CODE>\p{Lu}</CODE> matches any
+character with the Unicode uppercase property, while <CODE>\p{M}</CODE> matches
+any mark character.  Single letter properties may omit the brackets, so
+that can be written <CODE>\pM</CODE> also.  Many predefined character classes are
+available, such as <CODE>\p{IsMirrored}</CODE> and  <CODE>\p{InTibetan}</CODE>.
+<P></P>
+<LI>
+The special pattern <CODE>\X</CODE> match matches any extended Unicode sequence
+(a ``combining character sequence'' in Standardese), where the first
+character is a base character and subsequent characters are mark
+characters that apply to the base character.  It is equivalent to
+<CODE>(?:\PM\pM*)</CODE>.
+<P></P>
+<LI>
+The <A HREF="../../lib/Pod/perlfunc.html#item_tr/"><CODE>tr///</CODE></A> operator translates characters instead of bytes.  Note
+that the <A HREF="../../lib/Pod/perlfunc.html#item_tr/"><CODE>tr///CU</CODE></A> functionality has been removed, as the interface
+was a mistake.  For similar functionality see pack('U0', ...) and
+pack('C0', ...).
+<P></P>
+<LI>
+Case translation operators use the Unicode case translation tables
+when provided character input.  Note that <A HREF="../../lib/Pod/perlfunc.html#item_uc"><CODE>uc()</CODE></A> translates to
+uppercase, while <A HREF="../../lib/Pod/perlfunc.html#item_ucfirst"><CODE>ucfirst</CODE></A> translates to titlecase (for languages
+that make the distinction).  Naturally the corresponding backslash
+sequences have the same semantics.
+<P></P>
+<LI>
+Most operators that deal with positions or lengths in the string will
+automatically switch to using character positions, including <A HREF="../../lib/Pod/perlfunc.html#item_chop"><CODE>chop()</CODE></A>,
+<A HREF="../../lib/Pod/perlvar.html#item_substr"><CODE>substr()</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_pos"><CODE>pos()</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_index"><CODE>index()</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_rindex"><CODE>rindex()</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_sprintf"><CODE>sprintf()</CODE></A>,
+<A HREF="../../lib/Pod/perlfunc.html#item_write"><CODE>write()</CODE></A>, and <A HREF="../../lib/Pod/perlfunc.html#item_length"><CODE>length()</CODE></A>.  Operators that specifically don't switch
+include <A HREF="../../lib/Pod/perlfunc.html#item_vec"><CODE>vec()</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_pack"><CODE>pack()</CODE></A>, and <A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack()</CODE></A>.  Operators that really
+don't care include <A HREF="../../lib/Pod/perlfunc.html#item_chomp"><CODE>chomp()</CODE></A>, as well as any other operator that
+treats a string as a bucket of bits, such as <A HREF="../../lib/Pod/perlfunc.html#item_sort"><CODE>sort()</CODE></A>, and the
+operators dealing with filenames.
+<P></P>
+<LI>
+The <A HREF="../../lib/Pod/perlfunc.html#item_pack"><CODE>pack()</CODE></A>/<A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack()</CODE></A> letters ``<CODE>c</CODE>'' and ``<CODE>C</CODE>'' do <EM>not</EM> change,
+since they're often used for byte-oriented formats.  (Again, think
+``<CODE>char</CODE>'' in the C language.)  However, there is a new ``<CODE>U</CODE>'' specifier
+that will convert between UTF-8 characters and integers.  (It works
+outside of the utf8 pragma too.)
+<P></P>
+<LI>
+The <A HREF="../../lib/Pod/perlfunc.html#item_chr"><CODE>chr()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_ord"><CODE>ord()</CODE></A> functions work on characters.  This is like
+<A HREF="../../lib/Pod/perlfunc.html#item_pack"><CODE>pack(&quot;U&quot;)</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack(&quot;U&quot;)</CODE></A>, not like <A HREF="../../lib/Pod/perlfunc.html#item_pack"><CODE>pack(&quot;C&quot;)</CODE></A> and
+<A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack(&quot;C&quot;)</CODE></A>.  In fact, the latter are how you now emulate
+byte-oriented <A HREF="../../lib/Pod/perlfunc.html#item_chr"><CODE>chr()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_ord"><CODE>ord()</CODE></A> under utf8.
+<P></P>
+<LI>
+The bit string operators <CODE>&amp; | ^ ~</CODE> can operate on character data.
+However, for backward compatibility reasons (bit string operations
+when the characters all are less than 256 in ordinal value) one cannot
+mix <CODE>~</CODE> (the bit complement) and characters both less than 256 and
+equal or greater than 256.  Most importantly, the DeMorgan's laws
+(<CODE>~($x|$y) eq ~$x&amp;~$y</CODE>, <CODE>~($x&amp;$y) eq ~$x|~$y</CODE>) won't hold.
+Another way to look at this is that the complement cannot return
+<STRONG>both</STRONG> the 8-bit (byte) wide bit complement, and the full character
+wide bit complement.
+<P></P>
+<LI>
+And finally, <A HREF="../../lib/Pod/perlfunc.html#item_reverse"><CODE>scalar reverse()</CODE></A> reverses by character rather than by byte.
+<P></P></UL>
+<P>
+<H2><A NAME="character encodings for input and output">Character encodings for input and output</A></H2>
+<P>[XXX: This feature is not yet implemented.]</P>
+<P>
+<HR>
+<H1><A NAME="caveats">CAVEATS</A></H1>
+<P>As of yet, there is no method for automatically coercing input and
+output to some encoding other than UTF-8.  This is planned in the near
+future, however.</P>
+<P>Whether an arbitrary piece of data will be treated as ``characters'' or
+``bytes'' by internal operations cannot be divined at the current time.</P>
+<P>Use of locales with utf8 may lead to odd results.  Currently there is
+some attempt to apply 8-bit locale info to characters in the range
+0..255, but this is demonstrably incorrect for locales that use
+characters above that range (when mapped into Unicode).  It will also
+tend to run slower.  Avoidance of locales is strongly encouraged.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/bytes.html">the bytes manpage</A>, <A HREF="../../lib/utf8.html">the utf8 manpage</A>, <A HREF="../../lib/Pod/perlvar.html#${^wide_system_calls}">${^WIDE_SYSTEM_CALLS} in the perlvar manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlunicode - Unicode support in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

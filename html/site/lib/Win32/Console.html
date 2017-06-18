@@ -1,0 +1,726 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::Console - Win32 Console and Character Mode Functions</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Console - Win32 Console and Character Mode Functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#reference">REFERENCE</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+		<LI><A HREF="#constants">Constants</A></LI>
+		<LI><A HREF="#microsoft's documentation">Microsoft's Documentation</A></LI>
+	</UL>
+
+	<LI><A HREF="#version history">VERSION HISTORY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#disclaimer">DISCLAIMER</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Console - Win32 Console and Character Mode Functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module implements the Win32 console and character mode
+functions.  They give you full control on the console input and output,
+including: support of off-screen console buffers (eg. multiple screen
+pages)</P>
+<UL>
+<LI>
+reading and writing of characters, attributes and whole portions of
+the screen
+<P></P>
+<LI>
+complete processing of keyboard and mouse events
+<P></P>
+<LI>
+some very funny additional features :)
+<P></P></UL>
+<P>Those functions should also make possible a port of the Unix's curses
+library; if there is anyone interested (and/or willing to contribute)
+to this project, e-mail me.  Thank you.</P>
+<P>
+<HR>
+<H1><A NAME="reference">REFERENCE</A></H1>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Alloc">Alloc</A></STRONG><BR>
+<DD>
+Allocates a new console for the process.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a
+nonzero value on success.  A process cannot be associated with more
+than one console, so this method will fail if there is already an
+allocated console.  Use Free to detach the process from the console,
+and then call Alloc to create a new console.  See also: <A HREF="#item_Free"><CODE>Free</CODE></A>
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Alloc();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Attr_%5Battr%5D">Attr [attr]</A></STRONG><BR>
+<DD>
+Gets or sets the current console attribute.  This attribute is used by
+the Write method.
+<P>Example:</P>
+<PRE>
+    $attr = $CONSOLE-&gt;Attr();
+    $CONSOLE-&gt;Attr($FG_YELLOW | $BG_BLUE);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Close">Close</A></STRONG><BR>
+<DD>
+Closes a shortcut object.  Note that it is not ``strictly'' required to
+close the objects you created, since the Win32::Shortcut objects are
+automatically closed when the program ends (or when you elsehow
+destroy such an object).
+<P>Example:</P>
+<PRE>
+    $LINK-&gt;Close();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Cls_%5Battr%5D">Cls [attr]</A></STRONG><BR>
+<DD>
+Clear the console, with the specified <EM>attr</EM> if given, or using
+ATTR_NORMAL otherwise.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Cls();
+    $CONSOLE-&gt;Cls($FG_WHITE | $BG_GREEN);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Cursor_%5Bx%2C_y%2C_size%2C_visible%5D">Cursor [x, y, size, visible]</A></STRONG><BR>
+<DD>
+Gets or sets cursor position and appearance.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on
+errors, or a 4-element list containing: <EM>x</EM>, <EM>y</EM>, <EM>size</EM>,
+<EM>visible</EM>.  <EM>x</EM> and <EM>y</EM> are the current cursor position; ...
+<P>Example:</P>
+<PRE>
+    ($x, $y, $size, $visible) = $CONSOLE-&gt;Cursor();</PRE>
+<PRE>
+    # Get position only
+    ($x, $y) = $CONSOLE-&gt;Cursor();</PRE>
+<PRE>
+    $CONSOLE-&gt;Cursor(40, 13, 50, 1);</PRE>
+<PRE>
+    # Set position only
+    $CONSOLE-&gt;Cursor(40, 13);</PRE>
+<PRE>
+    # Set size and visibility without affecting position
+    $CONSOLE-&gt;Cursor(-1, -1, 50, 1);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Display">Display</A></STRONG><BR>
+<DD>
+Displays the specified console on the screen.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors,
+a nonzero value on success.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Display();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_FillAttr_%5Battribute%2C_number%2C_col%2C_row%5D">FillAttr [attribute, number, col, row]</A></STRONG><BR>
+<DD>
+Fills the specified number of consecutive attributes, beginning at
+<EM>col</EM>, <EM>row</EM>, with the value specified in <EM>attribute</EM>.  Returns the
+number of attributes filled, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also:
+<CODE>FillChar</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;FillAttr($FG_BLACK | $BG_BLACK, 80*25, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_FillChar_char%2C_number%2C_col%2C_row">FillChar char, number, col, row</A></STRONG><BR>
+<DD>
+Fills the specified number of consecutive characters, beginning at
+<EM>col</EM>, <EM>row</EM>, with the character specified in <EM>char</EM>.  Returns the
+number of characters filled, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also:
+<CODE>FillAttr</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;FillChar(&quot;X&quot;, 80*25, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Flush">Flush</A></STRONG><BR>
+<DD>
+Flushes the console input buffer.  All the events in the buffer are
+discarded.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a nonzero value on success.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Flush();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Free">Free</A></STRONG><BR>
+<DD>
+Detaches the process from the console.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a
+nonzero value on success.  See also: <A HREF="#item_Alloc"><CODE>Alloc</CODE></A>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Free();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GenerateCtrlEvent_%5Btype%2C_processgroup%5D">GenerateCtrlEvent [type, processgroup]</A></STRONG><BR>
+<DD>
+Sends a break signal of the specified <EM>type</EM> to the specified
+<EM>processgroup</EM>.  <EM>type</EM> can be one of the following constants:
+<PRE>
+    CTRL_BREAK_EVENT
+    CTRL_C_EVENT</PRE>
+<P>they signal, respectively, the pressing of Control + Break and of
+Control + C; if not specified, it defaults to CTRL_C_EVENT.
+<EM>processgroup</EM> is the pid of a process sharing the same console.  If
+omitted, it defaults to 0 (the current process), which is also the
+only meaningful value that you can pass to this function.  Returns
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a nonzero value on success.</P>
+<P>Example:</P>
+<PRE>
+    # break this script now
+    $CONSOLE-&gt;GenerateCtrlEvent();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GetEvents">GetEvents</A></STRONG><BR>
+<DD>
+Returns the number of unread input events in the console's input
+buffer, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also: <A HREF="#item_Input"><CODE>Input</CODE></A>, <CODE>InputChar</CODE>,
+<A HREF="#item_PeekInput"><CODE>PeekInput</CODE></A>, <A HREF="#item_WriteInput"><CODE>WriteInput</CODE></A>.
+<P>Example:</P>
+<PRE>
+    $events = $CONSOLE-&gt;GetEvents();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Info">Info</A></STRONG><BR>
+<DD>
+Returns an array of informations about the console (or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on
+errors), which contains:
+<UL>
+<LI>
+columns (X size) of the console buffer.
+<P></P>
+<LI>
+rows (Y size) of the console buffer.
+<P></P>
+<LI>
+current column (X position) of the cursor.
+<P></P>
+<LI>
+current row (Y position) of the cursor.
+<P></P>
+<LI>
+current attribute used for <CODE>Write</CODE>.
+<P></P>
+<LI>
+left column (X of the starting point) of the current console window.
+<P></P>
+<LI>
+top row (Y of the starting point) of the current console window.
+<P></P>
+<LI>
+right column (X of the final point) of the current console window.
+<P></P>
+<LI>
+bottom row (Y of the final point) of the current console window.
+<P></P>
+<LI>
+maximum number of columns for the console window, given the current
+buffer size, font and the screen size.
+<P></P>
+<LI>
+maximum number of rows for the console window, given the current
+buffer size, font and the screen size.
+<P></P></UL>
+<P>See also: <CODE>Attr</CODE>, <CODE>Cursor</CODE>, <CODE>Size</CODE>, <CODE>Window</CODE>, <A HREF="#item_MaxWindow"><CODE>MaxWindow</CODE></A>.</P>
+<P>Example:</P>
+<PRE>
+    @info = $CONSOLE-&gt;Info();
+    print &quot;Cursor at $info[3], $info[4].\n&quot;;</PRE>
+<DT><STRONG><A NAME="item_Input">Input</A></STRONG><BR>
+<DD>
+Reads an event from the input buffer.  Returns a list of values, which
+depending on the event's nature are:
+<DL>
+<DT><STRONG><A NAME="item_keyboard_event">keyboard event</A></STRONG><BR>
+<DD>
+The list will contain:
+<UL>
+<LI>
+event type: 1 for keyboard
+<P></P>
+<LI>
+key down: TRUE if the key is being pressed, FALSE if the key is being released
+<P></P>
+<LI>
+repeat count: the number of times the key is being held down
+<P></P>
+<LI>
+virtual keycode: the virtual key code of the key
+<P></P>
+<LI>
+virtual scancode: the virtual scan code of the key
+<P></P>
+<LI>
+char: the ASCII code of the character (if the key is a character key, 0 otherwise)
+<P></P>
+<LI>
+control key state: the state of the control keys (SHIFTs, CTRLs, ALTs, etc.)
+<P></P></UL>
+<DT><STRONG><A NAME="item_mouse_event">mouse event</A></STRONG><BR>
+<DD>
+The list will contain:
+<UL>
+<LI>
+event type: 2 for mouse
+<P></P>
+<LI>
+mouse pos. X: X coordinate (column) of the mouse location
+<P></P>
+<LI>
+mouse pos. Y: Y coordinate (row) of the mouse location
+<P></P>
+<LI>
+button state: the mouse <CODE>button(s)</CODE> which are pressed
+<P></P>
+<LI>
+control key state: the state of the control keys (SHIFTs, CTRLs, ALTs, etc.)
+<P></P>
+<LI>
+event flags: the type of the mouse event
+<P></P></UL>
+</DL>
+<P>This method will return <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  Note that the events
+returned are depending on the input <CODE>Mode</CODE> of the console; for example,
+mouse events are not intercepted unless ENABLE_MOUSE_INPUT is
+specified.  See also: <A HREF="#item_GetEvents"><CODE>GetEvents</CODE></A>, <CODE>InputChar</CODE>, <CODE>Mode</CODE>,
+<A HREF="#item_PeekInput"><CODE>PeekInput</CODE></A>, <A HREF="#item_WriteInput"><CODE>WriteInput</CODE></A>.</P>
+<P>Example:</P>
+<PRE>
+    @event = $CONSOLE-&gt;Input();</PRE>
+<DT><STRONG><A NAME="item_InputChar_number">InputChar number</A></STRONG><BR>
+<DD>
+Reads and returns <EM>number</EM> characters from the console input buffer,
+or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also: <A HREF="#item_Input"><CODE>Input</CODE></A>, <CODE>Mode</CODE>.
+<P>Example:</P>
+<PRE>
+    $key = $CONSOLE-&gt;InputChar(1);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_InputCP_%5Bcodepage%5D">InputCP [codepage]</A></STRONG><BR>
+<DD>
+Gets or sets the input code page used by the console.  Note that this
+doesn't apply to a console object, but to the standard input
+console.  This attribute is used by the Write method.  See also:
+<CODE>OutputCP</CODE>.
+<P>Example:</P>
+<PRE>
+    $codepage = $CONSOLE-&gt;InputCP();
+    $CONSOLE-&gt;InputCP(437);</PRE>
+<PRE>
+    # you may want to use the non-instanciated form to avoid confuzion :)
+    $codepage = Win32::Console::InputCP();
+    Win32::Console::InputCP(437);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_MaxWindow">MaxWindow</A></STRONG><BR>
+<DD>
+Returns the size of the largest possible console window, based on the
+current font and the size of the display.  The result is <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on
+errors, otherwise a 2-element list containing col, row.
+<P>Example:</P>
+<PRE>
+    ($maxCol, $maxRow) = $CONSOLE-&gt;MaxWindow();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Mode_%5Bflags%5D">Mode [flags]</A></STRONG><BR>
+<DD>
+Gets or sets the input or output mode of a console.  <EM>flags</EM> can be a
+combination of the following constants:
+<PRE>
+    ENABLE_LINE_INPUT
+    ENABLE_ECHO_INPUT
+    ENABLE_PROCESSED_INPUT
+    ENABLE_WINDOW_INPUT
+    ENABLE_MOUSE_INPUT
+    ENABLE_PROCESSED_OUTPUT
+    ENABLE_WRAP_AT_EOL_OUTPUT</PRE>
+<P>For more informations on the meaning of those flags, please refer to
+the <A HREF="#microsoft's documentation">Microsoft's Documentation</A>.</P>
+<P>Example:</P>
+<PRE>
+    $mode = $CONSOLE-&gt;Mode();
+    $CONSOLE-&gt;Mode(ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_MouseButtons">MouseButtons</A></STRONG><BR>
+<DD>
+Returns the number of the buttons on your mouse, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.
+<P>Example:</P>
+<PRE>
+    print &quot;Your mouse has &quot;, $CONSOLE-&gt;MouseButtons(), &quot; buttons.\n&quot;;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_new_Win32%3A%3AConsole_standard_handle">new Win32::Console standard_handle</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_new_Win32%3A%3AConsole_%5Baccessmode%2C_sharemode%">new Win32::Console [accessmode, sharemode]</A></STRONG><BR>
+<DD>
+Creates a new console object.  The first form creates a handle to a
+standard channel, <EM>standard_handle</EM> can be one of the following:
+<PRE>
+    STD_OUTPUT_HANDLE
+    STD_ERROR_HANDLE
+    STD_INPUT_HANDLE</PRE>
+<P>The second form, instead, creates a console screen buffer in memory,
+which you can access for reading and writing as a normal console, and
+then redirect on the standard output (the screen) with <A HREF="#item_Display"><CODE>Display</CODE></A>.  In
+this case, you can specify one or both of the following values for
+<EM>accessmode</EM>:</P>
+<PRE>
+    GENERIC_READ
+    GENERIC_WRITE</PRE>
+<P>which are the permissions you will have on the created buffer, and one
+or both of the following values for <EM>sharemode</EM>:</P>
+<PRE>
+    FILE_SHARE_READ
+    FILE_SHARE_WRITE</PRE>
+<P>which affect the way the console can be shared.  If you don't specify
+any of those parameters, all 4 flags will be used.</P>
+<P>Example:</P>
+<PRE>
+    $STDOUT = new Win32::Console(STD_OUTPUT_HANDLE);
+    $STDERR = new Win32::Console(STD_ERROR_HANDLE);
+    $STDIN  = new Win32::Console(STD_INPUT_HANDLE);</PRE>
+<PRE>
+    $BUFFER = new Win32::Console();
+    $BUFFER = new Win32::Console(GENERIC_READ | GENERIC_WRITE);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_OutputCP_%5Bcodepage%5D">OutputCP [codepage]</A></STRONG><BR>
+<DD>
+Gets or sets the output code page used by the console.  Note that this
+doesn't apply to a console object, but to the standard output console.
+See also: <CODE>InputCP</CODE>.
+<P>Example:</P>
+<PRE>
+    $codepage = $CONSOLE-&gt;OutputCP();
+    $CONSOLE-&gt;OutputCP(437);</PRE>
+<PRE>
+    # you may want to use the non-instanciated form to avoid confuzion :)
+    $codepage = Win32::Console::OutputCP();
+    Win32::Console::OutputCP(437);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_PeekInput">PeekInput</A></STRONG><BR>
+<DD>
+Does exactly the same as <A HREF="#item_Input"><CODE>Input</CODE></A>, except that the event read is not
+removed from the input buffer.  See also: <A HREF="#item_GetEvents"><CODE>GetEvents</CODE></A>, <A HREF="#item_Input"><CODE>Input</CODE></A>,
+<CODE>InputChar</CODE>, <CODE>Mode</CODE>, <A HREF="#item_WriteInput"><CODE>WriteInput</CODE></A>.
+<P>Example:</P>
+<PRE>
+    @event = $CONSOLE-&gt;PeekInput();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ReadAttr_%5Bnumber%2C_col%2C_row%5D">ReadAttr [number, col, row]</A></STRONG><BR>
+<DD>
+Reads the specified <EM>number</EM> of consecutive attributes, beginning at
+<EM>col</EM>, <EM>row</EM>, from the console.  Returns the attributes read (a
+variable containing one character for each attribute), or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on
+errors.  You can then pass the returned variable to <CODE>WriteAttr</CODE> to
+restore the saved attributes on screen.  See also: <CODE>ReadChar</CODE>,
+<CODE>ReadRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $colors = $CONSOLE-&gt;ReadAttr(80*25, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ReadChar_%5Bnumber%2C_col%2C_row%5D">ReadChar [number, col, row]</A></STRONG><BR>
+<DD>
+Reads the specified <EM>number</EM> of consecutive characters, beginning at
+<EM>col</EM>, <EM>row</EM>, from the console.  Returns a string containing the
+characters read, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  You can then pass the
+returned variable to <CODE>WriteChar</CODE> to restore the saved characters on
+screen.  See also: <CODE>ReadAttr</CODE>, <CODE>ReadRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $chars = $CONSOLE-&gt;ReadChar(80*25, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ReadRect_left%2C_top%2C_right%2C_bottom">ReadRect left, top, right, bottom</A></STRONG><BR>
+<DD>
+Reads the content (characters and attributes) of the rectangle
+specified by <EM>left</EM>, <EM>top</EM>, <EM>right</EM>, <EM>bottom</EM> from the console.
+Returns a string containing the rectangle read, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.
+You can then pass the returned variable to <CODE>WriteRect</CODE> to restore the
+saved rectangle on screen (or on another console).  See also:
+<CODE>ReadAttr</CODE>, <CODE>ReadChar</CODE>.
+<P>Example:</P>
+<PRE>
+     $rect = $CONSOLE-&gt;ReadRect(0, 0, 80, 25);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Scroll_left%2C_top%2C_right%2C_bottom%2C_col%2C_ro">Scroll left, top, right, bottom, col, row, char, attr,
+             [cleft, ctop, cright, cbottom]</A></STRONG><BR>
+<DD>
+Moves a block of data in a console buffer; the block is identified by
+<EM>left</EM>, <EM>top</EM>, <EM>right</EM>, <EM>bottom</EM>, while <EM>row</EM>, <EM>col</EM> identify
+the new location of the block.  The cells left empty as a result of
+the move are filled with the character <EM>char</EM> and attribute <EM>attr</EM>.
+Optionally you can specify a clipping region with <EM>cleft</EM>, <EM>ctop</EM>,
+<EM>cright</EM>, <EM>cbottom</EM>, so that the content of the console outside this
+rectangle are unchanged.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a nonzero value
+on success.
+<P>Example:</P>
+<PRE>
+    # scrolls the screen 10 lines down, filling with black spaces
+    $CONSOLE-&gt;Scroll(0, 0, 80, 25, 0, 10, &quot; &quot;, $FG_BLACK | $BG_BLACK);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Select_standard_handle">Select standard_handle</A></STRONG><BR>
+<DD>
+Redirects a standard handle to the specified console.
+<EM>standard_handle</EM> can have one of the following values:
+<PRE>
+    STD_INPUT_HANDLE
+    STD_OUTPUT_HANDLE
+    STD_ERROR_HANDLE</PRE>
+<P>Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, a nonzero value on success.</P>
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Select(STD_OUTPUT_HANDLE);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Size_%5Bcol%2C_row%5D">Size [col, row]</A></STRONG><BR>
+<DD>
+Gets or sets the console buffer size.
+<P>Example:</P>
+<PRE>
+    ($x, $y) = $CONSOLE-&gt;Size();
+    $CONSOLE-&gt;Size(80, 25);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Title_%5Btitle%5D">Title [title]</A></STRONG><BR>
+<DD>
+Gets or sets the title bar the string of the current console window.
+<P>Example:</P>
+<PRE>
+    $title = $CONSOLE-&gt;Title();
+    $CONSOLE-&gt;Title(&quot;This is a title&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Window_%5Bflag%2C_left%2C_top%2C_right%2C_bottom%5">Window [flag, left, top, right, bottom]</A></STRONG><BR>
+<DD>
+Gets or sets the current console window size.  If called without
+arguments, returns a 4-element list containing the current window
+coordinates in the form of <EM>left</EM>, <EM>top</EM>, <EM>right</EM>, <EM>bottom</EM>.  To
+set the window size, you have to specify an additional <EM>flag</EM>
+parameter: if it is 0 (zero), coordinates are considered relative to
+the current coordinates; if it is non-zero, coordinates are absolute.
+<P>Example:</P>
+<PRE>
+    ($left, $top, $right, $bottom) = $CONSOLE-&gt;Window();
+    $CONSOLE-&gt;Window(1, 0, 0, 80, 50);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Write_string">Write string</A></STRONG><BR>
+<DD>
+Writes <EM>string</EM> on the console, using the current attribute, that you
+can set with <CODE>Attr</CODE>, and advancing the cursor as needed.  This isn't
+so different from Perl's ``print'' statement.  Returns the number of
+characters written or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also: <CODE>WriteAttr</CODE>,
+<CODE>WriteChar</CODE>, <CODE>WriteRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;Write(&quot;Hello, world!&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_WriteAttr_attrs%2C_col%2C_row">WriteAttr attrs, col, row</A></STRONG><BR>
+<DD>
+Writes the attributes in the string <EM>attrs</EM>, beginning at <EM>col</EM>,
+<EM>row</EM>, without affecting the characters that are on screen.  The
+string attrs can be the result of a <CODE>ReadAttr</CODE> function, or you can
+build your own attribute string; in this case, keep in mind that every
+attribute is treated as a character, not a number (see example).
+Returns the number of attributes written or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See
+also: <CODE>Write</CODE>, <CODE>WriteChar</CODE>, <CODE>WriteRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;WriteAttr($attrs, 0, 0);</PRE>
+<PRE>
+    # note the use of chr()...
+    $attrs = chr($FG_BLACK | $BG_WHITE) x 80;
+    $CONSOLE-&gt;WriteAttr($attrs, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_WriteChar_chars%2C_col%2C_row">WriteChar chars, col, row</A></STRONG><BR>
+<DD>
+Writes the characters in the string <EM>attr</EM>, beginning at <EM>col</EM>, <EM>row</EM>,
+without affecting the attributes that are on screen.  The string <EM>chars</EM>
+can be the result of a <CODE>ReadChar</CODE> function, or a normal string.  Returns
+the number of characters written or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also:
+<CODE>Write</CODE>, <CODE>WriteAttr</CODE>, <CODE>WriteRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;WriteChar(&quot;Hello, worlds!&quot;, 0, 0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_WriteInput">WriteInput (event)</A></STRONG><BR>
+<DD>
+Pushes data in the console input buffer.  <EM>(event)</EM> is a list of values,
+for more information see <A HREF="#item_Input"><CODE>Input</CODE></A>.  The string chars can be the result of
+a <CODE>ReadChar</CODE> function, or a normal string.  Returns the number of
+characters written or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also: <CODE>Write</CODE>,
+<CODE>WriteAttr</CODE>, <CODE>WriteRect</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;WriteInput(@event);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_WriteRect_rect%2C_left%2C_top%2C_right%2C_bottom">WriteRect rect, left, top, right, bottom</A></STRONG><BR>
+<DD>
+Writes a rectangle of characters and attributes (contained in <EM>rect</EM>)
+on the console at the coordinates specified by <EM>left</EM>, <EM>top</EM>,
+<EM>right</EM>, <EM>bottom</EM>.  <EM>rect</EM> can be the result of a <CODE>ReadRect</CODE>
+function.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, otherwise a 4-element list
+containing the coordinates of the affected rectangle, in the format
+<EM>left</EM>, <EM>top</EM>, <EM>right</EM>, <EM>bottom</EM>.  See also: <CODE>Write</CODE>,
+<CODE>WriteAttr</CODE>, <CODE>WriteChar</CODE>.
+<P>Example:</P>
+<PRE>
+    $CONSOLE-&gt;WriteRect($rect, 0, 0, 80, 25);</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="constants">Constants</A></H2>
+<P>The following constants are exported in the main namespace of your
+script using Win32::Console:</P>
+<PRE>
+    BACKGROUND_BLUE
+    BACKGROUND_GREEN
+    BACKGROUND_INTENSITY
+    BACKGROUND_RED
+    CAPSLOCK_ON
+    CONSOLE_TEXTMODE_BUFFER
+    ENABLE_ECHO_INPUT
+    ENABLE_LINE_INPUT
+    ENABLE_MOUSE_INPUT
+    ENABLE_PROCESSED_INPUT
+    ENABLE_PROCESSED_OUTPUT
+    ENABLE_WINDOW_INPUT
+    ENABLE_WRAP_AT_EOL_OUTPUT
+    ENHANCED_KEY
+    FILE_SHARE_READ
+    FILE_SHARE_WRITE
+    FOREGROUND_BLUE
+    FOREGROUND_GREEN
+    FOREGROUND_INTENSITY
+    FOREGROUND_RED
+    LEFT_ALT_PRESSED
+    LEFT_CTRL_PRESSED
+    NUMLOCK_ON
+    GENERIC_READ
+    GENERIC_WRITE
+    RIGHT_ALT_PRESSED
+    RIGHT_CTRL_PRESSED
+    SCROLLLOCK_ON
+    SHIFT_PRESSED
+    STD_INPUT_HANDLE
+    STD_OUTPUT_HANDLE
+    STD_ERROR_HANDLE</PRE>
+<P>Additionally, the following variables can be used:</P>
+<PRE>
+    $FG_BLACK
+    $FG_BLUE
+    $FG_LIGHTBLUE
+    $FG_RED
+    $FG_LIGHTRED
+    $FG_GREEN
+    $FG_LIGHTGREEN
+    $FG_MAGENTA
+    $FG_LIGHTMAGENTA
+    $FG_CYAN
+    $FG_LIGHTCYAN
+    $FG_BROWN
+    $FG_YELLOW
+    $FG_GRAY
+    $FG_WHITE</PRE>
+<PRE>
+    $BG_BLACK
+    $BG_BLUE
+    $BG_LIGHTBLUE
+    $BG_RED
+    $BG_LIGHTRED
+    $BG_GREEN
+    $BG_LIGHTGREEN
+    $BG_MAGENTA
+    $BG_LIGHTMAGENTA
+    $BG_CYAN
+    $BG_LIGHTCYAN
+    $BG_BROWN
+    $BG_YELLOW
+    $BG_GRAY
+    $BG_WHITE</PRE>
+<PRE>
+    $ATTR_NORMAL
+    $ATTR_INVERSE</PRE>
+<P>ATTR_NORMAL is set to gray foreground on black background (DOS's
+standard colors).</P>
+<P>
+<H2><A NAME="microsoft's documentation">Microsoft's Documentation</A></H2>
+<P>Documentation for the Win32 Console and Character mode Functions can
+be found on Microsoft's site at this URL:</P>
+<P><A HREF="http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar.htm">http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar.htm</A></P>
+<P>A reference of the available functions is at:</P>
+<P><A HREF="http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar_34.htm">http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar_34.htm</A></P>
+<P>
+<HR>
+<H1><A NAME="version history">VERSION HISTORY</A></H1>
+<UL>
+<LI><STRONG><A NAME="item_031">0.031 (24 Sep 1999)</A></STRONG><BR>
+
+<UL>
+<LI>
+Fixed typo in GenerateCtrlEvent().
+<P></P>
+<LI>
+Converted and added pod documentation (from Jan Dubois &lt;<A HREF="mailto:jand@activestate.com">jand@activestate.com</A>&gt;).
+<P></P></UL>
+<LI><STRONG><A NAME="item_03">0.03 (07 Apr 1997)</A></STRONG><BR>
+
+<UL>
+<LI>
+Added ``GenerateCtrlEvent'' method.
+<P></P>
+<LI>
+The PLL file now comes in 2 versions, one for Perl version 5.001
+(build 110) and one for Perl version 5.003 (build 300 and higher,
+EXCEPT 304).
+<P></P>
+<LI>
+added an installation program that will automatically copy the right
+version in the right place.
+<P></P></UL>
+<LI><STRONG><A NAME="item_01">0.01 (09 Feb 1997)</A></STRONG><BR>
+
+<UL>
+<LI>
+First public release.
+<P></P></UL>
+</UL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Aldo Calpini &lt;<A HREF="mailto:a.calpini@romagiubileo.it">a.calpini@romagiubileo.it</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Thanks to: Jesse Dougherty, Dave Roth, ActiveWare, and the
+Perl-Win32-Users community.</P>
+<P>
+<HR>
+<H1><A NAME="disclaimer">DISCLAIMER</A></H1>
+<P>This program is FREE; you can redistribute, modify, disassemble, or
+even reverse engineer this software at your will.  Keep in mind,
+however, that NOTHING IS GUARANTEED to work and everything you do is
+AT YOUR OWN RISK - I will not take responsibility for any damage, loss
+of money and/or health that may arise from the use of this program!</P>
+<P>This is distributed under the terms of Larry Wall's Artistic License.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Console - Win32 Console and Character Mode Functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

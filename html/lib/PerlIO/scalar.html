@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>PerlIO::scalar - support module for in-memory IO.</title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;PerlIO::scalar - support module for in-memory IO.</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>PerlIO::scalar - support module for in-memory IO.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+   open($fh,&quot;&lt;&quot;,\$scalar);
+   open($fh,&quot;&gt;&quot;,\$scalar);</pre>
+<p>or</p>
+<pre>
+   open($fh,&quot;&lt;:scalar&quot;,\$scalar);
+   open($fh,&quot;&gt;:scalar&quot;,\$scalar);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><code>PerlIO::scalar</code> only exists to use XSLoader to load C code that provides
+support for treating a scalar as an ``in memory'' file.</p>
+<p>All normal file operations can be performed on the handle. The scalar
+is considered a stream of bytes. Currently <a href="../../lib/Pod/perlfunc.html#item_fileno"><code>fileno($fh)</code></a> returns <a href="../../lib/Pod/perlfunc.html#item_undef"><code>undef</code></a>.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;PerlIO::scalar - support module for in-memory IO.</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

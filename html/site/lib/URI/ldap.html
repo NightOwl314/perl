@@ -1,0 +1,141 @@
+
+<HTML>
+<HEAD>
+<TITLE>URI::ldap - LDAP Uniform Resource Locators</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::ldap - LDAP Uniform Resource Locators</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>URI::ldap - LDAP Uniform Resource Locators</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use URI;</PRE>
+<PRE>
+  $uri = URI-&gt;new(&quot;ldap:$uri_string&quot;);
+  $dn     = $uri-&gt;dn;
+  $filter = $uri-&gt;filter;
+  @attr   = $uri-&gt;attributes;
+  $scope  = $uri-&gt;scope;
+  %extn   = $uri-&gt;extensions;
+</PRE>
+<PRE>
+
+  $uri = URI-&gt;new(&quot;ldap:&quot;);  # start empty
+  $uri-&gt;host(&quot;ldap.itd.umich.edu&quot;);
+  $uri-&gt;dn(&quot;o=University of Michigan,c=US&quot;);
+  $uri-&gt;attributes(qw(postalAddress));
+  $uri-&gt;scope('sub');
+  $uri-&gt;filter('(cn=Babs Jensen)');
+  print $uri-&gt;as_string,&quot;\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>URI::ldap</CODE> provides an interface to parse an LDAP URI in its
+constituent parts and also build a URI as described in
+RFC 2255.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P><CODE>URI::ldap</CODE> support all the generic and server methods defined by
+<A HREF="../../../site/lib/URI.html">the URI manpage</A>, plus the following.</P>
+<P>Each of the following methods can be used to set or get the value in
+the URI. The values are passed in unescaped form.  None of these will
+return undefined values, but elements without a default can be empty.
+If arguments are given then a new value will be set for the given part
+of the URI.</P>
+<DL>
+<DT><STRONG><A NAME="item_dn">$uri-&gt;dn( [$new_dn] )</A></STRONG><BR>
+<DD>
+Set or get the <EM>Distinguised Name</EM> part of the URI.  The DN
+identifies the base object of the LDAP search.
+<P></P>
+<DT><STRONG><A NAME="item_attributes">$uri-&gt;attributes( [@new_attrs] )</A></STRONG><BR>
+<DD>
+Set or get the list of attribute names which will be
+returned by the search.
+<P></P>
+<DT><STRONG><A NAME="item_scope">$uri-&gt;scope( [$new_scope] )</A></STRONG><BR>
+<DD>
+Set or get the scope that the search will use. The value can be one of
+<CODE>&quot;base&quot;</CODE>, <CODE>&quot;one&quot;</CODE> or <CODE>&quot;sub&quot;</CODE>. If none is given in the URI then the
+return value will default to <CODE>&quot;base&quot;</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item__scope">$uri-&gt;_scope( [$new_scope] )</A></STRONG><BR>
+<DD>
+Same as scope(), but does not default to anything.
+<P></P>
+<DT><STRONG><A NAME="item_filter">$uri-&gt;filter( [$new_filter] )</A></STRONG><BR>
+<DD>
+Set or get the filter that the search will use. If none is given in
+the URI then the return value will default to <CODE>&quot;(objectClass=*)&quot;</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item__filter">$uri-&gt;_filter( [$new_filter] )</A></STRONG><BR>
+<DD>
+Same as filter(), but does not default to anything.
+<P></P>
+<DT><STRONG><A NAME="item_extensions">$uri-&gt;extensions( [$etype =&gt; $evalue,...] )</A></STRONG><BR>
+<DD>
+Set or get the extensions used for the search. The list passed should
+be in the form etype1 =&gt; evalue1, etype2 =&gt; evalue2,... This is also
+the form of list that will be returned.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>RFC-2255</EM></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<EM><A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A></EM>&gt;</P>
+<P>Slightly modified by Gisle Aas to fit into the URI distribution.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1998 Graham Barr. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::ldap - LDAP Uniform Resource Locators</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

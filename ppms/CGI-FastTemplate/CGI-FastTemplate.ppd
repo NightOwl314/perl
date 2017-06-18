@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="CGI-FastTemplate" VERSION="1,09,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="sun4-solaris-thread-multi/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="sun4-solaris-thread-multi" />
+    <OS NAME="solaris" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="PA-RISC1.1-thread-multi/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="PA-RISC1.1-thread-multi" />
+    <OS NAME="hpux" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="MSWin32-x86-multi-thread/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="IA64.ARCHREV_0-thread-multi/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="IA64.ARCHREV_0-thread-multi" />
+    <OS NAME="hpux" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="i686-linux-thread-multi/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="i686-linux-thread-multi" />
+    <OS NAME="linux" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="IA64.ARCHREV_0-thread-multi-64all/CGI-FastTemplate.tar.gz" />
+    <ARCHITECTURE NAME="IA64.ARCHREV_0-thread-multi-64all" />
+    <OS NAME="hpux" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Perl extension for managing templates, and performing variable interpolation.</ABSTRACT>
+  <AUTHOR>Jason Moore (jmoore@sober.com)</AUTHOR>
+  <TITLE>CGI-FastTemplate</TITLE>
+</SOFTPKG>

@@ -1,0 +1,122 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTML::Tree - overview of HTML::TreeBuilder et al</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Tree - overview of HTML::TreeBuilder et al</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Tree - overview of HTML::TreeBuilder et al</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use HTML::TreeBuilder;
+  my $tree = HTML::TreeBuilder-&gt;new();
+  $tree-&gt;parse_file($filename);
+   #
+   # Then do something with the tree, using HTML::Element
+   # methods -- for example $tree-&gt;dump
+   #
+   # Then:
+  $tree-&gt;delete;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>HTML-Tree is a suite of Perl modules for making parse trees out of
+HTML source.  It consists of mainly two modules, whose documentation
+you should refer to: <A HREF="../../../site/lib/HTML/TreeBuilder.html">HTML::TreeBuilder</A>
+and <A HREF="../../../site/lib/HTML/Element.html">HTML::Element</A>.</P>
+<P>HTML::TreeBuilder is the module that builds the parse trees.  (It uses
+HTML::Parser to do the work of breaking the HTML up into tokens.)</P>
+<P>The tree that TreeBuilder builds for you is made up of objects of the
+class HTML::Element.</P>
+<P>If you find that you do not properly understand the documentation
+for HTML::TreeBuilder and HTML::Element, it may be because you are
+unfamiliar with tree-shaped data structures, or with object-oriented
+modules in general.  I have written some articles for <EM>The Perl
+Journal</EM> (<CODE>www.tpj.com</CODE>) that seek to provide that background:
+my article ``A User's View of Object-Oriented Modules'' in TPJ17;
+my article ``Trees'' in TPJ18;
+and
+my article ``Scanning HTML'' in TPJ19.
+The full text of those articles is contained in this distribution, as:</P>
+<P><A HREF="../../../site/lib/HTML/Tree/AboutObjects.html">HTML::Tree::AboutObjects</A>
+-- article: ``User's View of Object-Oriented Modules''</P>
+<P><A HREF="../../../site/lib/HTML/Tree/AboutTrees.html">HTML::Tree::AboutTrees</A>
+-- article: ``Trees''</P>
+<P><A HREF="../../../site/lib/HTML/Tree/Scanning.html">HTML::Tree::Scanning</A>
+-- article: ``Scanning HTML''</P>
+<P>Readers already familiar with object-oriented modules and tree-shaped
+data structures should read just the last article.  Readers without
+that background should read the first, then the second, and then the
+third.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/HTML/TreeBuilder.html">the HTML::TreeBuilder manpage</A>, <A HREF="../../../site/lib/HTML/Element.html">the HTML::Element manpage</A>, <A HREF="../../../site/lib/HTML/Tagset.html">the HTML::Tagset manpage</A>,
+<A HREF="../../../site/lib/HTML/Parser.html">the HTML::Parser manpage</A></P>
+<P><A HREF="../../../HTML/DOMbo.html">the HTML::DOMbo manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas; copyright 1999-2001 Sean M. Burke.
+(Except the articles contained in HTML::Tree::AboutObjects,
+HTML::Tree::AboutTrees, and HTML::Tree::Scanning, which are all
+copyright 2000 The Perl Journal.)</P>
+<P>Except for those three TPJ articles, the whole HTML-Tree distribution,
+of which this file is a part, is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.</P>
+<P>Those three TPJ articles may be distributed under the same terms as
+Perl itself.</P>
+<P>The programs and documentation in this dist are distributed in
+the hope that they will be useful, but without any warranty; without
+even the implied warranty of merchantability or fitness for a
+particular purpose.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Original HTML-Tree author Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt;; current
+maintainer Sean M. Burke, &lt;<A HREF="mailto:sburke@cpan.org">sburke@cpan.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Tree - overview of HTML::TreeBuilder et al</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

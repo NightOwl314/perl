@@ -1,0 +1,266 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::TreeBuilder - Parser that builds a HTML syntax tree</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::TreeBuilder - Parser that builds a HTML syntax tree</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods and attributes">METHODS AND ATTRIBUTES</A></LI>
+	<LI><A HREF="#html and its discontents">HTML AND ITS DISCONTENTS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#bug reports">BUG REPORTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::TreeBuilder - Parser that builds a HTML syntax tree</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  foreach my $file_name (@ARGV) {
+    my $tree = HTML::TreeBuilder-&gt;new; # empty tree
+    $tree-&gt;parse_file($file_name);
+    print &quot;Hey, here's a dump of the parse tree of $file_name:\n&quot;;
+    $tree-&gt;dump; # a method we inherit from HTML::Element
+    print &quot;And here it is, bizarrely rerendered as HTML:\n&quot;,
+      $tree-&gt;as_HTML, &quot;\n&quot;;
+</PRE>
+<PRE>
+
+    # Now that we're done with it, we must destroy it.
+    $tree = $tree-&gt;delete;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class is for HTML syntax trees that get built out of HTML
+source.  The way to use it is to:</P>
+<P>1. start a new (empty) HTML::TreeBuilder object,</P>
+<P>2. then use one of the methods from HTML::Parser (presumably with
+$tree-&gt;<CODE>parse_file($filename)</CODE> for files, or with
+$tree-&gt;<CODE>parse($document_content)</CODE> and $tree-&gt;eof if you've got
+the content in a string) to parse the HTML
+document into the tree $tree.</P>
+<P>3. do whatever you need to do with the syntax tree, presumably
+involving traversing it looking for some bit of information in it,</P>
+<P>4. and finally, when you're done with the tree, call $tree-&gt;delete to
+erase the contents of the tree from memory.  This kind of thing
+usually isn't necessary with most Perl objects, but it's necessary for
+TreeBuilder objects.  See <A HREF="../../lib/HTML/Element.html">the HTML::Element manpage</A> for a more verbose
+explanation of why this is the case.</P>
+<P>
+<HR>
+<H1><A NAME="methods and attributes">METHODS AND ATTRIBUTES</A></H1>
+<P>Objects of this class inherit the methods of both HTML::Parser and
+HTML::Element.  The methods inherited from HTML::Parser are used for
+building the HTML tree, and the methods inherited from HTML::Element
+are what you use to scrutinize the tree.  Besides this
+(HTML::TreeBuilder) documentation, you must also carefully read the
+HTML::Element documentation, and also skim the HTML::Parser
+documentation -- probably only its parse and parse_file methods are of
+interest.</P>
+<P>The following methods native to HTML::TreeBuilder all control how
+parsing takes place; they should be set <EM>before</EM> you try parsing into
+the given object.  You can set the attributes by passing a TRUE or
+FALSE value as argument.  E.g., $root-&gt;implicit_tags returns the current
+setting for the implicit_tags option, $root-&gt;<A HREF="#item_implicit_tags"><CODE>implicit_tags(1)</CODE></A> turns that
+option on, and $root-&gt;<A HREF="#item_implicit_tags"><CODE>implicit_tags(0)</CODE></A> turns it off.</P>
+<DL>
+<DT><STRONG><A NAME="item_implicit_tags">$root-&gt;<CODE>implicit_tags(value)</CODE></A></STRONG><BR>
+<DD>
+Setting this attribute to true will instruct the parser to try to
+deduce implicit elements and implicit end tags.  If it is false you
+get a parse tree that just reflects the text as it stands, which is
+unlikely to be useful for anything but quick and dirty parsing.  (And, in current versions, $root-&gt;
+Default is true.
+<P>Implicit elements have the <CODE>implicit()</CODE> attribute set.</P>
+<P></P>
+<DT><STRONG><A NAME="item_implicit_body_p_tag">$root-&gt;<CODE>implicit_body_p_tag(value)</CODE></A></STRONG><BR>
+<DD>
+This controls an aspect of implicit element behavior, if implicit_tags
+is on:  If a text element (PCDATA) or a phrasal element (such as
+``&lt;em&gt;'') is to be inserted under ``&lt;body&gt;'', two things
+can happen: if implicit_body_p_tag is true, it's placed under a new,
+implicit ``&lt;p&gt;'' tag.  (Past DTDs suggested this was the only
+correct behavior, and this is how past versions of this module
+behaved.)  But if implicit_body_p_tag is false, nothing is implicated
+-- the PCDATA or phrasal element is simply placed under
+``&lt;body&gt;''.  Default is false.
+<P></P>
+<DT><STRONG><A NAME="item_ignore_unknown">$root-&gt;<CODE>ignore_unknown(value)</CODE></A></STRONG><BR>
+<DD>
+This attribute controls whether unknown tags should be represented as
+elements in the parse tree, or whether they should be ignored. 
+Default is true (to ignore unknown tags.)
+<P></P>
+<DT><STRONG><A NAME="item_ignore_text">$root-&gt;<CODE>ignore_text(value)</CODE></A></STRONG><BR>
+<DD>
+Do not represent the text content of elements.  This saves space if
+all you want is to examine the structure of the document.  Default is
+false.
+<P></P>
+<DT><STRONG><A NAME="item_ignore_ignorable_whitespace">$root-&gt;<CODE>ignore_ignorable_whitespace(value)</CODE></A></STRONG><BR>
+<DD>
+If set to true, TreeBuilder will try to avoid
+creating ignorable whitespace text nodes in the tree.  Default is
+true.  (In fact, I'd be interested in hearing if there's ever a case
+where you need this off, or where leaving it on leads to incorrect
+behavior.)
+<P></P>
+<DT><STRONG><A NAME="item_p_strict">$root-&gt;<CODE>p_strict(value)</CODE></A></STRONG><BR>
+<DD>
+If set to true (and it defaults to false), TreeBuilder will take a
+narrower than normal view of what can be under a ``p'' element; if it sees
+a non-phrasal element about to be inserted under a ``p'', it will close that
+``p''.  Otherwise it will close p elements only for other ``p'''s, headings,
+and ``form'' (altho the latter may be removed in future versions).
+<P>For example, when going thru this snippet of code,</P>
+<PRE>
+  &lt;p&gt;stuff
+  &lt;ul&gt;</PRE>
+<P>TreeBuilder will normally (with <A HREF="#item_p_strict"><CODE>p_strict</CODE></A> false) put the ``ul'' element
+under the ``p'' element.  However, with <A HREF="#item_p_strict"><CODE>p_strict</CODE></A> set to true, it will
+close the ``p'' first.</P>
+<P>In theory, there should be strictness options like this for other/all
+elements besides just ``p''; but I treat this as a specal case simply
+because of the fact that ``p'' occurs so frequently and its end-tag is
+omitted so often; and also because application of strictness rules
+at parse-time across all elements often makes tiny errors in HTML
+coding produce drastically bad parse-trees, in my experience.</P>
+<P>If you find that you wish you had an option like this to enforce
+content-models on all elements, then I suggest that what you want is
+content-model checking as a stage after TreeBuilder has finished
+parsing.</P>
+<P></P>
+<DT><STRONG><A NAME="item_store_comments">$root-&gt;<CODE>store_comments(value)</CODE></A></STRONG><BR>
+<DD>
+This determines whether TreeBuilder will normally store comments found
+while parsing content into <CODE>$root</CODE>.  Currently, this is off by default.
+<P></P>
+<DT><STRONG><A NAME="item_store_declarations">$root-&gt;<CODE>store_declarations(value)</CODE></A></STRONG><BR>
+<DD>
+This determines whether TreeBuilder will normally store markup
+declarations found while parsing content into <CODE>$root</CODE>.  Currently,
+this is off by default.
+<P>It is somewhat of a known bug (to be fixed one of these days, if
+anyone needs it?) that declarations in the preamble (before the ``html''
+start-tag) end up actually <EM>under</EM> the ``html'' element.</P>
+<P></P>
+<DT><STRONG><A NAME="item_store_pis">$root-&gt;<CODE>store_pis(value)</CODE></A></STRONG><BR>
+<DD>
+This determines whether TreeBuilder will normally store processing
+instructions found while parsing content into <CODE>$root</CODE> -- assuming a
+recent version of HTML::Parser (old versions won't parse PIs
+correctly).  Currently, this is off (false) by default.
+<P>It is somewhat of a known bug (to be fixed one of these days, if
+anyone needs it?) that PIs in the preamble (before the ``html''
+start-tag) end up actually <EM>under</EM> the ``html'' element.</P>
+<P></P>
+<DT><STRONG><A NAME="item_warn">$root-&gt;<CODE>warn(value)</CODE></A></STRONG><BR>
+<DD>
+This determines whether syntax errors during parsing should generate
+warnings, emitted via Perl's <A HREF="#item_warn"><CODE>warn</CODE></A> function.
+<P>This is off (false) by default.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="html and its discontents">HTML AND ITS DISCONTENTS</A></H1>
+<P>HTML is rather harder to parse than people who write it generally
+suspect.</P>
+<P>Here's the problem: HTML is a kind of SGML that permits ``minimization''
+and ``implication''.  In short, this means that you don't have to close
+every tag you open (because the opening of a subsequent tag may
+implicitly close it), and if you use a tag that can't occur in the
+context you seem to using it in, under certain conditions the parser
+will be able to realize you mean to leave the current context and
+enter the new one, that being the only one that your code could
+correctly be interpreted in.</P>
+<P>Now, this would all work flawlessly and unproblematically if: 1) all
+the rules that both prescribe and describe HTML were (and had been)
+clearly set out, and 2) everyone was aware of these rules and wrote
+their code in compliance to them.</P>
+<P>However, it didn't happen that way, and so most HTML pages are
+difficult if not impossible to correctly parse with nearly any set of
+straightforward SGML rules.  That's why the internals of
+HTML::TreeBuilder consist of lots and lots of special cases -- instead
+of being just a generic SGML parser with HTML DTD rules plugged in.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>* Hopefully framesets behave correctly now.  Email me if you find a
+strange parse of documents with framesets.</P>
+<P>* Bad HTML code will, often as not, make for a bad parse tree. 
+Regrettable, but unavoidably true.</P>
+<P>* If you're running with implicit_tags off (God help you!), consider
+that $tree-&gt;content_list probably contains the tree or grove from the
+parse, and not $tree itself (which will, oddly enough, be an implicit
+'html' element).  This seems counter-intuitive and problematic; but
+seeing as how almost no HTML ever parses correctly with implicit_tags
+off, this interface oddity seems the least of your problems.</P>
+<P>
+<HR>
+<H1><A NAME="bug reports">BUG REPORTS</A></H1>
+<P>When a document parses in a way different from how you think it
+should, I ask that you report this to me as a bug.  The first thing
+you should do is copy the document, trim out as much of it as you can
+while still producing the bug in question, and <EM>then</EM> email me that
+mini-document <EM>and</EM> the code you're using to parse it, at <CODE>sburke@cpan.org</CODE>.
+Include a note as to how it 
+parses (presumably including its $tree-&gt;dump output), and then a
+<EM>careful and clear</EM> explanation of where you think the parser is
+going astray, and how you would prefer that it work instead.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/HTML/Parser.html">the HTML::Parser manpage</A>, <A HREF="../../lib/HTML/Element.html">the HTML::Element manpage</A>, <A HREF="../../lib/HTML/Tagset.html">the HTML::Tagset manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas; copyright 1999, 2000 Sean M. Burke.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Original author Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt;; current maintainer
+Sean M. Burke, &lt;<A HREF="mailto:sburke@cpan.org">sburke@cpan.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::TreeBuilder - Parser that builds a HTML syntax tree</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

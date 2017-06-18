@@ -1,0 +1,114 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec - portably perform operations on file names</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec - portably perform operations on file names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec - portably perform operations on file names</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use File::Spec;</PRE>
+<PRE>
+        $x=File::Spec-&gt;catfile('a', 'b', 'c');</PRE>
+<P>which returns 'a/b/c' under Unix. Or:</P>
+<PRE>
+        use File::Spec::Functions;</PRE>
+<PRE>
+        $x = catfile('a', 'b', 'c');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module is designed to support operations commonly performed on file
+specifications (usually called ``file names'', but not to be confused with the
+contents of a file, or Perl's file handles), such as concatenating several
+directory and file names into a single path, or determining whether a path
+is rooted. It is based on code directly taken from MakeMaker 5.17, code
+written by Andreas K&ouml;nig, Andy Dougherty, Charles Bailey, Ilya
+Zakharevich, Paul Schinder, and others.</P>
+<P>Since these functions are different for most operating systems, each set of
+OS specific routines is available in a separate module, including:</P>
+<PRE>
+        File::Spec::Unix
+        File::Spec::Mac
+        File::Spec::OS2
+        File::Spec::Win32
+        File::Spec::VMS</PRE>
+<P>The module appropriate for the current OS is automatically loaded by
+File::Spec. Since some modules (like VMS) make use of facilities available
+only under that OS, it may not be possible to load all modules under all
+operating systems.</P>
+<P>Since File::Spec is object oriented, subroutines should not called directly,
+as in:</P>
+<PRE>
+        File::Spec::catfile('a','b');</PRE>
+<P>but rather as class methods:</P>
+<PRE>
+        File::Spec-&gt;catfile('a','b');</PRE>
+<P>For simple uses, <A HREF="../../lib/File/Spec/Functions.html">the File::Spec::Functions manpage</A> provides convenient functional
+forms of these methods.</P>
+<P>For a list of available methods, please consult <A HREF="../../lib/File/Spec/Unix.html">the File::Spec::Unix manpage</A>,
+which contains the entire set, and which is inherited by the modules for
+other platforms. For further information, please see <A HREF="../../lib/File/Spec/Mac.html">the File::Spec::Mac manpage</A>,
+<A HREF="../../lib/File/Spec/OS2.html">the File::Spec::OS2 manpage</A>, <A HREF="../../lib/File/Spec/Win32.html">the File::Spec::Win32 manpage</A>, or <A HREF="../../lib/File/Spec/VMS.html">the File::Spec::VMS manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>File::Spec::Unix, File::Spec::Mac, File::Spec::OS2, File::Spec::Win32,
+File::Spec::VMS, File::Spec::Functions, ExtUtils::MakeMaker</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Kenneth Albanowski &lt;<EM><A HREF="mailto:kjahds@kjahds.com">kjahds@kjahds.com</A></EM>&gt;, Andy Dougherty
+&lt;<EM><A HREF="mailto:doughera@lafcol.lafayette.edu">doughera@lafcol.lafayette.edu</A></EM>&gt;, Andreas K&ouml;nig
+&lt;<EM><A HREF="mailto:A.Koenig@franz.ww.TU-Berlin.DE">A.Koenig@franz.ww.TU-Berlin.DE</A></EM>&gt;, Tim Bunce &lt;<EM><A HREF="mailto:Tim.Bunce@ig.co.uk">Tim.Bunce@ig.co.uk</A></EM>&gt;. VMS
+support by Charles Bailey &lt;<EM><A HREF="mailto:bailey@newman.upenn.edu">bailey@newman.upenn.edu</A></EM>&gt;.  OS/2 support by
+Ilya Zakharevich &lt;<EM><A HREF="mailto:ilya@math.ohio-state.edu">ilya@math.ohio-state.edu</A></EM>&gt;. Mac support by Paul Schinder
+&lt;<EM><A HREF="mailto:schinder@pobox.com">schinder@pobox.com</A></EM>&gt;.  <CODE>abs2rel()</CODE> and <CODE>rel2abs()</CODE> written by
+Shigio Yamaguchi &lt;<EM><A HREF="mailto:shigio@tamacom.com">shigio@tamacom.com</A></EM>&gt;, modified by Barrie Slaymaker
+&lt;<EM><A HREF="mailto:barries@slaysys.com">barries@slaysys.com</A></EM>&gt;.  splitpath(), splitdir(), <CODE>catpath()</CODE> and <CODE>catdir()</CODE>
+by Barrie Slaymaker.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec - portably perform operations on file names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

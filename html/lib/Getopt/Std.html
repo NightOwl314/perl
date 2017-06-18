@@ -1,0 +1,81 @@
+
+<HTML>
+<HEAD>
+<TITLE>getopt - Process single-character switches with switch clustering</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;getopt - Process single-character switches with switch clustering</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>getopt - Process single-character switches with switch clustering</P>
+<P>getopts - Process single-character switches with switch clustering</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Getopt::Std;</PRE>
+<PRE>
+    getopt('oDI');    # -o, -D &amp; -I take arg.  Sets opt_* as a side effect.
+    getopt('oDI', \%opts);    # -o, -D &amp; -I take arg.  Values in %opts
+    getopts('oif:');  # -o &amp; -i are boolean flags, -f takes an argument
+                      # Sets opt_* as a side effect.
+    getopts('oif:', \%opts);  # options as above. Values in %opts</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>getopt()</CODE> functions processes single-character switches with switch
+clustering.  Pass one argument which is a string containing all switches
+that take an argument.  For each switch found, sets $opt_x (where x is the
+switch name) to the value of the argument, or 1 if no argument.  Switches
+which take an argument don't care whether there is a space between the
+switch and the argument.</P>
+<P>Note that, if your code is running under the recommended <CODE>use strict
+'vars'</CODE> pragma, you will need to declare these package variables
+with ``our'':</P>
+<PRE>
+    our($opt_foo, $opt_bar);</PRE>
+<P>For those of you who don't like additional global variables being created, <CODE>getopt()</CODE>
+and <CODE>getopts()</CODE> will also accept a hash reference as an optional second argument. 
+Hash keys will be x (where x is the switch name) with key values the value of
+the argument or 1 if no argument is specified.</P>
+<P>To allow programs to process arguments that look like switches, but aren't,
+both functions will stop processing switches when they see the argument
+<CODE>--</CODE>.  The <CODE>--</CODE> will be removed from @ARGV.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;getopt - Process single-character switches with switch clustering</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

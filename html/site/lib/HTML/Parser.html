@@ -1,0 +1,758 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::Parser - HTML parser class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Parser - HTML parser class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#argspec">Argspec</A></LI>
+		<LI><A HREF="#events">Events</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 2 compatibility">VERSION 2 COMPATIBILITY</A></LI>
+	<LI><A HREF="#subclassing">SUBCLASSING</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Parser - HTML parser class</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>This is the new XS based HTML::Parser.
+It should be completely backwards compatible with
+HTML::Parser version 2.2x, but has many new features
+and is significantly faster.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTML::Parser ();</PRE>
+<PRE>
+ # Create parser object
+ $p = HTML::Parser-&gt;new( api_version =&gt; 3,
+                         start_h =&gt; [\&amp;start, &quot;tagname, attr&quot;],
+                         end_h   =&gt; [\&amp;end,   &quot;tagname&quot;],
+                         marked_sections =&gt; 1,
+                       );</PRE>
+<PRE>
+ # Parse document text chunk by chunk
+ $p-&gt;parse($chunk1);
+ $p-&gt;parse($chunk2);
+ #...
+ $p-&gt;eof;                 # signal end of document</PRE>
+<PRE>
+ # Parse directly from file
+ $p-&gt;parse_file(&quot;foo.html&quot;);
+ # or
+ open(F, &quot;foo.html&quot;) || die;
+ $p-&gt;parse_file(*F);</PRE>
+<P>HTML::Parser version 2 style subclassing and method callbacks:</P>
+<PRE>
+ {
+    package MyParser;
+    use base 'HTML::Parser';</PRE>
+<PRE>
+    sub start {
+       my($self, $tagname, $attr, $attrseq, $origtext) = @_;
+       #...
+    }</PRE>
+<PRE>
+    sub end {
+        my($self, $tagname, $origtext) = @_;
+        #...
+    }</PRE>
+<PRE>
+    sub text {
+        my($self, $origtext, $is_cdata) = @_;
+        #...
+    }
+ }</PRE>
+<PRE>
+ my $p = MyParser-&gt;new;
+ $p-&gt;parse_file(&quot;foo.html&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Objects of the <CODE>HTML::Parser</CODE> class will recognize markup and
+separate it from plain text (alias data content) in HTML
+documents.  As different kinds of markup and text are recognized, the
+corresponding event handlers are invoked.</P>
+<P><CODE>HTML::Parser</CODE> in not a generic SGML parser.  We have tried to
+make it able to deal with the HTML that is actually ``out there'', and
+it normally parses as closely as possible to the way the popular web
+browsers do it instead of strictly following one of the many HTML
+specifications from W3C.  Where there is disagreement there is often
+an option that you can enable to get the official behaviour.</P>
+<P>The document to be parsed may be supplied in arbitrary chunks.  This
+makes on-the-fly parsing as documents are received from the network
+possible.</P>
+<P>If event driven parsing does not feel right for your application, you
+might want to use <CODE>HTML::TokeParser</CODE>.  It is a
+<CODE>HTML::Parser</CODE> subclass that allows a more conventional program
+structure.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following method is used to construct a new <CODE>HTML::Parser</CODE> object:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$p = HTML::Parser-&gt;new( %options_and_handlers )</A></STRONG><BR>
+<DD>
+This class method creates a new <CODE>HTML::Parser</CODE> object and
+returns it.  Key/value pair arguments may be provided to assign event
+handlers or initialize parser options.  The handlers and parser
+options can also be set or modified later by method calls described below.
+<P>If a top level key is in the form ``&lt;event&gt;_h'' (e.g., ``text_h''} then it
+assigns a handler to that event, otherwise it initializes a parser
+option. The event handler specification value must be an array
+reference.  Multiple handlers may also be assigned with the 'handlers
+=&gt; [%handlers]' option.  See examples below.</P>
+<P>If <A HREF="#item_new"><CODE>new()</CODE></A> is called without any arguments, it will create a parser that
+uses callback methods compatible with version 2 of <CODE>HTML::Parser</CODE>.
+See the section on ``version 2 compatibility'' below for details.</P>
+<P>Special constructor option 'api_version =&gt; 2' can be used to
+initialize version 2 callbacks while still setting other options and
+handlers.  The 'api_version =&gt; 3' option can be used if you don't want
+to set any options and don't want to fall back to v2 compatible
+mode.</P>
+<P>Examples:</P>
+<PRE>
+ $p = HTML::Parser-&gt;new(api_version =&gt; 3,
+                        text_h =&gt; [ sub {...}, &quot;dtext&quot; ]);</PRE>
+<P>This creates a new parser object with a text event handler subroutine
+that receives the original text with general entities decoded.</P>
+<PRE>
+ $p = HTML::Parser-&gt;new(api_version =&gt; 3,
+                        start_h =&gt; [ 'my_start', &quot;self,tokens&quot; ]);</PRE>
+<P>This creates a new parser object with a start event handler method
+that receives the $p and the tokens array.</P>
+<PRE>
+ $p = HTML::Parser-&gt;new(api_version =&gt; 3,
+                        handlers =&gt; { text =&gt; [\@array, &quot;event,text&quot;],
+                                      comment =&gt; [\@array, &quot;event,text&quot;],
+                                    });</PRE>
+<P>This creates a new parser object that stores the event type and the
+original text in @array for text and comment events.</P>
+<P></P></DL>
+<P>The following methods feed the HTML document
+to the <CODE>HTML::Parser</CODE> object:</P>
+<DL>
+<DT><STRONG><A NAME="item_parse">$p-&gt;parse( $string )</A></STRONG><BR>
+<DD>
+Parse $string as the next chunk of the HTML document.  The return
+value is normally a reference to the parser object (i.e. $p).
+Handlers invoked should not attempt modify the $string in-place until
+$p-&gt;parse returns.
+<P>If an invoked event handler aborts parsing by calling $p-&gt;eof, then
+$p-&gt;<A HREF="#item_parse"><CODE>parse()</CODE></A> will return a FALSE value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_parse_file">$p-&gt;parse_file( $file )</A></STRONG><BR>
+<DD>
+Parse text directly from a file.  The $file argument can be a
+filename, an open file handle, or a reference to a an open file
+handle.
+<P>If $file contains a filename and the file can't be opened, then the
+method returns an undefined value and $! tells why it failed.
+Otherwise the return value is a reference to the parser object.</P>
+<P>If a file handle is passed as the $file argument, then the file will
+normally be read until EOF, but not closed.</P>
+<P>If an invoked event handler aborts parsing by calling $p-&gt;eof,
+then $p-&gt;<A HREF="#item_parse_file"><CODE>parse_file()</CODE></A> may not have read the entire file.</P>
+<P>On systems with multi-byte line terminators, the values passed for the
+offset and length argspecs may be too low if parse_file is called with
+a file handle that is not in binary mode.</P>
+<P></P>
+<DT><STRONG><A NAME="item_eof">$p-&gt;eof</A></STRONG><BR>
+<DD>
+Signals the end of the HTML document.  Calling the $p-&gt;eof method
+outside a handler callback will flush any remaining buffered text
+(which triggers the <A HREF="#item_text"><CODE>text</CODE></A> event if there is any remaining text).
+<P>Calling $p-&gt;eof inside a handler will terminate parsing at that point
+and cause $p-&gt;parse to return a FALSE value.  This also terminates
+parsing by $p-&gt;parse_file().</P>
+<P>The return value is a reference to the parser object.</P>
+<P></P></DL>
+<P>Most parser options are controlled by boolean attributes.
+Each boolean attribute is enabled by calling the corresponding method
+with a TRUE argument and disabled with a FALSE argument.  The
+attribute value is left unchanged if no argument is given.  The return
+value from each method is the old attribute value.</P>
+<P>Methods that can be used to get and/or set parser options are:</P>
+<DL>
+<DT><STRONG><A NAME="item_strict_comment">$p-&gt;strict_comment( [$bool] )</A></STRONG><BR>
+<DD>
+By default, comments are terminated by the first occurrence of ``--&gt;''.
+This is the behaviour of most popular browsers (like Netscape and
+MSIE), but it is not correct according to the official HTML
+standard.  Officially, you need an even number of ``--'' tokens before
+the closing ``&gt;'' is recognized and there may not be anything but
+whitespace between an even and an odd ``--''.
+<P>The official behaviour is enabled by enabling this attribute.</P>
+<P></P>
+<DT><STRONG><A NAME="item_strict_names">$p-&gt;strict_names( [$bool] )</A></STRONG><BR>
+<DD>
+By default, almost anything is allowed in tag and attribute names.
+This is the behaviour of most popular browsers and allows us to parse
+some broken tags with invalid attr values like:
+<PRE>
+   &lt;IMG SRC=newprevlstGr.gif ALT=[PREV LIST] BORDER=0&gt;</PRE>
+<P>By default, ``LIST]'' is parsed as a boolean attribute, not as
+part of the ALT value as was clearly intended.  This is also what
+Netscape sees.</P>
+<P>The official behaviour is enabled by enabling this attribute.  If
+enabled, it will cause the tag above to be reported as text
+since ``LIST]'' is not a legal attribute name.</P>
+<P></P>
+<DT><STRONG><A NAME="item_boolean_attribute_value">$p-&gt;boolean_attribute_value( $val )</A></STRONG><BR>
+<DD>
+This method sets the value reported for boolean attributes inside HTML
+start tags.  By default, the name of the attribute is also used as its
+value.  This affects the values reported for <A HREF="#item_tokens"><CODE>tokens</CODE></A> and <A HREF="#item_attr"><CODE>attr</CODE></A>
+argspecs.
+<P></P>
+<DT><STRONG><A NAME="item_xml_mode">$p-&gt;xml_mode( [$bool] )</A></STRONG><BR>
+<DD>
+Enabling this attribute changes the parser to allow some XML
+constructs such as <EM>empty element tags</EM> and <EM>XML processing
+instructions</EM>.  It disables forcing tag and attribute names to lower
+case when they are reported by the <A HREF="#item_tagname"><CODE>tagname</CODE></A> and <A HREF="#item_attr"><CODE>attr</CODE></A> argspecs,
+and suppress special treatment of elements that are parsed as CDATA
+for HTML.
+<P><EM>Empty element tags</EM> look like start tags, but end with the character
+sequence ``/&gt;''.  When recognized by <CODE>HTML::Parser</CODE> they cause an
+artificial end event in addition to the start event.  The <A HREF="#item_text"><CODE>text</CODE></A> for
+the artificial end event will be empty and the <A HREF="#item_tokenpos"><CODE>tokenpos</CODE></A> array will
+be undefined even though the only element in the token array will have
+the correct tag name.</P>
+<P><EM>XML processing instructions</EM> are terminated by ``?&gt;'' instead of a
+simple ``&gt;'' as is the case for HTML.</P>
+<P></P>
+<DT><STRONG><A NAME="item_unbroken_text">$p-&gt;unbroken_text( [$bool] )</A></STRONG><BR>
+<DD>
+By default, blocks of text are given to the text handler as soon as
+possible (but the parser makes sure to always break text at the
+boundary between whitespace and non-whitespace so single words and
+entities always can be decoded safely).  This might create breaks that
+make it hard to do transformations on the text. When this attribute is
+enabled, blocks of text are always reported in one piece.  This will
+delay the text event until the following (non-text) event has been
+recognized by the parser.
+<P></P>
+<DT><STRONG><A NAME="item_marked_sections">$p-&gt;marked_sections( [$bool] )</A></STRONG><BR>
+<DD>
+By default, section markings like &lt;![CDATA[...]]&gt; are treated like
+ordinary text.  When this attribute is enabled section markings are
+honoured.
+<P>There are currently no events associated with marked section
+elements.</P>
+<P></P></DL>
+<P>As markup and text is recognized, handlers are invoked.  The following
+method is used to set up handlers for different events:</P>
+<DL>
+<DT><STRONG><A NAME="item_handler">$p-&gt;handler( event =&gt; \&amp;subroutine, argspec )</A></STRONG><BR>
+<DD>
+<DT><STRONG>$p-&gt;handler( event =&gt; method_name, argspec )</STRONG><BR>
+<DD>
+<DT><STRONG>$p-&gt;handler( event =&gt; \@accum, argspec )</STRONG><BR>
+<DD>
+<DT><STRONG>$p-&gt;handler( event =&gt; ``'' );</STRONG><BR>
+<DD>
+<DT><STRONG>$p-&gt;handler( event =&gt; undef );</STRONG><BR>
+<DD>
+<DT><STRONG>$p-&gt;handler( event );</STRONG><BR>
+<DD>
+This method assigns a subroutine, method, or array to handle an event.
+<P>Event is one of <A HREF="#item_text"><CODE>text</CODE></A>, <A HREF="#item_start"><CODE>start</CODE></A>, <A HREF="#item_end"><CODE>end</CODE></A>, <A HREF="#item_declaration"><CODE>declaration</CODE></A>, <A HREF="#item_comment"><CODE>comment</CODE></A>,
+<A HREF="#item_process"><CODE>process</CODE></A> or <A HREF="#item_default"><CODE>default</CODE></A>.</P>
+<P><EM>Subroutine</EM> is a reference to a subroutine which is called to handle
+the event.</P>
+<P><EM>Method_name</EM> is the name of a method of $p which is called to handle
+the event.</P>
+<P><EM>Accum</EM> is a array that will hold the event information as
+sub-arrays.</P>
+<P>If the second argument is ``'', the event is ignored.
+If it is undef, the default handler is invoked for the event.</P>
+<P><EM>Argspec</EM> is a string that describes the information to be reported
+for the event.  Any requested information that does not apply to a
+specific event is passed as <A HREF="#item_undef"><CODE>undef</CODE></A>.  If argspec is omitted, then it
+is left unchanged since last update.</P>
+<P>The return value from $p-&gt;handle is the old callback routine or a
+reference to the accumulator array.</P>
+<P>Return values from handler callback routines/methods are always
+ignored.  A handler callback can request parsing to be aborted by
+invoking the $p-&gt;eof method.  A handler callback is not allowed to
+invoke $p-&gt;<A HREF="#item_parse"><CODE>parse()</CODE></A> or $p-&gt;parse_file().</P>
+<P>Examples:</P>
+<PRE>
+    $p-&gt;handler(start =&gt;  &quot;start&quot;, 'self, attr, attrseq, text' );</PRE>
+<P>This causes the ``start'' method of object $p to be called for 'start' events.
+The callback signature is $p-&gt;start(\%attr, \@attr_seq, $text).</P>
+<PRE>
+    $p-&gt;handler(start =&gt;  \&amp;start, 'attr, attrseq, text' );</PRE>
+<P>This causes subroutine <A HREF="#item_start"><CODE>start()</CODE></A> to be called for 'start' events.
+The callback signature is start(\%attr, \@attr_seq, $text).</P>
+<PRE>
+    $p-&gt;handler(start =&gt;  \@accum, '&quot;S&quot;, attr, attrseq, text' );</PRE>
+<P>This causes 'start' event information to be saved in @accum.
+The array elements will be ['S', \%attr, \@attr_seq, $text].</P>
+<PRE>
+   $p-&gt;handler(start =&gt; &quot;&quot;);</PRE>
+<P>This causes 'start' events to be ignored.  It also supresses
+invokations of any default handler for start events.  It is equivalent
+to $p-&gt;handler(start =&gt; sub {}), but is more efficient.</P>
+<PRE>
+   $p-&gt;handler(start =&gt; undef);</PRE>
+<P>This causes no handler to be assosiated with start events.
+If there is a default handler it will be invoked.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="argspec">Argspec</A></H2>
+<P>Argspec is a string containing a comma separated list that describes
+the information reported by the event.  The following argspec
+identifier names can be used:</P>
+<DL>
+<DT><STRONG><A NAME="item_self"><CODE>self</CODE></A></STRONG><BR>
+<DD>
+Self causes the current object to be passed to the handler.  If the
+handler is a method, this must be the first element in the argspec.
+<P></P>
+<DT><STRONG><A NAME="item_tokens"><CODE>tokens</CODE></A></STRONG><BR>
+<DD>
+Tokens causes a reference to an array of token strings to be passed.
+The strings are exactly as they were found in the original text,
+no decoding or case changes are applied.
+<P>For <A HREF="#item_declaration"><CODE>declaration</CODE></A> events, the array contains each word, comment, and
+delimited string starting with the declaration type.</P>
+<P>For <A HREF="#item_comment"><CODE>comment</CODE></A> events, this contains each sub-comment.  If
+$p-&gt;strict_comments is disabled, there will be only one sub-comment.</P>
+<P>For <A HREF="#item_start"><CODE>start</CODE></A> events, this contains the original tag name followed by
+the attribute name/value pairs.  The value of boolean attributes will
+be either the value set by $p-&gt;boolean_attribute_value or the
+attribute name if no value has been set by
+$p-&gt;boolean_attribute_value.</P>
+<P>For <A HREF="#item_end"><CODE>end</CODE></A> events, this contains the original tag name (one token
+only).</P>
+<P>For <A HREF="#item_process"><CODE>process</CODE></A> events, this contains the process instructions (one
+token only).</P>
+<P>This passes <A HREF="#item_undef"><CODE>undef</CODE></A> for <A HREF="#item_text"><CODE>text</CODE></A> events.</P>
+<P></P>
+<DT><STRONG><A NAME="item_tokenpos"><CODE>tokenpos</CODE></A></STRONG><BR>
+<DD>
+Tokenpos causes a reference to an array of token positions to be
+passed.  For each string that appears in <A HREF="#item_tokens"><CODE>tokens</CODE></A>, this array
+contains two numbers.  The first number is the offset of the start of
+the token in the original <A HREF="#item_text"><CODE>text</CODE></A> and the second number is the length
+of the token.
+<P>Boolean attributes in a <A HREF="#item_start"><CODE>start</CODE></A> event will have (0,0) for the
+attribute value offset and length.</P>
+<P>This passes undef if there are no tokens in the event (e.g., <A HREF="#item_text"><CODE>text</CODE></A>)
+and for artifical <A HREF="#item_end"><CODE>end</CODE></A> events triggered by empty element tags.</P>
+<P>If you are using these offsets and lengths to modify <A HREF="#item_text"><CODE>text</CODE></A>, you
+should either work from right to left, or be very careful to calculate
+the changes to the offsets.</P>
+<P></P>
+<DT><STRONG><A NAME="item_token0"><CODE>token0</CODE></A></STRONG><BR>
+<DD>
+Token0 causes the original text of the first token string to be
+passed.  This should always be the same as $tokens-&gt;[0].
+<P>For <A HREF="#item_declaration"><CODE>declaration</CODE></A> events, this is the declaration type.</P>
+<P>For <A HREF="#item_start"><CODE>start</CODE></A> and <A HREF="#item_end"><CODE>end</CODE></A> events, this is the tag name.</P>
+<P>For <A HREF="#item_process"><CODE>process</CODE></A> and non-strict <A HREF="#item_comment"><CODE>comment</CODE></A> events, this is everything
+inside the tag.</P>
+<P>This passes undef if there are no tokens in the event.</P>
+<P></P>
+<DT><STRONG><A NAME="item_tagname"><CODE>tagname</CODE></A></STRONG><BR>
+<DD>
+This is the element name (or <EM>generic identifier</EM> in SGML jargon) for
+start and end tags.  Since HTML is case insensitive this name is
+forced to lower case to ease string matching.
+<P>Since XML is case sensitive, the tagname case is not
+changed when <A HREF="#item_xml_mode"><CODE>xml_mode</CODE></A> is enabled.</P>
+<P>The declaration type of declaration elements is also passed as a tagname,
+even if that is a bit strange.
+In fact, in the current implementation tagname is
+identical to <A HREF="#item_token0"><CODE>token0</CODE></A> except that the name may be forced to lower case.</P>
+<P></P>
+<DT><STRONG><A NAME="item_attr"><CODE>attr</CODE></A></STRONG><BR>
+<DD>
+Attr causes a reference to a hash of attribute name/value pairs to be
+passed.
+<P>Boolean attributes' values are either the value set by
+$p-&gt;boolean_attribute_value or the attribute name if no value has been
+set by $p-&gt;boolean_attribute_value.</P>
+<P>This passes undef except for <A HREF="#item_start"><CODE>start</CODE></A> events.</P>
+<P>Unless <A HREF="#item_xml_mode"><CODE>xml_mode</CODE></A> is enabled, the attribute names are forced to
+lower case.</P>
+<P>General entities are decoded in the attribute values and
+one layer of matching quotes enclosing the attribute values are removed.</P>
+<P></P>
+<DT><STRONG><A NAME="item_attrseq"><CODE>attrseq</CODE></A></STRONG><BR>
+<DD>
+Attrseq causes a reference to an array of attribute names to be
+passed.  This can be useful if you want to walk the <A HREF="#item_attr"><CODE>attr</CODE></A> hash in
+the original sequence.
+<P>This passes undef except for <A HREF="#item_start"><CODE>start</CODE></A> events.</P>
+<P>Unless <A HREF="#item_xml_mode"><CODE>xml_mode</CODE></A> is enabled, the attribute names are forced to lower
+case.</P>
+<P></P>
+<DT><STRONG><A NAME="item_text"><CODE>text</CODE></A></STRONG><BR>
+<DD>
+Text causes the source text (including markup element delimiters) to be
+passed.
+<P></P>
+<DT><STRONG><A NAME="item_dtext"><CODE>dtext</CODE></A></STRONG><BR>
+<DD>
+Dtext causes the decoded text to be passed.  General entities are
+automatically decoded unless the event was inside a CDATA section or
+was between literal start and end tags (<CODE>script</CODE>, <CODE>style</CODE>, <CODE>xmp</CODE>,
+and <CODE>plaintext</CODE>).
+<P>The ISO 8859-1 character set (aka Latin1) is assumed for entity
+decoding.</P>
+<P>It is planned that <CODE>HTML::Parser</CODE> will get an <CODE>utf8</CODE> option
+at some point that will affect the byte sequence that characters with
+codes greater than 127 will decode into.</P>
+<P>This passes undef except for <A HREF="#item_text"><CODE>text</CODE></A> events.</P>
+<P></P>
+<DT><STRONG><A NAME="item_is_cdata"><CODE>is_cdata</CODE></A></STRONG><BR>
+<DD>
+Is_cdata causes a TRUE value to be passed if the event is inside a CDATA
+section or is between literal start and end tags (<CODE>script</CODE>,
+<CODE>style</CODE>, <CODE>xmp</CODE>, and <CODE>plaintext</CODE>).
+<P>When the flag is FALSE for a text event, then you should normally
+either use <A HREF="#item_dtext"><CODE>dtext</CODE></A> or decode the entities yourself before the text is
+processed further.</P>
+<P></P>
+<DT><STRONG><A NAME="item_offset"><CODE>offset</CODE></A></STRONG><BR>
+<DD>
+Offset causes the byte position in the HTML document of the start of
+the event to be passed.  The first byte in the document is 0.
+<P></P>
+<DT><STRONG><A NAME="item_length"><CODE>length</CODE></A></STRONG><BR>
+<DD>
+Length causes the number of bytes of the source text of the event to
+be passed.
+<P></P>
+<DT><STRONG><A NAME="item_event"><CODE>event</CODE></A></STRONG><BR>
+<DD>
+Event causes the event name to be passed.
+<P>The event name is one of <A HREF="#item_text"><CODE>text</CODE></A>, <A HREF="#item_start"><CODE>start</CODE></A>, <A HREF="#item_end"><CODE>end</CODE></A>, <A HREF="#item_declaration"><CODE>declaration</CODE></A>,
+<A HREF="#item_comment"><CODE>comment</CODE></A>, <A HREF="#item_process"><CODE>process</CODE></A> or <A HREF="#item_default"><CODE>default</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_line"><CODE>line</CODE></A></STRONG><BR>
+<DD>
+<EM>Note: This is not supported yet!</EM>
+<P>Line causes the line number of the start of the event to be passed.
+The first line in the document is 1.  Line counting doesn't start
+until at least one handler requests this value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%27%2E%2E%2E%27"><CODE>'...'</CODE></A></STRONG><BR>
+<DD>
+A literal string of 0 to 255 characters enclosed
+in single (') or double (``) quotes is passed as entered.
+<P></P>
+<DT><STRONG><A NAME="item_undef"><CODE>undef</CODE></A></STRONG><BR>
+<DD>
+Pass an undefined value.  Useful as padding.
+<P></P></DL>
+<P>
+<H2><A NAME="events">Events</A></H2>
+<P>Handlers for the following events can be registered:</P>
+<DL>
+<DT><STRONG><CODE>text</CODE></STRONG><BR>
+<DD>
+This event is triggered when plain text is recognized.  The text may
+contain multiple lines.  A sequence of text may be broken between
+several text events unless $p-&gt;unbroken_text is enabled.
+<P>The parser will make sure that it does not break a word or a sequence
+of whitespace between two text events.</P>
+<P></P>
+<DT><STRONG><A NAME="item_start"><CODE>start</CODE></A></STRONG><BR>
+<DD>
+This event is triggered when a start tag is recognized.
+<P>Example:</P>
+<PRE>
+  &lt;A HREF=&quot;<A HREF="http://www.perl.com/&quot">http://www.perl.com/&quot</A>;&gt;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_end"><CODE>end</CODE></A></STRONG><BR>
+<DD>
+This event is triggered when an end tag is recognized.
+<P>Example:</P>
+<PRE>
+  &lt;/A&gt;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_declaration"><CODE>declaration</CODE></A></STRONG><BR>
+<DD>
+This event is triggered when a <EM>markup declaration</EM> is recognized.
+<P>For typical HTML documents, the only declaration you are
+likely to find is &lt;!DOCTYPE ...&gt;.</P>
+<P>Example:</P>
+<PRE>
+  &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;
+  &quot;<A HREF="http://www.w3.org/TR/html40/strict.dtd&quot">http://www.w3.org/TR/html40/strict.dtd&quot</A>;&gt;</PRE>
+<P>DTDs inside &lt;!DOCTYPE ...&gt; will confuse HTML::Parser.</P>
+<P></P>
+<DT><STRONG><A NAME="item_comment"><CODE>comment</CODE></A></STRONG><BR>
+<DD>
+This event is triggered when a markup comment is recognized.
+<P>Example:</P>
+<PRE>
+  &lt;!-- This is a comment -- -- So is this --&gt;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_process"><CODE>process</CODE></A></STRONG><BR>
+<DD>
+This event is triggered when a processing instructions markup is
+recognized.
+<P>The format and content of processing instructions is system and
+application dependent.</P>
+<P>Examples:</P>
+<PRE>
+  &lt;? HTML processing instructions &gt;
+  &lt;? XML processing instructions ?&gt;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_default"><CODE>default</CODE></A></STRONG><BR>
+<DD>
+This event is triggered for events that do not have a specific
+handler.  You can set up a handler for this event to catch stuff you
+did not want to catch explicitly.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="version 2 compatibility">VERSION 2 COMPATIBILITY</A></H1>
+<P>When an <CODE>HTML::Parser</CODE> object is constructed with no arguments, a set
+of handlers is automatically provided that is compatible with the old
+HTML::Parser version 2 callback methods.</P>
+<P>This is equivalent to the following method calls:</P>
+<PRE>
+   $p-&gt;handler(start   =&gt; &quot;start&quot;,   &quot;self, tagname, attr, attrseq, text&quot;);
+   $p-&gt;handler(end     =&gt; &quot;end&quot;,     &quot;self, tagname, text&quot;);
+   $p-&gt;handler(text    =&gt; &quot;text&quot;,    &quot;self, text, is_cdata&quot;);
+   $p-&gt;handler(process =&gt; &quot;process&quot;, &quot;self, token0, text&quot;);
+   $p-&gt;handler(comment =&gt;
+             sub {
+                 my($self, $tokens) = @_;
+                 for (@$tokens) {$self-&gt;comment($_);}},
+             &quot;self, tokens&quot;);
+   $p-&gt;handler(declaration =&gt;
+             sub {
+                 my $self = shift;
+                 $self-&gt;declaration(substr($_[0], 2, -1));},
+             &quot;self, text&quot;);</PRE>
+<P>Setup of these handlers can also be requested with the ``api_version =&gt;
+2'' constructor option.</P>
+<P>
+<HR>
+<H1><A NAME="subclassing">SUBCLASSING</A></H1>
+<P>The <CODE>HTML::Parser</CODE> class is subclassable.  Parser objects are plain
+hashes and <CODE>HTML::Parser</CODE> reserves only hash keys that start with
+``_hparser''.  The parser state can be set up by invoking the <CODE>init()</CODE>
+method which takes the same arguments as new().</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The first simple example shows how you might strip out comments from
+an HTML document.  We achieve this by setting up a comment handler that
+does nothing and a default handler that will print out anything else:</P>
+<PRE>
+  use HTML::Parser;
+  HTML::Parser-&gt;new(default_h =&gt; [sub { print shift }, 'text'],
+                    comment_h =&gt; [&quot;&quot;],
+                   )-&gt;parse_file(shift || die) || die $!;</PRE>
+<P>The next example prints out the text that is inside the &lt;title&gt;
+element of an HTML document.  Here we start by setting up a start
+handler.  When it sees the title start tag it enables a text handler
+that prints any text found and an end handler that will terminate
+parsing as soon as the title end tag is seen:</P>
+<PRE>
+  use HTML::Parser ();</PRE>
+<PRE>
+  sub start_handler
+  {
+    return if shift ne &quot;title&quot;;
+    my $self = shift;
+    $self-&gt;handler(text =&gt; sub { print shift }, &quot;dtext&quot;);
+    $self-&gt;handler(end  =&gt; sub { shift-&gt;eof if shift eq &quot;title&quot;; },
+                           &quot;tagname,self&quot;);
+  }</PRE>
+<PRE>
+  my $p = HTML::Parser-&gt;new(api_version =&gt; 3);
+  $p-&gt;handler( start =&gt; \&amp;start_handler, &quot;tagname,self&quot;);
+  $p-&gt;parse_file(shift || die) || die $!;
+  print &quot;\n&quot;;</PRE>
+<P>More examples are found in the ``eg/'' directory of the <CODE>HTML-Parser</CODE>
+distribution; the program <CODE>hrefsub</CODE> shows how you can edit all links
+found in a document and <CODE>htextsub</CODE> how to edid the text only; the
+program <CODE>hstrip</CODE> shows how you can strip out certain tags/elements
+and/or attributes; and the program <CODE>htext</CODE> show how to obtain the
+plain text, but not any script/style content.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P><CODE>HTML::Parser</CODE> will leave &lt;plaintext&gt; mode when it sees &lt;/plaintext&gt;.
+Plaintext mode should not really be escapeable.</P>
+<P>The &lt;style&gt; and &lt;script&gt; sections do not end with the first ``&lt;/'', but
+need the complete corresponding end tag.</P>
+<P>When the <EM>strict_comment</EM> option is enabled, we still recognize
+comments where there is something other than whitespace between even
+and odd ``--'' markers.</P>
+<P>Once $p-&gt;boolean_attribute_value has been set, there is no way to
+restore the default behaviour.</P>
+<P>There is currently no way to get both quote characters
+into the same literal argspec.</P>
+<P>Empty tags, e.g. ``&lt;&gt;'' and ``&lt;/&gt;'', are not recognized.  SGML allows them
+to repeat the previous start tag or close the previous start tag
+respecitvely.</P>
+<P>NET tags, e.g. ``code/.../'' are not recognized.  This is an SGML
+shorthand for ``&lt;code&gt;...&lt;/code&gt;''.</P>
+<P>Unclosed start or end tags, e.g. ``&lt;tt&lt;b&gt;...&lt;/b&lt;/tt&gt;'' are not
+recognized.</P>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<P>The following messages may be produced by HTML::Parser.  The notation
+in this listing is the same as used in <EM>perldiag</EM>:</P>
+<DL>
+<DT><STRONG><A NAME="item_Not_a_reference_to_a_hash">Not a reference to a hash</A></STRONG><BR>
+<DD>
+(F) The object blessed into or subclassed from HTML::Parser is not a
+hash as required by the HTML::Parser methods.
+<P></P>
+<DT><STRONG><A NAME="item_Bad_signature_in_parser_state_object_at_%25p">Bad signature in parser state object at %p</A></STRONG><BR>
+<DD>
+(F) The _hparser_xs_state element does not refer to a valid state structure.
+Something must have changed the internal value
+stored in this hash element, or the memory has been overwritten.
+<P></P>
+<DT><STRONG><A NAME="item__hparser_xs_state_element_is_not_a_reference">_hparser_xs_state element is not a reference</A></STRONG><BR>
+<DD>
+(F) The _hparser_xs_state element has been destroyed.
+<P></P>
+<DT><STRONG><A NAME="item_Can%27t_find_%27_hparser_xs_state%27_element_in_HT">Can't find '_hparser_xs_state' element in HTML::Parser hash</A></STRONG><BR>
+<DD>
+(F) The _hparser_xs_state element is missing from the parser hash.
+It was either deleted, or not created when the object was created.
+<P></P>
+<DT><STRONG><A NAME="item_API_version_%25s_not_supported_by_HTML%3A%3AParser">API version %s not supported by HTML::Parser %s</A></STRONG><BR>
+<DD>
+(F) The constructor option 'api_version' with an argument greater than
+or equal to 4 is reserved for future extentions.
+<P></P>
+<DT><STRONG><A NAME="item_Bad_constructor_option_%27%25s%27">Bad constructor option '%s'</A></STRONG><BR>
+<DD>
+(F) An unknown constructor option key was passed to the <A HREF="#item_new"><CODE>new()</CODE></A> or
+<CODE>init()</CODE> methods.
+<P></P>
+<DT><STRONG><A NAME="item_Parse_loop_not_allowed">Parse loop not allowed</A></STRONG><BR>
+<DD>
+(F) A handler invoked the <A HREF="#item_parse"><CODE>parse()</CODE></A> or <A HREF="#item_parse_file"><CODE>parse_file()</CODE></A> method.
+This is not permitted.
+<P></P>
+<DT><STRONG><A NAME="item_marked_sections_not_supported">marked sections not supported</A></STRONG><BR>
+<DD>
+(F) The $p-&gt;<A HREF="#item_marked_sections"><CODE>marked_sections()</CODE></A> method was invoked in a HTML::Parser
+module that was compiled without support for marked sections.
+<P></P>
+<DT><STRONG><A NAME="item_attribute">Unknown boolean attribute (%d)</A></STRONG><BR>
+<DD>
+(F) Something is wrong with the internal logic that set up aliases for
+boolean attributes.
+<P></P>
+<DT><STRONG><A NAME="item_Only_code_or_array_references_allowed_as_handler">Only code or array references allowed as handler</A></STRONG><BR>
+<DD>
+(F) The second argument for $p-&gt;handler must be either a subroutine
+reference, then name of a subroutine or method, or a reference to an
+array.
+<P></P>
+<DT><STRONG><A NAME="item_No_handler_for_%25s_events">No handler for %s events</A></STRONG><BR>
+<DD>
+(F) The first argument to $p-&gt;handler must be a valid event name; i.e. one
+of ``start'', ``end'', ``text'', ``process'', ``declaration'' or ``comment''.
+<P></P>
+<DT><STRONG><A NAME="item_Unrecognized_identifier_%25s_in_argspec">Unrecognized identifier %s in argspec</A></STRONG><BR>
+<DD>
+(F) The identifier is not a known argspec name.
+Use one of the names mentioned in the argspec section above.
+<P></P>
+<DT><STRONG><A NAME="item_Literal_string_is_longer_than_255_chars_in_argspec">Literal string is longer than 255 chars in argspec</A></STRONG><BR>
+<DD>
+(F) The current implementation limits the length of literals in
+an argspec to 255 characters.  Make the literal shorter.
+<P></P>
+<DT><STRONG><A NAME="item_Backslash_reserved_for_literal_string_in_argspec">Backslash reserved for literal string in argspec</A></STRONG><BR>
+<DD>
+(F) The backslash character ``\'' is not allowed in argspec literals.
+It is reserved to permit quoting inside a literal in a later version.
+<P></P>
+<DT><STRONG><A NAME="item_Unterminated_literal_string_in_argspec">Unterminated literal string in argspec</A></STRONG><BR>
+<DD>
+(F) The terminating quote character for a literal was not found.
+<P></P>
+<DT><STRONG><A NAME="item_argspec">Bad argspec (%s)</A></STRONG><BR>
+<DD>
+(F) Only identifier names, literals, spaces and commas
+are allowed in argspecs.
+<P></P>
+<DT><STRONG><A NAME="item_Missing_comma_separator_in_argspec">Missing comma separator in argspec</A></STRONG><BR>
+<DD>
+(F) Identifiers in an argspec must be separated with ``,''.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/HTML/Entities.html">the HTML::Entities manpage</A>, <A HREF="../../lib/HTML/TokeParser.html">the HTML::TokeParser manpage</A>, <A HREF="../../lib/HTML/HeadParser.html">the HTML::HeadParser manpage</A>,
+<A HREF="../../lib/HTML/LinkExtor.html">the HTML::LinkExtor manpage</A>, <A HREF="../../lib/HTML/Form.html">the HTML::Form manpage</A></P>
+<P><A HREF="../../lib/HTML/TreeBuilder.html">the HTML::TreeBuilder manpage</A> (part of the <EM>HTML-Tree</EM> distribution)</P>
+<P><A HREF="http://www.w3.org/TR/REC-html40">http://www.w3.org/TR/REC-html40</A></P>
+<P>More information about marked sections and processing instructions may
+be found at <CODE>http://www.sgml.u-net.com/book/sgml-8.htm</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<PRE>
+ Copyright 1996-2000 Gisle Aas. All rights reserved.
+ Copyright 1999-2000 Michael A. Chase.  All rights reserved.</PRE>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Parser - HTML parser class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

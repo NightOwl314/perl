@@ -1,0 +1,254 @@
+
+<HTML>
+<HEAD>
+<TITLE>Digest::MD5 - Perl interface to the MD5 Algorithm</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Digest::MD5 - Perl interface to the MD5 Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Digest::MD5 - Perl interface to the MD5 Algorithm</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ # Functional style
+ use Digest::MD5  qw(md5 md5_hex md5_base64);</PRE>
+<PRE>
+ $digest = md5($data);
+ $digest = md5_hex($data);
+ $digest = md5_base64($data);</PRE>
+<PRE>
+ # OO style
+ use Digest::MD5;</PRE>
+<PRE>
+ $ctx = Digest::MD5-&gt;new;</PRE>
+<PRE>
+ $ctx-&gt;add($data);
+ $ctx-&gt;addfile(*FILE);</PRE>
+<PRE>
+ $digest = $ctx-&gt;digest;
+ $digest = $ctx-&gt;hexdigest;
+ $digest = $ctx-&gt;b64digest;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>Digest::MD5</CODE> module allows you to use the RSA Data Security
+Inc. MD5 Message Digest algorithm from within Perl programs.  The
+algorithm takes as input a message of arbitrary length and produces as
+output a 128-bit ``fingerprint'' or ``message digest'' of the input.</P>
+<P>The <CODE>Digest::MD5</CODE> module provide a procedural interface for simple
+use, as well as an object oriented interface that can handle messages
+of arbitrary length and which can read files directly.</P>
+<P>A binary digest will be 16 bytes long.  A hex digest will be 32
+characters long.  A base64 digest will be 22 characters long.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>The following functions can be exported from the <CODE>Digest::MD5</CODE>
+module.  No functions are exported by default.</P>
+<DL>
+<DT><STRONG><A NAME="item_md5"><CODE>md5($data,...)</CODE></A></STRONG><BR>
+<DD>
+This function will concatenate all arguments, calculate the MD5 digest
+of this ``message'', and return it in binary form.
+<P></P>
+<DT><STRONG><A NAME="item_md5_hex"><CODE>md5_hex($data,...)</CODE></A></STRONG><BR>
+<DD>
+Same as md5(), but will return the digest in hexadecimal form.
+<P></P>
+<DT><STRONG><A NAME="item_md5_base64"><CODE>md5_base64($data,...)</CODE></A></STRONG><BR>
+<DD>
+Same as md5(), but will return the digest as a base64 encoded string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$md5 = Digest::MD5-&gt;new</A></STRONG><BR>
+<DD>
+The constructor returns a new <CODE>Digest::MD5</CODE> object which encapsulate
+the state of the MD5 message-digest algorithm.  You can add data to
+the object and finally ask for the digest.
+<P>If called as a instance method (i.e. $md5-&gt;new) it will just reset the
+state the object to the state of a newly created object.  No new
+object is created in this case.</P>
+<P></P>
+<DT><STRONG><A NAME="item_reset">$md5-&gt;reset</A></STRONG><BR>
+<DD>
+This is just an alias for $md5-&gt;new.
+<P></P>
+<DT><STRONG><A NAME="item_add">$md5-&gt;<CODE>add($data,...)</CODE></A></STRONG><BR>
+<DD>
+The $data provided as argument are appended to the message we
+calculate the digest for.  The return value is the $md5 object itself.
+<P></P>
+<DT><STRONG><A NAME="item_addfile">$md5-&gt;<CODE>addfile($io_handle)</CODE></A></STRONG><BR>
+<DD>
+The $io_handle is read until EOF and the content is appended to the
+message we calculate the digest for.  The return value is the $md5
+object itself.
+<P></P>
+<DT><STRONG><A NAME="item_digest">$md5-&gt;digest</A></STRONG><BR>
+<DD>
+Return the binary digest for the message.
+<P>Note that the <A HREF="#item_digest"><CODE>digest</CODE></A> operation is effectively a destructive,
+read-once operation. Once it has been performed, the <CODE>Digest::MD5</CODE>
+object is automatically <A HREF="#item_reset"><CODE>reset</CODE></A> and can be used to calculate another
+digest value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_hexdigest">$md5-&gt;hexdigest</A></STRONG><BR>
+<DD>
+Same as $md5-&gt;digest, but will return the digest in hexadecimal form.
+<P></P>
+<DT><STRONG><A NAME="item_b64digest">$md5-&gt;b64digest</A></STRONG><BR>
+<DD>
+Same as $md5-&gt;digest, but will return the digest as a base64 encoded
+string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The simplest way to use this library is to import the <A HREF="#item_md5_hex"><CODE>md5_hex()</CODE></A>
+function (or one of its cousins):</P>
+<PRE>
+    use Digest::MD5 qw(md5_hex);
+    print &quot;Digest is &quot;, md5_hex(&quot;foobarbaz&quot;), &quot;\n&quot;;</PRE>
+<P>The above example would print out the message</P>
+<PRE>
+    Digest is 6df23dc03f9b54cc38a0fc1483df6e21</PRE>
+<P>provided that the implementation is working correctly.  The same
+checksum can also be calculated in OO style:</P>
+<PRE>
+    use Digest::MD5;
+</PRE>
+<PRE>
+
+    $md5 = Digest::MD5-&gt;new;
+    $md5-&gt;add('foo', 'bar');
+    $md5-&gt;add('baz');
+    $digest = $md5-&gt;hexdigest;</PRE>
+<PRE>
+
+    print &quot;Digest is $digest\n&quot;;</PRE>
+<P>With OO style you can break the message arbitrary.  This means that we
+are no longer limited to have space for the whole message in memory, i.e.
+we can handle messages of any size.</P>
+<P>This is useful when calculating checksum for files:</P>
+<PRE>
+    use Digest::MD5;</PRE>
+<PRE>
+    my $file = shift || &quot;/etc/passwd&quot;;
+    open(FILE, $file) or die &quot;Can't open '$file': $!&quot;;
+    binmode(FILE);</PRE>
+<PRE>
+    $md5 = Digest::MD5-&gt;new;
+    while (&lt;FILE&gt;) {
+        $md5-&gt;add($_);
+    }
+    close(FILE);
+    print $md5-&gt;b64digest, &quot; $file\n&quot;;</PRE>
+<P>Or we can use the builtin addfile method for more efficient reading of
+the file:</P>
+<PRE>
+    use Digest::MD5;</PRE>
+<PRE>
+    my $file = shift || &quot;/etc/passwd&quot;;
+    open(FILE, $file) or die &quot;Can't open '$file': $!&quot;;
+    binmode(FILE);</PRE>
+<PRE>
+    print Digest::MD5-&gt;new-&gt;addfile(*FILE)-&gt;hexdigest, &quot; $file\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/Digest.html">the Digest manpage</A>,
+<A HREF="../../../site/lib/Digest/MD2.html">the Digest::MD2 manpage</A>,
+<A HREF="../../../site/lib/Digest/SHA1.html">the Digest::SHA1 manpage</A>,
+<A HREF="../../../site/lib/Digest/HMAC.html">the Digest::HMAC manpage</A></P>
+<P><EM>md5sum(1)</EM></P>
+<P>RFC 1321</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<PRE>
+ Copyright 1998-2000 Gisle Aas.
+ Copyright 1995-1996 Neil Winton.
+ Copyright 1991-1992 RSA Data Security, Inc.</PRE>
+<P>The MD5 algorithm is defined in RFC 1321. The basic C code
+implementing the algorithm is derived from that in the RFC and is
+covered by the following copyright:</P>
+<DL>
+<DT><DD>
+Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
+rights reserved.
+<P>License to copy and use this software is granted provided that it
+is identified as the ``RSA Data Security, Inc. MD5 Message-Digest
+Algorithm'' in all material mentioning or referencing this software
+or this function.</P>
+<P>License is also granted to make and use derivative works provided
+that such works are identified as ``derived from the RSA Data
+Security, Inc. MD5 Message-Digest Algorithm'' in all material
+mentioning or referencing the derived work.</P>
+<P>RSA Data Security, Inc. makes no representations concerning either
+the merchantability of this software or the suitability of this
+software for any particular purpose. It is provided ``as is''
+without express or implied warranty of any kind.</P>
+<P>These notices must be retained in any copies of any part of this
+documentation and/or software.</P>
+<P></P></DL>
+<P>This copyright does not prohibit distribution of any version of Perl
+containing this extension under the terms of the GNU or Artistic
+licenses.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>The original MD5 interface was written by Neil Winton
+(<CODE>N.Winton@axion.bt.co.uk</CODE>).</P>
+<P>This release was made by Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Digest::MD5 - Perl interface to the MD5 Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

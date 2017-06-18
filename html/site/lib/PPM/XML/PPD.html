@@ -1,0 +1,389 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPM::XML::PPD - PPD file format and XML parsing elements</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::PPD - PPD file format and XML parsing elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#major elements">MAJOR ELEMENTS</A></LI>
+	<UL>
+
+		<LI><A HREF="#softpkg">SOFTPKG</A></LI>
+		<LI><A HREF="#implementation">IMPLEMENTATION</A></LI>
+		<LI><A HREF="#dependency">DEPENDENCY</A></LI>
+	</UL>
+
+	<LI><A HREF="#minor elements">MINOR ELEMENTS</A></LI>
+	<UL>
+
+		<LI><A HREF="#title">TITLE</A></LI>
+		<LI><A HREF="#abstract">ABSTRACT</A></LI>
+		<LI><A HREF="#author">AUTHOR</A></LI>
+		<LI><A HREF="#language">LANGUAGE</A></LI>
+		<LI><A HREF="#license">LICENSE</A></LI>
+		<LI><A HREF="#os">OS</A></LI>
+		<LI><A HREF="#osversion">OSVERSION</A></LI>
+		<LI><A HREF="#perlcore">PERLCORE</A></LI>
+		<LI><A HREF="#processor">PROCESSOR</A></LI>
+		<LI><A HREF="#codebase">CODEBASE</A></LI>
+		<LI><A HREF="#install">INSTALL</A></LI>
+		<LI><A HREF="#uninstall">UNINSTALL</A></LI>
+	</UL>
+
+	<LI><A HREF="#document type definition">DOCUMENT TYPE DEFINITION</A></LI>
+	<LI><A HREF="#sample ppd file">SAMPLE PPD FILE</A></LI>
+	<LI><A HREF="#known bugs/issues">KNOWN BUGS/ISSUES</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>PPM::XML::PPD - PPD file format and XML parsing elements</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use XML::Parser;
+ use PPM::XML::PPD;</PRE>
+<PRE>
+ $p = new PPM::XML::Parser( Style =&gt; 'Objects', Pkg =&gt; 'PPM::XML::PPD' );
+ ...</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides a set of classes for parsing PPD files using the
+<CODE>XML::Parser</CODE> module.  Each of the classes is derived from
+<CODE>PPM::XML::ValidatingElement</CODE>, with optional/required attributes/children
+enforced.</P>
+<P>
+<HR>
+<H1><A NAME="major elements">MAJOR ELEMENTS</A></H1>
+<P>
+<H2><A NAME="softpkg">SOFTPKG</A></H2>
+<P>Defines a Perl Package.  The root of a PPD document is <STRONG>always</STRONG> a SOFTPKG
+element.  The SOFTPKG element allows for the following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_NAME">NAME</A></STRONG><BR>
+<DD>
+Required attribute.  Name of the package (e.g. ``Foobar'').
+<P></P>
+<DT><STRONG><A NAME="item_VERSION">VERSION</A></STRONG><BR>
+<DD>
+Version number of the package, in comma-delimited format (e.g. ``1,0,0,0'').
+<P></P></DL>
+<P>
+<H2><A NAME="implementation">IMPLEMENTATION</A></H2>
+<P>Child of SOFTPKG, used to describe a particular implementation of the Perl
+Package.  Multiple instances are valid, and should be used to describe
+different implementations/ports for different operating systems or
+architectures.</P>
+<P>
+<H2><A NAME="dependency">DEPENDENCY</A></H2>
+<P>Child of SOFTPKG or IMPLEMENTATION, used to indicate a dependency this Perl
+Package has on another Perl Package.  Multiple instances are valid.  The
+DEPENDENCY element allows for the following attributes:</P>
+<DL>
+<DT><STRONG>NAME</STRONG><BR>
+<DD>
+Name of the package that this implementation is dependant upon.
+<P></P>
+<DT><STRONG>VERSION</STRONG><BR>
+<DD>
+Version number of the dependency, in comma-delimited format (e.g. ``1,0,0,0'').
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="minor elements">MINOR ELEMENTS</A></H1>
+<P>
+<H2><A NAME="title">TITLE</A></H2>
+<P>Child of SOFTPKG, used to state the title of the Perl Package.  Only one
+instance should be present.</P>
+<P>
+<H2><A NAME="abstract">ABSTRACT</A></H2>
+<P>Child of SOFTPKG, used to provide a short description outlining the nature and
+purpose of the Perl Package.  Only one instance should be present.</P>
+<P>
+<H2><A NAME="author">AUTHOR</A></H2>
+<P>Child of SOFTPKG, used to provide information about the <CODE>author(s)</CODE> of the Perl
+Package.  Multiple instances are valid.</P>
+<P>
+<H2><A NAME="language">LANGUAGE</A></H2>
+<P>Child of IMPLEMENTATION, used to specify the language used within the given
+implementation of the Perl Package.  Only one instance should be present.</P>
+<P>
+<H2><A NAME="license">LICENSE</A></H2>
+<P>Child of SOFTPKG, indicating the location of the appropriate license agreement
+or copyright notice for the Perl Package.  Only one instance should be
+present.  The LICENSE element allows for the following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_HREF">HREF</A></STRONG><BR>
+<DD>
+Required attribute.  A reference to the location of the license agreement or
+copyright notice for this package.
+<P></P></DL>
+<P>
+<H2><A NAME="os">OS</A></H2>
+<P>Child of IMPLEMENTATION, used to outline the operating system required for this
+implementation of the Perl Package.  Multiple instances are valid.  Valid
+values can be taken from the OSD Specification and it's OS element.  The OS
+element allows for the following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_VALUE">VALUE</A></STRONG><BR>
+<DD>
+The name of the operating system required for this implementation of the Perl
+Package.  This value should be obtained from Config.pm as 'osname'.
+<P></P></DL>
+<P>Note that previous versions of the PPD format used a 'NAME' attribute.  It's
+use has been deprecated in preference of the 'VALUE' attribute.  Also note that
+during validation, this element will automatically convert any existing 'NAME'
+attribute to be a 'VALUE' attribute.</P>
+<P>
+<H2><A NAME="osversion">OSVERSION</A></H2>
+<P>Child of IMPLEMENTATION, used to outline the required version of the operating
+system required for this implementation of the Perl Package.  Only one instance
+should be present.  The OSVERSION element allows for the following attributes:</P>
+<DL>
+<DT><STRONG>VALUE</STRONG><BR>
+<DD>
+The version of the operating system required for installation of this
+implementation of the package, in a comma-delimited format (e.g. ``3,1,0,0'').
+<P></P></DL>
+<P>Note that previous versions of the PPD format used a 'NAME' attribute.  It's
+use has been deprecated in preference of the 'VALUE' attribute.  Also note that
+during validation, this element will automatically convert any existing 'NAME'
+attribute to be a 'VALUE' attribute.</P>
+<P>
+<H2><A NAME="perlcore">PERLCORE</A></H2>
+<P>Child of IMPLEMENTATION, used to specify the minimum version of the Perl core
+distribution that this Perl Package is to be used with.  Only one instance
+should be present.  The PERLCORE element allows for the following attributes:</P>
+<DL>
+<DT><STRONG>VERSION</STRONG><BR>
+<DD>
+Version of the Perl core that is required for this implementation of the Perl
+Package.
+<P></P></DL>
+<P>
+<H2><A NAME="processor">PROCESSOR</A></H2>
+<P>Child of IMPLEMENTATION, outlining the cpu required for this implementation
+of the Perl Package.  Only one instance should be present.  The PROCESSOR
+element allows for the following attributes:</P>
+<DL>
+<DT><STRONG>VALUE</STRONG><BR>
+<DD>
+CPU required for the installation of this implementation of the Perl Package.
+The following values are all valid according to the OSD Specification:
+<PRE>
+ x86 alpha mips sparc 680x0</PRE>
+<P></P></DL>
+<P>Note that previous versions of the PPD format used a 'NAME' attribute.  It's
+use has been deprecated in preference of the 'VALUE' attribute.  Also note that
+during validation, this element will automatically convert any existing 'NAME'
+attribute to be a 'VALUE' attribute.</P>
+<P>
+<H2><A NAME="codebase">CODEBASE</A></H2>
+<P>Child of IMPLEMENTATION, indicating a location where an archive of the Perl
+Package can be retrieved.  Multiple instances are valid, and can be used to
+indicate multiple possible locations where the same version of the Perl Package
+can be retrieved.  The CODEBASE element allows for the following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_FILENAME">FILENAME</A></STRONG><BR>
+<DD>
+???
+<P></P>
+<DT><STRONG>HREF</STRONG><BR>
+<DD>
+Required attribute.  A reference to the location of the Perl Package
+distribution.
+<P></P></DL>
+<P>
+<H2><A NAME="install">INSTALL</A></H2>
+<P>Child of IMPLEMENTATION, used to provide either a reference to an
+installation script or a series of commands which can be used to install
+the Perl Package once it has been retrieved.  If the EXEC attribute is not
+specified, the value is assumed to be one or more commands, separated by
+`;;'.  Each such command will be executed by the Perl `system()' function.
+Only one instance should be present.  The INSTALL element allows for
+the following attributes:</P>
+<DL>
+<DT><STRONG>HREF</STRONG><BR>
+<DD>
+Reference to an external script which should be retrieved and run as part
+of the installation process.  Both filenames and URLs should be considered
+valid.
+<P></P>
+<DT><STRONG><A NAME="item_EXEC">EXEC</A></STRONG><BR>
+<DD>
+Name of interpreter/shell used to execute the installation script.
+If the value of EXEC is `PPM_PERL', the copy of Perl that is executing
+PPM itself ($^X) is used to execute the install script.
+<P></P></DL>
+<P>
+<H2><A NAME="uninstall">UNINSTALL</A></H2>
+<P>Child of IMPLEMENTATION, used to provide either a reference to an
+uninstallation script or a raw Perl script which can be used to uninstall the
+Perl Package at a later point.  Only one instance should be present.  The
+UNINSTALL element allows for the following attributs:</P>
+<DL>
+<DT><STRONG>HREF</STRONG><BR>
+<DD>
+Reference to an external script which should be retrieved and run as part of
+the removal process.  Both filenames and URLs should be considered valid.
+<P></P>
+<DT><STRONG>EXEC</STRONG><BR>
+<DD>
+Name of interpreter/shell used to execute the uninstallation script.
+If the value of EXEC is `PPM_PERL', the copy of Perl that is executing
+PPM itself ($^X) is used to execute the install script.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="document type definition">DOCUMENT TYPE DEFINITION</A></H1>
+<P>The DTD for PPD documents is available from the ActiveState website and the
+latest version can be found at <A HREF="http://www.ActiveState.com/PPM/DTD/ppd.dtd">http://www.ActiveState.com/PPM/DTD/ppd.dtd</A></P>
+<P>This revision of the <CODE>PPM::XML::PPD</CODE> module implements the following DTD:</P>
+<PRE>
+ &lt;!ELEMENT SOFTPKG   (ABSTRACT | AUTHOR | IMPLEMENTATION | LICENSE | TITLE)*&gt;
+ &lt;!ATTLIST SOFTPKG   NAME    CDATA #REQUIRED
+                     VERSION CDATA #IMPLIED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT TITLE     (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT ABSTRACT  (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT AUTHOR    (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT LICENSE   EMPTY&gt;
+ &lt;!ATTLIST LICENSE   HREF     CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT IMPLEMENTATION    (CODEBASE | DEPENDENCY | LANGUAGE | OS |
+                              OSVERSION | PERLCORE | PROCESSOR | INSTALL |
+                              UNINSTALL) *&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT CODEBASE  EMPTY&gt;
+ &lt;!ATTLIST CODEBASE  FILENAME CDATA #IMPLIED
+                     HREF     CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT DEPENDENCY EMPTY&gt;
+ &lt;!ATTLIST DEPENDENCY VERSION CDATA #IMPLIED
+                      NAME CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT LANGUAGE  EMPTY&gt;
+ &lt;!ATTLIST LANGUAGE  VALUE CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT OS        EMPTY&gt;
+ &lt;!ATTLIST OS        VALUE CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT OSVERSION EMPTY&gt;
+ &lt;!ATTLIST OSVERSION VALUE CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PERLCORE  EMPTY&gt;
+ &lt;!ATTLIST PERLCORE  VERSION CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PROCESSOR EMPTY&gt;
+ &lt;!ATTLIST PROCESSOR VALUE CDATA #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT INSTALL   (#PCDATA)&gt;
+ &lt;!ATTLIST INSTALL   HREF  CDATA #IMPLIED
+                     EXEC  CDATA #IMPLIED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT UNINSTALL (#PCDATA)&gt;
+ &lt;!ATTLIST UNINSTALL HREF  CDATA #IMPLIED
+                     EXEC  CDATA #IMPLIED&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="sample ppd file">SAMPLE PPD FILE</A></H1>
+<P>The following is a sample PPD file describing the <CODE>Math-MatrixBool</CODE> module.
+Note that this may <STRONG>not</STRONG> be a current/proper description of this module and is
+for sample purposes only.</P>
+<PRE>
+ &lt;SOFTPKG NAME=&quot;Math-MatrixBool&quot; VERSION=&quot;4,2,0,0&quot;&gt;
+     &lt;TITLE&gt;Math-MatrixBool&lt;/TITLE&gt;
+     &lt;ABSTRACT&gt;Easy manipulation of matrices of booleans (Boolean Algebra)&lt;/ABSTRACT&gt;
+     &lt;AUTHOR&gt;Steffen Beyer (sb@sdm.de)&lt;/AUTHOR&gt;
+     &lt;LICENSE HREF=&quot;<A HREF="http://www.ActiveState.com/packages/Math-MatrixBool/license.html&quot">http://www.ActiveState.com/packages/Math-MatrixBool/license.html&quot</A>; /&gt;
+     &lt;IMPLEMENTATION&gt;
+         &lt;OS VALUE=&quot;WinNT&quot; /&gt;
+         &lt;OS VALUE=&quot;Win95&quot; /&gt;
+         &lt;PROCESSOR VALUE=&quot;x86&quot; /&gt;
+         &lt;CODEBASE HREF=&quot;<A HREF="http://www.ActiveState.com/packages/Math-MatrixBool/Math-MatrixBool-4.2-bin-1-Win32.tar.gz&quot">http://www.ActiveState.com/packages/Math-MatrixBool/Math-MatrixBool-4.2-bin-1-Win32.tar.gz&quot</A>; /&gt;
+         &lt;DEPENDENCY NAME=&quot;Bit-Vector&quot; /&gt;
+         &lt;INSTALL&gt;
+         &lt;/INSTALL&gt;
+         &lt;UNINSTALL&gt;
+         &lt;/UNINSTALL&gt;
+     &lt;/IMPLEMENTATION&gt;</PRE>
+<PRE>
+     &lt;IMPLEMENTATION&gt;
+         &lt;DEPENDENCY NAME=&quot;Bit-Vector&quot; /&gt;
+         &lt;CODEBASE HREF=&quot;&amp;CPAN;/CPAN/modules/by-module/Math/Math-MatrixBool-4.2.tar.gz&quot; /&gt;
+         &lt;INSTALL&gt;
+             system(&quot;make&quot;); ;;
+             system(&quot;make test&quot;); ;;
+             system(&quot;make install&quot;); ;;
+         &lt;/INSTALL&gt;
+     &lt;/IMPLEMENTATION&gt;
+ &lt;/SOFTPKG&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="known bugs/issues">KNOWN BUGS/ISSUES</A></H1>
+<P>Elements which are required to be empty (e.g. LICENSE) are not enforced as
+such.</P>
+<P>Notations above about elements for which ``only one instance'' or ``multiple
+instances'' are valid are not enforced; this primarily a guideline for
+generating your own PPD files.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Graham TerMarsch &lt;<A HREF="mailto:grahamt@ActiveState.com">grahamt@ActiveState.com</A>&gt;</P>
+<P>Murray Nesbitt &lt;<A HREF="mailto:murrayn@ActiveState.com">murrayn@ActiveState.com</A>&gt;</P>
+<P>Dick Hardt &lt;<A HREF="mailto:dick_hardt@ActiveState.com">dick_hardt@ActiveState.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>v0.1 - Initial release</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../../site/lib/PPM/XML/ValidatingElement.html">the PPM::XML::ValidatingElement manpage</A>,
+<A HREF="../../../../site/lib/PPM/XML/Element.html">the PPM::XML::Element manpage</A>,
+<A HREF="../../../../site/lib/XML/Parser.html">the XML::Parser manpage</A>,
+OSD Specification (http://www.microsoft.com/standards/osd/)</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::PPD - PPD file format and XML parsing elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

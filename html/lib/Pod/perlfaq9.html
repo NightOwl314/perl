@@ -1,0 +1,595 @@
+<HTML>
+<HEAD>
+<TITLE>perlfaq9 - Networking</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq9 - Networking</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#my cgi script runs from the command line but not the browser. (500 server error)">My CGI script runs from the command line but not the browser.  (500 Server Error)</A></LI>
+		<LI><A HREF="#how can i get better error messages from a cgi program">How can I get better error messages from a CGI program?</A></LI>
+		<LI><A HREF="#how do i remove html from a string">How do I remove HTML from a string?</A></LI>
+		<LI><A HREF="#how do i extract urls">How do I extract URLs?</A></LI>
+		<LI><A HREF="#how do i download a file from the user's machine how do i open a file on another machine">How do I download a file from the user's machine?  How do I open a file on another machine?</A></LI>
+		<LI><A HREF="#how do i make a popup menu in html">How do I make a pop-up menu in HTML?</A></LI>
+		<LI><A HREF="#how do i fetch an html file">How do I fetch an HTML file?</A></LI>
+		<LI><A HREF="#how do i automate an html form submission">How do I automate an HTML form submission?</A></LI>
+		<LI><A HREF="#how do i decode or create those %encodings on the web">How do I decode or create those %-encodings on the web?</A></LI>
+		<LI><A HREF="#how do i redirect to another page">How do I redirect to another page?</A></LI>
+		<LI><A HREF="#how do i put a password on my web pages">How do I put a password on my web pages?</A></LI>
+		<LI><A HREF="#how do i edit my .htpasswd and .htgroup files with perl">How do I edit my .htpasswd and .htgroup files with Perl?</A></LI>
+		<LI><A HREF="#how do i make sure users can't enter values into a form that cause my cgi script to do bad things">How do I make sure users can't enter values into a form that cause my CGI script to do bad things?</A></LI>
+		<LI><A HREF="#how do i parse a mail header">How do I parse a mail header?</A></LI>
+		<LI><A HREF="#how do i decode a cgi form">How do I decode a CGI form?</A></LI>
+		<LI><A HREF="#how do i check a valid mail address">How do I check a valid mail address?</A></LI>
+		<LI><A HREF="#how do i decode a mime/base64 string">How do I decode a MIME/BASE64 string?</A></LI>
+		<LI><A HREF="#how do i return the user's mail address">How do I return the user's mail address?</A></LI>
+		<LI><A HREF="#how do i send mail">How do I send mail?</A></LI>
+		<LI><A HREF="#how do i use mime to make an attachment to a mail message">How do I use MIME to make an attachment to a mail message?</A></LI>
+		<LI><A HREF="#how do i read mail">How do I read mail?</A></LI>
+		<LI><A HREF="#how do i find out my hostname/domainname/ip address">How do I find out my hostname/domainname/IP address?</A></LI>
+		<LI><A HREF="#how do i fetch a news article or the active newsgroups">How do I fetch a news article or the active newsgroups?</A></LI>
+		<LI><A HREF="#how do i fetch/put an ftp file">How do I fetch/put an FTP file?</A></LI>
+		<LI><A HREF="#how can i do rpc in perl">How can I do RPC in Perl?</A></LI>
+	</UL>
+
+	<LI><A HREF="#author and copyright">AUTHOR AND COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlfaq9 - Networking ($Revision: 1.26 $, $Date: 1999/05/23 16:08:30 $)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This section deals with questions related to networking, the internet,
+and a few on the web.</P>
+<P>
+<H2><A NAME="my cgi script runs from the command line but not the browser. (500 server error)">My CGI script runs from the command line but not the browser.  (500 Server Error)</A></H2>
+<P>If you can demonstrate that you've read the following FAQs and that
+your problem isn't something simple that can be easily answered, you'll
+probably receive a courteous and useful reply to your question if you
+post it on comp.infosystems.www.authoring.cgi (if it's something to do
+with HTTP, HTML, or the CGI protocols).  Questions that appear to be Perl
+questions but are really CGI ones that are posted to comp.lang.perl.misc
+may not be so well received.</P>
+<P>The useful FAQs and related documents are:</P>
+<PRE>
+    CGI FAQ
+        <A HREF="http://www.webthing.com/tutorials/cgifaq.html">http://www.webthing.com/tutorials/cgifaq.html</A></PRE>
+<PRE>
+    Web FAQ
+        <A HREF="http://www.boutell.com/faq/">http://www.boutell.com/faq/</A></PRE>
+<PRE>
+    WWW Security FAQ
+        <A HREF="http://www.w3.org/Security/Faq/">http://www.w3.org/Security/Faq/</A></PRE>
+<PRE>
+    HTTP Spec
+        <A HREF="http://www.w3.org/pub/WWW/Protocols/HTTP/">http://www.w3.org/pub/WWW/Protocols/HTTP/</A></PRE>
+<PRE>
+    HTML Spec
+        <A HREF="http://www.w3.org/TR/REC-html40/">http://www.w3.org/TR/REC-html40/</A>
+        <A HREF="http://www.w3.org/pub/WWW/MarkUp/">http://www.w3.org/pub/WWW/MarkUp/</A></PRE>
+<PRE>
+    CGI Spec
+        <A HREF="http://www.w3.org/CGI/">http://www.w3.org/CGI/</A></PRE>
+<PRE>
+    CGI Security FAQ
+        <A HREF="http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt">http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt</A></PRE>
+<P>
+<H2><A NAME="how can i get better error messages from a cgi program">How can I get better error messages from a CGI program?</A></H2>
+<P>Use the CGI::Carp module.  It replaces <A HREF="../../lib/Pod/perlfunc.html#item_warn"><CODE>warn</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A>, plus the
+normal Carp modules <CODE>carp</CODE>, <CODE>croak</CODE>, and <CODE>confess</CODE> functions with
+more verbose and safer versions.  It still sends them to the normal
+server error log.</P>
+<PRE>
+    use CGI::Carp;
+    warn &quot;This is a complaint&quot;;
+    die &quot;But this one is serious&quot;;</PRE>
+<P>The following use of CGI::Carp also redirects errors to a file of your choice,
+placed in a BEGIN block to catch compile-time warnings as well:</P>
+<PRE>
+    BEGIN {
+        use CGI::Carp qw(carpout);
+        open(LOG, &quot;&gt;&gt;/var/local/cgi-logs/mycgi-log&quot;)
+            or die &quot;Unable to append to mycgi-log: $!\n&quot;;
+        carpout(*LOG);
+    }</PRE>
+<P>You can even arrange for fatal errors to go back to the client browser,
+which is nice for your own debugging, but might confuse the end user.</P>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser);
+    die &quot;Bad error here&quot;;</PRE>
+<P>Even if the error happens before you get the HTTP header out, the module
+will try to take care of this to avoid the dreaded server 500 errors.
+Normal warnings still go out to the server error log (or wherever
+you've sent them with <CODE>carpout</CODE>) with the application name and date
+stamp prepended.</P>
+<P>
+<H2><A NAME="how do i remove html from a string">How do I remove HTML from a string?</A></H2>
+<P>The most correct way (albeit not the fastest) is to use HTML::Parser
+from CPAN.  Another mostly correct
+way is to use HTML::FormatText which not only removes HTML but also
+attempts to do a little simple formatting of the resulting plain text.</P>
+<P>Many folks attempt a simple-minded regular expression approach, like
+<A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s/&lt;.*?&gt;//g</CODE></A>, but that fails in many cases because the tags
+may continue over line breaks, they may contain quoted angle-brackets,
+or HTML comment may be present.  Plus, folks forget to convert
+entities--like <CODE>&amp;lt;</CODE> for example.</P>
+<P>Here's one ``simple-minded'' approach, that works for most files:</P>
+<PRE>
+    #!/usr/bin/perl -p0777
+    s/&lt;(?:[^&gt;'&quot;]*|(['&quot;]).*?\1)*&gt;//gs</PRE>
+<P>If you want a more complete solution, see the 3-stage striphtml
+program in
+<A HREF="http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/striphtml.gz">http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/striphtml.gz</A>
+.</P>
+<P>Here are some tricky cases that you should think about when picking
+a solution:</P>
+<PRE>
+    &lt;IMG SRC = &quot;foo.gif&quot; ALT = &quot;A &gt; B&quot;&gt;</PRE>
+<PRE>
+    &lt;IMG SRC = &quot;foo.gif&quot;
+         ALT = &quot;A &gt; B&quot;&gt;</PRE>
+<PRE>
+    &lt;!-- &lt;A comment&gt; --&gt;</PRE>
+<PRE>
+    &lt;script&gt;if (a&lt;b &amp;&amp; a&gt;c)&lt;/script&gt;</PRE>
+<PRE>
+    &lt;# Just data #&gt;</PRE>
+<PRE>
+    &lt;![INCLUDE CDATA [ &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; ]]&gt;</PRE>
+<P>If HTML comments include other tags, those solutions would also break
+on text like this:</P>
+<PRE>
+    &lt;!-- This section commented out.
+        &lt;B&gt;You can't see me!&lt;/B&gt;
+    --&gt;</PRE>
+<P>
+<H2><A NAME="how do i extract urls">How do I extract URLs?</A></H2>
+<P>A quick but imperfect approach is</P>
+<PRE>
+    #!/usr/bin/perl -n00
+    # qxurl - tchrist@perl.com
+    print &quot;$2\n&quot; while m{
+        &lt; \s*
+          A \s+ HREF \s* = \s* ([&quot;']) (.*?) \1
+        \s* &gt;
+    }gsix;</PRE>
+<P>This version does not adjust relative URLs, understand alternate
+bases, deal with HTML comments, deal with HREF and NAME attributes
+in the same tag, understand extra qualifiers like TARGET, or accept
+URLs themselves as arguments.  It also runs about 100x faster than a
+more ``complete'' solution using the LWP suite of modules, such as the
+<A HREF="http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/xurl.gz">http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/xurl.gz</A> program.</P>
+<P>
+<H2><A NAME="how do i download a file from the user's machine how do i open a file on another machine">How do I download a file from the user's machine?  How do I open a file on another machine?</A></H2>
+<P>In the context of an HTML form, you can use what's known as
+<STRONG>multipart/form-data</STRONG> encoding.  The CGI.pm module (available from
+CPAN) supports this in the <CODE>start_multipart_form()</CODE> method, which isn't
+the same as the <CODE>startform()</CODE> method.</P>
+<P>
+<H2><A NAME="how do i make a popup menu in html">How do I make a pop-up menu in HTML?</A></H2>
+<P>Use the <STRONG>&lt;SELECT</STRONG> &gt;&gt; and <STRONG>&lt;OPTION</STRONG> &gt;&gt; tags.  The CGI.pm
+module (available from CPAN) supports this widget, as well as many
+others, including some that it cleverly synthesizes on its own.</P>
+<P>
+<H2><A NAME="how do i fetch an html file">How do I fetch an HTML file?</A></H2>
+<P>One approach, if you have the lynx text-based HTML browser installed
+on your system, is this:</P>
+<PRE>
+    $html_code = `lynx -source $url`;
+    $text_data = `lynx -dump $url`;</PRE>
+<P>The libwww-perl (LWP) modules from CPAN provide a more powerful way
+to do this.  They don't require lynx, but like lynx, can still work
+through proxies:</P>
+<PRE>
+    # simplest version
+    use LWP::Simple;
+    $content = get($URL);</PRE>
+<PRE>
+    # or print HTML from a URL
+    use LWP::Simple;
+    getprint &quot;<A HREF="http://www.linpro.no/lwp/&quot">http://www.linpro.no/lwp/&quot</A>;;</PRE>
+<PRE>
+    # or print ASCII from HTML from a URL
+    # also need HTML-Tree package from CPAN
+    use LWP::Simple;
+    use HTML::Parser;
+    use HTML::FormatText;
+    my ($html, $ascii);
+    $html = get(&quot;<A HREF="http://www.perl.com/&quot">http://www.perl.com/&quot</A>;);
+    defined $html
+        or die &quot;Can't fetch HTML from <A HREF="http://www.perl.com/&quot">http://www.perl.com/&quot</A>;;
+    $ascii = HTML::FormatText-&gt;new-&gt;format(parse_html($html));
+    print $ascii;</PRE>
+<P>
+<H2><A NAME="how do i automate an html form submission">How do I automate an HTML form submission?</A></H2>
+<P>If you're submitting values using the GET method, create a URL and encode
+the form using the <CODE>query_form</CODE> method:</P>
+<PRE>
+    use LWP::Simple;
+    use URI::URL;</PRE>
+<PRE>
+    my $url = url('<A HREF="http://www.perl.com/cgi-bin/cpan_mod">http://www.perl.com/cgi-bin/cpan_mod</A>');
+    $url-&gt;query_form(module =&gt; 'DB_File', readme =&gt; 1);
+    $content = get($url);</PRE>
+<P>If you're using the POST method, create your own user agent and encode
+the content appropriately.</P>
+<PRE>
+    use HTTP::Request::Common qw(POST);
+    use LWP::UserAgent;</PRE>
+<PRE>
+    $ua = LWP::UserAgent-&gt;new();
+    my $req = POST '<A HREF="http://www.perl.com/cgi-bin/cpan_mod">http://www.perl.com/cgi-bin/cpan_mod</A>',
+                   [ module =&gt; 'DB_File', readme =&gt; 1 ];
+    $content = $ua-&gt;request($req)-&gt;as_string;</PRE>
+<P>
+<H2><A NAME="how do i decode or create those %encodings on the web">How do I decode or create those %-encodings on the web?</A></H2>
+<P>If you are writing a CGI script, you should be using the CGI.pm module
+that comes with perl, or some other equivalent module.  The CGI module
+automatically decodes queries for you, and provides an <CODE>escape()</CODE>
+function to handle encoding.</P>
+<P>The best source of detailed information on URI encoding is RFC 2396.
+Basically, the following substitutions do it:</P>
+<PRE>
+    s/([^\w()'*~!.-])/sprintf '%%%02x', $1/eg;   # encode</PRE>
+<PRE>
+    s/%([A-Fa-f\d]{2})/chr hex $1/eg;            # decode</PRE>
+<P>However, you should only apply them to individual URI components, not
+the entire URI, otherwise you'll lose information and generally mess
+things up.  If that didn't explain it, don't worry.  Just go read
+section 2 of the RFC, it's probably the best explanation there is.</P>
+<P>RFC 2396 also contains a lot of other useful information, including a
+regexp for breaking any arbitrary URI into components (Appendix B).</P>
+<P>
+<H2><A NAME="how do i redirect to another page">How do I redirect to another page?</A></H2>
+<P>According to RFC 2616, ``Hypertext Transfer Protocol -- HTTP/1.1'', the
+preferred method is to send a <CODE>Location:</CODE> header instead of a
+<CODE>Content-Type:</CODE> header:</P>
+<PRE>
+    Location: <A HREF="http://www.domain.com/newpage">http://www.domain.com/newpage</A></PRE>
+<P>Note that relative URLs in these headers can cause strange effects
+because of ``optimizations'' that servers do.</P>
+<PRE>
+    $url = &quot;<A HREF="http://www.perl.com/CPAN/&quot">http://www.perl.com/CPAN/&quot</A>;;
+    print &quot;Location: $url\n\n&quot;;
+    exit;</PRE>
+<P>To target a particular frame in a frameset, include the ``Window-target:''
+in the header.</P>
+<PRE>
+    print &lt;&lt;EOF;
+    Location: <A HREF="http://www.domain.com/newpage">http://www.domain.com/newpage</A>
+    Window-target: &lt;FrameName&gt;</PRE>
+<PRE>
+    EOF</PRE>
+<P>To be correct to the spec, each of those virtual newlines should
+really be physical <CODE>&quot;\015\012&quot;</CODE> sequences by the time your message is
+received by the client browser.  Except for NPH scripts, though, that
+local newline should get translated by your server into standard form,
+so you shouldn't have a problem here, even if you are stuck on MacOS.
+Everybody else probably won't even notice.</P>
+<P>
+<H2><A NAME="how do i put a password on my web pages">How do I put a password on my web pages?</A></H2>
+<P>That depends.  You'll need to read the documentation for your web
+server, or perhaps check some of the other FAQs referenced above.</P>
+<P>
+<H2><A NAME="how do i edit my .htpasswd and .htgroup files with perl">How do I edit my .htpasswd and .htgroup files with Perl?</A></H2>
+<P>The HTTPD::UserAdmin and HTTPD::GroupAdmin modules provide a
+consistent OO interface to these files, regardless of how they're
+stored.  Databases may be text, dbm, Berkley DB or any database with a
+DBI compatible driver.  HTTPD::UserAdmin supports files used by the
+`Basic' and `Digest' authentication schemes.  Here's an example:</P>
+<PRE>
+    use HTTPD::UserAdmin ();
+    HTTPD::UserAdmin
+          -&gt;new(DB =&gt; &quot;/foo/.htpasswd&quot;)
+          -&gt;add($username =&gt; $password);</PRE>
+<P>
+<H2><A NAME="how do i make sure users can't enter values into a form that cause my cgi script to do bad things">How do I make sure users can't enter values into a form that cause my CGI script to do bad things?</A></H2>
+<P>Read the CGI security FAQ, at
+<A HREF="http://www-genome.wi.mit.edu/WWW/faqs/www-security-faq.html">http://www-genome.wi.mit.edu/WWW/faqs/www-security-faq.html</A> , and the
+Perl/CGI FAQ at
+<A HREF="http://www.perl.com/CPAN/doc/FAQs/cgi/perl-cgi-faq.html">http://www.perl.com/CPAN/doc/FAQs/cgi/perl-cgi-faq.html</A> .</P>
+<P>In brief: use tainting (see <A HREF="../../lib/Pod/perlsec.html">the perlsec manpage</A>), which makes sure that data
+from outside your script (eg, CGI parameters) are never used in
+<A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system</CODE></A> calls.  In addition to tainting, never use the
+single-argument form of <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> or exec().  Instead, supply the
+command and arguments as a list, which prevents shell globbing.</P>
+<P>
+<H2><A NAME="how do i parse a mail header">How do I parse a mail header?</A></H2>
+<P>For a quick-and-dirty solution, try this solution derived
+from <A HREF="../../lib/Pod/perlfunc.html#split">split in the perlfunc manpage</A>:</P>
+<PRE>
+    $/ = '';
+    $header = &lt;MSG&gt;;
+    $header =~ s/\n\s+/ /g;      # merge continuation lines
+    %head = ( UNIX_FROM_LINE, split /^([-\w]+):\s*/m, $header );</PRE>
+<P>That solution doesn't do well if, for example, you're trying to
+maintain all the Received lines.  A more complete approach is to use
+the Mail::Header module from CPAN (part of the MailTools package).</P>
+<P>
+<H2><A NAME="how do i decode a cgi form">How do I decode a CGI form?</A></H2>
+<P>You use a standard module, probably CGI.pm.  Under no circumstances
+should you attempt to do so by hand!</P>
+<P>You'll see a lot of CGI programs that blindly read from STDIN the number
+of bytes equal to CONTENT_LENGTH for POSTs, or grab QUERY_STRING for
+decoding GETs.  These programs are very poorly written.  They only work
+sometimes.  They typically forget to check the return value of the <A HREF="../../lib/Pod/perlfunc.html#item_read"><CODE>read()</CODE></A>
+system call, which is a cardinal sin.  They don't handle HEAD requests.
+They don't handle multipart forms used for file uploads.  They don't deal
+with GET/POST combinations where query fields are in more than one place.
+They don't deal with keywords in the query string.</P>
+<P>In short, they're bad hacks.  Resist them at all costs.  Please do not be
+tempted to reinvent the wheel.  Instead, use the CGI.pm or CGI_Lite.pm
+(available from CPAN), or if you're trapped in the module-free land
+of perl1 .. perl4, you might look into cgi-lib.pl (available from
+<A HREF="http://cgi-lib.stanford.edu/cgi-lib/">http://cgi-lib.stanford.edu/cgi-lib/</A> ).</P>
+<P>Make sure you know whether to use a GET or a POST in your form.
+GETs should only be used for something that doesn't update the server.
+Otherwise you can get mangled databases and repeated feedback mail
+messages.  The fancy word for this is ``idempotency''.  This simply
+means that there should be no difference between making a GET request
+for a particular URL once or multiple times.  This is because the
+HTTP protocol definition says that a GET request may be cached by the
+browser, or server, or an intervening proxy.  POST requests cannot be
+cached, because each request is independent and matters.  Typically,
+POST requests change or depend on state on the server (query or update
+a database, send mail, or purchase a computer).</P>
+<P>
+<H2><A NAME="how do i check a valid mail address">How do I check a valid mail address?</A></H2>
+<P>You can't, at least, not in real time.  Bummer, eh?</P>
+<P>Without sending mail to the address and seeing whether there's a human
+on the other hand to answer you, you cannot determine whether a mail
+address is valid.  Even if you apply the mail header standard, you
+can have problems, because there are deliverable addresses that aren't
+RFC-822 (the mail header standard) compliant, and addresses that aren't
+deliverable which are compliant.</P>
+<P>Many are tempted to try to eliminate many frequently-invalid
+mail addresses with a simple regex, such as
+<CODE>/^[\w.-]+\@(?:[\w-]+\.)+\w+$/</CODE>.  It's a very bad idea.  However,
+this also throws out many valid ones, and says nothing about
+potential deliverability, so it is not suggested.  Instead, see
+<A HREF="http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/ckaddr.gz,">http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/ckaddr.gz,</A>
+which actually checks against the full RFC spec (except for nested
+comments), looks for addresses you may not wish to accept mail to
+(say, Bill Clinton or your postmaster), and then makes sure that the
+hostname given can be looked up in the DNS MX records.  It's not fast,
+but it works for what it tries to do.</P>
+<P>Our best advice for verifying a person's mail address is to have them
+enter their address twice, just as you normally do to change a password.
+This usually weeds out typos.  If both versions match, send
+mail to that address with a personal message that looks somewhat like:</P>
+<PRE>
+    Dear someuser@host.com,</PRE>
+<PRE>
+    Please confirm the mail address you gave us Wed May  6 09:38:41
+    MDT 1998 by replying to this message.  Include the string
+    &quot;Rumpelstiltskin&quot; in that reply, but spelled in reverse; that is,
+    start with &quot;Nik...&quot;.  Once this is done, your confirmed address will
+    be entered into our records.</PRE>
+<P>If you get the message back and they've followed your directions,
+you can be reasonably assured that it's real.</P>
+<P>A related strategy that's less open to forgery is to give them a PIN
+(personal ID number).  Record the address and PIN (best that it be a
+random one) for later processing.  In the mail you send, ask them to
+include the PIN in their reply.  But if it bounces, or the message is
+included via a ``vacation'' script, it'll be there anyway.  So it's
+best to ask them to mail back a slight alteration of the PIN, such as
+with the characters reversed, one added or subtracted to each digit, etc.</P>
+<P>
+<H2><A NAME="how do i decode a mime/base64 string">How do I decode a MIME/BASE64 string?</A></H2>
+<P>The MIME-Base64 package (available from CPAN) handles this as well as
+the MIME/QP encoding.  Decoding BASE64 becomes as simple as:</P>
+<PRE>
+    use MIME::Base64;
+    $decoded = decode_base64($encoded);</PRE>
+<P>The MIME-Tools package (available from CPAN) supports extraction with
+decoding of BASE64 encoded attachments and content directly from email
+messages.</P>
+<P>If the string to decode is short (less than 84 bytes long)
+a more direct approach is to use the <A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack()</CODE></A> function's ``u''
+format after minor transliterations:</P>
+<PRE>
+    tr#A-Za-z0-9+/##cd;                   # remove non-base64 chars
+    tr#A-Za-z0-9+/# -_#;                  # convert to uuencoded format
+    $len = pack(&quot;c&quot;, 32 + 0.75*length);   # compute length byte
+    print unpack(&quot;u&quot;, $len . $_);         # uudecode and print</PRE>
+<P>
+<H2><A NAME="how do i return the user's mail address">How do I return the user's mail address?</A></H2>
+<P>On systems that support getpwuid, the $&lt; variable, and the
+Sys::Hostname module (which is part of the standard perl distribution),
+you can probably try using something like this:</P>
+<PRE>
+    use Sys::Hostname;
+    $address = sprintf('%s@%s', scalar getpwuid($&lt;), hostname);</PRE>
+<P>Company policies on mail address can mean that this generates addresses
+that the company's mail system will not accept, so you should ask for
+users' mail addresses when this matters.  Furthermore, not all systems
+on which Perl runs are so forthcoming with this information as is Unix.</P>
+<P>The Mail::Util module from CPAN (part of the MailTools package) provides a
+<CODE>mailaddress()</CODE> function that tries to guess the mail address of the user.
+It makes a more intelligent guess than the code above, using information
+given when the module was installed, but it could still be incorrect.
+Again, the best way is often just to ask the user.</P>
+<P>
+<H2><A NAME="how do i send mail">How do I send mail?</A></H2>
+<P>Use the <CODE>sendmail</CODE> program directly:</P>
+<PRE>
+    open(SENDMAIL, &quot;|/usr/lib/sendmail -oi -t -odq&quot;)
+                        or die &quot;Can't fork for sendmail: $!\n&quot;;
+    print SENDMAIL &lt;&lt;&quot;EOF&quot;;
+    From: User Originating Mail &lt;me\@host&gt;
+    To: Final Destination &lt;you\@otherhost&gt;
+    Subject: A relevant subject line</PRE>
+<PRE>
+    Body of the message goes here after the blank line
+    in as many lines as you like.
+    EOF
+    close(SENDMAIL)     or warn &quot;sendmail didn't close nicely&quot;;</PRE>
+<P>The <STRONG>-oi</STRONG> option prevents sendmail from interpreting a line consisting
+of a single dot as ``end of message''.  The <STRONG>-t</STRONG> option says to use the
+headers to decide who to send the message to, and <STRONG>-odq</STRONG> says to put
+the message into the queue.  This last option means your message won't
+be immediately delivered, so leave it out if you want immediate
+delivery.</P>
+<P>Alternate, less convenient approaches include calling mail (sometimes
+called mailx) directly or simply opening up port 25 have having an
+intimate conversation between just you and the remote SMTP daemon,
+probably sendmail.</P>
+<P>Or you might be able use the CPAN module Mail::Mailer:</P>
+<PRE>
+    use Mail::Mailer;</PRE>
+<PRE>
+    $mailer = Mail::Mailer-&gt;new();
+    $mailer-&gt;open({ From    =&gt; $from_address,
+                    To      =&gt; $to_address,
+                    Subject =&gt; $subject,
+                  })
+        or die &quot;Can't open: $!\n&quot;;
+    print $mailer $body;
+    $mailer-&gt;close();</PRE>
+<P>The Mail::Internet module uses Net::SMTP which is less Unix-centric than
+Mail::Mailer, but less reliable.  Avoid raw SMTP commands.  There
+are many reasons to use a mail transport agent like sendmail.  These
+include queueing, MX records, and security.</P>
+<P>
+<H2><A NAME="how do i use mime to make an attachment to a mail message">How do I use MIME to make an attachment to a mail message?</A></H2>
+<P>This answer is extracted directly from the MIME::Lite documentation.
+Create a multipart message (i.e., one with attachments).</P>
+<PRE>
+    use MIME::Lite;</PRE>
+<PRE>
+    ### Create a new multipart message:
+    $msg = MIME::Lite-&gt;new(
+                 From    =&gt;'me@myhost.com',
+                 To      =&gt;'you@yourhost.com',
+                 Cc      =&gt;'some@other.com, some@more.com',
+                 Subject =&gt;'A message with 2 parts...',
+                 Type    =&gt;'multipart/mixed'
+                 );</PRE>
+<PRE>
+    ### Add parts (each &quot;attach&quot; has same arguments as &quot;new&quot;):
+    $msg-&gt;attach(Type     =&gt;'TEXT',
+                 Data     =&gt;&quot;Here's the GIF file you wanted&quot;
+                 );
+    $msg-&gt;attach(Type     =&gt;'image/gif',
+                 Path     =&gt;'aaa000123.gif',
+                 Filename =&gt;'logo.gif'
+                 );</PRE>
+<PRE>
+    $text = $msg-&gt;as_string;</PRE>
+<P>MIME::Lite also includes a method for sending these things.</P>
+<PRE>
+    $msg-&gt;send;</PRE>
+<P>This defaults to using <EM>sendmail(1)</EM> but can be customized to use
+SMTP via <A HREF="../../site/lib/Net/SMTP.html">the Net::SMTP manpage</A>.</P>
+<P>
+<H2><A NAME="how do i read mail">How do I read mail?</A></H2>
+<P>While you could use the Mail::Folder module from CPAN (part of the
+MailFolder package) or the Mail::Internet module from CPAN (also part
+of the MailTools package), often a module is overkill.  Here's a
+mail sorter.</P>
+<PRE>
+    #!/usr/bin/perl
+    # bysub1 - simple sort by subject
+    my(@msgs, @sub);
+    my $msgno = -1;
+    $/ = '';                    # paragraph reads
+    while (&lt;&gt;) {
+        if (/^From/m) {
+            /^Subject:\s*(?:Re:\s*)*(.*)/mi;
+            $sub[++$msgno] = lc($1) || '';
+        }
+        $msgs[$msgno] .= $_;
+    }
+    for my $i (sort { $sub[$a] cmp $sub[$b] || $a &lt;=&gt; $b } (0 .. $#msgs)) {
+        print $msgs[$i];
+    }</PRE>
+<P>Or more succinctly,</P>
+<PRE>
+    #!/usr/bin/perl -n00
+    # bysub2 - awkish sort-by-subject
+    BEGIN { $msgno = -1 }
+    $sub[++$msgno] = (/^Subject:\s*(?:Re:\s*)*(.*)/mi)[0] if /^From/m;
+    $msg[$msgno] .= $_;
+    END { print @msg[ sort { $sub[$a] cmp $sub[$b] || $a &lt;=&gt; $b } (0 .. $#msg) ] }</PRE>
+<P>
+<H2><A NAME="how do i find out my hostname/domainname/ip address">How do I find out my hostname/domainname/IP address?</A></H2>
+<P>The normal way to find your own hostname is to call the <CODE>`hostname`</CODE>
+program.  While sometimes expedient, this has some problems, such as
+not knowing whether you've got the canonical name or not.  It's one of
+those tradeoffs of convenience versus portability.</P>
+<P>The Sys::Hostname module (part of the standard perl distribution) will
+give you the hostname after which you can find out the IP address
+(assuming you have working DNS) with a <A HREF="../../lib/Pod/perlfunc.html#item_gethostbyname"><CODE>gethostbyname()</CODE></A> call.</P>
+<PRE>
+    use Socket;
+    use Sys::Hostname;
+    my $host = hostname();
+    my $addr = inet_ntoa(scalar gethostbyname($host || 'localhost'));</PRE>
+<P>Probably the simplest way to learn your DNS domain name is to grok
+it out of /etc/resolv.conf, at least under Unix.  Of course, this
+assumes several things about your resolv.conf configuration, including
+that it exists.</P>
+<P>(We still need a good DNS domain name-learning method for non-Unix
+systems.)</P>
+<P>
+<H2><A NAME="how do i fetch a news article or the active newsgroups">How do I fetch a news article or the active newsgroups?</A></H2>
+<P>Use the Net::NNTP or News::NNTPClient modules, both available from CPAN.
+This can make tasks like fetching the newsgroup list as simple as</P>
+<PRE>
+    perl -MNews::NNTPClient
+      -e 'print News::NNTPClient-&gt;new-&gt;list(&quot;newsgroups&quot;)'</PRE>
+<P>
+<H2><A NAME="how do i fetch/put an ftp file">How do I fetch/put an FTP file?</A></H2>
+<P>LWP::Simple (available from CPAN) can fetch but not put.  Net::FTP (also
+available from CPAN) is more complex but can put as well as fetch.</P>
+<P>
+<H2><A NAME="how can i do rpc in perl">How can I do RPC in Perl?</A></H2>
+<P>A DCE::RPC module is being developed (but is not yet available) and
+will be released as part of the DCE-Perl package (available from
+CPAN).  The rpcgen suite, available from CPAN/authors/id/JAKE/, is
+an RPC stub generator and includes an RPC::ONC module.</P>
+<P>
+<HR>
+<H1><A NAME="author and copyright">AUTHOR AND COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-1999 Tom Christiansen and Nathan Torkington.
+All rights reserved.</P>
+<P>When included as part of the Standard Version of Perl, or as part of
+its complete documentation whether printed or otherwise, this work
+may be distributed only under the terms of Perl's Artistic License.
+Any distribution of this file or derivatives thereof <EM>outside</EM>
+of that package require that special arrangements be made with
+copyright holder.</P>
+<P>Irrespective of its distribution, all code examples in this file
+are hereby placed into the public domain.  You are permitted and
+encouraged to use this code in your own programs for fun
+or for profit as you see fit.  A simple comment in the code giving
+credit would be courteous but is not required.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq9 - Networking</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

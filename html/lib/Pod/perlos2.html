@@ -1,0 +1,1637 @@
+<HTML>
+<HEAD>
+<TITLE>perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#target">Target</A></LI>
+		<LI><A HREF="#other oses">Other OSes</A></LI>
+		<LI><A HREF="#prerequisites">Prerequisites</A></LI>
+		<LI><A HREF="#starting perl programs under os/2 (and dos and...)">Starting Perl programs under OS/2 (and DOS and...)</A></LI>
+		<LI><A HREF="#starting os/2 (and dos) programs under perl">Starting OS/2 (and DOS) programs under Perl</A></LI>
+	</UL>
+
+	<LI><A HREF="#frequently asked questions">Frequently asked questions</A></LI>
+	<UL>
+
+		<LI><A HREF="#it does not work">``It does not work''</A></LI>
+		<LI><A HREF="#i cannot run external programs">I cannot run external programs</A></LI>
+		<LI><A HREF="#i cannot embed perl into my program, or use perl.dll from my">I cannot embed perl into my program, or use <EM>perl.dll</EM> from my</A></LI>
+		<LI><A HREF="#`` and pipeopen do not work under dos."><CODE>``</CODE> and pipe-<A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A> do not work under DOS.</A></LI>
+		<LI><A HREF="#cannot start find.exe pattern file">Cannot start <CODE>find.exe &quot;pattern&quot; file</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#automatic binary installation">Automatic binary installation</A></LI>
+		<LI><A HREF="#manual binary installation">Manual binary installation</A></LI>
+		<LI><A HREF="#warning"><STRONG>Warning</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#accessing documentation">Accessing documentation</A></LI>
+	<UL>
+
+		<LI><A HREF="#os/2 .inf file">OS/2 <EM>.INF</EM> file</A></LI>
+		<LI><A HREF="#plain text">Plain text</A></LI>
+		<LI><A HREF="#manpages">Manpages</A></LI>
+		<LI><A HREF="#html">HTML</A></LI>
+		<LI><A HREF="#gnu info files">GNU <CODE>info</CODE> files</A></LI>
+		<LI><A HREF="#.pdf files"><EM>.PDF</EM> files</A></LI>
+		<LI><A HREF="#latex docs"><CODE>LaTeX</CODE> docs</A></LI>
+	</UL>
+
+	<LI><A HREF="#build">BUILD</A></LI>
+	<UL>
+
+		<LI><A HREF="#the short story">The short story</A></LI>
+		<LI><A HREF="#prerequisites">Prerequisites</A></LI>
+		<LI><A HREF="#getting perl source">Getting perl source</A></LI>
+		<LI><A HREF="#application of the patches">Application of the patches</A></LI>
+		<LI><A HREF="#handediting">Hand-editing</A></LI>
+		<LI><A HREF="#making">Making</A></LI>
+		<LI><A HREF="#testing">Testing</A></LI>
+		<LI><A HREF="#installing the built perl">Installing the built perl</A></LI>
+		<LI><A HREF="#a.outstyle build"><CODE>a.out</CODE>-style build</A></LI>
+	</UL>
+
+	<LI><A HREF="#build faq">Build FAQ</A></LI>
+	<UL>
+
+		<LI><A HREF="#some / became \ in pdksh.">Some <CODE>/</CODE> became <CODE>\</CODE> in pdksh.</A></LI>
+		<LI><A HREF="#'errno'  unresolved external"><CODE>'errno'</CODE> - unresolved external</A></LI>
+		<LI><A HREF="#problems with tr or sed">Problems with tr or sed</A></LI>
+		<LI><A HREF="#some problem (forget which ;)">Some problem (forget which ;-)</A></LI>
+		<LI><A HREF="#library ... not found">Library ... not found</A></LI>
+		<LI><A HREF="#segfault in make">Segfault in make</A></LI>
+		<LI><A HREF="#op/sprintf test failure">op/sprintf test failure</A></LI>
+	</UL>
+
+	<LI><A HREF="#specific (mis)features of os/2 port">Specific (mis)features of OS/2 port</A></LI>
+	<UL>
+
+		<LI><A HREF="#setpriority, getpriority"><A HREF="../../lib/Pod/perlfunc.html#item_setpriority"><CODE>setpriority</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_getpriority"><CODE>getpriority</CODE></A></A></LI>
+		<LI><A HREF="#system()"><A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A></A></LI>
+		<LI><A HREF="#extproc on the first line"><CODE>extproc</CODE> on the first line</A></LI>
+		<LI><A HREF="#additional modules:">Additional modules:</A></LI>
+		<LI><A HREF="#prebuilt methods:">Prebuilt methods:</A></LI>
+		<LI><A HREF="#prebuilt variables:">Prebuilt variables:</A></LI>
+		<LI><A HREF="#misfeatures">Misfeatures</A></LI>
+		<LI><A HREF="#modifications">Modifications</A></LI>
+		<LI><A HREF="#identifying dlls">Identifying DLLs</A></LI>
+		<LI><A HREF="#centralized management of resources">Centralized management of resources</A></LI>
+	</UL>
+
+	<LI><A HREF="#perl flavors">Perl flavors</A></LI>
+	<UL>
+
+		<LI><A HREF="#perl.exe"><EM>perl.exe</EM></A></LI>
+		<LI><A HREF="#perl_.exe"><EM>perl_.exe</EM></A></LI>
+		<LI><A HREF="#perl__.exe"><EM>perl__.exe</EM></A></LI>
+		<LI><A HREF="#perl___.exe"><EM>perl___.exe</EM></A></LI>
+		<LI><A HREF="#why strange names">Why strange names?</A></LI>
+		<LI><A HREF="#why dynamic linking">Why dynamic linking?</A></LI>
+		<LI><A HREF="#why chimera build">Why chimera build?</A></LI>
+	</UL>
+
+	<LI><A HREF="#environment">ENVIRONMENT</A></LI>
+	<UL>
+
+		<LI><A HREF="#perllib_prefix"><CODE>PERLLIB_PREFIX</CODE></A></LI>
+		<LI><A HREF="#perl_badlang"><CODE>PERL_BADLANG</CODE></A></LI>
+		<LI><A HREF="#perl_badfree"><CODE>PERL_BADFREE</CODE></A></LI>
+		<LI><A HREF="#perl_sh_dir"><CODE>PERL_SH_DIR</CODE></A></LI>
+		<LI><A HREF="#use_perl_flock"><CODE>USE_PERL_FLOCK</CODE></A></LI>
+		<LI><A HREF="#tmp or temp"><CODE>TMP</CODE> or <CODE>TEMP</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#evolution">Evolution</A></LI>
+	<UL>
+
+		<LI><A HREF="#priorities">Priorities</A></LI>
+		<LI><A HREF="#dll name mangling">DLL name mangling</A></LI>
+		<LI><A HREF="#threading">Threading</A></LI>
+		<LI><A HREF="#calls to external programs">Calls to external programs</A></LI>
+		<LI><A HREF="#memory allocation">Memory allocation</A></LI>
+		<LI><A HREF="#threads">Threads</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>One can read this document in the following formats:</P>
+<PRE>
+        man <A HREF="../../lib/Pod/perlos2.html">perlos2</A>
+        view perl <A HREF="../../lib/Pod/perlos2.html">perlos2</A>
+        explorer <A HREF="../../lib/Pod/perlos2.html">perlos2</A>.html
+        info <A HREF="../../lib/Pod/perlos2.html">perlos2</A></PRE>
+<P>to list some (not all may be available simultaneously), or it may
+be read <EM>as is</EM>: either as <EM>README.os2</EM>, or <EM>pod/perlos2.pod</EM>.</P>
+<P>To read the <EM>.INF</EM> version of documentation (<STRONG>very</STRONG> recommended)
+outside of OS/2, one needs an IBM's reader (may be available on IBM
+ftp sites (?)  (URL anyone?)) or shipped with PC DOS 7.0 and IBM's
+Visual Age C++ 3.5.</P>
+<P>A copy of a Win* viewer is contained in the ``Just add OS/2 Warp'' package</P>
+<PRE>
+  <A HREF="ftp://ftp.software.ibm.com/ps/products/os2/tools/jaow/jaow.zip">ftp://ftp.software.ibm.com/ps/products/os2/tools/jaow/jaow.zip</A></PRE>
+<P>in <EM>?:\JUST_ADD\view.exe</EM>. This gives one an access to EMX's 
+<EM>.INF</EM> docs as well (text form is available in <EM>/emx/doc</EM> in 
+EMX's distribution).</P>
+<P>Note that if you have <EM>lynx.exe</EM> installed, you can follow WWW links
+from this document in <EM>.INF</EM> format. If you have EMX docs installed 
+correctly, you can follow library links (you need to have <CODE>view emxbook</CODE>
+working by setting <CODE>EMXBOOK</CODE> environment variable as it is described
+in EMX docs).</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="target">Target</A></H2>
+<P>The target is to make OS/2 the best supported platform for
+using/building/developing Perl and <EM>Perl applications</EM>, as well as
+make Perl the best language to use under OS/2. The secondary target is
+to try to make this work under DOS and Win* as well (but not <STRONG>too</STRONG> hard).</P>
+<P>The current state is quite close to this target. Known limitations:</P>
+<UL>
+<LI>
+Some *nix programs use <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> a lot; with the mostly useful flavors of perl
+for OS/2 (there are several built simultaneously) this is supported;
+some flavors do not.  Using <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> after <EM>use</EM>ing dynamically loading
+extensions would not work with very old versions of EMX.
+<P></P>
+<LI>
+You need a separate perl executable <EM>perl__.exe</EM> (see <A HREF="#perl__.exe">the perl__.exe manpage</A>)
+if you want to use PM code in your application (as Perl/Tk or OpenGL
+Perl modules do) without having a text-mode window present.
+<P>While using the standard <EM>perl.exe</EM> from a text-mode window is possible
+too, I have seen cases when this causes degradation of the system stability.
+Using <EM>perl__.exe</EM> avoids such a degradation.</P>
+<P></P>
+<LI>
+There is no simple way to access WPS objects. The only way I know
+is via <CODE>OS2::REXX</CODE> extension (see <A HREF="../../OS2/REXX.html">the OS2::REXX manpage</A>), and we do not have access to
+convenience methods of Object-REXX. (Is it possible at all? I know
+of no Object-REXX API.)  The <CODE>SOM</CODE> extension (currently in alpha-text)
+may eventually remove this shortcoming.
+<P></P></UL>
+<P>Please keep this list up-to-date by informing me about other items.</P>
+<P>
+<H2><A NAME="other oses">Other OSes</A></H2>
+<P>Since OS/2 port of perl uses a remarkable EMX environment, it can
+run (and build extensions, and - possibly - be built itself) under any
+environment which can run EMX. The current list is DOS,
+DOS-inside-OS/2, Win0.3*, Win0.95 and WinNT. Out of many perl flavors,
+only one works, see <A HREF="#perl_.exe">perl_.exe</A>.</P>
+<P>Note that not all features of Perl are available under these
+environments. This depends on the features the <EM>extender</EM> - most
+probably RSX - decided to implement.</P>
+<P>Cf. <EM>Prerequisites</EM>.</P>
+<P>
+<H2><A NAME="prerequisites">Prerequisites</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_EMX">EMX</A></STRONG><BR>
+<DD>
+EMX runtime is required (may be substituted by RSX). Note that
+it is possible to make <EM>perl_.exe</EM> to run under DOS without any
+external support by binding <EM>emx.exe</EM>/<EM>rsx.exe</EM> to it, see <EM>emxbind</EM>. Note
+that under DOS for best results one should use RSX runtime, which
+has much more functions working (like <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork</CODE></A>, <A HREF="#item_popen"><CODE>popen</CODE></A> and so on). In
+fact RSX is required if there is no VCPI present. Note the
+RSX requires DPMI.
+<P>Only the latest runtime is supported, currently <CODE>0.9d fix 03</CODE>. Perl may run
+under earlier versions of EMX, but this is not tested.</P>
+<P>One can get different parts of EMX from, say</P>
+<PRE>
+  <A HREF="http://www.leo.org/pub/comp/os/os2/leo/gnu/emx+gcc/">http://www.leo.org/pub/comp/os/os2/leo/gnu/emx+gcc/</A>
+  <A HREF="http://powerusersbbs.com/pub/os2/dev/">http://powerusersbbs.com/pub/os2/dev/</A>   [EMX+GCC Development]
+  <A HREF="http://hobbes.nmsu.edu/pub/os2/dev/emx/v0.9d/">http://hobbes.nmsu.edu/pub/os2/dev/emx/v0.9d/</A></PRE>
+<P>The runtime component should have the name <EM>emxrt.zip</EM>.</P>
+<P><STRONG>NOTE</STRONG>. It is enough to have <EM>emx.exe</EM>/<EM>rsx.exe</EM> on your path. One
+does not need to specify them explicitly (though this</P>
+<PRE>
+  emx perl_.exe -de 0</PRE>
+<P>will work as well.)</P>
+<P></P>
+<DT><STRONG><A NAME="item_RSX">RSX</A></STRONG><BR>
+<DD>
+To run Perl on DPMI platforms one needs RSX runtime. This is
+needed under DOS-inside-OS/2, Win0.3*, Win0.95 and WinNT (see 
+<A HREF="#other oses">Other OSes</A>). RSX would not work with VCPI
+only, as EMX would, it requires DMPI.
+<P>Having RSX and the latest <EM>sh.exe</EM> one gets a fully functional
+<STRONG>*nix</STRONG>-ish environment under DOS, say, <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork</CODE></A>, <CODE>``</CODE> and
+pipe-<A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A> work. In fact, MakeMaker works (for static build), so one
+can have Perl development environment under DOS.</P>
+<P>One can get RSX from, say</P>
+<PRE>
+  <A HREF="ftp://ftp.cdrom.com/pub/os2/emx09c/contrib">ftp://ftp.cdrom.com/pub/os2/emx09c/contrib</A>
+  <A HREF="ftp://ftp.uni-bielefeld.de/pub/systems/msdos/misc">ftp://ftp.uni-bielefeld.de/pub/systems/msdos/misc</A>
+  <A HREF="ftp://ftp.leo.org/pub/comp/os/os2/leo/devtools/emx+gcc/contrib">ftp://ftp.leo.org/pub/comp/os/os2/leo/devtools/emx+gcc/contrib</A></PRE>
+<P>Contact the author on <CODE>rainer@mathematik.uni-bielefeld.de</CODE>.</P>
+<P>The latest <EM>sh.exe</EM> with DOS hooks is available in</P>
+<PRE>
+  <A HREF="ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/">ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/</A></PRE>
+<P>as <EM>sh_dos.zip</EM> or under similar names starting with <CODE>sh</CODE>, <A HREF="#item_pdksh"><CODE>pdksh</CODE></A> etc.</P>
+<P></P>
+<DT><STRONG><A NAME="item_HPFS">HPFS</A></STRONG><BR>
+<DD>
+Perl does not care about file systems, but to install the whole perl
+library intact one needs a file system which supports long file names.
+<P>Note that if you do not plan to build the perl itself, it may be
+possible to fool EMX to truncate file names. This is not supported,
+read EMX docs to see how to do it.</P>
+<P></P>
+<DT><STRONG><A NAME="item_pdksh">pdksh</A></STRONG><BR>
+<DD>
+To start external programs with complicated command lines (like with
+pipes in between, and/or quoting of arguments), Perl uses an external
+shell. With EMX port such shell should be named <EM>sh.exe</EM>, and located
+either in the wired-in-during-compile locations (usually <EM>F:/bin</EM>),
+or in configurable location (see <A HREF="#perl_sh_dir">PERL_SH_DIR</A>).
+<P>For best results use EMX pdksh. The standard binary (5.2.14 or later) runs
+under DOS (with <A HREF="#item_RSX">RSX</A>) as well, see</P>
+<PRE>
+  <A HREF="ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/">ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/</A></PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="starting perl programs under os/2 (and dos and...)">Starting Perl programs under OS/2 (and DOS and...)</A></H2>
+<P>Start your Perl program <EM>foo.pl</EM> with arguments <CODE>arg1 arg2 arg3</CODE> the
+same way as on any other platform, by</P>
+<PRE>
+        perl foo.pl arg1 arg2 arg3</PRE>
+<P>If you want to specify perl options <CODE>-my_opts</CODE> to the perl itself (as
+opposed to to your program), use</P>
+<PRE>
+        perl -my_opts foo.pl arg1 arg2 arg3</PRE>
+<P>Alternately, if you use OS/2-ish shell, like CMD or 4os2, put
+the following at the start of your perl script:</P>
+<PRE>
+        extproc perl -S -my_opts</PRE>
+<P>rename your program to <EM>foo.cmd</EM>, and start it by typing</P>
+<PRE>
+        foo arg1 arg2 arg3</PRE>
+<P>Note that because of stupid OS/2 limitations the full path of the perl
+script is not available when you use <CODE>extproc</CODE>, thus you are forced to
+use <A HREF="../../lib/Pod/perlrun.html#item_%2DS"><CODE>-S</CODE></A> perl switch, and your script should be on the <A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>. As a plus
+side, if you know a full path to your script, you may still start it
+with</P>
+<PRE>
+        perl ../../blah/foo.cmd arg1 arg2 arg3</PRE>
+<P>(note that the argument <CODE>-my_opts</CODE> is taken care of by the <CODE>extproc</CODE> line
+in your script, see <A HREF="#c<extproc> on the first line"><CODE>extproc</CODE> on the first line</A>).</P>
+<P>To understand what the above <EM>magic</EM> does, read perl docs about <A HREF="../../lib/Pod/perlrun.html#item_%2DS"><CODE>-S</CODE></A>
+switch - see <A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A>, and cmdref about <CODE>extproc</CODE>:</P>
+<PRE>
+        view perl <A HREF="../../lib/Pod/perlrun.html">perlrun</A>
+        man <A HREF="../../lib/Pod/perlrun.html">perlrun</A>
+        view cmdref extproc
+        help extproc</PRE>
+<P>or whatever method you prefer.</P>
+<P>There are also endless possibilities to use <EM>executable extensions</EM> of
+4os2, <EM>associations</EM> of WPS and so on... However, if you use
+*nixish shell (like <EM>sh.exe</EM> supplied in the binary distribution),
+you need to follow the syntax specified in <A HREF="../../lib/Pod/perlrun.html#switches">Switches in the perlrun manpage</A>.</P>
+<P>Note that <STRONG>-S</STRONG> switch enables a search with additional extensions 
+<EM>.cmd</EM>, <EM>.btm</EM>, <EM>.bat</EM>, <EM>.pl</EM> as well.</P>
+<P>
+<H2><A NAME="starting os/2 (and dos) programs under perl">Starting OS/2 (and DOS) programs under Perl</A></H2>
+<P>This is what <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> (see <A HREF="../../lib/Pod/perlfunc.html#system">system in the perlfunc manpage</A>), <CODE>``</CODE> (see
+<A HREF="../../lib/Pod/perlop.html#i/o operators">I/O Operators in the perlop manpage</A>), and <EM>open pipe</EM> (see <A HREF="../../lib/Pod/perlfunc.html#open">open in the perlfunc manpage</A>)
+are for. (Avoid <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A> (see <A HREF="../../lib/Pod/perlfunc.html#exec">exec in the perlfunc manpage</A>) unless you know what you
+do).</P>
+<P>Note however that to use some of these operators you need to have a
+sh-syntax shell installed (see <A HREF="#pdksh">Pdksh</A>, 
+<A HREF="#frequently asked questions">Frequently asked questions</A>), and perl should be able to find it
+(see <A HREF="#perl_sh_dir">PERL_SH_DIR</A>).</P>
+<P>The cases when the shell is used are:</P>
+<OL>
+<LI>
+One-argument <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> (see <A HREF="../../lib/Pod/perlfunc.html#system">system in the perlfunc manpage</A>), <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A> (see <A HREF="../../lib/Pod/perlfunc.html#exec">exec in the perlfunc manpage</A>)
+with redirection or shell meta-characters;
+<P></P>
+<LI>
+Pipe-open (see <A HREF="../../lib/Pod/perlfunc.html#open">open in the perlfunc manpage</A>) with the command which contains redirection 
+or shell meta-characters;
+<P></P>
+<LI>
+Backticks <CODE>``</CODE> (see <A HREF="../../lib/Pod/perlop.html#i/o operators">I/O Operators in the perlop manpage</A>) with the command which contains
+redirection or shell meta-characters;
+<P></P>
+<LI>
+If the executable called by system()/exec()/pipe-open()/<CODE>``</CODE> is a script
+with the ``magic'' <CODE>#!</CODE> line or <CODE>extproc</CODE> line which specifies shell;
+<P></P>
+<LI>
+If the executable called by system()/exec()/pipe-open()/<CODE>``</CODE> is a script
+without ``magic'' line, and <CODE>$ENV{EXECSHELL}</CODE> is set to shell;
+<P></P>
+<LI>
+If the executable called by system()/exec()/pipe-open()/<CODE>``</CODE> is not
+found;
+<P></P>
+<LI>
+For globbing (see <A HREF="../../lib/Pod/perlfunc.html#glob">glob in the perlfunc manpage</A>, <A HREF="../../lib/Pod/perlop.html#i/o operators">I/O Operators in the perlop manpage</A>).
+<P></P></OL>
+<P>For the sake of speed for a common case, in the above algorithms 
+backslashes in the command name are not considered as shell metacharacters.</P>
+<P>Perl starts scripts which begin with cookies
+<CODE>extproc</CODE> or <CODE>#!</CODE> directly, without an intervention of shell.  Perl uses the
+same algorithm to find the executable as <EM>pdksh</EM>: if the path
+on <CODE>#!</CODE> line does not work, and contains <CODE>/</CODE>, then the executable
+is searched in <EM>.</EM> and on <A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>.  To find arguments for these scripts
+Perl uses a different algorithm than <EM>pdksh</EM>: up to 3 arguments are 
+recognized, and trailing whitespace is stripped.</P>
+<P>If a script
+does not contain such a cooky, then to avoid calling <EM>sh.exe</EM>, Perl uses
+the same algorithm as <EM>pdksh</EM>: if <CODE>$ENV{EXECSHELL}</CODE> is set, the
+script is given as the first argument to this command, if not set, then
+<CODE>$ENV{COMSPEC} /c</CODE> is used (or a hardwired guess if <CODE>$ENV{COMSPEC}</CODE> is
+not set).</P>
+<P>If starting scripts directly, Perl will use exactly the same algorithm as for 
+the search of script given by <STRONG>-S</STRONG> command-line option: it will look in
+the current directory, then on components of <CODE>$ENV{PATH}</CODE> using the 
+following order of appended extensions: no extension, <EM>.cmd</EM>, <EM>.btm</EM>, 
+<EM>.bat</EM>, <EM>.pl</EM>.</P>
+<P>Note that Perl will start to look for scripts only if OS/2 cannot start the
+specified application, thus <CODE>system 'blah'</CODE> will not look for a script if 
+there is an executable file <EM>blah.exe</EM> <EM>anywhere</EM> on <A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>.</P>
+<P>Note also that executable files on OS/2 can have an arbitrary extension, 
+but <EM>.exe</EM> will be automatically appended if no dot is present in the name.  
+The workaround as as simple as that:  since <EM>blah.</EM> and <EM>blah</EM> denote the 
+same file, to start an executable residing in file <EM>n:/bin/blah</EM> (no 
+extension) give an argument <CODE>n:/bin/blah.</CODE> (dot appended) to system().</P>
+<P>Perl will correctly start PM programs from VIO (=text-mode) Perl process;
+the opposite is not true: when you start a non-PM program from a PM
+Perl process, it would not run it in a separate session.  If a separate
+session is desired, either ensure
+that shell will be used, as in <CODE>system 'cmd /c myprog'</CODE>, or start it using
+optional arguments to <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> documented in <CODE>OS2::Process</CODE> module.  This
+is considered to be a feature.</P>
+<P>
+<HR>
+<H1><A NAME="frequently asked questions">Frequently asked questions</A></H1>
+<P>
+<H2><A NAME="it does not work">``It does not work''</A></H2>
+<P>Perl binary distributions come with a <EM>testperl.cmd</EM> script which tries
+to detect common problems with misconfigured installations.  There is a
+pretty large chance it will discover which step of the installation you
+managed to goof.  <CODE>;-)</CODE></P>
+<P>
+<H2><A NAME="i cannot run external programs">I cannot run external programs</A></H2>
+<UL>
+<LI>
+Did you run your programs with <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A> switch? See 
+<EM>Starting OS/2 (and DOS) programs under Perl</EM>.
+<P></P>
+<LI>
+Do you try to run <EM>internal</EM> shell commands, like <CODE>`copy a b`</CODE>
+(internal for <EM>cmd.exe</EM>), or <CODE>`glob a*b`</CODE> (internal for ksh)? You
+need to specify your shell explicitly, like <CODE>`cmd /c copy a b`</CODE>,
+since Perl cannot deduce which commands are internal to your shell.
+<P></P></UL>
+<P>
+<H2><A NAME="i cannot embed perl into my program, or use perl.dll from my program.">I cannot embed perl into my program, or use <EM>perl.dll</EM> from my
+program.</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Is_your_program_EMX%2Dcompiled_with_%2DZmt_%2DZcrt">Is your program EMX-compiled with <CODE>-Zmt -Zcrtdll</CODE>?</A></STRONG><BR>
+<DD>
+If not, you need to build a stand-alone DLL for perl. Contact me, I
+did it once. Sockets would not work, as a lot of other stuff.
+<P></P>
+<DT><STRONG><A NAME="item_Did_you_use_ExtUtils%3A%3AEmbed%3F">Did you use <A HREF="../../lib/ExtUtils/Embed.html">the ExtUtils::Embed manpage</A>?</A></STRONG><BR>
+<DD>
+I had reports it does not work. Somebody would need to fix it.
+<P></P></DL>
+<P>
+<H2><A NAME="`` and pipeopen do not work under dos."><CODE>``</CODE> and pipe-<A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A> do not work under DOS.</A></H2>
+<P>This may a variant of just <A HREF="#i cannot run external programs">I cannot run external programs</A>, or a
+deeper problem. Basically: you <EM>need</EM> RSX (see <A HREF="#prerequisites">Prerequisites</A>)
+for these commands to work, and you may need a port of <EM>sh.exe</EM> which
+understands command arguments. One of such ports is listed in
+<A HREF="#prerequisites">Prerequisites</A> under RSX. Do not forget to set variable
+<CODE>&quot;PERL_SH_DIR&quot;</CODE> as well.</P>
+<P>DPMI is required for RSX.</P>
+<P>
+<H2><A NAME="cannot start find.exe pattern file">Cannot start <CODE>find.exe &quot;pattern&quot; file</CODE></A></H2>
+<P>Use one of</P>
+<PRE>
+  system 'cmd', '/c', 'find &quot;pattern&quot; file';
+  `cmd /c 'find &quot;pattern&quot; file'`</PRE>
+<P>This would start <EM>find.exe</EM> via <EM>cmd.exe</EM> via <CODE>sh.exe</CODE> via
+<CODE>perl.exe</CODE>, but this is a price to pay if you want to use
+non-conforming program. In fact <EM>find.exe</EM> cannot be started at all
+using C library API only. Otherwise the following command-lines would be
+equivalent:</P>
+<PRE>
+  find &quot;pattern&quot; file
+  find pattern file</PRE>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<P>
+<H2><A NAME="automatic binary installation">Automatic binary installation</A></H2>
+<P>The most convenient way of installing a binary distribution of perl is via perl installer
+<EM>install.exe</EM>. Just follow the instructions, and 99% of the
+installation blues would go away.</P>
+<P>Note however, that you need to have <EM>unzip.exe</EM> on your path, and
+EMX environment <EM>running</EM>. The latter means that if you just
+installed EMX, and made all the needed changes to <EM>Config.sys</EM>,
+you may need to reboot in between. Check EMX runtime by running</P>
+<PRE>
+        emxrev</PRE>
+<P>A folder is created on your desktop which contains some useful
+objects.</P>
+<P><STRONG>Things not taken care of by automatic binary installation:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_PERL_BADLANG"><CODE>PERL_BADLANG</CODE></A></STRONG><BR>
+<DD>
+may be needed if you change your codepage <EM>after</EM> perl installation,
+and the new value is not supported by EMX. See <A HREF="#perl_badlang">PERL_BADLANG</A>.
+<P></P>
+<DT><STRONG><A NAME="item_PERL_BADFREE"><CODE>PERL_BADFREE</CODE></A></STRONG><BR>
+<DD>
+see <A HREF="#perl_badfree">PERL_BADFREE</A>.
+<P></P>
+<DT><STRONG><A NAME="item_Config%2Epm"><EM>Config.pm</EM></A></STRONG><BR>
+<DD>
+This file resides somewhere deep in the location you installed your
+perl library, find it out by
+<PRE>
+  perl -MConfig -le &quot;print $INC{'Config.pm'}&quot;</PRE>
+<P>While most important values in this file <EM>are</EM> updated by the binary
+installer, some of them may need to be hand-edited. I know no such
+data, please keep me informed if you find one.</P>
+<P></P></DL>
+<P><STRONG>NOTE</STRONG>. Because of a typo the binary installer of 5.00305
+would install a variable <CODE>PERL_SHPATH</CODE> into <EM>Config.sys</EM>. Please
+remove this variable and put <CODE>PERL_SH_DIR</CODE> instead.</P>
+<P>
+<H2><A NAME="manual binary installation">Manual binary installation</A></H2>
+<P>As of version 5.00305, OS/2 perl binary distribution comes split
+into 11 components. Unfortunately, to enable configurable binary
+installation, the file paths in the zip files are not absolute, but
+relative to some directory.</P>
+<P>Note that the extraction with the stored paths is still necessary
+(default with unzip, specify <A HREF="../../lib/Pod/perlrun.html#item_%2Dd"><CODE>-d</CODE></A> to pkunzip). However, you
+need to know where to extract the files. You need also to manually
+change entries in <EM>Config.sys</EM> to reflect where did you put the
+files. Note that if you have some primitive unzipper (like
+pkunzip), you may get a lot of warnings/errors during
+unzipping. Upgrade to <CODE>(w)unzip</CODE>.</P>
+<P>Below is the sample of what to do to reproduce the configuration on my
+machine:</P>
+<DL>
+<DT><STRONG><A NAME="item_executables">Perl VIO and PM executables (dynamically linked)</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_exc.zip *.exe *.ico -d f:/emx.add/bin
+  unzip perl_exc.zip *.dll -d f:/emx.add/dll</PRE>
+<P>(have the directories with <CODE>*.exe</CODE> on PATH, and <CODE>*.dll</CODE> on
+LIBPATH);</P>
+<DT><STRONG><A NAME="item_executable">Perl_ VIO executable (statically linked)</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_aou.zip -d f:/emx.add/bin</PRE>
+<P>(have the directory on PATH);</P>
+<DT><STRONG><A NAME="item_Executables_for_Perl_utilities">Executables for Perl utilities</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_utl.zip -d f:/emx.add/bin</PRE>
+<P>(have the directory on PATH);</P>
+<DT><STRONG><A NAME="item_Main_Perl_library">Main Perl library</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_mlb.zip -d f:/perllib/lib</PRE>
+<P>If this directory is exactly the same as the prefix which was compiled
+into <EM>perl.exe</EM>, you do not need to change
+anything. However, for perl to find the library if you use a different
+path, you need to
+<CODE>set PERLLIB_PREFIX</CODE> in <EM>Config.sys</EM>, see <A HREF="#perllib_prefix">PERLLIB_PREFIX</A>.</P>
+<DT><STRONG><A NAME="item_Additional_Perl_modules">Additional Perl modules</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_ste.zip -d f:/perllib/lib/site_perl/5.8.3/</PRE>
+<P>Same remark as above applies.  Additionally, if this directory is not
+one of directories on @INC (and @INC is influenced by <CODE>PERLLIB_PREFIX</CODE>), you
+need to put this
+directory and subdirectory <EM>./os2</EM> in <A HREF="../../lib/Pod/perlrun.html#item_PERLLIB"><CODE>PERLLIB</CODE></A> or <A HREF="../../lib/Pod/perlrun.html#item_PERL5LIB"><CODE>PERL5LIB</CODE></A>
+variable. Do not use <A HREF="../../lib/Pod/perlrun.html#item_PERL5LIB"><CODE>PERL5LIB</CODE></A> unless you have it set already. See
+<A HREF="../../lib/Pod/perl.html#environment">ENVIRONMENT in the perl manpage</A>.</P>
+<DT><STRONG><A NAME="item_Tools_to_compile_Perl_modules">Tools to compile Perl modules</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_blb.zip -d f:/perllib/lib</PRE>
+<P>Same remark as for <EM>perl_ste.zip</EM>.</P>
+<DT><STRONG><A NAME="item_Manpages_for_Perl_and_utilities">Manpages for Perl and utilities</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_man.zip -d f:/perllib/man</PRE>
+<P>This directory should better be on <CODE>MANPATH</CODE>. You need to have a
+working man to access these files.</P>
+<DT><STRONG><A NAME="item_Manpages_for_Perl_modules">Manpages for Perl modules</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_mam.zip -d f:/perllib/man</PRE>
+<P>This directory should better be on <CODE>MANPATH</CODE>. You need to have a
+working man to access these files.</P>
+<DT><STRONG><A NAME="item_Source_for_Perl_documentation">Source for Perl documentation</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_pod.zip -d f:/perllib/lib</PRE>
+<P>This is used by the <CODE>perldoc</CODE> program (see <EM>perldoc</EM>), and may be used to
+generate HTML documentation usable by WWW browsers, and
+documentation in zillions of other formats: <CODE>info</CODE>, <CODE>LaTeX</CODE>,
+<CODE>Acrobat</CODE>, <CODE>FrameMaker</CODE> and so on.</P>
+<DT><STRONG><A NAME="item_Perl_manual_in_%2EINF_format">Perl manual in <EM>.INF</EM> format</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_inf.zip -d d:/os2/book</PRE>
+<P>This directory should better be on <CODE>BOOKSHELF</CODE>.</P>
+<DT><STRONG><A NAME="item_Pdksh">Pdksh</A></STRONG><BR>
+<DD>
+<PRE>
+  unzip perl_sh.zip -d f:/bin</PRE>
+<P>This is used by perl to run external commands which explicitly
+require shell, like the commands using <EM>redirection</EM> and <EM>shell
+metacharacters</EM>. It is also used instead of explicit <EM>/bin/sh</EM>.</P>
+<P>Set <CODE>PERL_SH_DIR</CODE> (see <A HREF="#perl_sh_dir">PERL_SH_DIR</A>) if you move <EM>sh.exe</EM> from
+the above location.</P>
+<P><STRONG>Note.</STRONG> It may be possible to use some other sh-compatible shell
+(file globbing - if done via shell - may break).</P>
+</DL>
+<P>After you installed the components you needed and updated the
+<EM>Config.sys</EM> correspondingly, you need to hand-edit
+<EM>Config.pm</EM>. This file resides somewhere deep in the location you
+installed your perl library, find it out by</P>
+<PRE>
+  perl -MConfig -le &quot;print $INC{'Config.pm'}&quot;</PRE>
+<P>You need to correct all the entries which look like file paths (they
+currently start with <CODE>f:/</CODE>).</P>
+<P>
+<H2><A NAME="warning"><STRONG>Warning</STRONG></A></H2>
+<P>The automatic and manual perl installation leave precompiled paths
+inside perl executables. While these paths are overwriteable (see
+<A HREF="#perllib_prefix">PERLLIB_PREFIX</A>, <A HREF="#perl_sh_dir">PERL_SH_DIR</A>), one may get better results by
+binary editing of paths inside the executables/DLLs.</P>
+<P>
+<HR>
+<H1><A NAME="accessing documentation">Accessing documentation</A></H1>
+<P>Depending on how you built/installed perl you may have (otherwise
+identical) Perl documentation in the following formats:</P>
+<P>
+<H2><A NAME="os/2 .inf file">OS/2 <EM>.INF</EM> file</A></H2>
+<P>Most probably the most convenient form. Under OS/2 view it as</P>
+<PRE>
+  view perl
+  view perl <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>
+  view perl less
+  view perl ExtUtils::MakeMaker</PRE>
+<P>(currently the last two may hit a wrong location, but this may improve
+soon). Under Win* see <A HREF="#synopsis">SYNOPSIS</A>.</P>
+<P>If you want to build the docs yourself, and have <EM>OS/2 toolkit</EM>, run</P>
+<PRE>
+        pod2ipf &gt; perl.ipf</PRE>
+<P>in <EM>/perllib/lib/pod</EM> directory, then</P>
+<PRE>
+        ipfc /inf perl.ipf</PRE>
+<P>(Expect a lot of errors during the both steps.) Now move it on your
+BOOKSHELF path.</P>
+<P>
+<H2><A NAME="plain text">Plain text</A></H2>
+<P>If you have perl documentation in the source form, perl utilities
+installed, and GNU groff installed, you may use</P>
+<PRE>
+        perldoc <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>
+        perldoc less
+        perldoc ExtUtils::MakeMaker</PRE>
+<P>to access the perl documentation in the text form (note that you may get
+better results using perl manpages).</P>
+<P>Alternately, try running pod2text on <EM>.pod</EM> files.</P>
+<P>
+<H2><A NAME="manpages">Manpages</A></H2>
+<P>If you have man installed on your system, and you installed perl
+manpages, use something like this:</P>
+<PRE>
+        man <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>
+        man 3 less
+        man ExtUtils.MakeMaker</PRE>
+<P>to access documentation for different components of Perl. Start with</P>
+<PRE>
+        man perl</PRE>
+<P>Note that dot (<EM>.</EM>) is used as a package separator for documentation
+for packages, and as usual, sometimes you need to give the section - <CODE>3</CODE>
+above - to avoid shadowing by the <EM>less(1) manpage</EM>.</P>
+<P>Make sure that the directory <STRONG>above</STRONG> the directory with manpages is
+on our <CODE>MANPATH</CODE>, like this</P>
+<PRE>
+  set MANPATH=c:/man;f:/perllib/man</PRE>
+<P>for Perl manpages in <CODE>f:/perllib/man/man1/</CODE> etc.</P>
+<P>
+<H2><A NAME="html">HTML</A></H2>
+<P>If you have some WWW browser available, installed the Perl
+documentation in the source form, and Perl utilities, you can build
+HTML docs. Cd to directory with <EM>.pod</EM> files, and do like this</P>
+<PRE>
+        cd f:/perllib/lib/pod
+        pod2html</PRE>
+<P>After this you can direct your browser the file <EM>perl.html</EM> in this
+directory, and go ahead with reading docs, like this:</P>
+<PRE>
+        explore <A HREF="file:///f:/perllib/lib/pod/perl.html">file:///f:/perllib/lib/pod/perl.html</A></PRE>
+<P>Alternatively you may be able to get these docs prebuilt from CPAN.</P>
+<P>
+<H2><A NAME="gnu info files">GNU <CODE>info</CODE> files</A></H2>
+<P>Users of Emacs would appreciate it very much, especially with
+<CODE>CPerl</CODE> mode loaded. You need to get latest <CODE>pod2info</CODE> from <CODE>CPAN</CODE>,
+or, alternately, prebuilt info pages.</P>
+<P>
+<H2><A NAME=".pdf files"><EM>.PDF</EM> files</A></H2>
+<P>for <CODE>Acrobat</CODE> are available on CPAN (for slightly old version of
+perl).</P>
+<P>
+<H2><A NAME="latex docs"><CODE>LaTeX</CODE> docs</A></H2>
+<P>can be constructed using <CODE>pod2latex</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="build">BUILD</A></H1>
+<P>Here we discuss how to build Perl under OS/2. There is an alternative
+(but maybe older) view on <A HREF="http://www.shadow.net/~troc/os2perl.html">http://www.shadow.net/~troc/os2perl.html</A></P>
+<P>
+<H2><A NAME="the short story">The short story</A></H2>
+<P>Assume that you are a seasoned porter, so are sure that all the necessary
+tools are already present on your system, and you know how to get the Perl
+source distribution.  Untar it, change to the extract directory, and</P>
+<PRE>
+  gnupatch -p0 &lt; os2\diff.configure
+  sh Configure -des -D prefix=f:/perllib
+  make
+  make test
+  make install
+  make aout_test
+  make aout_install</PRE>
+<P>This puts the executables in f:/perllib/bin.  Manually move them to the
+<A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>, manually move the built <EM>perl*.dll</EM> to <CODE>LIBPATH</CODE> (here <EM>*</EM> is
+a not-very-meaningful hex checksum), and run</P>
+<PRE>
+  make installcmd INSTALLCMDDIR=d:/ir/on/path</PRE>
+<P>What follows is a detailed guide through these steps.</P>
+<P>
+<H2><A NAME="prerequisites">Prerequisites</A></H2>
+<P>You need to have the latest EMX development environment, the full
+GNU tool suite (gawk renamed to awk, and GNU <EM>find.exe</EM>
+earlier on path than the OS/2 <EM>find.exe</EM>, same with <EM>sort.exe</EM>, to
+check use</P>
+<PRE>
+  find --version
+  sort --version</PRE>
+<P>). You need the latest version of <EM>pdksh</EM> installed as <EM>sh.exe</EM>.</P>
+<P>Check that you have <STRONG>BSD</STRONG> libraries and headers installed, and - 
+optionally - Berkeley DB headers and libraries, and crypt.</P>
+<P>Possible locations to get this from are</P>
+<PRE>
+  <A HREF="ftp://hobbes.nmsu.edu/os2/unix/">ftp://hobbes.nmsu.edu/os2/unix/</A>
+  <A HREF="ftp://ftp.cdrom.com/pub/os2/unix/">ftp://ftp.cdrom.com/pub/os2/unix/</A>
+  <A HREF="ftp://ftp.cdrom.com/pub/os2/dev32/">ftp://ftp.cdrom.com/pub/os2/dev32/</A>
+  <A HREF="ftp://ftp.cdrom.com/pub/os2/emx09c/">ftp://ftp.cdrom.com/pub/os2/emx09c/</A></PRE>
+<P>It is reported that the following archives contain enough utils to
+build perl: <EM>gnufutil.zip</EM>, <EM>gnusutil.zip</EM>, <EM>gnututil.zip</EM>, <EM>gnused.zip</EM>,
+<EM>gnupatch.zip</EM>, <EM>gnuawk.zip</EM>, <EM>gnumake.zip</EM>, <EM>bsddev.zip</EM> and
+<EM>ksh527rt.zip</EM> (or a later version).  Note that all these utilities are
+known to be available from LEO:</P>
+<PRE>
+  <A HREF="ftp://ftp.leo.org/pub/comp/os/os2/leo/gnu">ftp://ftp.leo.org/pub/comp/os/os2/leo/gnu</A></PRE>
+<P>If you have <EM>exactly the same version of Perl</EM> installed already,
+make sure that no copies or perl are currently running.  Later steps
+of the build may fail since an older version of <EM>perl.dll</EM> loaded into
+memory may be found.</P>
+<P>Also make sure that you have <EM>/tmp</EM> directory on the current drive,
+and <EM>.</EM> directory in your <CODE>LIBPATH</CODE>. One may try to correct the
+latter condition by</P>
+<PRE>
+  set BEGINLIBPATH .</PRE>
+<P>if you use something like <EM>CMD.EXE</EM> or latest versions of <EM>4os2.exe</EM>.</P>
+<P>Make sure your gcc is good for <CODE>-Zomf</CODE> linking: run <CODE>omflibs</CODE>
+script in <EM>/emx/lib</EM> directory.</P>
+<P>Check that you have link386 installed. It comes standard with OS/2,
+but may be not installed due to customization. If typing</P>
+<PRE>
+  link386</PRE>
+<P>shows you do not have it, do <EM>Selective install</EM>, and choose <CODE>Link
+object modules</CODE> in <EM>Optional system utilities/More</EM>. If you get into
+link386 prompts, press <CODE>Ctrl-C</CODE> to exit.</P>
+<P>
+<H2><A NAME="getting perl source">Getting perl source</A></H2>
+<P>You need to fetch the latest perl source (including developers
+releases). With some probability it is located in</P>
+<PRE>
+  <A HREF="http://www.perl.com/CPAN/src/5.0">http://www.perl.com/CPAN/src/5.0</A>
+  <A HREF="http://www.perl.com/CPAN/src/5.0/unsupported">http://www.perl.com/CPAN/src/5.0/unsupported</A></PRE>
+<P>If not, you may need to dig in the indices to find it in the directory
+of the current maintainer.</P>
+<P>Quick cycle of developers release may break the OS/2 build time to
+time, looking into</P>
+<PRE>
+  <A HREF="http://www.perl.com/CPAN/ports/os2/ilyaz/">http://www.perl.com/CPAN/ports/os2/ilyaz/</A></PRE>
+<P>may indicate the latest release which was publicly released by the
+maintainer. Note that the release may include some additional patches
+to apply to the current source of perl.</P>
+<P>Extract it like this</P>
+<PRE>
+  tar vzxf perl5.00409.tar.gz</PRE>
+<P>You may see a message about errors while extracting <EM>Configure</EM>. This is
+because there is a conflict with a similarly-named file <EM>configure</EM>.</P>
+<P>Change to the directory of extraction.</P>
+<P>
+<H2><A NAME="application of the patches">Application of the patches</A></H2>
+<P>You need to apply the patches in <EM>./os2/diff.*</EM> like this:</P>
+<PRE>
+  gnupatch -p0 &lt; os2\diff.configure</PRE>
+<P>You may also need to apply the patches supplied with the binary
+distribution of perl.</P>
+<P>Note also that the <EM>db.lib</EM> and <EM>db.a</EM> from the EMX distribution
+are not suitable for multi-threaded compile (even single-threaded
+flavor of Perl uses multi-threaded C RTL, for
+compatibility with XFree86-OS/2). Get a corrected one from</P>
+<PRE>
+  <A HREF="ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/db_mt.zip">ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2/db_mt.zip</A></PRE>
+<P>
+<H2><A NAME="handediting">Hand-editing</A></H2>
+<P>You may look into the file <EM>./hints/os2.sh</EM> and correct anything
+wrong you find there. I do not expect it is needed anywhere.</P>
+<P>
+<H2><A NAME="making">Making</A></H2>
+<PRE>
+  sh Configure -des -D prefix=f:/perllib</PRE>
+<P><CODE>prefix</CODE> means: where to install the resulting perl library. Giving
+correct prefix you may avoid the need to specify <CODE>PERLLIB_PREFIX</CODE>,
+see <A HREF="#perllib_prefix">PERLLIB_PREFIX</A>.</P>
+<P><EM>Ignore the message about missing <CODE>ln</CODE>, and about <A HREF="../../lib/Pod/perlrun.html#item_%2Dc"><CODE>-c</CODE></A> option to
+tr</EM>. The latter is most probably already fixed, if you see it and can trace
+where the latter spurious warning comes from, please inform me.</P>
+<P>Now</P>
+<PRE>
+  make</PRE>
+<P>At some moment the built may die, reporting a <EM>version mismatch</EM> or
+<EM>unable to run <EM>perl</EM></EM>.  This means that you do not have <EM>.</EM> in
+your LIBPATH, so <EM>perl.exe</EM> cannot find the needed <EM>perl67B2.dll</EM> (treat
+these hex digits as line noise).  After this is fixed the build
+should finish without a lot of fuss.</P>
+<P>
+<H2><A NAME="testing">Testing</A></H2>
+<P>Now run</P>
+<PRE>
+  make test</PRE>
+<P>All tests should succeed (with some of them skipped).</P>
+<P>Some tests may generate extra messages similar to</P>
+<DL>
+<DT><STRONG><A NAME="item_A_lot_of_bad_free">A lot of <CODE>bad free</CODE></A></STRONG><BR>
+<DD>
+in database tests related to Berkeley DB. <EM>This should be fixed already.</EM>
+If it persists, you may disable this warnings, see <A HREF="#perl_badfree">PERL_BADFREE</A>.
+<P></P>
+<DT><STRONG><A NAME="item_Process_terminated_by_SIGTERM%2FSIGINT">Process terminated by SIGTERM/SIGINT</A></STRONG><BR>
+<DD>
+This is a standard message issued by OS/2 applications. *nix
+applications die in silence. It is considered to be a feature. One can
+easily disable this by appropriate sighandlers.
+<P>However the test engine bleeds these message to screen in unexpected
+moments. Two messages of this kind <EM>should</EM> be present during
+testing.</P>
+<P></P></DL>
+<P>To get finer test reports, call</P>
+<PRE>
+  perl t/harness</PRE>
+<P>The report with <EM>io/pipe.t</EM> failing may look like this:</P>
+<PRE>
+  Failed Test  Status Wstat Total Fail  Failed  List of failed
+  ------------------------------------------------------------
+  io/pipe.t                    12    1   8.33%  9
+  7 tests skipped, plus 56 subtests skipped.
+  Failed 1/195 test scripts, 99.49% okay. 1/6542 subtests failed, 99.98% okay.</PRE>
+<P>The reasons for most important skipped tests are:</P>
+<DL>
+<DT><STRONG><A NAME="item_op%2Ffs%2Et"><EM>op/fs.t</EM></A></STRONG><BR>
+<DD>
+<OL>
+<LI>
+Checks <CODE>atime</CODE> and <CODE>mtime</CODE> of <A HREF="#item_stat"><CODE>stat()</CODE></A> - unfortunately, HPFS
+provides only 2sec time granularity (for compatibility with FAT?).
+<P></P>
+<LI>
+Checks <A HREF="../../lib/Pod/perlfunc.html#item_truncate"><CODE>truncate()</CODE></A> on a filehandle just opened for write - I do not
+know why this should or should not work.
+<P></P></OL>
+<DT><STRONG><A NAME="item_op%2Fstat%2Et"><EM>op/stat.t</EM></A></STRONG><BR>
+<DD>
+Checks <A HREF="#item_stat"><CODE>stat()</CODE></A>. Tests:
+<OL>
+<LI>
+Checks <CODE>atime</CODE> and <CODE>mtime</CODE> of <A HREF="#item_stat"><CODE>stat()</CODE></A> - unfortunately, HPFS
+provides only 2sec time granularity (for compatibility with FAT?).
+<P></P></OL>
+</DL>
+<P>
+<H2><A NAME="installing the built perl">Installing the built perl</A></H2>
+<P>If you haven't yet moved perl.dll onto LIBPATH, do it now.</P>
+<P>Run</P>
+<PRE>
+  make install</PRE>
+<P>It would put the generated files into needed locations. Manually put
+<EM>perl.exe</EM>, <EM>perl__.exe</EM> and <EM>perl___.exe</EM> to a location on your
+PATH, <EM>perl.dll</EM> to a location on your LIBPATH.</P>
+<P>Run</P>
+<PRE>
+  make installcmd INSTALLCMDDIR=d:/ir/on/path</PRE>
+<P>to convert perl utilities to <EM>.cmd</EM> files and put them on
+PATH. You need to put <EM>.EXE</EM>-utilities on path manually. They are
+installed in <CODE>$prefix/bin</CODE>, here <CODE>$prefix</CODE> is what you gave to
+<EM>Configure</EM>, see <EM>Making</EM>.</P>
+<P>
+<H2><A NAME="a.outstyle build"><CODE>a.out</CODE>-style build</A></H2>
+<P>Proceed as above, but make <EM>perl_.exe</EM> (see <A HREF="#perl_.exe">perl_.exe</A>) by</P>
+<PRE>
+  make perl_</PRE>
+<P>test and install by</P>
+<PRE>
+  make aout_test
+  make aout_install</PRE>
+<P>Manually put <EM>perl_.exe</EM> to a location on your PATH.</P>
+<P><STRONG>Note.</STRONG> The build process for <CODE>perl_</CODE> <EM>does not know</EM> about all the
+dependencies, so you should make sure that anything is up-to-date,
+say, by doing</P>
+<PRE>
+  make perl_dll</PRE>
+<P>first.</P>
+<P>
+<HR>
+<H1><A NAME="build faq">Build FAQ</A></H1>
+<P>
+<H2><A NAME="some / became \ in pdksh.">Some <CODE>/</CODE> became <CODE>\</CODE> in pdksh.</A></H2>
+<P>You have a very old pdksh. See <EM>Prerequisites</EM>.</P>
+<P>
+<H2><A NAME="'errno'  unresolved external"><CODE>'errno'</CODE> - unresolved external</A></H2>
+<P>You do not have MT-safe <EM>db.lib</EM>. See <EM>Prerequisites</EM>.</P>
+<P>
+<H2><A NAME="problems with tr or sed">Problems with tr or sed</A></H2>
+<P>reported with very old version of tr and sed.</P>
+<P>
+<H2><A NAME="some problem (forget which ;)">Some problem (forget which ;-)</A></H2>
+<P>You have an older version of <EM>perl.dll</EM> on your LIBPATH, which
+broke the build of extensions.</P>
+<P>
+<H2><A NAME="library ... not found">Library ... not found</A></H2>
+<P>You did not run <CODE>omflibs</CODE>. See <EM>Prerequisites</EM>.</P>
+<P>
+<H2><A NAME="segfault in make">Segfault in make</A></H2>
+<P>You use an old version of GNU make. See <EM>Prerequisites</EM>.</P>
+<P>
+<H2><A NAME="op/sprintf test failure">op/sprintf test failure</A></H2>
+<P>This can result from a bug in emx sprintf which was fixed in 0.9d fix 03.</P>
+<P>
+<HR>
+<H1><A NAME="specific (mis)features of os/2 port">Specific (mis)features of OS/2 port</A></H1>
+<P>
+<H2><A NAME="setpriority, getpriority"><A HREF="../../lib/Pod/perlfunc.html#item_setpriority"><CODE>setpriority</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_getpriority"><CODE>getpriority</CODE></A></A></H2>
+<P>Note that these functions are compatible with *nix, not with the older
+ports of '94 - 95. The priorities are absolute, go from 32 to -95,
+lower is quicker. 0 is the default priority.</P>
+<P><STRONG>WARNING</STRONG>.  Calling <A HREF="../../lib/Pod/perlfunc.html#item_getpriority"><CODE>getpriority</CODE></A> on a non-existing process can lock the
+system before Warp3 fixpak22.</P>
+<P>
+<H2><A NAME="system()"><A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A></A></H2>
+<P>Multi-argument form of <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> allows an additional numeric
+argument. The meaning of this argument is described in
+<A HREF="../../OS2/Process.html">the OS2::Process manpage</A>.</P>
+<P>When finding a program to run, Perl first asks the OS to look for executables
+on <A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>.  If not found, it looks for a script with possible extensions 
+added in this order: no extension, <EM>.cmd</EM>, <EM>.btm</EM>, 
+<EM>.bat</EM>, <EM>.pl</EM>.  If found, Perl checks the start of the file for magic
+strings <CODE>&quot;#!&quot;</CODE> and <CODE>&quot;extproc &quot;</CODE>.  If found, Perl uses the rest of the
+first line as the beginning of the command line to run this script.  The
+only mangling done to the first line is extraction of arguments (currently
+up to 3), and ignoring of the path-part of the ``interpreter'' name if it can't
+be found using the full path.</P>
+<P>E.g., <CODE>system 'foo', 'bar', 'baz'</CODE> may lead Perl to finding
+<EM>C:/emx/bin/foo.cmd</EM> with the first line being</P>
+<PRE>
+ extproc /bin/bash    -x   -c</PRE>
+<P>If <EM>/bin/bash</EM> is not found, and appending of executable extensions to
+<EM>/bin/bash</EM> does not help either, then Perl looks for an executable <EM>bash</EM> on
+<A HREF="../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>.  If found in <EM>C:/emx.add/bin/bash.exe</EM>, then the above <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> is
+translated to</P>
+<PRE>
+  system qw(C:/emx.add/bin/bash.exe -x -c C:/emx/bin/foo.cmd bar baz)</PRE>
+<P>One additional translation is performed: instead of <EM>/bin/sh</EM> Perl uses
+the hardwired-or-customized shell (see <CODE>&quot;PERL_SH_DIR&quot;</CODE>).</P>
+<P>The above search for ``interpreter'' is recursive: if <EM>bash</EM> executable is not
+found, but <EM>bash.btm</EM> is found, Perl will investigate its first line etc.
+The only hardwired limit on the recursion depth is implicit: there is a limit
+4 on the number of additional arguments inserted before the actual arguments
+given to system().  In particular, if no additional arguments are specified
+on the ``magic'' first lines, then the limit on the depth is 4.</P>
+<P>If Perl finds that the found executable is of different type than the
+current session, it will start the new process in a separate session of
+necessary type.  Call via <CODE>OS2::Process</CODE> to disable this magic.</P>
+<P>
+<H2><A NAME="extproc on the first line"><CODE>extproc</CODE> on the first line</A></H2>
+<P>If the first chars of a Perl script are <CODE>&quot;extproc &quot;</CODE>, this line is treated
+as <CODE>#!</CODE>-line, thus all the switches on this line are processed (twice
+if script was started via cmd.exe).  See <A HREF="../../lib/Pod/perlrun.html#description">DESCRIPTION in the perlrun manpage</A>.</P>
+<P>
+<H2><A NAME="additional modules:">Additional modules:</A></H2>
+<P><A HREF="../../OS2/Process.html">the OS2::Process manpage</A>, <A HREF="../../OS2/DLL.html">the OS2::DLL manpage</A>, <A HREF="../../OS2/REXX.html">the OS2::REXX manpage</A>, <A HREF="../../OS2/PrfDB.html">the OS2::PrfDB manpage</A>, <A HREF="../../OS2/ExtAttr.html">the OS2::ExtAttr manpage</A>. These
+modules provide access to additional numeric argument for <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system</CODE></A>
+and to the information about the running process,
+to DLLs having functions with REXX signature and to the REXX runtime, to
+OS/2 databases in the <EM>.INI</EM> format, and to Extended Attributes.</P>
+<P>Two additional extensions by Andreas Kaiser, <CODE>OS2::UPM</CODE>, and
+<CODE>OS2::FTP</CODE>, are included into <CODE>ILYAZ</CODE> directory, mirrored on CPAN.</P>
+<P>
+<H2><A NAME="prebuilt methods:">Prebuilt methods:</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_File%3A%3ACopy%3A%3Asyscopy"><CODE>File::Copy::syscopy</CODE></A></STRONG><BR>
+<DD>
+used by <CODE>File::Copy::copy</CODE>, see <A HREF="../../lib/File/Copy.html">the File::Copy manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_DynaLoader%3A%3Amod2fname"><CODE>DynaLoader::mod2fname</CODE></A></STRONG><BR>
+<DD>
+used by <CODE>DynaLoader</CODE> for DLL name mangling.
+<P></P>
+<DT><STRONG><A NAME="item_current_drive"><CODE>Cwd::current_drive()</CODE></A></STRONG><BR>
+<DD>
+Self explanatory.
+<P></P>
+<DT><STRONG><A NAME="item_sys_chdir"><CODE>Cwd::sys_chdir(name)</CODE></A></STRONG><BR>
+<DD>
+leaves drive as it is.
+<P></P>
+<DT><STRONG><A NAME="item_change_drive"><CODE>Cwd::change_drive(name)</CODE></A></STRONG><BR>
+<DD>
+chanes the ``current'' drive.
+<P></P>
+<DT><STRONG><A NAME="item_sys_is_absolute"><CODE>Cwd::sys_is_absolute(name)</CODE></A></STRONG><BR>
+<DD>
+means has drive letter and is_rooted.
+<P></P>
+<DT><STRONG><A NAME="item_sys_is_rooted"><CODE>Cwd::sys_is_rooted(name)</CODE></A></STRONG><BR>
+<DD>
+means has leading <CODE>[/\\]</CODE> (maybe after a drive-letter:).
+<P></P>
+<DT><STRONG><A NAME="item_sys_is_relative"><CODE>Cwd::sys_is_relative(name)</CODE></A></STRONG><BR>
+<DD>
+means changes with current dir.
+<P></P>
+<DT><STRONG><A NAME="item_sys_cwd"><CODE>Cwd::sys_cwd(name)</CODE></A></STRONG><BR>
+<DD>
+Interface to cwd from EMX. Used by <CODE>Cwd::cwd</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_sys_abspath"><CODE>Cwd::sys_abspath(name, dir)</CODE></A></STRONG><BR>
+<DD>
+Really really odious function to implement. Returns absolute name of
+file which would have <CODE>name</CODE> if CWD were <CODE>dir</CODE>.  <CODE>Dir</CODE> defaults to the
+current dir.
+<P></P>
+<DT><STRONG><A NAME="item_extLibpath"><CODE>Cwd::extLibpath([type])</CODE></A></STRONG><BR>
+<DD>
+Get current value of extended library search path. If <CODE>type</CODE> is
+present and <EM>true</EM>, works with END_LIBPATH, otherwise with
+<CODE>BEGIN_LIBPATH</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_extLibpath_set"><CODE>Cwd::extLibpath_set( path [, type ] )</CODE></A></STRONG><BR>
+<DD>
+Set current value of extended library search path. If <CODE>type</CODE> is
+present and <EM>true</EM>, works with END_LIBPATH, otherwise with
+<CODE>BEGIN_LIBPATH</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Error"><CODE>OS2::Error(do_harderror,do_exception)</CODE></A></STRONG><BR>
+<DD>
+Returns	<A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if it was not called yet, otherwise bit 1 is
+set if on the previous call do_harderror was enabled, bit
+2 is set if if on previous call do_exception was enabled.
+<P>This function enables/disables error popups associated with 
+hardware errors (Disk not ready etc.) and software exceptions.</P>
+<P>I know of no way to find out the state of popups <EM>before</EM> the first call
+to this function.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Errors2Drive"><CODE>OS2::Errors2Drive(drive)</CODE></A></STRONG><BR>
+<DD>
+Returns <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if it was not called yet, otherwise return false if errors
+were not requested to be written to a hard drive, or the drive letter if
+this was requested.
+<P>This function may redirect error popups associated with hardware errors
+(Disk not ready etc.) and software exceptions to the file POPUPLOG.OS2 at
+the root directory of the specified drive.  Overrides OS2::Error() specified
+by individual programs.  Given argument undef will disable redirection.</P>
+<P>Has global effect, persists after the application exits.</P>
+<P>I know of no way to find out the state of redirection of popups to the disk
+<EM>before</EM> the first call to this function.</P>
+<P></P>
+<DT><STRONG><A NAME="item_SysInfo">OS2::SysInfo()</A></STRONG><BR>
+<DD>
+Returns a hash with system information. The keys of the hash are
+<PRE>
+        MAX_PATH_LENGTH, MAX_TEXT_SESSIONS, MAX_PM_SESSIONS,
+        MAX_VDM_SESSIONS, BOOT_DRIVE, DYN_PRI_VARIATION,
+        MAX_WAIT, MIN_SLICE, MAX_SLICE, PAGE_SIZE,
+        VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION,
+        MS_COUNT, TIME_LOW, TIME_HIGH, TOTPHYSMEM, TOTRESMEM,
+        TOTAVAILMEM, MAXPRMEM, MAXSHMEM, TIMER_INTERVAL,
+        MAX_COMP_LENGTH, FOREGROUND_FS_SESSION,
+        FOREGROUND_PROCESS</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_BootDrive">OS2::BootDrive()</A></STRONG><BR>
+<DD>
+Returns a letter without colon.
+<P></P>
+<DT><STRONG><A NAME="item_MorphPM"><CODE>OS2::MorphPM(serve)</CODE>, <CODE>OS2::UnMorphPM(serve)</CODE></A></STRONG><BR>
+<DD>
+Transforms the current application into a PM application and back.
+The argument true means that a real message loop is going to be served.
+OS2::MorphPM() returns the PM message queue handle as an integer.
+<P>See <A HREF="#centralized management of resources">Centralized management of resources</A> for additional details.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Serve_Messages"><CODE>OS2::Serve_Messages(force)</CODE></A></STRONG><BR>
+<DD>
+Fake on-demand retrieval of outstanding PM messages.  If <CODE>force</CODE> is false,
+will not dispatch messages if a real message loop is known to
+be present.  Returns number of messages retrieved.
+<P>Dies with ``QUITing...'' if WM_QUIT message is obtained.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Process_Messages"><CODE>OS2::Process_Messages(force [, cnt])</CODE></A></STRONG><BR>
+<DD>
+Retrieval of PM messages until window creation/destruction.  
+If <CODE>force</CODE> is false, will not dispatch messages if a real message loop
+is known to be present.
+<P>Returns change in number of windows.  If <CODE>cnt</CODE> is given,
+it is incremented by the number of messages retrieved.</P>
+<P>Dies with ``QUITing...'' if WM_QUIT message is obtained.</P>
+<P></P>
+<DT><STRONG><A NAME="item__control87"><CODE>OS2::_control87(new,mask)</CODE></A></STRONG><BR>
+<DD>
+the same as <A HREF="#item__control87">_control87(3)</A> of EMX.  Takes integers as arguments, returns
+the previous coprocessor control word as an integer.  Only bits in <CODE>new</CODE> which
+are present in <CODE>mask</CODE> are changed in the control word.
+<P></P>
+<DT><STRONG><A NAME="item_get_control87">OS2::get_control87()</A></STRONG><BR>
+<DD>
+gets the coprocessor control word as an integer.
+<P></P>
+<DT><STRONG><A NAME="item_set_control87_em"><CODE>OS2::set_control87_em(new=MCW_EM,mask=MCW_EM)</CODE></A></STRONG><BR>
+<DD>
+The variant of OS2::_control87() with default values good for
+handling exception mask: if no <CODE>mask</CODE>, uses exception mask part of <CODE>new</CODE>
+only.  If no <CODE>new</CODE>, disables all the floating point exceptions.
+<P>See <A HREF="#misfeatures">Misfeatures</A> for details.</P>
+<P></P></DL>
+<P>(Note that some of these may be moved to different libraries -
+eventually).</P>
+<P>
+<H2><A NAME="prebuilt variables:">Prebuilt variables:</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_%24OS2%3A%3Aemx_rev">$OS2::emx_rev</A></STRONG><BR>
+<DD>
+same as _emx_rev of EMX, a string similar to <CODE>0.9c</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_%24OS2%3A%3Aemx_env">$OS2::emx_env</A></STRONG><BR>
+<DD>
+same as _emx_env of EMX, a number similar to 0x8001.
+<P></P>
+<DT><STRONG><A NAME="item_%24OS2%3A%3Aos_ver">$OS2::os_ver</A></STRONG><BR>
+<DD>
+a number <CODE>OS_MAJOR + 0.001 * OS_MINOR</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="misfeatures">Misfeatures</A></H2>
+<UL>
+<LI>
+Since <A HREF="#item_flock">flock(3)</A> is present in EMX, but is not functional, it is 
+emulated by perl.  To disable the emulations, set environment variable
+<CODE>USE_PERL_FLOCK=0</CODE>.
+<P></P>
+<LI>
+Here is the list of things which may be ``broken'' on
+EMX (from EMX docs):
+<UL>
+<LI>
+The functions <EM>recvmsg(3)</EM>, <EM>sendmsg(3)</EM>, and <A HREF="../../lib/Pod/perlfunc.html#item_socketpair">socketpair(3)</A> are not
+implemented.
+<P></P>
+<LI>
+<EM>sock_init(3)</EM> is not required and not implemented.
+<P></P>
+<LI>
+<A HREF="#item_flock">flock(3)</A> is not yet implemented (dummy function).  (Perl has a workaround.)
+<P></P>
+<LI>
+<A HREF="../../lib/Pod/perlfunc.html#item_kill">kill(3)</A>:  Special treatment of PID=0, PID=1 and PID=-1 is not implemented.
+<P></P>
+<LI>
+<A HREF="../../lib/Pod/perlfunc.html#item_waitpid">waitpid(3)</A>:
+<PRE>
+      WUNTRACED
+              Not implemented.
+      waitpid() is not implemented for negative values of PID.</PRE>
+<P></P></UL>
+<P>Note that <CODE>kill -9</CODE> does not work with the current version of EMX.</P>
+<LI>
+Since <EM>sh.exe</EM> is used for globing (see <A HREF="../../lib/Pod/perlfunc.html#glob">glob in the perlfunc manpage</A>), the bugs
+of <EM>sh.exe</EM> plague perl as well.
+<P>In particular, uppercase letters do not work in <CODE>[...]</CODE>-patterns with
+the current pdksh.</P>
+<P></P>
+<LI>
+Unix-domain sockets on OS/2 live in a pseudo-file-system <CODE>/sockets/...</CODE>.
+To avoid a failure to create a socket with a name of a different form,
+<CODE>&quot;/socket/&quot;</CODE> is prepended to the socket name (unless it starts with this
+already).
+<P>This may lead to problems later in case the socket is accessed via the
+``usual'' file-system calls using the ``initial'' name.</P>
+<P></P>
+<LI>
+Apparently, IBM used a compiler (for some period of time around '95?) which
+changes FP mask right and left.  This is not <EM>that</EM> bad for IBM's
+programs, but the same compiler was used for DLLs which are used with
+general-purpose applications.  When these DLLs are used, the state of
+floating-point flags in the application is not predictable.
+<P>What is much worse, some DLLs change the floating point flags when in
+<CODE>_DLLInitTerm()</CODE> (e.g., <EM>TCP32IP</EM>).  This means that even if you do not <EM>call</EM>
+any function in the DLL, just the act of loading this DLL will reset your
+flags.  What is worse, the same compiler was used to compile some HOOK DLLs.
+Given that HOOK dlls are executed in the context of <EM>all</EM> the applications
+in the system, this means a complete unpredictablity of floating point
+flags on systems using such HOOK DLLs.  E.g., <EM>GAMESRVR.DLL</EM> of <STRONG>DIVE</STRONG>
+origin changes the floating point flags on each write to the TTY of a VIO
+(windowed text-mode) applications.</P>
+<P>Some other (not completely debugged) situations when FP flags change include
+some video drivers (?), and some operations related to creation of the windows.
+People who code <STRONG>OpenGL</STRONG> may have more experience on this.</P>
+<P>Perl is generally used in the situation when all the floating-point
+exceptions are ignored, as is the default under EMX.  If they are not ignored,
+some benign Perl programs would get a <CODE>SIGFPE</CODE> and would die a horrible death.</P>
+<P>To circumvent this, Perl uses two hacks.  They help against <EM>one</EM> type of
+damage only: FP flags changed when loading a DLL.</P>
+<P>One of the hacks is to disable floating point exceptions on startup (as
+is the default with EMX).  This helps only with compile-time-linked DLLs
+changing the flags before <CODE>main()</CODE> had a chance to be called.</P>
+<P>The other hack is to restore FP flags after a call to dlopen().  This helps
+against similar damage done by DLLs <CODE>_DLLInitTerm()</CODE> at runtime.  Currently
+no way to switch these hacks off is provided.</P>
+<P></P></UL>
+<P>
+<H2><A NAME="modifications">Modifications</A></H2>
+<P>Perl modifies some standard C library calls in the following ways:</P>
+<DL>
+<DT><STRONG><A NAME="item_popen"><CODE>popen</CODE></A></STRONG><BR>
+<DD>
+<CODE>my_popen</CODE> uses <EM>sh.exe</EM> if shell is required, cf. <A HREF="#perl_sh_dir">PERL_SH_DIR</A>.
+<P></P>
+<DT><STRONG><A NAME="item_tmpnam"><CODE>tmpnam</CODE></A></STRONG><BR>
+<DD>
+is created using <CODE>TMP</CODE> or <CODE>TEMP</CODE> environment variable, via
+<CODE>tempnam</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_tmpfile"><CODE>tmpfile</CODE></A></STRONG><BR>
+<DD>
+If the current directory is not writable, file is created using modified
+<A HREF="#item_tmpnam"><CODE>tmpnam</CODE></A>, so there may be a race condition.
+<P></P>
+<DT><STRONG><A NAME="item_ctermid"><CODE>ctermid</CODE></A></STRONG><BR>
+<DD>
+a dummy implementation.
+<P></P>
+<DT><STRONG><A NAME="item_stat"><CODE>stat</CODE></A></STRONG><BR>
+<DD>
+<CODE>os2_stat</CODE> special-cases <EM>/dev/tty</EM> and <EM>/dev/con</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_mkdir%2C_rmdir"><A HREF="../../lib/Pod/perlfunc.html#item_mkdir"><CODE>mkdir</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_rmdir"><CODE>rmdir</CODE></A></A></STRONG><BR>
+<DD>
+these EMX functions do not work if the path contains a trailing <CODE>/</CODE>.
+Perl contains a workaround for this.
+<P></P>
+<DT><STRONG><A NAME="item_flock"><CODE>flock</CODE></A></STRONG><BR>
+<DD>
+Since <A HREF="#item_flock">flock(3)</A> is present in EMX, but is not functional, it is 
+emulated by perl.  To disable the emulations, set environment variable
+<CODE>USE_PERL_FLOCK=0</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="identifying dlls">Identifying DLLs</A></H2>
+<P>All the DLLs built with the current versions of Perl have ID strings
+identifying the name of the extension, its version, and the version
+of Perl required for this DLL.  Run <CODE>bldlevel DLL-name</CODE> to find this
+info.</P>
+<P>
+<H2><A NAME="centralized management of resources">Centralized management of resources</A></H2>
+<P>Since to call certain OS/2 API one needs to have a correctly initialized
+<CODE>Win</CODE> subsystem, OS/2-specific extensions may require getting <A HREF="#item_HAB"><CODE>HAB</CODE></A>s and
+<A HREF="#item_HMQ"><CODE>HMQ</CODE></A>s.  If an extension would do it on its own, another extension could
+fail to initialize.</P>
+<P>Perl provides a centralized management of these resources:</P>
+<DL>
+<DT><STRONG><A NAME="item_HAB"><CODE>HAB</CODE></A></STRONG><BR>
+<DD>
+To get the HAB, the extension should call <CODE>hab = perl_hab_GET()</CODE> in C.  After
+this call is performed, <CODE>hab</CODE> may be accessed as <CODE>Perl_hab</CODE>.  There is
+no need to release the HAB after it is used.
+<P>If by some reasons <EM>perl.h</EM> cannot be included, use</P>
+<PRE>
+  extern int Perl_hab_GET(void);</PRE>
+<P>instead.</P>
+<P></P>
+<DT><STRONG><A NAME="item_HMQ"><CODE>HMQ</CODE></A></STRONG><BR>
+<DD>
+There are two cases:
+<UL>
+<LI>
+the extension needs an <A HREF="#item_HMQ"><CODE>HMQ</CODE></A> only because some API will not work otherwise.
+Use <CODE>serve = 0</CODE> below.
+<P></P>
+<LI>
+the extension needs an <A HREF="#item_HMQ"><CODE>HMQ</CODE></A> since it wants to engage in a PM event loop.
+Use <CODE>serve = 1</CODE> below.
+<P></P></UL>
+<P>To get an <A HREF="#item_HMQ"><CODE>HMQ</CODE></A>, the extension should call <CODE>hmq = perl_hmq_GET(serve)</CODE> in C.
+After this call is performed, <CODE>hmq</CODE> may be accessed as <CODE>Perl_hmq</CODE>.</P>
+<P>To signal to Perl that HMQ is not needed any more, call
+<CODE>perl_hmq_UNSET(serve)</CODE>.  Perl process will automatically morph/unmorph itself
+into/from a PM process if HMQ is needed/not-needed.  Perl will automatically
+enable/disable <CODE>WM_QUIT</CODE> message during shutdown if the message queue is
+served/not-served.</P>
+<P><STRONG>NOTE</STRONG>.  If during a shutdown there is a message queue which did not disable
+WM_QUIT, and which did not process the received WM_QUIT message, the
+shutdown will be automatically cancelled.  Do not call <CODE>perl_hmq_GET(1)</CODE>
+unless you are going to process messages on an orderly basis.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="perl flavors">Perl flavors</A></H1>
+<P>Because of idiosyncrasies of OS/2 one cannot have all the eggs in the
+same basket (though EMX environment tries hard to overcome this
+limitations, so the situation may somehow improve). There are 4
+executables for Perl provided by the distribution:</P>
+<P>
+<H2><A NAME="perl.exe"><EM>perl.exe</EM></A></H2>
+<P>The main workhorse. This is a chimera executable: it is compiled as an
+<CODE>a.out</CODE>-style executable, but is linked with <CODE>omf</CODE>-style dynamic
+library <EM>perl.dll</EM>, and with dynamic CRT DLL. This executable is a
+VIO application.</P>
+<P>It can load perl dynamic extensions, and it can fork().</P>
+<P><STRONG>Note.</STRONG> Keep in mind that <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> is needed to open a pipe to yourself.</P>
+<P>
+<H2><A NAME="perl_.exe"><EM>perl_.exe</EM></A></H2>
+<P>This is a statically linked <CODE>a.out</CODE>-style executable. It cannot
+load dynamic Perl extensions. The executable supplied in binary
+distributions has a lot of extensions prebuilt, thus the above restriction is 
+important only if you use custom-built extensions. This executable is a VIO
+application.</P>
+<P><EM>This is the only executable with does not require OS/2.</EM> The
+friends locked into <CODE>M$</CODE> world would appreciate the fact that this
+executable runs under DOS, Win0.3*, Win0.95 and WinNT with an
+appropriate extender. See <A HREF="#other oses">Other OSes</A>.</P>
+<P>
+<H2><A NAME="perl__.exe"><EM>perl__.exe</EM></A></H2>
+<P>This is the same executable as <EM>perl___.exe</EM>, but it is a PM
+application.</P>
+<P><STRONG>Note.</STRONG> Usually (unless explicitly redirected during the startup)
+STDIN, STDERR, and STDOUT of a PM
+application are redirected to <EM>nul</EM>. However, it is possible to <EM>see</EM>
+them if you start <CODE>perl__.exe</CODE> from a PM program which emulates a
+console window, like <EM>Shell mode</EM> of Emacs or EPM. Thus it <EM>is
+possible</EM> to use Perl debugger (see <A HREF="../../lib/Pod/perldebug.html">the perldebug manpage</A>) to debug your PM
+application (but beware of the message loop lockups - this will not
+work if you have a message queue to serve, unless you hook the serving
+into the <A HREF="../../lib/Pod/perlfunc.html#item_getc"><CODE>getc()</CODE></A> function of the debugger).</P>
+<P>Another way to see the output of a PM program is to run it as</P>
+<PRE>
+  pm_prog args 2&gt;&amp;1 | cat -</PRE>
+<P>with a shell <EM>different</EM> from <EM>cmd.exe</EM>, so that it does not create
+a link between a VIO session and the session of <CODE>pm_porg</CODE>.  (Such a link
+closes the VIO window.)  E.g., this works with <EM>sh.exe</EM> - or with Perl!</P>
+<PRE>
+  open P, 'pm_prog args 2&gt;&amp;1 |' or die;
+  print while &lt;P&gt;;</PRE>
+<P>The flavor <EM>perl__.exe</EM> is required if you want to start your program without
+a VIO window present, but not <CODE>detach</CODE>ed (run <CODE>help detach</CODE> for more info).
+Very useful for extensions which use PM, like <CODE>Perl/Tk</CODE> or <CODE>OpenGL</CODE>.</P>
+<P>
+<H2><A NAME="perl___.exe"><EM>perl___.exe</EM></A></H2>
+<P>This is an <CODE>omf</CODE>-style executable which is dynamically linked to
+<EM>perl.dll</EM> and CRT DLL. I know no advantages of this executable
+over <CODE>perl.exe</CODE>, but it cannot <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> at all. Well, one advantage is
+that the build process is not so convoluted as with <CODE>perl.exe</CODE>.</P>
+<P>It is a VIO application.</P>
+<P>
+<H2><A NAME="why strange names">Why strange names?</A></H2>
+<P>Since Perl processes the <CODE>#!</CODE>-line (cf. 
+<A HREF="../../lib/Pod/perlrun.html#description">DESCRIPTION in the perlrun manpage</A>, <A HREF="../../lib/Pod/perlrun.html#switches">Switches in the perlrun manpage</A>,
+<A HREF="../../lib/Pod/perldiag.html#not a perl script">Not a perl script in the perldiag manpage</A>, 
+<A HREF="../../lib/Pod/perldiag.html#no perl script found in input">No Perl script found in input in the perldiag manpage</A>), it should know when a
+program <EM>is a Perl</EM>. There is some naming convention which allows
+Perl to distinguish correct lines from wrong ones. The above names are
+almost the only names allowed by this convention which do not contain
+digits (which have absolutely different semantics).</P>
+<P>
+<H2><A NAME="why dynamic linking">Why dynamic linking?</A></H2>
+<P>Well, having several executables dynamically linked to the same huge
+library has its advantages, but this would not substantiate the
+additional work to make it compile. The reason is the complicated-to-developers
+but very quick and convenient-to-users ``hard'' dynamic linking used by OS/2.</P>
+<P>There are two distinctive features of the dyna-linking model of OS/2:
+all the references to external functions are resolved at the compile time;
+there is no runtime fixup of the DLLs after they are loaded into memory.
+The first feature is an enormous advantage over other models: it avoids
+conflicts when several DLLs used by an application export entries with
+the same name.  In such cases ``other'' models of dyna-linking just choose
+between these two entry points using some random criterion - with predictable
+disasters as results.  But it is the second feature which requires the build
+of <EM>perl.dll</EM>.</P>
+<P>The address tables of DLLs are patched only once, when they are
+loaded. The addresses of the entry points into DLLs are guaranteed to be
+the same for all the programs which use the same DLL.  This removes the
+runtime fixup - once DLL is loaded, its code is read-only.</P>
+<P>While this allows some (significant?) performance advantages, this makes life
+much harder for developers, since the above scheme makes it impossible
+for a DLL to be ``linked'' to a symbol in the <EM>.EXE</EM> file.  Indeed, this
+would need a DLL to have different relocations tables for the
+(different) executables which use this DLL.</P>
+<P>However, a dynamically loaded Perl extension is forced to use some symbols
+from the perl
+executable, e.g., to know how to find the arguments to the functions:
+the arguments live on the perl
+internal evaluation stack. The solution is to put the main code of
+the interpreter into a DLL, and make the <EM>.EXE</EM> file which just loads
+this DLL into memory and supplies command-arguments.  The extension DLL
+cannot link to symbols in <EM>.EXE</EM>, but it has no problem linking
+to symbols in the <EM>.DLL</EM>.</P>
+<P>This <EM>greatly</EM> increases the load time for the application (as well as
+complexity of the compilation). Since interpreter is in a DLL,
+the C RTL is basically forced to reside in a DLL as well (otherwise
+extensions would not be able to use CRT).  There are some advantages if
+you use different flavors of perl, such as running <EM>perl.exe</EM> and
+<EM>perl__.exe</EM> simultaneously: they share the memory of <EM>perl.dll</EM>.</P>
+<P><STRONG>NOTE</STRONG>.  There is one additional effect which makes DLLs more wasteful:
+DLLs are loaded in the shared memory region, which is a scarse resource
+given the 512M barrier of the ``standard'' OS/2 virtual memory.  The code of
+<EM>.EXE</EM> files is also shared by all the processes which use the particular
+<EM>.EXE</EM>, but they are ``shared in the private address space of the process'';
+this is possible because the address at which different sections
+of the <EM>.EXE</EM> file are loaded is decided at compile-time, thus all the
+processes have these sections loaded at same addresses, and no fixup
+of internal links inside the <EM>.EXE</EM> is needed.</P>
+<P>Since DLLs may be loaded at run time, to have the same mechanism for for DLLs
+one needs to have the address range of <EM>any of the loaded</EM> DLLs in the
+system to be available <EM>in all the processes</EM> which did not load a particular
+DLL yet.  This is why the DLLs are mapped to the shared memory region.</P>
+<P>
+<H2><A NAME="why chimera build">Why chimera build?</A></H2>
+<P>Current EMX environment does not allow DLLs compiled using Unixish
+<CODE>a.out</CODE> format to export symbols for data (or at least some types of
+data). This forces <CODE>omf</CODE>-style compile of <EM>perl.dll</EM>.</P>
+<P>Current EMX environment does not allow <EM>.EXE</EM> files compiled in
+<CODE>omf</CODE> format to fork(). <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> is needed for exactly three Perl
+operations:</P>
+<UL>
+<LI>
+explicit <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> in the script,
+<P></P>
+<LI>
+<CODE>open FH, &quot;|-&quot;</CODE>
+<P></P>
+<LI>
+<CODE>open FH, &quot;-|&quot;</CODE>, in other words, opening pipes to itself.
+<P></P></UL>
+<P>While these operations are not questions of life and death, they are
+needed for a lot of
+useful scripts. This forces <CODE>a.out</CODE>-style compile of
+<EM>perl.exe</EM>.</P>
+<P>
+<HR>
+<H1><A NAME="environment">ENVIRONMENT</A></H1>
+<P>Here we list environment variables with are either OS/2- and DOS- and
+Win*-specific, or are more important under OS/2 than under other OSes.</P>
+<P>
+<H2><A NAME="perllib_prefix"><CODE>PERLLIB_PREFIX</CODE></A></H2>
+<P>Specific for EMX port. Should have the form</P>
+<PRE>
+  path1;path2</PRE>
+<P>or</P>
+<PRE>
+  path1 path2</PRE>
+<P>If the beginning of some prebuilt path matches <EM>path1</EM>, it is
+substituted with <EM>path2</EM>.</P>
+<P>Should be used if the perl library is moved from the default
+location in preference to <CODE>PERL(5)LIB</CODE>, since this would not leave wrong
+entries in @INC.  For example, if the compiled version of perl looks for @INC
+in <EM>f:/perllib/lib</EM>, and you want to install the library in
+<EM>h:/opt/gnu</EM>, do</P>
+<PRE>
+  set PERLLIB_PREFIX=f:/perllib/lib;h:/opt/gnu</PRE>
+<P>This will cause Perl with the prebuilt @INC of</P>
+<PRE>
+  f:/perllib/lib/5.00553/os2
+  f:/perllib/lib/5.00553
+  f:/perllib/lib/site_perl/5.00553/os2
+  f:/perllib/lib/site_perl/5.00553
+  .</PRE>
+<P>to use the following @INC:</P>
+<PRE>
+  h:/opt/gnu/5.00553/os2
+  h:/opt/gnu/5.00553
+  h:/opt/gnu/site_perl/5.00553/os2
+  h:/opt/gnu/site_perl/5.00553
+  .</PRE>
+<P>
+<H2><A NAME="perl_badlang"><A HREF="#item_PERL_BADLANG"><CODE>PERL_BADLANG</CODE></A></A></H2>
+<P>If 0, perl ignores <CODE>setlocale()</CODE> failing. May be useful with some
+strange <EM>locale</EM>s.</P>
+<P>
+<H2><A NAME="perl_badfree"><A HREF="#item_PERL_BADFREE"><CODE>PERL_BADFREE</CODE></A></A></H2>
+<P>If 0, perl would not warn of in case of unwarranted free(). With older
+perls this might be
+useful in conjunction with the module DB_File, which was buggy when
+dynamically linked and OMF-built.</P>
+<P>Should not be set with newer Perls, since this may hide some <EM>real</EM> problems.</P>
+<P>
+<H2><A NAME="perl_sh_dir"><CODE>PERL_SH_DIR</CODE></A></H2>
+<P>Specific for EMX port. Gives the directory part of the location for
+<EM>sh.exe</EM>.</P>
+<P>
+<H2><A NAME="use_perl_flock"><CODE>USE_PERL_FLOCK</CODE></A></H2>
+<P>Specific for EMX port. Since <A HREF="#item_flock">flock(3)</A> is present in EMX, but is not 
+functional, it is emulated by perl.  To disable the emulations, set 
+environment variable <CODE>USE_PERL_FLOCK=0</CODE>.</P>
+<P>
+<H2><A NAME="tmp or temp"><CODE>TMP</CODE> or <CODE>TEMP</CODE></A></H2>
+<P>Specific for EMX port. Used as storage place for temporary files.</P>
+<P>
+<HR>
+<H1><A NAME="evolution">Evolution</A></H1>
+<P>Here we list major changes which could make you by surprise.</P>
+<P>
+<H2><A NAME="priorities">Priorities</A></H2>
+<P><A HREF="../../lib/Pod/perlfunc.html#item_setpriority"><CODE>setpriority</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_getpriority"><CODE>getpriority</CODE></A> are not compatible with earlier
+ports by Andreas Kaiser. See <CODE>&quot;setpriority, getpriority&quot;</CODE>.</P>
+<P>
+<H2><A NAME="dll name mangling">DLL name mangling</A></H2>
+<P>With the release 5.003_01 the dynamically loadable libraries
+should be rebuilt when a different version of Perl is compiled. In particular,
+DLLs (including <EM>perl.dll</EM>) are now created with the names
+which contain a checksum, thus allowing workaround for OS/2 scheme of
+caching DLLs.</P>
+<P>It may be possible to code a simple workaround which would</P>
+<UL>
+<LI>
+find the old DLLs looking through the old @INC;
+<P></P>
+<LI>
+mangle the names according to the scheme of new perl and copy the DLLs to
+these names;
+<P></P>
+<LI>
+edit the internal <CODE>LX</CODE> tables of DLL to reflect the change of the name
+(probably not needed for Perl extension DLLs, since the internally coded names
+are not used for ``specific'' DLLs, they used only for ``global'' DLLs).
+<P></P>
+<LI>
+edit the internal <CODE>IMPORT</CODE> tables and change the name of the ``old''
+<EM>perl????.dll</EM> to the ``new'' <EM>perl????.dll</EM>.
+<P></P></UL>
+<P>
+<H2><A NAME="threading">Threading</A></H2>
+<P>As of release 5.003_01 perl is linked to multithreaded C RTL
+DLL.  If perl itself is not compiled multithread-enabled, so will not be perl's
+malloc(). However, extensions may use multiple thread on their own
+risk.</P>
+<P>This was needed to compile <CODE>Perl/Tk</CODE> for XFree86-OS/2 out-of-the-box, and
+link with DLLs for other useful libraries, which typically are compiled
+with <CODE>-Zmt -Zcrtdll</CODE>.</P>
+<P>
+<H2><A NAME="calls to external programs">Calls to external programs</A></H2>
+<P>Due to a popular demand the perl external program calling has been
+changed wrt Andreas Kaiser's port.  <EM>If</EM> perl needs to call an
+external program <EM>via shell</EM>, the <EM>f:/bin/sh.exe</EM> will be called, or
+whatever is the override, see <A HREF="#perl_sh_dir">PERL_SH_DIR</A>.</P>
+<P>Thus means that you need to get some copy of a <EM>sh.exe</EM> as well (I
+use one from pdksh). The path <EM>F:/bin</EM> above is set up automatically during
+the build to a correct value on the builder machine, but is
+overridable at runtime,</P>
+<P><STRONG>Reasons:</STRONG> a consensus on <CODE>perl5-porters</CODE> was that perl should use
+one non-overridable shell per platform. The obvious choices for OS/2
+are <EM>cmd.exe</EM> and <EM>sh.exe</EM>. Having perl build itself would be impossible
+with <EM>cmd.exe</EM> as a shell, thus I picked up <CODE>sh.exe</CODE>. This assures almost
+100% compatibility with the scripts coming from *nix. As an added benefit 
+this works as well under DOS if you use DOS-enabled port of pdksh 
+(see <A HREF="#prerequisites">Prerequisites</A>).</P>
+<P><STRONG>Disadvantages:</STRONG> currently <EM>sh.exe</EM> of pdksh calls external programs
+via fork()/exec(), and there is <EM>no</EM> functioning <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A> on
+OS/2. <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A> is emulated by EMX by an asynchronous call while the caller
+waits for child completion (to pretend that the <CODE>pid</CODE> did not change). This
+means that 1 <EM>extra</EM> copy of <EM>sh.exe</EM> is made active via fork()/exec(),
+which may lead to some resources taken from the system (even if we do
+not count extra work needed for fork()ing).</P>
+<P>Note that this a lesser issue now when we do not spawn <EM>sh.exe</EM>
+unless needed (metachars found).</P>
+<P>One can always start <EM>cmd.exe</EM> explicitly via</P>
+<PRE>
+  system 'cmd', '/c', 'mycmd', 'arg1', 'arg2', ...</PRE>
+<P>If you need to use <EM>cmd.exe</EM>, and do not want to hand-edit thousands of your
+scripts, the long-term solution proposed on p5-p is to have a directive</P>
+<PRE>
+  use OS2::Cmd;</PRE>
+<P>which will override system(), exec(), <CODE>``</CODE>, and
+<A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open(,'...|')</CODE></A>. With current perl you may override only system(),
+<A HREF="../../lib/Pod/perlfunc.html#item_readpipe"><CODE>readpipe()</CODE></A> - the explicit version of <CODE>``</CODE>, and maybe exec(). The code
+will substitute the one-argument call to <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> by
+<A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>CORE::system('cmd.exe', '/c', shift)</CODE></A>.</P>
+<P>If you have some working code for <CODE>OS2::Cmd</CODE>, please send it to me,
+I will include it into distribution. I have no need for such a module, so
+cannot test it.</P>
+<P>For the details of the current situation with calling external programs,
+see <EM>Starting OS/2 (and DOS) programs under Perl</EM>.  Set us mention a couple
+of features:</P>
+<UL>
+<LI>
+External scripts may be called by their basename.  Perl will try the same
+extensions as when processing <STRONG>-S</STRONG> command-line switch.
+<P></P>
+<LI>
+External scripts starting with <CODE>#!</CODE> or <CODE>extproc </CODE> will be executed directly,
+without calling the shell, by calling the program specified on the rest of
+the first line.
+<P></P></UL>
+<P>
+<H2><A NAME="memory allocation">Memory allocation</A></H2>
+<P>Perl uses its own <CODE>malloc()</CODE> under OS/2 - interpreters are usually malloc-bound
+for speed, but perl is not, since its malloc is lightning-fast.
+Perl-memory-usage-tuned benchmarks show that Perl's malloc is 5 times quicker
+than EMX one.  I do not have convincing data about memory footprint, but
+a (pretty random) benchmark showed that Perl's one is 5% better.</P>
+<P>Combination of perl's <CODE>malloc()</CODE> and rigid DLL name resolution creates
+a special problem with library functions which expect their return value to
+be free()d by system's free(). To facilitate extensions which need to call 
+such functions, system memory-allocation functions are still available with
+the prefix <CODE>emx_</CODE> added. (Currently only DLL perl has this, it should 
+propagate to <EM>perl_.exe</EM> shortly.)</P>
+<P>
+<H2><A NAME="threads">Threads</A></H2>
+<P>One can build perl with thread support enabled by providing <CODE>-D usethreads</CODE>
+option to <EM>Configure</EM>.  Currently OS/2 support of threads is very 
+preliminary.</P>
+<P>Most notable problems:</P>
+<DL>
+<DT><STRONG><A NAME="item_COND_WAIT"><CODE>COND_WAIT</CODE></A></STRONG><BR>
+<DD>
+may have a race condition.  Needs a reimplementation (in terms of chaining
+waiting threads, with the linked list stored in per-thread structure?).
+<P></P>
+<DT><STRONG><A NAME="item_os2%2Ec"><EM>os2.c</EM></A></STRONG><BR>
+<DD>
+has a couple of static variables used in OS/2-specific functions.  (Need to be
+moved to per-thread structure, or serialized?)
+<P></P></DL>
+<P>Note that these problems should not discourage experimenting, since they
+have a low probability of affecting small programs.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ilya Zakharevich, <A HREF="mailto:ilya@math.ohio-state.edu">ilya@math.ohio-state.edu</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

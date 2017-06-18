@@ -1,0 +1,199 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTML::Form - Class that represents HTML forms</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Form - Class that represents HTML forms</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#inputs">INPUTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Form - Class that represents HTML forms</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTML::Form;
+ $form = HTML::Form-&gt;parse($html, $base_uri);
+ $form-&gt;value(query =&gt; &quot;Perl&quot;);</PRE>
+<PRE>
+ use LWP;
+ LWP::UserAgent-&gt;new-&gt;request($form-&gt;click);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Objects of the <CODE>HTML::Form</CODE> class represents a single HTML &lt;form&gt;
+... &lt;/form&gt; instance.  A form consist of a sequence of inputs that
+usually have names, and which can take on various values.</P>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$form = HTML::Form-&gt;new($method, $action_uri, [[$enctype], $input,...])</A></STRONG><BR>
+<DD>
+The constructor takes a $method and a $uri as argument.  The $enctype
+and and initial inputs are optional.  You will normally use
+HTML::Form-&gt;<A HREF="#item_parse"><CODE>parse()</CODE></A> to create new HTML::Form objects.
+<P></P>
+<DT><STRONG><A NAME="item_parse">@forms = HTML::Form-&gt;parse($html_document, $base_uri)</A></STRONG><BR>
+<DD>
+The <A HREF="#item_parse"><CODE>parse()</CODE></A> class method will parse an HTML document and build up
+<CODE>HTML::Form</CODE> objects for each &lt;form&gt; found.  If called in scalar
+context only returns the first &lt;form&gt;.  Returns an empty list if there
+are no forms to be found.
+<P>The $base_uri is (usually) the URI used to access the $html_document.
+It is needed to resolve relative action URIs.  For LWP this parameter
+is obtained from the $response-&gt;<CODE>base()</CODE> method.</P>
+<P></P>
+<DT><STRONG><A NAME="item_push_input">$form-&gt;push_input($type, \%attr)</A></STRONG><BR>
+<DD>
+Adds a new input to the form.
+<P></P>
+<DT><STRONG><A NAME="item_method">$form-&gt;method( [$new] )</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_action">$form-&gt;action( [$new] )</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_enctype">$form-&gt;enctype( [$new] )</A></STRONG><BR>
+<DD>
+These method can be used to get/set the corresponding attribute of the
+form.
+<P></P>
+<DT><STRONG><A NAME="item_inputs">$form-&gt;inputs</A></STRONG><BR>
+<DD>
+This method returns the list of inputs in the form.
+<P></P>
+<DT><STRONG><A NAME="item_find_input">$form-&gt;find_input($name, $type, $no)</A></STRONG><BR>
+<DD>
+This method is used to locate some specific input within the form.  At
+least one of the arguments must be defined.  If no matching input is
+found, <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> is returned.
+<P>If $name is specified, then the input must have the indicated name.
+If $type is specified then the input must have the specified type.  In
+addition to the types possible for &lt;input&gt; HTML tags, we also have
+``textarea'' and ``option''.  The $no is the sequence number of the input
+with the indicated $name and/or $type (where 1 is the first).</P>
+<P></P>
+<DT><STRONG><A NAME="item_value">$form-&gt;value($name, [$value])</A></STRONG><BR>
+<DD>
+The <A HREF="#item_value"><CODE>value()</CODE></A> method can be used to get/set the value of some input.  If
+no input have the indicated name, then this method will croak.
+<P></P>
+<DT><STRONG><A NAME="item_try_others">$form-&gt;<CODE>try_others(\&amp;callback)</CODE></A></STRONG><BR>
+<DD>
+This method will iterate over all permutations of unvisited enumerated
+values (&lt;select&gt;, &lt;radio&gt;, &lt;checkbox&gt;) and invoke the callback for
+each.  The callback is passed the $form as argument.
+<P></P>
+<DT><STRONG><A NAME="item_make_request">$form-&gt;make_request</A></STRONG><BR>
+<DD>
+Will return a HTTP::Request object that reflects the current setting
+of the form.  You might want to use the click method instead.
+<P></P>
+<DT><STRONG><A NAME="item_click">$form-&gt;click([$name], [$x, $y])</A></STRONG><BR>
+<DD>
+Will click on the first clickable input (<CODE>input/submit</CODE> or
+<CODE>input/image</CODE>), with the indicated $name, if specified.  You can
+optinally specify a coordinate clicked, which only makes a difference
+if you clicked on an image.  The default coordinate is (1,1).
+<P></P>
+<DT><STRONG><A NAME="item_form">$form-&gt;form</A></STRONG><BR>
+<DD>
+Returns the current setting as a sequence of key/value pairs.
+<P></P>
+<DT><STRONG><A NAME="item_dump">$form-&gt;dump</A></STRONG><BR>
+<DD>
+Returns a textual representation of the form.  Mainly useful for
+debugging.  If called in void context, then the dump is printed on
+STDERR.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="inputs">INPUTS</A></H1>
+<P>An <CODE>HTML::Form</CODE> contains a sequence of inputs.  References to the
+inputs can be obtained with the $form-&gt;inputs or $form-&gt;find_input
+methods.  Once you have such a reference, then one of the following
+methods can be used on it:</P>
+<DL>
+<DT><STRONG><A NAME="item_type">$input-&gt;type</A></STRONG><BR>
+<DD>
+Returns the type of this input.  Types are stuff like ``text'',
+``password'', ``hidden'', ``textarea'', ``image'', ``submit'', ``radio'',
+``checkbox'', ``option''...
+<P></P>
+<DT><STRONG><A NAME="item_name">$input-&gt;<CODE>name([$new])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG>$input-&gt;<CODE>value([$new])</CODE></STRONG><BR>
+<DD>
+These methods can be used to set/get the current name or value of an
+input.  If the input only can take an enumerated list of values, then
+it is an error to try to set it to something else and the method will
+croak if you try.
+<P></P>
+<DT><STRONG><A NAME="item_possible_values">$input-&gt;possible_values</A></STRONG><BR>
+<DD>
+Returns a list of all values that and input can take.  For inputs that
+does not have discrete values this returns an empty list.
+<P></P>
+<DT><STRONG><A NAME="item_other_possible_values">$input-&gt;other_possible_values</A></STRONG><BR>
+<DD>
+Returns a list of all values not tried yet.
+<P></P>
+<DT><STRONG><A NAME="item_form_name_value">$input-&gt;form_name_value</A></STRONG><BR>
+<DD>
+Returns a (possible empty) list of key/value pairs that should be
+incorporated in the form value from this input.
+<P></P>
+<DT><STRONG>$input-&gt;click($form, $x, $y)</STRONG><BR>
+<DD>
+Some input types (currently ``sumbit'' buttons and ``images'') can be
+clicked to submit the form.  The <A HREF="#item_click"><CODE>click()</CODE></A> method returns the
+corrsponding <CODE>HTTP::Request</CODE> object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/LWP.html">the LWP manpage</A>, <A HREF="../../../site/lib/HTML/Parser.html">the HTML::Parser manpage</A>, <EM>webchatpp</EM></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1998-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Form - Class that represents HTML forms</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

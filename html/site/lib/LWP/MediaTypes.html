@@ -1,0 +1,121 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP::MediaTypes - guess media type for a file or a URL</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::MediaTypes - guess media type for a file or a URL</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP::MediaTypes - guess media type for a file or a URL</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use LWP::MediaTypes qw(guess_media_type);
+ $type = guess_media_type(&quot;/tmp/foo.gif&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides functions for handling media (also known as
+MIME) types and encodings.  The mapping from file extentions to media
+types is defined by the <EM>media.types</EM> file.  If the <EM>~/.media.types</EM>
+file exists it is used instead.
+For backwards compatability we will also look for <EM>~/.mime.types</EM>.</P>
+<P>The following functions are exported by default:</P>
+<DL>
+<DT><STRONG><A NAME="item_guess_media_type">guess_media_type($filename_or_url, [$header_to_modify])</A></STRONG><BR>
+<DD>
+This function tries to guess media type and encoding for a file or url.
+It returns the content-type, which is a string like <CODE>&quot;text/html&quot;</CODE>.
+In array context it also returns any content-encodings applied (in the
+order used to encode the file).  You can pass a URI object
+reference, instead of the file name.
+<P>If the type can not be deduced from looking at the file name,
+then <A HREF="#item_guess_media_type"><CODE>guess_media_type()</CODE></A> will let the <A HREF="../../../lib/Pod/perlrun.html#item_%2DT"><CODE>-T</CODE></A> Perl operator take a look.
+If this works (and <A HREF="../../../lib/Pod/perlrun.html#item_%2DT"><CODE>-T</CODE></A> returns a TRUE value) then we return
+<EM>text/plain</EM> as the type, otherwise we return
+<EM>application/octet-stream</EM> as the type.</P>
+<P>The optional second argument should be a reference to a HTTP::Headers
+object or any object that implements the $obj-&gt;header method in a
+similar way.  When it is present the values of the
+'Content-Type' and 'Content-Encoding' will be set for this header.</P>
+<P></P>
+<DT><STRONG><A NAME="item_media_suffix"><CODE>media_suffix($type,...)</CODE></A></STRONG><BR>
+<DD>
+This function will return all suffixes that can be used to denote the
+specified media type(s).  Wildcard types can be used.  In a scalar
+context it will return the first suffix found.
+<P>Examples:</P>
+<PRE>
+  @suffixes = media_suffix('image/*', 'audio/basic');
+  $suffix = media_suffix('text/html');</PRE>
+<P></P></DL>
+<P>The following functions are only exported by explict request:</P>
+<DL>
+<DT><STRONG><A NAME="item_add_type">add_type($type, @exts)</A></STRONG><BR>
+<DD>
+Associate a list of file extensions with the given media type.
+<P>Example:</P>
+<PRE>
+    add_type(&quot;x-world/x-vrml&quot; =&gt; qw(wrl vrml));</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_add_encoding">add_encoding($type, @ext)</A></STRONG><BR>
+<DD>
+Associate a list of file extensions with an encoding type.
+<P>Example:</P>
+<PRE>
+ add_encoding(&quot;x-gzip&quot; =&gt; &quot;gz&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_read_media_types"><CODE>read_media_types(@files)</CODE></A></STRONG><BR>
+<DD>
+Parse media types files and add the type mappings found there.
+<P>Example:</P>
+<PRE>
+    read_media_types(&quot;conf/mime.types&quot;);</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1999 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::MediaTypes - guess media type for a file or a URL</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

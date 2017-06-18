@@ -1,0 +1,580 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::OLE::NLS - OLE National Language Support</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::NLS - OLE National Language Support</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#functions">Functions</A></LI>
+		<LI><A HREF="#locale types">Locale Types</A></LI>
+	</UL>
+
+	<LI><A HREF="#authors/copyright">AUTHORS/COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::OLE::NLS - OLE National Language Support</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        missing</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides access to the national language support features
+in the <EM>OLENLS.DLL</EM>.</P>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_CompareString"><CODE>CompareString(LCID,FLAGS,STR1,STR2)</CODE></A></STRONG><BR>
+<DD>
+Compare STR1 and STR2 in the LCID locale.  FLAGS indicate the character
+traits to be used or ignored when comparing the two strings.
+<PRE>
+        NORM_IGNORECASE         Ignore case
+        NORM_IGNOREKANATYPE     Ignore hiragana/katakana character differences
+        NORM_IGNORENONSPACE     Ignore accents, diacritics, and vowel marks
+        NORM_IGNORESYMBOLS      Ignore symbols
+        NORM_IGNOREWIDTH        Ignore character width</PRE>
+<P>Possible return values are:</P>
+<PRE>
+        0       Function failed
+        1       STR1 is less than STR2
+        2       STR1 is equal to STR2
+        3       STR1 is greater than STR2</PRE>
+<P>Note that you can subtract 2 from the return code to get values
+comparable to the <CODE>cmp</CODE> operator.</P>
+<P></P>
+<DT><STRONG><A NAME="item_LCMapString"><CODE>LCMapString(LCID,FLAGS,STR)</CODE></A></STRONG><BR>
+<DD>
+LCMapString translates STR using LCID dependent translation.
+Flags contains a combination of the following options:
+<PRE>
+        LCMAP_LOWERCASE         Lowercase
+        LCMAP_UPPERCASE         Uppercase
+        LCMAP_HALFWIDTH         Narrow characters
+        LCMAP_FULLWIDTH         Wide characters
+        LCMAP_HIRAGANA          Hiragana
+        LCMAP_KATAKANA          Katakana
+        LCMAP_SORTKEY           Character sort key</PRE>
+<P>The following normalization options can be combined with <CODE>LCMAP_SORTKEY</CODE>:</P>
+<PRE>
+        NORM_IGNORECASE         Ignore case
+        NORM_IGNOREKANATYPE     Ignore hiragana/katakana character differences
+        NORM_IGNORENONSPACE     Ignore accents, diacritics, and vowel marks
+        NORM_IGNORESYMBOLS      Ignore symbols
+        NORM_IGNOREWIDTH        Ignore character width</PRE>
+<P>The return value is the translated string.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetLocaleInfo"><CODE>GetLocaleInfo(LCID,LCTYPE)</CODE></A></STRONG><BR>
+<DD>
+Retrieve locale setting LCTYPE from the locale specified by LCID.  Use
+LOCALE_NOUSEROVERRIDE | LCTYPE to always query the locale database.
+Otherwise user changes to <CODE>win.ini</CODE> through the windows control panel
+take precedence when retrieving values for the system default locale.
+See the documentation below for a list of valid LCTYPE values.
+<P>The return value is the contents of the requested locale setting.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetStringType"><CODE>GetStringType(LCID,TYPE,STR)</CODE></A></STRONG><BR>
+<DD>
+Retrieve type information from locale LCID about each character in STR.
+The requested TYPE can be one of the following 3 levels:
+<PRE>
+        CT_CTYPE1               ANSI C and POSIX type information
+        CT_CTYPE2               Text layout type information
+        CT_CTYPE3               Text processing type information</PRE>
+<P>The return value is a list of values, each of wich is a bitwise OR of
+the applicable type bits from the corresponding table below:</P>
+<PRE>
+        @ct = GetStringType(LOCALE_SYSTEM_DEFAULT, CT_CTYPE1, &quot;String&quot;);</PRE>
+<P>ANSI C and POSIX character type information:</P>
+<PRE>
+        C1_UPPER                Uppercase
+        C1_LOWER                Lowercase
+        C1_DIGIT                Decimal digits
+        C1_SPACE                Space characters
+        C1_PUNCT                Punctuation
+        C1_CNTRL                Control characters
+        C1_BLANK                Blank characters
+        C1_XDIGIT               Hexadecimal digits
+        C1_ALPHA                Any letter</PRE>
+<P>Text layout type information:</P>
+<PRE>
+        C2_LEFTTORIGHT          Left to right
+        C2_RIGHTTOLEFT          Right to left
+        C2_EUROPENUMBER         European number, European digit
+        C2_EUROPESEPARATOR      European numeric separator
+        C2_EUROPETERMINATOR     European numeric terminator
+        C2_ARABICNUMBER         Arabic number
+        C2_COMMONSEPARATOR      Common numeric separator
+        C2_BLOCKSEPARATOR       Block separator
+        C2_SEGMENTSEPARATOR     Segment separator
+        C2_WHITESPACE           White space
+        C2_OTHERNEUTRAL         Other neutrals
+        C2_NOTAPPLICABLE        No implicit direction (e.g. ctrl codes)</PRE>
+<P>Text precessing type information:</P>
+<PRE>
+        C3_NONSPACING           Nonspacing mark
+        C3_DIACRITIC            Diacritic nonspacing mark
+        C3_VOWELMARK            Vowel nonspacing mark
+        C3_SYMBOL               Symbol
+        C3_KATAKANA             Katakana character
+        C3_HIRAGANA             Hiragana character
+        C3_HALFWIDTH            Narrow character
+        C3_FULLWIDTH            Wide character
+        C3_IDEOGRAPH            Ideograph
+        C3_ALPHA                Any letter
+        C3_NOTAPPLICABLE        Not applicable</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GetSystemDefaultLangID"><CODE>GetSystemDefaultLangID()</CODE></A></STRONG><BR>
+<DD>
+Returns the system default language identifier.
+<P></P>
+<DT><STRONG><A NAME="item_GetSystemDefaultLCID"><CODE>GetSystemDefaultLCID()</CODE></A></STRONG><BR>
+<DD>
+Returns the system default locale identifier.
+<P></P>
+<DT><STRONG><A NAME="item_GetUserDefaultLangID"><CODE>GetUserDefaultLangID()</CODE></A></STRONG><BR>
+<DD>
+Returns the user default language identifier.
+<P></P>
+<DT><STRONG><A NAME="item_GetUserDefaultLCID"><CODE>GetUserDefaultLCID()</CODE></A></STRONG><BR>
+<DD>
+Returns the user default locale identifier.
+<P></P>
+<DT><STRONG><A NAME="item_SendSettingChange"><CODE>SendSettingChange()</CODE></A></STRONG><BR>
+<DD>
+Sends a WM_SETTINGCHANGE message to all top level windows.
+<P></P>
+<DT><STRONG><A NAME="item_SetLocaleInfo">SetLocaleInfo(LCID, LCTYPE, LCDATA)</A></STRONG><BR>
+<DD>
+Changes an item in the user override part of the locale setting LCID.
+It doesn't change the system default database.  The following LCTYPEs are
+changeable:
+<PRE>
+        LOCALE_ICALENDARTYPE    LOCALE_SDATE
+        LOCALE_ICURRDIGITS      LOCALE_SDECIMAL
+        LOCALE_ICURRENCY        LOCALE_SGROUPING
+        LOCALE_IDIGITS          LOCALE_SLIST
+        LOCALE_IFIRSTDAYOFWEEK  LOCALE_SLONGDATE
+        LOCALE_IFIRSTWEEKOFYEAR LOCALE_SMONDECIMALSEP
+        LOCALE_ILZERO           LOCALE_SMONGROUPING
+        LOCALE_IMEASURE         LOCALE_SMONTHOUSANDSEP
+        LOCALE_INEGCURR         LOCALE_SNEGATIVESIGN
+        LOCALE_INEGNUMBER       LOCALE_SPOSITIVESIGN
+        LOCALE_IPAPERSIZE       LOCALE_SSHORTDATE
+        LOCALE_ITIME            LOCALE_STHOUSAND
+        LOCALE_S1159            LOCALE_STIME
+        LOCALE_S2359            LOCALE_STIMEFORMAT
+        LOCALE_SCURRENCY        LOCALE_SYEARMONTH</PRE>
+<P>You have to call <A HREF="#item_SendSettingChange"><CODE>SendSettingChange()</CODE></A> to activate these changes for
+subsequent Win32::OLE::Variant object formatting because the OLE
+subsystem seems to cache locale information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_MAKELANGID"><CODE>MAKELANGID(LANG,SUBLANG)</CODE></A></STRONG><BR>
+<DD>
+Creates a lnguage identifier from a primary language and a sublanguage.
+<P></P>
+<DT><STRONG><A NAME="item_PRIMARYLANGID"><CODE>PRIMARYLANGID(LANGID)</CODE></A></STRONG><BR>
+<DD>
+Retrieves the primary language from a language identifier.
+<P></P>
+<DT><STRONG><A NAME="item_SUBLANGID"><CODE>SUBLANGID(LANGID)</CODE></A></STRONG><BR>
+<DD>
+Retrieves the sublanguage from a language identifier.
+<P></P>
+<DT><STRONG><A NAME="item_MAKELCID"><CODE>MAKELCID(LANGID)</CODE></A></STRONG><BR>
+<DD>
+Creates a locale identifies from a language identifier.
+<P></P>
+<DT><STRONG><A NAME="item_LANGIDFROMLCID"><CODE>LANGIDFROMLCID(LCID)</CODE></A></STRONG><BR>
+<DD>
+Retrieves a language identifier from a locale identifier.
+<P></P></DL>
+<P>
+<H2><A NAME="locale types">Locale Types</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_LOCALE_ILANGUAGE">LOCALE_ILANGUAGE</A></STRONG><BR>
+<DD>
+The language identifier (in hex).
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SLANGUAGE">LOCALE_SLANGUAGE</A></STRONG><BR>
+<DD>
+The localized name of the language.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SENGLANGUAGE">LOCALE_SENGLANGUAGE</A></STRONG><BR>
+<DD>
+The ISO Standard 639 English name of the language.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SABBREVLANGNAME">LOCALE_SABBREVLANGNAME</A></STRONG><BR>
+<DD>
+The three-letter abbreviated name of the language.  The first two
+letters are from the ISO Standard 639 language name abbreviation.  The
+third letter indicates the sublanguage type.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SNATIVELANGNAME">LOCALE_SNATIVELANGNAME</A></STRONG><BR>
+<DD>
+The native name of the language.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ICOUNTRY">LOCALE_ICOUNTRY</A></STRONG><BR>
+<DD>
+The country code, which is based on international phone codes.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SCOUNTRY">LOCALE_SCOUNTRY</A></STRONG><BR>
+<DD>
+The localized name of the country.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SENGCOUNTRY">LOCALE_SENGCOUNTRY</A></STRONG><BR>
+<DD>
+The English name of the country.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SABBREVCTRYNAME">LOCALE_SABBREVCTRYNAME</A></STRONG><BR>
+<DD>
+The ISO Standard 3166 abbreviated name of the country.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SNATIVECTRYNAME">LOCALE_SNATIVECTRYNAME</A></STRONG><BR>
+<DD>
+The native name of the country.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDEFAULTLANGUAGE">LOCALE_IDEFAULTLANGUAGE</A></STRONG><BR>
+<DD>
+Language identifier for the principal language spoken in this
+locale.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDEFAULTCOUNTRY">LOCALE_IDEFAULTCOUNTRY</A></STRONG><BR>
+<DD>
+Country code for the principal country in this locale.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDEFAULTANSICODEPAGE">LOCALE_IDEFAULTANSICODEPAGE</A></STRONG><BR>
+<DD>
+The ANSI code page associated with this locale.  Format: 4 Unicode
+decimal digits plus a Unicode null terminator.
+<P>XXX This should be translated by GetLocaleInfo. XXX</P>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDEFAULTCODEPAGE">LOCALE_IDEFAULTCODEPAGE</A></STRONG><BR>
+<DD>
+The OEM code page associated with the country.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SLIST">LOCALE_SLIST</A></STRONG><BR>
+<DD>
+Characters used to separate list items (often a comma).
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IMEASURE">LOCALE_IMEASURE</A></STRONG><BR>
+<DD>
+Default measurement system:
+<PRE>
+        0       metric system (S.I.)
+        1       U.S. system</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SDECIMAL">LOCALE_SDECIMAL</A></STRONG><BR>
+<DD>
+Characters used for the decimal separator (often a dot).
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_STHOUSAND">LOCALE_STHOUSAND</A></STRONG><BR>
+<DD>
+Characters used as the separator between groups of digits left of the decimal.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SGROUPING">LOCALE_SGROUPING</A></STRONG><BR>
+<DD>
+Sizes for each group of digits to the left of the decimal.  An explicit
+size is required for each group.  Sizes are separated by semicolons.  If
+the last value is 0, the preceding value is repeated.  To group
+thousands, specify 3;0.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDIGITS">LOCALE_IDIGITS</A></STRONG><BR>
+<DD>
+The number of fractional digits.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ILZERO">LOCALE_ILZERO</A></STRONG><BR>
+<DD>
+Whether to use leading zeros in decimal fields.  A setting of 0
+means use no leading zeros; 1 means use leading zeros.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SNATIVEDIGITS">LOCALE_SNATIVEDIGITS</A></STRONG><BR>
+<DD>
+The ten characters that are the native equivalent of the ASCII 0-9.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_INEGNUMBER">LOCALE_INEGNUMBER</A></STRONG><BR>
+<DD>
+Negative number mode.
+<PRE>
+        0       (1.1)
+        1       -1.1
+        2       -1.1
+        3       1.1
+        4       1.1</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SCURRENCY">LOCALE_SCURRENCY</A></STRONG><BR>
+<DD>
+The string used as the local monetary symbol.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SINTLSYMBOL">LOCALE_SINTLSYMBOL</A></STRONG><BR>
+<DD>
+Three characters of the International monetary symbol specified in ISO
+4217, Codes for the Representation of Currencies and Funds, followed
+by the character separating this string from the amount.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SMONDECIMALSEP">LOCALE_SMONDECIMALSEP</A></STRONG><BR>
+<DD>
+Characters used for the monetary decimal separators.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SMONTHOUSANDSEP">LOCALE_SMONTHOUSANDSEP</A></STRONG><BR>
+<DD>
+Characters used as monetary separator between groups of digits left of
+the decimal.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SMONGROUPING">LOCALE_SMONGROUPING</A></STRONG><BR>
+<DD>
+Sizes for each group of monetary digits to the left of the decimal.  An
+explicit size is needed for each group.  Sizes are separated by
+semicolons.  If the last value is 0, the preceding value is
+repeated.  To group thousands, specify 3;0.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ICURRDIGITS">LOCALE_ICURRDIGITS</A></STRONG><BR>
+<DD>
+Number of fractional digits for the local monetary format.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IINTLCURRDIGITS">LOCALE_IINTLCURRDIGITS</A></STRONG><BR>
+<DD>
+Number of fractional digits for the international monetary format.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ICURRENCY">LOCALE_ICURRENCY</A></STRONG><BR>
+<DD>
+Positive currency mode.
+<PRE>
+        0       Prefix, no separation.
+        1       Suffix, no separation.
+        2       Prefix, 1-character separation.
+        3       Suffix, 1-character separation.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_INEGCURR">LOCALE_INEGCURR</A></STRONG><BR>
+<DD>
+Negative currency mode.
+<PRE>
+        0       ($1.1)
+        1       -$1.1
+        2       $-1.1
+        3       $1.1-
+        4       $(1.1$)
+        5       -1.1$
+        6       1.1-$
+        7       1.1$-
+        8       -1.1 $ (space before $)
+        9       -$ 1.1 (space after $)
+        10      1.1 $- (space before $)</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ICALENDARTYPE">LOCALE_ICALENDARTYPE</A></STRONG><BR>
+<DD>
+The type of calendar currently in use.
+<PRE>
+        1       Gregorian (as in U.S.)
+        2       Gregorian (always English strings)
+        3       Era: Year of the Emperor (Japan)
+        4       Era: Year of the Republic of China
+        5       Tangun Era (Korea)</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IOPTIONALCALENDAR">LOCALE_IOPTIONALCALENDAR</A></STRONG><BR>
+<DD>
+The additional calendar types available for this LCID.  Can be a
+null-separated list of all valid optional calendars.  Value is
+0 for ``None available'' or any of the LOCALE_ICALENDARTYPE settings.
+<P>XXX null separated list should be translated by GetLocaleInfo XXX</P>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SDATE">LOCALE_SDATE</A></STRONG><BR>
+<DD>
+Characters used for the date separator.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_STIME">LOCALE_STIME</A></STRONG><BR>
+<DD>
+Characters used for the time separator.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_STIMEFORMAT">LOCALE_STIMEFORMAT</A></STRONG><BR>
+<DD>
+Time-formatting string.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SSHORTDATE">LOCALE_SSHORTDATE</A></STRONG><BR>
+<DD>
+Short Date_Time formatting strings for this locale.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SLONGDATE">LOCALE_SLONGDATE</A></STRONG><BR>
+<DD>
+Long Date_Time formatting strings for this locale.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDATE">LOCALE_IDATE</A></STRONG><BR>
+<DD>
+Short Date format-ordering specifier.
+<PRE>
+        0       Month - Day - Year
+        1       Day - Month - Year
+        2       Year - Month - Day</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ILDATE">LOCALE_ILDATE</A></STRONG><BR>
+<DD>
+Long Date format ordering specifier.  Value can be any of the valid
+LOCALE_IDATE settings.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ITIME">LOCALE_ITIME</A></STRONG><BR>
+<DD>
+Time format specifier.
+<PRE>
+        0       AM/PM 12-hour format.
+        1       24-hour format.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ITIMEMARKPOSN">LOCALE_ITIMEMARKPOSN</A></STRONG><BR>
+<DD>
+Whether the time marker string (AM|PM) precedes or follows the time
+string.
+	0 Suffix (9:15 AM).
+	1 Prefix (AM 9:15).
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ICENTURY">LOCALE_ICENTURY</A></STRONG><BR>
+<DD>
+Whether to use full 4-digit century.
+<PRE>
+        0       Two digit.
+        1       Full century.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_ITLZERO">LOCALE_ITLZERO</A></STRONG><BR>
+<DD>
+Whether to use leading zeros in time fields.
+<PRE>
+        0       No leading zeros.
+        1       Leading zeros for hours.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IDAYLZERO">LOCALE_IDAYLZERO</A></STRONG><BR>
+<DD>
+Whether to use leading zeros in day fields.  Values as for
+LOCALE_ITLZERO.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IMONLZERO">LOCALE_IMONLZERO</A></STRONG><BR>
+<DD>
+Whether to use leading zeros in month fields.  Values as for
+LOCALE_ITLZERO.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_S1159">LOCALE_S1159</A></STRONG><BR>
+<DD>
+String for the AM designator.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_S2359">LOCALE_S2359</A></STRONG><BR>
+<DD>
+String for the PM designator.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IFIRSTWEEKOFYEAR">LOCALE_IFIRSTWEEKOFYEAR</A></STRONG><BR>
+<DD>
+Specifies which week of the year is considered first.
+<PRE>
+        0       Week containing 1/1 is the first week of the year.
+        1       First full week following 1/1is the first week of the year.
+        2       First week with at least 4 days is the first week of the year.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IFIRSTDAYOFWEEK">LOCALE_IFIRSTDAYOFWEEK</A></STRONG><BR>
+<DD>
+Specifies the day considered first in the week.  Value ``0'' means
+SDAYNAME1 and value ``6'' means SDAYNAME7.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SDAYNAME1_%2E%2E_LOCALE_SDAYNAME7">LOCALE_SDAYNAME1 .. LOCALE_SDAYNAME7</A></STRONG><BR>
+<DD>
+Long name for Monday .. Sunday.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SABBREVDAYNAME1_%2E%2E_LOCALE_SABBREVDAYNAM">LOCALE_SABBREVDAYNAME1 .. LOCALE_SABBREVDAYNAME7</A></STRONG><BR>
+<DD>
+Abbreviated name for Monday .. Sunday.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SMONTHNAME1_%2E%2E_LOCALE_SMONTHNAME12">LOCALE_SMONTHNAME1 .. LOCALE_SMONTHNAME12</A></STRONG><BR>
+<DD>
+Long name for January .. December.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SMONTHNAME13">LOCALE_SMONTHNAME13</A></STRONG><BR>
+<DD>
+Native name for 13th month, if it exists.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SABBREVMONTHNAME1_%2E%2E_LOCALE_SABBREVMONT">LOCALE_SABBREVMONTHNAME1 .. LOCALE_SABBREVMONTHNAME12</A></STRONG><BR>
+<DD>
+Abbreviated name for January .. December.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SABBREVMONTHNAME13">LOCALE_SABBREVMONTHNAME13</A></STRONG><BR>
+<DD>
+Native abbreviated name for 13th month, if it exists.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SPOSITIVESIGN">LOCALE_SPOSITIVESIGN</A></STRONG><BR>
+<DD>
+String value for the positive sign.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_SNEGATIVESIGN">LOCALE_SNEGATIVESIGN</A></STRONG><BR>
+<DD>
+String value for the negative sign.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IPOSSIGNPOSN">LOCALE_IPOSSIGNPOSN</A></STRONG><BR>
+<DD>
+Formatting index for positive values.
+<PRE>
+        0 Parentheses surround the amount and the monetary symbol.
+        1 The sign string precedes the amount and the monetary symbol.
+        2 The sign string precedes the amount and the monetary symbol.
+        3 The sign string precedes the amount and the monetary symbol.
+        4 The sign string precedes the amount and the monetary symbol.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_INEGSIGNPOSN">LOCALE_INEGSIGNPOSN</A></STRONG><BR>
+<DD>
+Formatting index for negative values.  Values as for LOCALE_IPOSSIGNPOSN.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IPOSSYMPRECEDES">LOCALE_IPOSSYMPRECEDES</A></STRONG><BR>
+<DD>
+If the monetary symbol precedes, 1.  If it succeeds a positive amount, 0.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_IPOSSEPBYSPACE">LOCALE_IPOSSEPBYSPACE</A></STRONG><BR>
+<DD>
+If the monetary symbol is separated by a space from a positive amount,
+1.  Otherwise, 0.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_INEGSYMPRECEDES">LOCALE_INEGSYMPRECEDES</A></STRONG><BR>
+<DD>
+If the monetary symbol precedes, 1.  If it succeeds a negative amount, 0.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALE_INEGSEPBYSPACE">LOCALE_INEGSEPBYSPACE</A></STRONG><BR>
+<DD>
+If the monetary symbol is separated by a space from a negative amount,
+1.  Otherwise, 0.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="authors/copyright">AUTHORS/COPYRIGHT</A></H1>
+<P>This module is part of the Win32::OLE distribution.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::NLS - OLE National Language Support</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

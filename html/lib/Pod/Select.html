@@ -1,0 +1,318 @@
+
+<HTML>
+<HEAD>
+<TITLE>podselect - extract selected sections of POD from input</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;podselect - extract selected sections of POD from input</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#requires">REQUIRES</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#section specifications">SECTION SPECIFICATIONS</A></LI>
+	<LI><A HREF="#range specifications">RANGE SPECIFICATIONS</A></LI>
+	<LI><A HREF="#object methods">OBJECT METHODS</A></LI>
+	<LI><A HREF="#curr_headings()"><STRONG>curr_headings()</STRONG></A></LI>
+	<LI><A HREF="#select()"><STRONG>select()</STRONG></A></LI>
+	<LI><A HREF="#add_selection()"><STRONG>add_selection()</STRONG></A></LI>
+	<LI><A HREF="#clear_selections()"><STRONG>clear_selections()</STRONG></A></LI>
+	<LI><A HREF="#match_section()"><STRONG>match_section()</STRONG></A></LI>
+	<LI><A HREF="#is_selected()"><STRONG>is_selected()</STRONG></A></LI>
+	<LI><A HREF="#exported functions">EXPORTED FUNCTIONS</A></LI>
+	<LI><A HREF="#podselect()"><STRONG>podselect()</STRONG></A></LI>
+	<LI><A HREF="#private methods and data">PRIVATE METHODS AND DATA</A></LI>
+	<LI><A HREF="#_compile_section_spec()"><STRONG>_compile_section_spec()</STRONG></A></LI>
+	<UL>
+
+		<LI><A HREF="#$self>{_section_headings}">$self-&gt;{_SECTION_HEADINGS}</A></LI>
+		<LI><A HREF="#$self>{_selected_sections}">$self-&gt;{_SELECTED_SECTIONS}</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Select, <CODE>podselect()</CODE> - extract selected sections of POD from input</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::Select;</PRE>
+<PRE>
+    ## Select all the POD sections for each file in @filelist
+    ## and print the result on standard output.
+    podselect(@filelist);</PRE>
+<PRE>
+    ## Same as above, but write to tmp.out
+    podselect({-output =&gt; &quot;tmp.out&quot;}, @filelist):</PRE>
+<PRE>
+    ## Select from the given filelist, only those POD sections that are
+    ## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
+    podselect({-sections =&gt; [&quot;NAME|SYNOPSIS&quot;, &quot;OPTIONS&quot;]}, @filelist):</PRE>
+<PRE>
+    ## Select the &quot;DESCRIPTION&quot; section of the PODs from STDIN and write
+    ## the result to STDERR.
+    podselect({-output =&gt; &quot;&gt;&amp;STDERR&quot;, -sections =&gt; [&quot;DESCRIPTION&quot;]}, \*STDIN);</PRE>
+<P>or</P>
+<PRE>
+    use Pod::Select;</PRE>
+<PRE>
+    ## Create a parser object for selecting POD sections from the input
+    $parser = new Pod::Select();</PRE>
+<PRE>
+    ## Select all the POD sections for each file in @filelist
+    ## and print the result to tmp.out.
+    $parser-&gt;parse_from_file(&quot;&lt;&amp;STDIN&quot;, &quot;tmp.out&quot;);</PRE>
+<PRE>
+    ## Select from the given filelist, only those POD sections that are
+    ## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
+    $parser-&gt;select(&quot;NAME|SYNOPSIS&quot;, &quot;OPTIONS&quot;);
+    for (@filelist) { $parser-&gt;parse_from_file($_); }</PRE>
+<PRE>
+    ## Select the &quot;DESCRIPTION&quot; and &quot;SEE ALSO&quot; sections of the PODs from
+    ## STDIN and write the result to STDERR.
+    $parser-&gt;select(&quot;DESCRIPTION&quot;);
+    $parser-&gt;add_selection(&quot;SEE ALSO&quot;);
+    $parser-&gt;parse_from_filehandle(\*STDIN, \*STDERR);</PRE>
+<P>
+<HR>
+<H1><A NAME="requires">REQUIRES</A></H1>
+<P>perl5.005, Pod::Parser, Exporter, Carp</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P><CODE>podselect()</CODE></P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>podselect()</STRONG> is a function which will extract specified sections of
+pod documentation from an input stream. This ability is provided by the
+<STRONG>Pod::Select</STRONG> module which is a subclass of <STRONG>Pod::Parser</STRONG>.
+<STRONG>Pod::Select</STRONG> provides a method named <STRONG>select()</STRONG> to specify the set of
+POD sections to select for processing/printing. <STRONG>podselect()</STRONG> merely
+creates a <STRONG>Pod::Select</STRONG> object and then invokes the <STRONG>podselect()</STRONG>
+followed by <STRONG>parse_from_file()</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="section specifications">SECTION SPECIFICATIONS</A></H1>
+<P><STRONG>podselect()</STRONG> and <STRONG>Pod::Select::select()</STRONG> may be given one or more
+``section specifications'' to restrict the text processed to only the
+desired set of sections and their corresponding subsections.  A section
+specification is a string containing one or more Perl-style regular
+expressions separated by forward slashes (``/'').  If you need to use a
+forward slash literally within a section title you can escape it with a
+backslash (``\/'').</P>
+<P>The formal syntax of a section specification is:</P>
+<UL>
+<LI>
+<EM>head1-title-regex</EM>/<EM>head2-title-regex</EM>/...
+<P></P></UL>
+<P>Any omitted or empty regular expressions will default to ``.*''.
+Please note that each regular expression given is implicitly
+anchored by adding ``^'' and ``$'' to the beginning and end.  Also, if a
+given regular expression starts with a ``!'' character, then the
+expression is <EM>negated</EM> (so <CODE>!foo</CODE> would match anything <EM>except</EM>
+<CODE>foo</CODE>).</P>
+<P>Some example section specifications follow.</P>
+<UL>
+<LI>
+Match the <CODE>NAME</CODE> and <CODE>SYNOPSIS</CODE> sections and all of their subsections:
+<P><CODE>NAME|SYNOPSIS</CODE></P>
+<P></P>
+<LI>
+Match only the <CODE>Question</CODE> and <CODE>Answer</CODE> subsections of the <CODE>DESCRIPTION</CODE>
+section:
+<P><CODE>DESCRIPTION/Question|Answer</CODE></P>
+<P></P>
+<LI>
+Match the <CODE>Comments</CODE> subsection of <EM>all</EM> sections:
+<P><CODE>/Comments</CODE></P>
+<P></P>
+<LI>
+Match all subsections of <CODE>DESCRIPTION</CODE> <EM>except</EM> for <CODE>Comments</CODE>:
+<P><CODE>DESCRIPTION/!Comments</CODE></P>
+<P></P>
+<LI>
+Match the <CODE>DESCRIPTION</CODE> section but do <EM>not</EM> match any of its subsections:
+<P><CODE>DESCRIPTION/!.+</CODE></P>
+<P></P>
+<LI>
+Match all top level sections but none of their subsections:
+<P><CODE>/!.+</CODE></P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="object methods">OBJECT METHODS</A></H1>
+<P>The following methods are provided in this module. Each one takes a
+reference to the object itself as an implicit first parameter.</P>
+<P>
+<HR>
+<H1><A NAME="curr_headings()"><STRONG>curr_headings()</STRONG></A></H1>
+<PRE>
+            ($head1, $head2, $head3, ...) = $parser-&gt;curr_headings();
+            $head1 = $parser-&gt;curr_headings(1);</PRE>
+<P>This method returns a list of the currently active section headings and
+subheadings in the document being parsed. The list of headings returned
+corresponds to the most recently parsed paragraph of the input.</P>
+<P>If an argument is given, it must correspond to the desired section
+heading number, in which case only the specified section heading is
+returned. If there is no current section heading at the specified
+level, then <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> is returned.</P>
+<P>
+<HR>
+<H1><A NAME="select()"><STRONG>select()</STRONG></A></H1>
+<PRE>
+            $parser-&gt;select($section_spec1,$section_spec2,...);</PRE>
+<P>This method is used to select the particular sections and subsections of
+POD documentation that are to be printed and/or processed. The existing
+set of selected sections is <EM>replaced</EM> with the given set of sections.
+See <STRONG>add_selection()</STRONG> for adding to the current set of selected
+sections.</P>
+<P>Each of the <CODE>$section_spec</CODE> arguments should be a section specification
+as described in <A HREF="#section specifications">SECTION SPECIFICATIONS</A>.  The section specifications
+are parsed by this method and the resulting regular expressions are
+stored in the invoking object.</P>
+<P>If no <CODE>$section_spec</CODE> arguments are given, then the existing set of
+selected sections is cleared out (which means <CODE>all</CODE> sections will be
+processed).</P>
+<P>This method should <EM>not</EM> normally be overridden by subclasses.</P>
+<P>
+<HR>
+<H1><A NAME="add_selection()"><STRONG>add_selection()</STRONG></A></H1>
+<PRE>
+            $parser-&gt;add_selection($section_spec1,$section_spec2,...);</PRE>
+<P>This method is used to add to the currently selected sections and
+subsections of POD documentation that are to be printed and/or
+processed. See &lt;select()&gt; for replacing the currently selected sections.</P>
+<P>Each of the <CODE>$section_spec</CODE> arguments should be a section specification
+as described in <A HREF="#section specifications">SECTION SPECIFICATIONS</A>. The section specifications
+are parsed by this method and the resulting regular expressions are
+stored in the invoking object.</P>
+<P>This method should <EM>not</EM> normally be overridden by subclasses.</P>
+<P>
+<HR>
+<H1><A NAME="clear_selections()"><STRONG>clear_selections()</STRONG></A></H1>
+<PRE>
+            $parser-&gt;clear_selections();</PRE>
+<P>This method takes no arguments, it has the exact same effect as invoking
+&lt;select()&gt; with no arguments.</P>
+<P>
+<HR>
+<H1><A NAME="match_section()"><STRONG>match_section()</STRONG></A></H1>
+<PRE>
+            $boolean = $parser-&gt;match_section($heading1,$heading2,...);</PRE>
+<P>Returns a value of true if the given section and subsection heading
+titles match any of the currently selected section specifications in
+effect from prior calls to <STRONG>select()</STRONG> and <STRONG>add_selection()</STRONG> (or if
+there are no explictly selected/deselected sections).</P>
+<P>The arguments <CODE>$heading1</CODE>, <CODE>$heading2</CODE>, etc. are the heading titles of
+the corresponding sections, subsections, etc. to try and match.  If
+<CODE>$headingN</CODE> is omitted then it defaults to the current corresponding
+section heading title in the input.</P>
+<P>This method should <EM>not</EM> normally be overridden by subclasses.</P>
+<P>
+<HR>
+<H1><A NAME="is_selected()"><STRONG>is_selected()</STRONG></A></H1>
+<PRE>
+            $boolean = $parser-&gt;is_selected($paragraph);</PRE>
+<P>This method is used to determine if the block of text given in
+<CODE>$paragraph</CODE> falls within the currently selected set of POD sections
+and subsections to be printed or processed. This method is also
+responsible for keeping track of the current input section and
+subsections. It is assumed that <CODE>$paragraph</CODE> is the most recently read
+(but not yet processed) input paragraph.</P>
+<P>The value returned will be true if the <CODE>$paragraph</CODE> and the rest of the
+text in the same section as <CODE>$paragraph</CODE> should be selected (included)
+for processing; otherwise a false value is returned.</P>
+<P>
+<HR>
+<H1><A NAME="exported functions">EXPORTED FUNCTIONS</A></H1>
+<P>The following functions are exported by this module. Please note that
+these are functions (not methods) and therefore <CODE>do not</CODE> take an
+implicit first argument.</P>
+<P>
+<HR>
+<H1><A NAME="podselect()"><STRONG>podselect()</STRONG></A></H1>
+<PRE>
+            podselect(\%options,@filelist);</PRE>
+<P><STRONG>podselect</STRONG> will print the raw (untranslated) POD paragraphs of all
+POD sections in the given input files specified by <CODE>@filelist</CODE>
+according to the given options.</P>
+<P>If any argument to <STRONG>podselect</STRONG> is a reference to a hash
+(associative array) then the values with the following keys are
+processed as follows:</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Doutput"><STRONG>-output</STRONG></A></STRONG><BR>
+<DD>
+A string corresponding to the desired output file (or ``&gt;&amp;STDOUT''
+or ``&gt;&amp;STDERR''). The default is to use standard output.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dsections"><STRONG>-sections</STRONG></A></STRONG><BR>
+<DD>
+A reference to an array of sections specifications (as described in
+<A HREF="#section specifications">SECTION SPECIFICATIONS</A>) which indicate the desired set of POD
+sections and subsections to be selected from input. If no section
+specifications are given, then all sections of the PODs are used.
+<P></P></DL>
+<P>All other arguments should correspond to the names of input files
+containing POD sections. A file name of ``-'' or ``&lt;&amp;STDIN'' will
+be interpeted to mean standard input (which is the default if no
+filenames are given).</P>
+<P>
+<HR>
+<H1><A NAME="private methods and data">PRIVATE METHODS AND DATA</A></H1>
+<P><STRONG>Pod::Select</STRONG> makes uses a number of internal methods and data fields
+which clients should not need to see or use. For the sake of avoiding
+name collisions with client data and methods, these methods and fields
+are briefly discussed here. Determined hackers may obtain further
+information about them by reading the <STRONG>Pod::Select</STRONG> source code.</P>
+<P>Private data fields are stored in the hash-object whose reference is
+returned by the <STRONG>new()</STRONG> constructor for this class. The names of all
+private methods and data-fields used by <STRONG>Pod::Select</STRONG> begin with a
+prefix of ``_'' and match the regular expression <CODE>/^_\w+$/</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brad Appleton &lt;<A HREF="mailto:bradapp@enteract.com">bradapp@enteract.com</A>&gt;</P>
+<P>Based on code for <STRONG>pod2text</STRONG> written by
+Tom Christiansen &lt;<A HREF="mailto:tchrist@mox.perl.com">tchrist@mox.perl.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;podselect - extract selected sections of POD from input</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

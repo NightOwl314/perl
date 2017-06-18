@@ -1,0 +1,189 @@
+<HTML>
+<HEAD>
+<TITLE>perldbmfilter - Perl DBM Filters</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perldbmfilter - Perl DBM Filters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the filter">The Filter</A></LI>
+		<LI><A HREF="#an example  the null termination problem.">An Example - the NULL termination problem.</A></LI>
+		<LI><A HREF="#another example  key is a c int.">Another Example - Key is a C int.</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perldbmfilter - Perl DBM Filters</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    $db = tie %hash, 'DBM', ...</PRE>
+<PRE>
+    $old_filter = $db-&gt;filter_store_key  ( sub { ... } ) ;
+    $old_filter = $db-&gt;filter_store_value( sub { ... } ) ;
+    $old_filter = $db-&gt;filter_fetch_key  ( sub { ... } ) ;
+    $old_filter = $db-&gt;filter_fetch_value( sub { ... } ) ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The four <CODE>filter_*</CODE> methods shown above are available in all the DBM
+modules that ship with Perl, namely DB_File, GDBM_File, NDBM_File,
+ODBM_File and SDBM_File.</P>
+<P>Each of the methods work identically, and are used to install (or
+uninstall) a single DBM Filter. The only difference between them is the
+place that the filter is installed.</P>
+<P>To summarise:</P>
+<DL>
+<DT><STRONG><A NAME="item_filter_store_key"><STRONG>filter_store_key</STRONG></A></STRONG><BR>
+<DD>
+If a filter has been installed with this method, it will be invoked
+every time you write a key to a DBM database.
+<P></P>
+<DT><STRONG><A NAME="item_filter_store_value"><STRONG>filter_store_value</STRONG></A></STRONG><BR>
+<DD>
+If a filter has been installed with this method, it will be invoked
+every time you write a value to a DBM database.
+<P></P>
+<DT><STRONG><A NAME="item_filter_fetch_key"><STRONG>filter_fetch_key</STRONG></A></STRONG><BR>
+<DD>
+If a filter has been installed with this method, it will be invoked
+every time you read a key from a DBM database.
+<P></P>
+<DT><STRONG><A NAME="item_filter_fetch_value"><STRONG>filter_fetch_value</STRONG></A></STRONG><BR>
+<DD>
+If a filter has been installed with this method, it will be invoked
+every time you read a value from a DBM database.
+<P></P></DL>
+<P>You can use any combination of the methods from none to all four.</P>
+<P>All filter methods return the existing filter, if present, or <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>
+in not.</P>
+<P>To delete a filter pass <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> to it.</P>
+<P>
+<H2><A NAME="the filter">The Filter</A></H2>
+<P>When each filter is called by Perl, a local copy of <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A> will contain
+the key or value to be filtered. Filtering is achieved by modifying
+the contents of <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A>. The return code from the filter is ignored.</P>
+<P>
+<H2><A NAME="an example  the null termination problem.">An Example -- the NULL termination problem.</A></H2>
+<P>DBM Filters are useful for a class of problems where you <EM>always</EM>
+want to make the same transformation to all keys, all values or both.</P>
+<P>For example, consider the following scenario. You have a DBM database
+that you need to share with a third-party C application. The C application
+assumes that <EM>all</EM> keys and values are NULL terminated. Unfortunately
+when Perl writes to DBM databases it doesn't use NULL termination, so
+your Perl application will have to manage NULL termination itself. When
+you write to the database you will have to use something like this:</P>
+<PRE>
+    $hash{&quot;$key\0&quot;} = &quot;$value\0&quot; ;</PRE>
+<P>Similarly the NULL needs to be taken into account when you are considering
+the length of existing keys/values.</P>
+<P>It would be much better if you could ignore the NULL terminations issue
+in the main application code and have a mechanism that automatically
+added the terminating NULL to all keys and values whenever you write to
+the database and have them removed when you read from the database. As I'm
+sure you have already guessed, this is a problem that DBM Filters can
+fix very easily.</P>
+<PRE>
+    use strict ;
+    use warnings ;
+    use SDBM_File ;
+    use Fcntl ;</PRE>
+<PRE>
+    my %hash ;
+    my $filename = &quot;/tmp/filt&quot; ;
+    unlink $filename ;</PRE>
+<PRE>
+    my $db = tie(%hash, 'SDBM_File', $filename, O_RDWR|O_CREAT, 0640)
+      or die &quot;Cannot open $filename: $!\n&quot; ;</PRE>
+<PRE>
+    # Install DBM Filters
+    $db-&gt;filter_fetch_key  ( sub { s/\0$//    } ) ;
+    $db-&gt;filter_store_key  ( sub { $_ .= &quot;\0&quot; } ) ;
+    $db-&gt;filter_fetch_value( 
+        sub { no warnings 'uninitialized' ;s/\0$// } ) ;
+    $db-&gt;filter_store_value( sub { $_ .= &quot;\0&quot; } ) ;</PRE>
+<PRE>
+    $hash{&quot;abc&quot;} = &quot;def&quot; ;
+    my $a = $hash{&quot;ABC&quot;} ;
+    # ...
+    undef $db ;
+    untie %hash ;</PRE>
+<P>The code above uses SDBM_File, but it will work with any of the DBM
+modules.</P>
+<P>Hopefully the contents of each of the filters should be
+self-explanatory. Both ``fetch'' filters remove the terminating NULL,
+and both ``store'' filters add a terminating NULL.</P>
+<P>
+<H2><A NAME="another example  key is a c int.">Another Example -- Key is a C int.</A></H2>
+<P>Here is another real-life example. By default, whenever Perl writes to
+a DBM database it always writes the key and value as strings. So when
+you use this:</P>
+<PRE>
+    $hash{12345} = &quot;something&quot; ;</PRE>
+<P>the key 12345 will get stored in the DBM database as the 5 byte string
+``12345''. If you actually want the key to be stored in the DBM database
+as a C int, you will have to use <A HREF="../../lib/Pod/perlfunc.html#item_pack"><CODE>pack</CODE></A> when writing, and <A HREF="../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack</CODE></A>
+when reading.</P>
+<P>Here is a DBM Filter that does it:</P>
+<PRE>
+    use strict ;
+    use warnings ;
+    use DB_File ;
+    my %hash ;
+    my $filename = &quot;/tmp/filt&quot; ;
+    unlink $filename ;</PRE>
+<PRE>
+    my $db = tie %hash, 'DB_File', $filename, O_CREAT|O_RDWR, 0666, $DB_HASH 
+      or die &quot;Cannot open $filename: $!\n&quot; ;</PRE>
+<PRE>
+    $db-&gt;filter_fetch_key  ( sub { $_ = unpack(&quot;i&quot;, $_) } ) ;
+    $db-&gt;filter_store_key  ( sub { $_ = pack (&quot;i&quot;, $_) } ) ;
+    $hash{123} = &quot;def&quot; ;
+    # ...
+    undef $db ;
+    untie %hash ;</PRE>
+<P>The code above uses DB_File, but again it will work with any of the
+DBM modules.</P>
+<P>This time only two filters have been used -- we only need to manipulate
+the contents of the key, so it wasn't necessary to install any value
+filters.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/DB_File.html">the DB_File manpage</A>, <EM>GDBM_File</EM>, <A HREF="../../lib/NDBM_File.html">the NDBM_File manpage</A>, <A HREF="../../lib/ODBM_File.html">the ODBM_File manpage</A> and <A HREF="../../lib/SDBM_File.html">the SDBM_File manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Marquess</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perldbmfilter - Perl DBM Filters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

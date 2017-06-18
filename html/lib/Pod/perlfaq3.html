@@ -1,0 +1,766 @@
+<HTML>
+<HEAD>
+<TITLE>perlfaq3 - Programming Tools</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq3 - Programming Tools</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#how do i do (anything)">How do I do (anything)?</A></LI>
+		<LI><A HREF="#how can i use perl interactively">How can I use Perl interactively?</A></LI>
+		<LI><A HREF="#is there a perl shell">Is there a Perl shell?</A></LI>
+		<LI><A HREF="#how do i debug my perl programs">How do I debug my Perl programs?</A></LI>
+		<LI><A HREF="#how do i profile my perl programs">How do I profile my Perl programs?</A></LI>
+		<LI><A HREF="#how do i crossreference my perl programs">How do I cross-reference my Perl programs?</A></LI>
+		<LI><A HREF="#is there a prettyprinter (formatter) for perl">Is there a pretty-printer (formatter) for Perl?</A></LI>
+		<LI><A HREF="#is there a ctags for perl">Is there a ctags for Perl?</A></LI>
+		<LI><A HREF="#is there an ide or windows perl editor">Is there an IDE or Windows Perl Editor?</A></LI>
+		<LI><A HREF="#where can i get perl macros for vi">Where can I get Perl macros for vi?</A></LI>
+		<LI><A HREF="#where can i get perlmode for emacs">Where can I get perl-mode for emacs?</A></LI>
+		<LI><A HREF="#how can i use curses with perl">How can I use curses with Perl?</A></LI>
+		<LI><A HREF="#how can i use x or tk with perl">How can I use X or Tk with Perl?</A></LI>
+		<LI><A HREF="#how can i generate simple menus without using cgi or tk">How can I generate simple menus without using CGI or Tk?</A></LI>
+		<LI><A HREF="#what is undump">What is undump?</A></LI>
+		<LI><A HREF="#how can i make my perl program run faster">How can I make my Perl program run faster?</A></LI>
+		<LI><A HREF="#how can i make my perl program take less memory">How can I make my Perl program take less memory?</A></LI>
+		<LI><A HREF="#is it unsafe to return a pointer to local data">Is it unsafe to return a pointer to local data?</A></LI>
+		<LI><A HREF="#how can i free an array or hash so my program shrinks">How can I free an array or hash so my program shrinks?</A></LI>
+		<LI><A HREF="#how can i make my cgi script more efficient">How can I make my CGI script more efficient?</A></LI>
+		<LI><A HREF="#how can i hide the source for my perl program">How can I hide the source for my Perl program?</A></LI>
+		<LI><A HREF="#how can i compile my perl program into byte code or c">How can I compile my Perl program into byte code or C?</A></LI>
+		<LI><A HREF="#how can i compile perl into java">How can I compile Perl into Java?</A></LI>
+		<LI><A HREF="#how can i get #!perl to work on [msdos,nt,...]">How can I get <CODE>#!perl</CODE> to work on [MS-DOS,NT,...]?</A></LI>
+		<LI><A HREF="#can i write useful perl programs on the command line">Can I write useful Perl programs on the command line?</A></LI>
+		<LI><A HREF="#why don't perl oneliners work on my dos/mac/vms system">Why don't Perl one-liners work on my DOS/Mac/VMS system?</A></LI>
+		<LI><A HREF="#where can i learn about cgi or web programming in perl">Where can I learn about CGI or Web programming in Perl?</A></LI>
+		<LI><A HREF="#where can i learn about objectoriented perl programming">Where can I learn about object-oriented Perl programming?</A></LI>
+		<LI><A HREF="#where can i learn about linking c with perl [h2xs, xsubpp]">Where can I learn about linking C with Perl? [h2xs, xsubpp]</A></LI>
+		<LI><A HREF="#i've read perlembed, perlguts, etc., but i can't embed perl in">I've read perlembed, perlguts, etc., but I can't embed perl in</A></LI>
+		<LI><A HREF="#when i tried to run my script, i got this message. what does it">When I tried to run my script, I got this message. What does it</A></LI>
+		<LI><A HREF="#what's makemaker">What's MakeMaker?</A></LI>
+	</UL>
+
+	<LI><A HREF="#author and copyright">AUTHOR AND COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlfaq3 - Programming Tools ($Revision: 1.38 $, $Date: 1999/05/23 16:08:30 $)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This section of the FAQ answers questions related to programmer tools
+and programming support.</P>
+<P>
+<H2><A NAME="how do i do (anything)">How do I do (anything)?</A></H2>
+<P>Have you looked at CPAN (see <A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>)?  The chances are that
+someone has already written a module that can solve your problem.
+Have you read the appropriate man pages?  Here's a brief index:</P>
+<PRE>
+        Basics          <A HREF="../../lib/Pod/perldata.html">perldata</A>, <A HREF="../../lib/Pod/perlvar.html">perlvar</A>, <A HREF="../../lib/Pod/perlsyn.html">perlsyn</A>, <A HREF="../../lib/Pod/perlop.html">perlop</A>, <A HREF="../../lib/Pod/perlsub.html">perlsub</A>
+        Execution       <A HREF="../../lib/Pod/perlrun.html">perlrun</A>, <A HREF="../../lib/Pod/perldebug.html">perldebug</A>
+        Functions       <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>
+        Objects         <A HREF="../../lib/Pod/perlref.html">perlref</A>, <A HREF="../../lib/Pod/perlmod.html">perlmod</A>, <A HREF="../../lib/Pod/perlobj.html">perlobj</A>, <A HREF="../../lib/Pod/perltie.html">perltie</A>
+        Data Structures <A HREF="../../lib/Pod/perlref.html">perlref</A>, <A HREF="../../lib/Pod/perllol.html">perllol</A>, <A HREF="../../lib/Pod/perldsc.html">perldsc</A>
+        Modules         <A HREF="../../lib/Pod/perlmod.html">perlmod</A>, <A HREF="../../lib/Pod/perlmodlib.html">perlmodlib</A>, <A HREF="../../lib/Pod/perlsub.html">perlsub</A>
+        Regexes         <A HREF="../../lib/Pod/perlre.html">perlre</A>, <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>, <A HREF="../../lib/Pod/perlop.html">perlop</A>, <A HREF="../../lib/Pod/perllocale.html">perllocale</A>
+        Moving to perl5 <A HREF="../../lib/Pod/perltrap.html">perltrap</A>, perl
+        Linking w/C     <A HREF="../../lib/Pod/perlxstut.html">perlxstut</A>, <A HREF="../../lib/Pod/perlxs.html">perlxs</A>, <A HREF="../../lib/Pod/perlcall.html">perlcall</A>, <A HREF="../../lib/Pod/perlguts.html">perlguts</A>, <A HREF="../../lib/Pod/perlembed.html">perlembed</A>
+        Various         <A HREF="http://www.perl.com/CPAN/doc/FMTEYEWTK/index.html">http://www.perl.com/CPAN/doc/FMTEYEWTK/index.html</A>
+                        (not a man-page but still useful)</PRE>
+<P>A crude table of contents for the Perl man page set is found in <A HREF="../../lib/Pod/perltoc.html">the perltoc manpage</A>.</P>
+<P>
+<H2><A NAME="how can i use perl interactively">How can I use Perl interactively?</A></H2>
+<P>The typical approach uses the Perl debugger, described in the
+<CODE>perldebug(1)</CODE> man page, on an ``empty'' program, like this:</P>
+<PRE>
+    perl -de 42</PRE>
+<P>Now just type in any legal Perl code, and it will be immediately
+evaluated.  You can also examine the symbol table, get stack
+backtraces, check variable values, set breakpoints, and other
+operations typically found in symbolic debuggers.</P>
+<P>
+<H2><A NAME="is there a perl shell">Is there a Perl shell?</A></H2>
+<P>In general, no.  The Shell.pm module (distributed with Perl) makes
+Perl try commands which aren't part of the Perl language as shell
+commands.  perlsh from the source distribution is simplistic and
+uninteresting, but may still be what you want.</P>
+<P>
+<H2><A NAME="how do i debug my perl programs">How do I debug my Perl programs?</A></H2>
+<P>Have you tried <CODE>use warnings</CODE> or used <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A>?  They enable warnings 
+to detect dubious practices.</P>
+<P>Have you tried <CODE>use strict</CODE>?  It prevents you from using symbolic
+references, makes you predeclare any subroutines that you call as bare
+words, and (probably most importantly) forces you to predeclare your
+variables with <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_our"><CODE>our</CODE></A>, or <CODE>use vars</CODE>.</P>
+<P>Did you check the return values of each and every system call?  The operating
+system (and thus Perl) tells you whether they worked, and if not
+why.</P>
+<PRE>
+  open(FH, &quot;&gt; /etc/cantwrite&quot;)
+    or die &quot;Couldn't write to /etc/cantwrite: $!\n&quot;;</PRE>
+<P>Did you read <A HREF="../../lib/Pod/perltrap.html">the perltrap manpage</A>?  It's full of gotchas for old and new Perl
+programmers and even has sections for those of you who are upgrading
+from languages like <EM>awk</EM> and <EM>C</EM>.</P>
+<P>Have you tried the Perl debugger, described in <A HREF="../../lib/Pod/perldebug.html">the perldebug manpage</A>?  You can
+step through your program and see what it's doing and thus work out
+why what it's doing isn't what it should be doing.</P>
+<P>
+<H2><A NAME="how do i profile my perl programs">How do I profile my Perl programs?</A></H2>
+<P>You should get the Devel::DProf module from the standard distribution
+(or separately on CPAN) and also use Benchmark.pm from the standard 
+distribution.  The Benchmark module lets you time specific portions of 
+your code, while Devel::DProf gives detailed breakdowns of where your 
+code spends its time.</P>
+<P>Here's a sample use of Benchmark:</P>
+<PRE>
+  use Benchmark;</PRE>
+<PRE>
+  @junk = `cat /etc/motd`;
+  $count = 10_000;</PRE>
+<PRE>
+  timethese($count, {
+            'map' =&gt; sub { my @a = @junk;
+                           map { s/a/b/ } @a;
+                           return @a
+                         },
+            'for' =&gt; sub { my @a = @junk;
+                           local $_;
+                           for (@a) { s/a/b/ };
+                           return @a },
+           });</PRE>
+<P>This is what it prints (on one machine--your results will be dependent
+on your hardware, operating system, and the load on your machine):</P>
+<PRE>
+  Benchmark: timing 10000 iterations of for, map...
+         for:  4 secs ( 3.97 usr  0.01 sys =  3.98 cpu)
+         map:  6 secs ( 4.97 usr  0.00 sys =  4.97 cpu)</PRE>
+<P>Be aware that a good benchmark is very hard to write.  It only tests the
+data you give it and proves little about the differing complexities
+of contrasting algorithms.</P>
+<P>
+<H2><A NAME="how do i crossreference my perl programs">How do I cross-reference my Perl programs?</A></H2>
+<P>The B::Xref module, shipped with the new, alpha-release Perl compiler
+(not the general distribution prior to the 5.005 release), can be used
+to generate cross-reference reports for Perl programs.</P>
+<PRE>
+    perl -MO=Xref[,OPTIONS] scriptname.plx</PRE>
+<P>
+<H2><A NAME="is there a prettyprinter (formatter) for perl">Is there a pretty-printer (formatter) for Perl?</A></H2>
+<P>There is no program that will reformat Perl as much as <CODE>indent(1)</CODE> does
+for C.  The complex feedback between the scanner and the parser (this
+feedback is what confuses the vgrind and emacs programs) makes it
+challenging at best to write a stand-alone Perl parser.</P>
+<P>Of course, if you simply follow the guidelines in <A HREF="../../lib/Pod/perlstyle.html">the perlstyle manpage</A>, you
+shouldn't need to reformat.  The habit of formatting your code as you
+write it will help prevent bugs.  Your editor can and should help you
+with this.  The perl-mode or newer cperl-mode for emacs can provide
+remarkable amounts of help with most (but not all) code, and even less
+programmable editors can provide significant assistance.  Tom swears
+by the following settings in vi and its clones:</P>
+<PRE>
+    set ai sw=4
+    map! ^O {^M}^[O^T</PRE>
+<P>Now put that in your <EM>.exrc</EM> file (replacing the caret characters
+with control characters) and away you go.  In insert mode, ^T is
+for indenting, ^D is for undenting, and ^O is for blockdenting--
+as it were.  If you haven't used the last one, you're missing
+a lot.  A more complete example, with comments, can be found at
+<A HREF="http://www.perl.com/CPAN-local/authors/id/TOMC/scripts/toms.exrc.gz">http://www.perl.com/CPAN-local/authors/id/TOMC/scripts/toms.exrc.gz</A></P>
+<P>If you are used to using the <EM>vgrind</EM> program for printing out nice code
+to a laser printer, you can take a stab at this using
+<A HREF="http://www.perl.com/CPAN/doc/misc/tips/working.vgrind.entry,">http://www.perl.com/CPAN/doc/misc/tips/working.vgrind.entry,</A> but the
+results are not particularly satisfying for sophisticated code.</P>
+<P>The a2ps at <A HREF="http://www.infres.enst.fr/%7Edemaille/a2ps/">http://www.infres.enst.fr/%7Edemaille/a2ps/</A> does lots of things
+related to generating nicely printed output of documents.</P>
+<P>
+<H2><A NAME="is there a ctags for perl">Is there a ctags for Perl?</A></H2>
+<P>There's a simple one at
+<A HREF="http://www.perl.com/CPAN/authors/id/TOMC/scripts/ptags.gz">http://www.perl.com/CPAN/authors/id/TOMC/scripts/ptags.gz</A> which may do
+the trick.  And if not, it's easy to hack into what you want.</P>
+<P>
+<H2><A NAME="is there an ide or windows perl editor">Is there an IDE or Windows Perl Editor?</A></H2>
+<P>Perl programs are just plain text, so any editor will do.</P>
+<P>If you're on Unix, you already have an IDE--Unix itself.  The UNIX
+philosophy is the philosophy of several small tools that each do one
+thing and do it well.  It's like a carpenter's toolbox.</P>
+<P>If you want a Windows IDE, check the following:</P>
+<DL>
+<DT><STRONG><A NAME="item_CodeMagicCD">CodeMagicCD</A></STRONG><BR>
+<DD>
+<A HREF="http://www.codemagiccd.com/">http://www.codemagiccd.com/</A>
+<P></P>
+<DT><STRONG><A NAME="item_Komodo">Komodo</A></STRONG><BR>
+<DD>
+ActiveState's cross-platform, multi-language IDE has Perl support,
+including a regular expression debugger and remote debugging
+(http://www.ActiveState.com/Products/Komodo/index.html).
+(Visual Perl, a Visual Studio.NET plug-in is currently (early 2001)
+in beta (http://www.ActiveState.com/Products/VisualPerl/index.html)).
+<P></P>
+<DT><STRONG><A NAME="item_The_Object_System">The Object System</A></STRONG><BR>
+<DD>
+(http://www.castlelink.co.uk/object_system/) is a Perl web
+applications development IDE.
+<P></P>
+<DT><STRONG><A NAME="item_PerlBuilder">PerlBuilder</A></STRONG><BR>
+<DD>
+(http://www.solutionsoft.com/perl.htm) is an integrated development
+environment for Windows that supports Perl development.
+<P></P>
+<DT><STRONG><A NAME="item_Perl_code_magic">Perl code magic</A></STRONG><BR>
+<DD>
+(http://www.petes-place.com/codemagic.html).
+<P></P>
+<DT><STRONG><A NAME="item_visiPerl%2B">visiPerl+</A></STRONG><BR>
+<DD>
+<A HREF="http://helpconsulting.net/visiperl/,">http://helpconsulting.net/visiperl/,</A> from Help Consulting.
+<P></P></DL>
+<P>For editors: if you're on Unix you probably have vi or a vi clone already,
+and possibly an emacs too, so you may not need to download anything.
+In any emacs the cperl-mode (M-x cperl-mode) gives you perhaps the
+best available Perl editing mode in any editor.</P>
+<P>For Windows editors: you can download an Emacs</P>
+<DL>
+<DT><STRONG><A NAME="item_GNU_Emacs">GNU Emacs</A></STRONG><BR>
+<DD>
+<A HREF="http://www.gnu.org/software/emacs/windows/ntemacs.html">http://www.gnu.org/software/emacs/windows/ntemacs.html</A>
+<P></P>
+<DT><STRONG><A NAME="item_MicroEMACS">MicroEMACS</A></STRONG><BR>
+<DD>
+<A HREF="http://members.nbci.com/uemacs/">http://members.nbci.com/uemacs/</A>
+<P></P>
+<DT><STRONG><A NAME="item_XEmacs">XEmacs</A></STRONG><BR>
+<DD>
+<A HREF="http://www.xemacs.org/Download/index.html">http://www.xemacs.org/Download/index.html</A>
+<P></P></DL>
+<P>or a vi clone such as</P>
+<DL>
+<DT><STRONG><A NAME="item_Elvis">Elvis</A></STRONG><BR>
+<DD>
+<A HREF="ftp://ftp.cs.pdx.edu/pub/elvis/">ftp://ftp.cs.pdx.edu/pub/elvis/</A> <A HREF="http://www.fh-wedel.de/elvis/">http://www.fh-wedel.de/elvis/</A>
+<P></P>
+<DT><STRONG><A NAME="item_Vile">Vile</A></STRONG><BR>
+<DD>
+<A HREF="http://vile.cx/">http://vile.cx/</A>
+<P></P>
+<DT><STRONG><A NAME="item_Vim">Vim</A></STRONG><BR>
+<DD>
+<A HREF="http://www.vim.org/">http://www.vim.org/</A>
+<P>win32: <A HREF="http://www.cs.vu.nl/%7Etmgil/vi.html">http://www.cs.vu.nl/%7Etmgil/vi.html</A></P>
+<P></P></DL>
+<P>For vi lovers in general, Windows or elsewhere:
+<A HREF="http://www.thomer.com/thomer/vi/vi.html.">http://www.thomer.com/thomer/vi/vi.html.</A></P>
+<P>nvi (http://www.bostic.com/vi/, available from CPAN in src/misc/) is
+yet another vi clone, unfortunately not available for Windows, but in
+UNIX platforms you might be interested in trying it out, firstly because
+strictly speaking it is not a vi clone, it is the real vi, or the new
+incarnation of it, and secondly because you can embed Perl inside it
+to use Perl as the scripting language.  nvi is not alone in this,
+though: at least also vim and vile offer an embedded Perl.</P>
+<P>The following are Win32 multilanguage editor/IDESs that support Perl:</P>
+<DL>
+<DT><STRONG><A NAME="item_Codewright">Codewright</A></STRONG><BR>
+<DD>
+<A HREF="http://www.starbase.com/">http://www.starbase.com/</A>
+<P></P>
+<DT><STRONG><A NAME="item_MultiEdit">MultiEdit</A></STRONG><BR>
+<DD>
+<A HREF="http://www.MultiEdit.com/">http://www.MultiEdit.com/</A>
+<P></P>
+<DT><STRONG><A NAME="item_SlickEdit">SlickEdit</A></STRONG><BR>
+<DD>
+<A HREF="http://www.slickedit.com/">http://www.slickedit.com/</A>
+<P></P></DL>
+<P>There is also a toyedit Text widget based editor written in Perl
+that is distributed with the Tk module on CPAN.  The ptkdb
+(http://world.std.com/~aep/ptkdb/) is a Perl/tk based debugger that
+acts as a development environment of sorts.  Perl Composer
+(http://perlcomposer.sourceforge.net/vperl.html) is an IDE for Perl/Tk
+GUI creation.</P>
+<P>In addition to an editor/IDE you might be interested in a more
+powerful shell environment for Win32.  Your options include</P>
+<DL>
+<DT><STRONG><A NAME="item_Bash">Bash</A></STRONG><BR>
+<DD>
+from the Cygwin package (http://sources.redhat.com/cygwin/)
+<P></P>
+<DT><STRONG><A NAME="item_Ksh">Ksh</A></STRONG><BR>
+<DD>
+from the MKS Toolkit (http://www.mks.com/), or the Bourne shell of
+the U/WIN environment (http://www.research.att.com/sw/tools/uwin/)
+<P></P>
+<DT><STRONG><A NAME="item_Tcsh">Tcsh</A></STRONG><BR>
+<DD>
+<A HREF="ftp://ftp.astron.com/pub/tcsh/,">ftp://ftp.astron.com/pub/tcsh/,</A> see also
+<A HREF="http://www.primate.wisc.edu/software/csh-tcsh-book/">http://www.primate.wisc.edu/software/csh-tcsh-book/</A>
+<P></P>
+<DT><STRONG><A NAME="item_Zsh">Zsh</A></STRONG><BR>
+<DD>
+<A HREF="ftp://ftp.blarg.net/users/amol/zsh/,">ftp://ftp.blarg.net/users/amol/zsh/,</A> see also <A HREF="http://www.zsh.org/">http://www.zsh.org/</A>
+<P></P></DL>
+<P>MKS and U/WIN are commercial (U/WIN is free for educational and
+research purposes), Cygwin is covered by the GNU Public License (but
+that shouldn't matter for Perl use).  The Cygwin, MKS, and U/WIN all
+contain (in addition to the shells) a comprehensive set of standard
+UNIX toolkit utilities.</P>
+<P>If you're transferring text files between Unix and Windows using FTP
+be sure to transfer them in ASCII mode so the ends of lines are
+appropriately converted.</P>
+<P>On Mac OS the MacPerl Application comes with a simple 32k text editor
+that behaves like a rudimentary IDE.  In contrast to the MacPerl Application
+the MPW Perl tool can make use of the MPW Shell itself as an editor (with
+no 32k limit).</P>
+<DL>
+<DT><STRONG><A NAME="item_BBEdit_and_BBEdit_Lite">BBEdit and BBEdit Lite</A></STRONG><BR>
+<DD>
+are text editors for Mac OS that have a Perl sensitivity mode
+(http://web.barebones.com/).
+<P></P>
+<DT><STRONG><A NAME="item_Alpha">Alpha</A></STRONG><BR>
+<DD>
+is an editor, written and extensible in Tcl, that nonetheless has
+built in support for several popular markup and programming languages
+including Perl and HTML (http://alpha.olm.net/).
+<P></P></DL>
+<P>Pepper and Pe are programming language sensitive text editors for Mac
+OS X and BeOS respectively (http://www.hekkelman.com/).</P>
+<P>
+<H2><A NAME="where can i get perl macros for vi">Where can I get Perl macros for vi?</A></H2>
+<P>For a complete version of Tom Christiansen's vi configuration file,
+see <A HREF="http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/toms.exrc.gz">http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/toms.exrc.gz</A> ,
+the standard benchmark file for vi emulators.  The file runs best with nvi,
+the current version of vi out of Berkeley, which incidentally can be built
+with an embedded Perl interpreter--see <A HREF="http://www.perl.com/CPAN/src/misc.">http://www.perl.com/CPAN/src/misc.</A></P>
+<P>
+<H2><A NAME="where can i get perlmode for emacs">Where can I get perl-mode for emacs?</A></H2>
+<P>Since Emacs version 19 patchlevel 22 or so, there have been both a
+perl-mode.el and support for the Perl debugger built in.  These should
+come with the standard Emacs 19 distribution.</P>
+<P>In the Perl source directory, you'll find a directory called ``emacs'',
+which contains a cperl-mode that color-codes keywords, provides
+context-sensitive help, and other nifty things.</P>
+<P>Note that the perl-mode of emacs will have fits with <CODE>&quot;main'foo&quot;</CODE>
+(single quote), and mess up the indentation and highlighting.  You
+are probably using <CODE>&quot;main::foo&quot;</CODE> in new Perl code anyway, so this
+shouldn't be an issue.</P>
+<P>
+<H2><A NAME="how can i use curses with perl">How can I use curses with Perl?</A></H2>
+<P>The Curses module from CPAN provides a dynamically loadable object
+module interface to a curses library.  A small demo can be found at the
+directory <A HREF="http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/rep;">http://www.perl.com/CPAN/authors/Tom_Christiansen/scripts/rep;</A>
+this program repeats a command and updates the screen as needed, rendering
+<STRONG>rep ps axu</STRONG> similar to <STRONG>top</STRONG>.</P>
+<P>
+<H2><A NAME="how can i use x or tk with perl">How can I use X or Tk with Perl?</A></H2>
+<P>Tk is a completely Perl-based, object-oriented interface to the Tk toolkit
+that doesn't force you to use Tcl just to get at Tk.  Sx is an interface
+to the Athena Widget set.  Both are available from CPAN.  See the
+directory <A HREF="http://www.perl.com/CPAN/modules/by-category/08_User_Interfaces/">http://www.perl.com/CPAN/modules/by-category/08_User_Interfaces/</A></P>
+<P>Invaluable for Perl/Tk programming are the Perl/Tk FAQ at
+<A HREF="http://w4.lns.cornell.edu/%7Epvhp/ptk/ptkTOC.html">http://w4.lns.cornell.edu/%7Epvhp/ptk/ptkTOC.html</A> , the Perl/Tk Reference
+Guide available at
+<A HREF="http://www.perl.com/CPAN-local/authors/Stephen_O_Lidie/">http://www.perl.com/CPAN-local/authors/Stephen_O_Lidie/</A> , and the
+online manpages at
+<A HREF="http://www-users.cs.umn.edu/%7Eamundson/perl/perltk/toc.html">http://www-users.cs.umn.edu/%7Eamundson/perl/perltk/toc.html</A> .</P>
+<P>
+<H2><A NAME="how can i generate simple menus without using cgi or tk">How can I generate simple menus without using CGI or Tk?</A></H2>
+<P>The <A HREF="http://www.perl.com/CPAN/authors/id/SKUNZ/perlmenu.v4.0.tar.gz">http://www.perl.com/CPAN/authors/id/SKUNZ/perlmenu.v4.0.tar.gz</A>
+module, which is curses-based, can help with this.</P>
+<P>
+<H2><A NAME="what is undump">What is undump?</A></H2>
+<P>See the next question on ``How can I make my Perl program run faster?''</P>
+<P>
+<H2><A NAME="how can i make my perl program run faster">How can I make my Perl program run faster?</A></H2>
+<P>The best way to do this is to come up with a better algorithm.  This
+can often make a dramatic difference.  Jon Bentley's book
+``Programming Pearls'' (that's not a misspelling!)  has some good tips
+on optimization, too.  Advice on benchmarking boils down to: benchmark
+and profile to make sure you're optimizing the right part, look for
+better algorithms instead of microtuning your code, and when all else
+fails consider just buying faster hardware.</P>
+<P>A different approach is to autoload seldom-used Perl code.  See the
+AutoSplit and AutoLoader modules in the standard distribution for
+that.  Or you could locate the bottleneck and think about writing just
+that part in C, the way we used to take bottlenecks in C code and
+write them in assembler.  Similar to rewriting in C,
+modules that have critical sections can be written in C (for instance, the
+PDL module from CPAN).</P>
+<P>In some cases, it may be worth it to use the backend compiler to
+produce byte code (saving compilation time) or compile into C, which
+will certainly save compilation time and sometimes a small amount (but
+not much) execution time.  See the question about compiling your Perl
+programs for more on the compiler--the wins aren't as obvious as you'd
+hope.</P>
+<P>If you're currently linking your perl executable to a shared <EM>libc.so</EM>,
+you can often gain a 10-25% performance benefit by rebuilding it to
+link with a static libc.a instead.  This will make a bigger perl
+executable, but your Perl programs (and programmers) may thank you for
+it.  See the <EM>INSTALL</EM> file in the source distribution for more
+information.</P>
+<P>Unsubstantiated reports allege that Perl interpreters that use sfio
+outperform those that don't (for I/O intensive applications).  To try
+this, see the <EM>INSTALL</EM> file in the source distribution, especially
+the ``Selecting File I/O mechanisms'' section.</P>
+<P>The undump program was an old attempt to speed up your Perl program
+by storing the already-compiled form to disk.  This is no longer
+a viable option, as it only worked on a few architectures, and
+wasn't a good solution anyway.</P>
+<P>
+<H2><A NAME="how can i make my perl program take less memory">How can I make my Perl program take less memory?</A></H2>
+<P>When it comes to time-space tradeoffs, Perl nearly always prefers to
+throw memory at a problem.  Scalars in Perl use more memory than
+strings in C, arrays take more than that, and hashes use even more.  While
+there's still a lot to be done, recent releases have been addressing
+these issues.  For example, as of 5.004, duplicate hash keys are
+shared amongst all hashes using them, so require no reallocation.</P>
+<P>In some cases, using <A HREF="../../lib/Pod/perlvar.html#item_substr"><CODE>substr()</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_vec"><CODE>vec()</CODE></A> to simulate arrays can be
+highly beneficial.  For example, an array of a thousand booleans will
+take at least 20,000 bytes of space, but it can be turned into one
+125-byte bit vector--a considerable memory savings.  The standard
+Tie::SubstrHash module can also help for certain types of data
+structure.  If you're working with specialist data structures
+(matrices, for instance) modules that implement these in C may use
+less memory than equivalent Perl modules.</P>
+<P>Another thing to try is learning whether your Perl was compiled with
+the system malloc or with Perl's builtin malloc.  Whichever one it
+is, try using the other one and see whether this makes a difference.
+Information about malloc is in the <EM>INSTALL</EM> file in the source
+distribution.  You can find out whether you are using perl's malloc by
+typing <CODE>perl -V:usemymalloc</CODE>.</P>
+<P>
+<H2><A NAME="is it unsafe to return a pointer to local data">Is it unsafe to return a pointer to local data?</A></H2>
+<P>No, Perl's garbage collection system takes care of this.</P>
+<PRE>
+    sub makeone {
+        my @a = ( 1 .. 10 );
+        return \@a;
+    }</PRE>
+<PRE>
+    for $i ( 1 .. 10 ) {
+        push @many, makeone();
+    }</PRE>
+<PRE>
+    print $many[4][5], &quot;\n&quot;;</PRE>
+<PRE>
+    print &quot;@many\n&quot;;</PRE>
+<P>
+<H2><A NAME="how can i free an array or hash so my program shrinks">How can I free an array or hash so my program shrinks?</A></H2>
+<P>You can't.  On most operating systems, memory allocated to a program
+can never be returned to the system.  That's why long-running programs
+sometimes re-exec themselves.  Some operating systems (notably,
+FreeBSD and Linux) allegedly reclaim large chunks of memory that is no
+longer used, but it doesn't appear to happen with Perl (yet).  The Mac
+appears to be the only platform that will reliably (albeit, slowly)
+return memory to the OS.</P>
+<P>We've had reports that on Linux (Redhat 5.1) on Intel, <CODE>undef
+$scalar</CODE> will return memory to the system, while on Solaris 2.6 it
+won't.  In general, try it yourself and see.</P>
+<P>However, judicious use of <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A> on your variables will help make sure
+that they go out of scope so that Perl can free up that space for
+use in other parts of your program.  A global variable, of course, never
+goes out of scope, so you can't get its space automatically reclaimed,
+although undef()ing and/or delete()ing it will achieve the same effect.
+In general, memory allocation and de-allocation isn't something you can
+or should be worrying about much in Perl, but even this capability
+(preallocation of data types) is in the works.</P>
+<P>
+<H2><A NAME="how can i make my cgi script more efficient">How can I make my CGI script more efficient?</A></H2>
+<P>Beyond the normal measures described to make general Perl programs
+faster or smaller, a CGI program has additional issues.  It may be run
+several times per second.  Given that each time it runs it will need
+to be re-compiled and will often allocate a megabyte or more of system
+memory, this can be a killer.  Compiling into C <STRONG>isn't going to help
+you</STRONG> because the process start-up overhead is where the bottleneck is.</P>
+<P>There are two popular ways to avoid this overhead.  One solution
+involves running the Apache HTTP server (available from
+<A HREF="http://www.apache.org/)">http://www.apache.org/)</A> with either of the mod_perl or mod_fastcgi
+plugin modules.</P>
+<P>With mod_perl and the Apache::Registry module (distributed with
+mod_perl), httpd will run with an embedded Perl interpreter which
+pre-compiles your script and then executes it within the same address
+space without forking.  The Apache extension also gives Perl access to
+the internal server API, so modules written in Perl can do just about
+anything a module written in C can.  For more on mod_perl, see
+<A HREF="http://perl.apache.org/">http://perl.apache.org/</A></P>
+<P>With the FCGI module (from CPAN) and the mod_fastcgi
+module (available from <A HREF="http://www.fastcgi.com/)">http://www.fastcgi.com/)</A> each of your Perl
+programs becomes a permanent CGI daemon process.</P>
+<P>Both of these solutions can have far-reaching effects on your system
+and on the way you write your CGI programs, so investigate them with
+care.</P>
+<P>See <A HREF="http://www.perl.com/CPAN/modules/by-category/15_World_Wide_Web_HTML_HTTP_CGI/">http://www.perl.com/CPAN/modules/by-category/15_World_Wide_Web_HTML_HTTP_CGI/</A> .</P>
+<P>A non-free, commercial product, ``The Velocity Engine for Perl'',
+(http://www.binevolve.com/ or <A HREF="http://www.binevolve.com/velocigen/">http://www.binevolve.com/velocigen/</A> )
+might also be worth looking at.  It will allow you to increase the
+performance of your Perl programs, running programs up to 25 times
+faster than normal CGI Perl when running in persistent Perl mode or 4
+to 5 times faster without any modification to your existing CGI
+programs. Fully functional evaluation copies are available from the
+web site.</P>
+<P>
+<H2><A NAME="how can i hide the source for my perl program">How can I hide the source for my Perl program?</A></H2>
+<P>Delete it. :-) Seriously, there are a number of (mostly
+unsatisfactory) solutions with varying levels of ``security''.</P>
+<P>First of all, however, you <EM>can't</EM> take away read permission, because
+the source code has to be readable in order to be compiled and
+interpreted.  (That doesn't mean that a CGI script's source is
+readable by people on the web, though--only by people with access to
+the filesystem.)  So you have to leave the permissions at the socially
+friendly 0755 level.</P>
+<P>Some people regard this as a security problem.  If your program does
+insecure things and relies on people not knowing how to exploit those
+insecurities, it is not secure.  It is often possible for someone to
+determine the insecure things and exploit them without viewing the
+source.  Security through obscurity, the name for hiding your bugs
+instead of fixing them, is little security indeed.</P>
+<P>You can try using encryption via source filters (Filter::* from CPAN),
+but any decent programmer will be able to decrypt it.  You can try using
+the byte code compiler and interpreter described below, but the curious
+might still be able to de-compile it.  You can try using the native-code
+compiler described below, but crackers might be able to disassemble it.
+These pose varying degrees of difficulty to people wanting to get at
+your code, but none can definitively conceal it (true of every
+language, not just Perl).</P>
+<P>If you're concerned about people profiting from your code, then the
+bottom line is that nothing but a restrictive license will give you
+legal security.  License your software and pepper it with threatening
+statements like ``This is unpublished proprietary software of XYZ Corp.
+Your access to it does not give you permission to use it blah blah
+blah.''  We are not lawyers, of course, so you should see a lawyer if
+you want to be sure your license's wording will stand up in court.</P>
+<P>
+<H2><A NAME="how can i compile my perl program into byte code or c">How can I compile my Perl program into byte code or C?</A></H2>
+<P>Malcolm Beattie has written a multifunction backend compiler,
+available from CPAN, that can do both these things.  It is included
+in the perl5.005 release, but is still considered experimental.
+This means it's fun to play with if you're a programmer but not
+really for people looking for turn-key solutions.</P>
+<P>Merely compiling into C does not in and of itself guarantee that your
+code will run very much faster.  That's because except for lucky cases
+where a lot of native type inferencing is possible, the normal Perl
+run-time system is still present and so your program will take just as
+long to run and be just as big.  Most programs save little more than
+compilation time, leaving execution no more than 10-30% faster.  A few
+rare programs actually benefit significantly (even running several times
+faster), but this takes some tweaking of your code.</P>
+<P>You'll probably be astonished to learn that the current version of the
+compiler generates a compiled form of your script whose executable is
+just as big as the original perl executable, and then some.  That's
+because as currently written, all programs are prepared for a full
+<A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> statement.  You can tremendously reduce this cost by building a
+shared <EM>libperl.so</EM> library and linking against that.  See the
+<EM>INSTALL</EM> podfile in the Perl source distribution for details.  If
+you link your main perl binary with this, it will make it minuscule.
+For example, on one author's system, <EM>/usr/bin/perl</EM> is only 11k in
+size!</P>
+<P>In general, the compiler will do nothing to make a Perl program smaller,
+faster, more portable, or more secure.  In fact, it can make your
+situation worse.  The executable will be bigger, your VM system may take
+longer to load the whole thing, the binary is fragile and hard to fix,
+and compilation never stopped software piracy in the form of crackers,
+viruses, or bootleggers.  The real advantage of the compiler is merely
+packaging, and once you see the size of what it makes (well, unless
+you use a shared <EM>libperl.so</EM>), you'll probably want a complete
+Perl install anyway.</P>
+<P>
+<H2><A NAME="how can i compile perl into java">How can I compile Perl into Java?</A></H2>
+<P>You can also integrate Java and Perl with the
+Perl Resource Kit from O'Reilly and Associates.  See
+<A HREF="http://www.oreilly.com/catalog/prkunix/">http://www.oreilly.com/catalog/prkunix/</A> .</P>
+<P>Perl 5.6 comes with Java Perl Lingo, or JPL.  JPL, still in
+development, allows Perl code to be called from Java.  See jpl/README
+in the Perl source tree.</P>
+<P>
+<H2><A NAME="how can i get #!perl to work on [msdos,nt,...]">How can I get <CODE>#!perl</CODE> to work on [MS-DOS,NT,...]?</A></H2>
+<P>For OS/2 just use</P>
+<PRE>
+    extproc perl -S -your_switches</PRE>
+<P>as the first line in <CODE>*.cmd</CODE> file (<A HREF="../../lib/Pod/perlrun.html#item_%2DS"><CODE>-S</CODE></A> due to a bug in cmd.exe's
+`extproc' handling).  For DOS one should first invent a corresponding
+batch file and codify it in <CODE>ALTERNATIVE_SHEBANG</CODE> (see the
+<EM>INSTALL</EM> file in the source distribution for more information).</P>
+<P>The Win95/NT installation, when using the ActiveState port of Perl,
+will modify the Registry to associate the <CODE>.pl</CODE> extension with the
+perl interpreter.  If you install another port, perhaps even building
+your own Win95/NT Perl from the standard sources by using a Windows port
+of gcc (e.g., with cygwin or mingw32), then you'll have to modify
+the Registry yourself.  In addition to associating <CODE>.pl</CODE> with the
+interpreter, NT people can use: <CODE>SET PATHEXT=%PATHEXT%;.PL</CODE> to let them
+run the program <CODE>install-linux.pl</CODE> merely by typing <CODE>install-linux</CODE>.</P>
+<P>Macintosh Perl programs will have the appropriate Creator and
+Type, so that double-clicking them will invoke the Perl application.</P>
+<P><EM>IMPORTANT!</EM>: Whatever you do, PLEASE don't get frustrated, and just
+throw the perl interpreter into your cgi-bin directory, in order to
+get your programs working for a web server.  This is an EXTREMELY big
+security risk.  Take the time to figure out how to do it correctly.</P>
+<P>
+<H2><A NAME="can i write useful perl programs on the command line">Can I write useful Perl programs on the command line?</A></H2>
+<P>Yes.  Read <A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A> for more information.  Some examples follow.
+(These assume standard Unix shell quoting rules.)</P>
+<PRE>
+    # sum first and last fields
+    perl -lane 'print $F[0] + $F[-1]' *</PRE>
+<PRE>
+    # identify text files
+    perl -le 'for(@ARGV) {print if -f &amp;&amp; -T _}' *</PRE>
+<PRE>
+    # remove (most) comments from C program
+    perl -0777 -pe 's{/\*.*?\*/}{}gs' foo.c</PRE>
+<PRE>
+    # make file a month younger than today, defeating reaper daemons
+    perl -e '$X=24*60*60; utime(time(),time() + 30 * $X,@ARGV)' *</PRE>
+<PRE>
+    # find first unused uid
+    perl -le '$i++ while getpwuid($i); print $i'</PRE>
+<PRE>
+    # display reasonable manpath
+    echo $PATH | perl -nl -072 -e '
+        s![^/+]*$!man!&amp;&amp;-d&amp;&amp;!$s{$_}++&amp;&amp;push@m,$_;END{print&quot;@m&quot;}'</PRE>
+<P>OK, the last one was actually an Obfuscated Perl Contest entry. :-)</P>
+<P>
+<H2><A NAME="why don't perl oneliners work on my dos/mac/vms system">Why don't Perl one-liners work on my DOS/Mac/VMS system?</A></H2>
+<P>The problem is usually that the command interpreters on those systems
+have rather different ideas about quoting than the Unix shells under
+which the one-liners were created.  On some systems, you may have to
+change single-quotes to double ones, which you must <EM>NOT</EM> do on Unix
+or Plan9 systems.  You might also have to change a single % to a %%.</P>
+<P>For example:</P>
+<PRE>
+    # Unix
+    perl -e 'print &quot;Hello world\n&quot;'</PRE>
+<PRE>
+    # DOS, etc.
+    perl -e &quot;print \&quot;Hello world\n\&quot;&quot;</PRE>
+<PRE>
+    # Mac
+    print &quot;Hello world\n&quot;
+     (then Run &quot;Myscript&quot; or Shift-Command-R)</PRE>
+<PRE>
+    # VMS
+    perl -e &quot;print &quot;&quot;Hello world\n&quot;&quot;&quot;</PRE>
+<P>The problem is that none of these examples are reliable: they depend on the
+command interpreter.  Under Unix, the first two often work. Under DOS,
+it's entirely possible that neither works.  If 4DOS was the command shell,
+you'd probably have better luck like this:</P>
+<PRE>
+  perl -e &quot;print &lt;Ctrl-x&gt;&quot;Hello world\n&lt;Ctrl-x&gt;&quot;&quot;</PRE>
+<P>Under the Mac, it depends which environment you are using.  The MacPerl
+shell, or MPW, is much like Unix shells in its support for several
+quoting variants, except that it makes free use of the Mac's non-ASCII
+characters as control characters.</P>
+<P>Using qq(), q(), and qx(), instead of ``double quotes'', 'single
+quotes', and `backticks`, may make one-liners easier to write.</P>
+<P>There is no general solution to all of this.  It is a mess, pure and
+simple.  Sucks to be away from Unix, huh? :-)</P>
+<P>[Some of this answer was contributed by Kenneth Albanowski.]</P>
+<P>
+<H2><A NAME="where can i learn about cgi or web programming in perl">Where can I learn about CGI or Web programming in Perl?</A></H2>
+<P>For modules, get the CGI or LWP modules from CPAN.  For textbooks,
+see the two especially dedicated to web stuff in the question on
+books.  For problems and questions related to the web, like ``Why
+do I get 500 Errors'' or ``Why doesn't it run from the browser right
+when it runs fine on the command line'', see these sources:</P>
+<PRE>
+    WWW Security FAQ
+        <A HREF="http://www.w3.org/Security/Faq/">http://www.w3.org/Security/Faq/</A></PRE>
+<PRE>
+    Web FAQ
+        <A HREF="http://www.boutell.com/faq/">http://www.boutell.com/faq/</A></PRE>
+<PRE>
+    CGI FAQ
+        <A HREF="http://www.webthing.com/tutorials/cgifaq.html">http://www.webthing.com/tutorials/cgifaq.html</A></PRE>
+<PRE>
+    HTTP Spec
+        <A HREF="http://www.w3.org/pub/WWW/Protocols/HTTP/">http://www.w3.org/pub/WWW/Protocols/HTTP/</A></PRE>
+<PRE>
+    HTML Spec
+        <A HREF="http://www.w3.org/TR/REC-html40/">http://www.w3.org/TR/REC-html40/</A>
+        <A HREF="http://www.w3.org/pub/WWW/MarkUp/">http://www.w3.org/pub/WWW/MarkUp/</A></PRE>
+<PRE>
+    CGI Spec
+        <A HREF="http://www.w3.org/CGI/">http://www.w3.org/CGI/</A></PRE>
+<PRE>
+    CGI Security FAQ
+        <A HREF="http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt">http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt</A></PRE>
+<P>
+<H2><A NAME="where can i learn about objectoriented perl programming">Where can I learn about object-oriented Perl programming?</A></H2>
+<P>A good place to start is <A HREF="../../lib/Pod/perltoot.html">the perltoot manpage</A>, and you can use <A HREF="../../lib/Pod/perlobj.html">the perlobj manpage</A>,
+<A HREF="../../lib/Pod/perlboot.html">the perlboot manpage</A>, and <A HREF="../../lib/Pod/perlbot.html">the perlbot manpage</A> for reference.  Perltoot didn't come out
+until the 5.004 release; you can get a copy (in pod, html, or
+postscript) from <A HREF="http://www.perl.com/CPAN/doc/FMTEYEWTK/">http://www.perl.com/CPAN/doc/FMTEYEWTK/</A> .</P>
+<P>
+<H2><A NAME="where can i learn about linking c with perl [h2xs, xsubpp]">Where can I learn about linking C with Perl? [h2xs, xsubpp]</A></H2>
+<P>If you want to call C from Perl, start with <A HREF="../../lib/Pod/perlxstut.html">the perlxstut manpage</A>,
+moving on to <A HREF="../../lib/Pod/perlxs.html">the perlxs manpage</A>, <EM>xsubpp</EM>, and <A HREF="../../lib/Pod/perlguts.html">the perlguts manpage</A>.  If you want to
+call Perl from C, then read <A HREF="../../lib/Pod/perlembed.html">the perlembed manpage</A>, <A HREF="../../lib/Pod/perlcall.html">the perlcall manpage</A>, and
+<A HREF="../../lib/Pod/perlguts.html">the perlguts manpage</A>.  Don't forget that you can learn a lot from looking at
+how the authors of existing extension modules wrote their code and
+solved their problems.</P>
+<P>
+<H2><A NAME="i've read perlembed, perlguts, etc., but i can't embed perl in my c program; what am i doing wrong">I've read perlembed, perlguts, etc., but I can't embed perl in
+my C program; what am I doing wrong?</A></H2>
+<P>Download the ExtUtils::Embed kit from CPAN and run `make test'.  If
+the tests pass, read the pods again and again and again.  If they
+fail, see <EM>perlbug</EM> and send a bug report with the output of
+<CODE>make test TEST_VERBOSE=1</CODE> along with <CODE>perl -V</CODE>.</P>
+<P>
+<H2><A NAME="when i tried to run my script, i got this message. what does it mean">When I tried to run my script, I got this message. What does it
+mean?</A></H2>
+<P>A complete list of Perl's error messages and warnings with explanatory
+text can be found in <A HREF="../../lib/Pod/perldiag.html">the perldiag manpage</A>. You can also use the splain program
+(distributed with Perl) to explain the error messages:</P>
+<PRE>
+    perl program 2&gt;diag.out
+    splain [-v] [-p] diag.out</PRE>
+<P>or change your program to explain the messages for you:</P>
+<PRE>
+    use diagnostics;</PRE>
+<P>or</P>
+<PRE>
+    use diagnostics -verbose;</PRE>
+<P>
+<H2><A NAME="what's makemaker">What's MakeMaker?</A></H2>
+<P>This module (part of the standard Perl distribution) is designed to
+write a Makefile for an extension module from a Makefile.PL.  For more
+information, see <A HREF="../../lib/ExtUtils/MakeMaker.html">the ExtUtils::MakeMaker manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="author and copyright">AUTHOR AND COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-1999 Tom Christiansen and Nathan Torkington.
+All rights reserved.</P>
+<P>When included as an integrated part of the Standard Distribution
+of Perl or of its documentation (printed or otherwise), this works is
+covered under Perl's Artistic License.  For separate distributions of
+all or part of this FAQ outside of that, see <A HREF="../../lib/Pod/perlfaq.html">the perlfaq manpage</A>.</P>
+<P>Irrespective of its distribution, all code examples here are in the public
+domain.  You are permitted and encouraged to use this code and any
+derivatives thereof in your own programs for fun or for profit as you
+see fit.  A simple comment in the code giving credit to the FAQ would
+be courteous but is not required.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq3 - Programming Tools</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

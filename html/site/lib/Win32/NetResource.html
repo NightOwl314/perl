@@ -1,0 +1,243 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::NetResource - manage network resources in perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::NetResource - manage network resources in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#data types">DATA TYPES</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#note">NOTE</A></LI>
+		<LI><A HREF="#note">NOTE</A></LI>
+	</UL>
+
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::NetResource - manage network resources in perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Win32::NetResource;</PRE>
+<PRE>
+    $ShareInfo = {
+                    'path' =&gt; &quot;C:\\MyShareDir&quot;,
+                    'netname' =&gt; &quot;MyShare&quot;,
+                    'remark' =&gt; &quot;It is good to share&quot;,
+                    'passwd' =&gt; &quot;&quot;,
+                    'current-users' =&gt;0,
+                    'permissions' =&gt; 0,
+                    'maxusers' =&gt; -1,
+                    'type'  =&gt; 0,
+                    };
+</PRE>
+<PRE>
+
+    Win32::NetResource::NetShareAdd( $ShareInfo,$parm )
+        or die &quot;unable to add share&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module offers control over the network resources of Win32.Disks,
+printers etc can be shared over a network.</P>
+<P>
+<HR>
+<H1><A NAME="data types">DATA TYPES</A></H1>
+<P>There are two main data types required to control network resources.
+In Perl these are represented by hash types.</P>
+<DL>
+<DT><STRONG><A NAME="item_%NETRESOURCE">%NETRESOURCE</A></STRONG><BR>
+<DD>
+<PRE>
+        KEY                    VALUE
+</PRE>
+<PRE>
+
+        'Scope'         =&gt;  Scope of an Enumeration
+                            RESOURCE_CONNECTED,
+                            RESOURCE_GLOBALNET,
+                            RESOURCE_REMEMBERED.</PRE>
+<PRE>
+
+        'Type'          =&gt;  The type of resource to Enum
+                            RESOURCETYPE_ANY    All resources
+                            RESOURCETYPE_DISK    Disk resources
+                            RESOURCETYPE_PRINT    Print resources</PRE>
+<PRE>
+
+        'DisplayType'   =&gt;  The way the resource should be displayed.
+                            RESOURCEDISPLAYTYPE_DOMAIN    
+                            The object should be displayed as a domain.
+                            RESOURCEDISPLAYTYPE_GENERIC    
+                            The method used to display the object does not matter.
+                            RESOURCEDISPLAYTYPE_SERVER    
+                            The object should be displayed as a server.
+                            RESOURCEDISPLAYTYPE_SHARE    
+                            The object should be displayed as a sharepoint.</PRE>
+<PRE>
+
+        'Usage'         =&gt;  Specifies the Resources usage:
+                            RESOURCEUSAGE_CONNECTABLE
+                            RESOURCEUSAGE_CONTAINER.</PRE>
+<PRE>
+
+        'LocalName'     =&gt;  Name of the local device the resource is 
+                            connected to.</PRE>
+<PRE>
+
+        'RemoteName'    =&gt;  The network name of the resource.</PRE>
+<PRE>
+
+        'Comment'       =&gt;  A string comment.</PRE>
+<PRE>
+
+        'Provider'      =&gt;  Name of the provider of the resource.</PRE>
+</DL>
+<DL>
+<DT><STRONG><A NAME="item_%SHARE_INFO">%SHARE_INFO</A></STRONG><BR>
+<DD>
+This hash represents the SHARE_INFO_502 struct.
+<PRE>
+        KEY                    VALUE
+        'netname'        =&gt;    Name of the share.
+        'type'           =&gt;    type of share.
+        'remark'         =&gt;    A string comment.
+        'permissions'    =&gt;    Permissions value
+        'maxusers'       =&gt;    the max # of users.
+        'current-users'  =&gt;    the current # of users.
+        'path'           =&gt;    The path of the share.
+        'passwd'         =&gt;    A password if one is req'd</PRE>
+</DL>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="note">NOTE</A></H2>
+<P>All of the functions return FALSE (0) if they fail.</P>
+<DL>
+<DT><STRONG><A NAME="item_GetSharedResources"><CODE>GetSharedResources(\@Resources,dwType)</CODE></A></STRONG><BR>
+<DD>
+Creates a list in @Resources of %NETRESOURCE hash references.
+<P>The return value indicates whether there was an error in accessing
+any of the shared resources.  All the shared resources that were
+encountered (until the point of an error, if any) are pushed into
+@Resources as references to %NETRESOURCE hashes.  See example
+below.</P>
+<P></P>
+<DT><STRONG><A NAME="item_AddConnection"><CODE>AddConnection(\%NETRESOURCE,$Password,$UserName,$Connection)</CODE></A></STRONG><BR>
+<DD>
+Makes a connection to a network resource specified by %NETRESOURCE
+<P></P>
+<DT><STRONG><A NAME="item_CancelConnection"><CODE>CancelConnection($Name,$Connection,$Force)</CODE></A></STRONG><BR>
+<DD>
+Cancels a connection to a network resource connected to local device 
+$name.$Connection is either 1 - persistent connection or 0, non-persistent.
+<P></P>
+<DT><STRONG><A NAME="item_WNetGetLastError"><CODE>WNetGetLastError($ErrorCode,$Description,$Name)</CODE></A></STRONG><BR>
+<DD>
+Gets the Extended Network Error.
+<P></P>
+<DT><STRONG><A NAME="item_GetError">GetError( $ErrorCode )</A></STRONG><BR>
+<DD>
+Gets the last Error for a Win32::NetResource call.
+<P></P>
+<DT><STRONG><A NAME="item_GetUNCName">GetUNCName( $UNCName, $LocalPath );</A></STRONG><BR>
+<DD>
+Returns the UNC name of the disk share connected to $LocalPath in $UNCName.
+<P></P></DL>
+<P>
+<H2><A NAME="note">NOTE</A></H2>
+<P>$servername is optional for all the calls below. (if not given the
+local machine is assumed.)</P>
+<DL>
+<DT><STRONG><A NAME="item_NetShareAdd">NetShareAdd(\%SHARE,$parm_err,$servername = NULL )</A></STRONG><BR>
+<DD>
+Add a share for sharing.
+<P></P>
+<DT><STRONG><A NAME="item_NetShareCheck">NetShareCheck($device,$type,$servername = NULL )</A></STRONG><BR>
+<DD>
+Check if a share is available for connection.
+<P></P>
+<DT><STRONG><A NAME="item_NetShareDel">NetShareDel( $netname, $servername = NULL )</A></STRONG><BR>
+<DD>
+Remove a share from a machines list of shares.
+<P></P>
+<DT><STRONG><A NAME="item_NetShareGetInfo">NetShareGetInfo( $netname, \%SHARE,$servername=NULL )</A></STRONG><BR>
+<DD>
+Get the %SHARE_INFO information about the share $netname on the
+server $servername.
+<P></P>
+<DT><STRONG><A NAME="item_NetShareSetInfo">NetShareSetInfo( $netname,\%SHARE,$parm_err,$servername=NULL)</A></STRONG><BR>
+<DD>
+Set the information for share $netname.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<PRE>
+    #
+    # This example displays all the share points in the entire
+    # visible part of the network.
+    #</PRE>
+<PRE>
+    use strict;
+    use Win32::NetResource qw(:DEFAULT GetSharedResources GetError);
+    my $resources = [];
+    unless(GetSharedResources($resources, RESOURCETYPE_ANY)) {
+        my $err = undef;
+        GetError($err);
+        warn Win32::FormatMessage($err);
+    }</PRE>
+<PRE>
+    foreach my $href (@$resources) {
+        next if ($$href{DisplayType} != RESOURCEDISPLAYTYPE_SHARE);
+        print &quot;-----\n&quot;;
+        foreach( keys %$href){
+            print &quot;$_: $href-&gt;{$_}\n&quot;;
+        }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jesse Dougherty for Hip Communications.</P>
+<P>Additional general cleanups and bug fixes by Gurusamy Sarathy &lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::NetResource - manage network resources in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

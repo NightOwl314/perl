@@ -1,0 +1,106 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::Event - Use Win32 event objects from Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Event - Use Win32 event objects from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Event - Use Win32 event objects from Perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Win32::Event;</PRE>
+<PRE>
+        $event = Win32::Event-&gt;new($manual,$initial,$name);
+        $event-&gt;wait();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module allows access to the Win32 event objects.  The <A HREF="#item_wait"><CODE>wait</CODE></A>
+method and <CODE>wait_all</CODE> &amp; <CODE>wait_any</CODE> functions are inherited from the
+<A HREF="#win32::ipc">Win32::IPC</A> module.</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">$event = Win32::Event-&gt;new([$manual, [$initial, [$name]]])</A></STRONG><BR>
+<DD>
+Constructor for a new event object.  If <CODE>$manual</CODE> is true, you must
+manually reset the event after it is signalled (the default is false).
+If <CODE>$initial</CODE> is true, the initial state of the object is signalled
+(default false).  If <CODE>$name</CODE> is omitted, creates an unnamed event
+object.
+<P>If <CODE>$name</CODE> signifies an existing event object, then <CODE>$manual</CODE> and
+<CODE>$initial</CODE> are ignored and the object is opened.</P>
+<P></P>
+<DT><STRONG><A NAME="item_open">$event = Win32::Event-&gt;<CODE>open($name)</CODE></A></STRONG><BR>
+<DD>
+Constructor for opening an existing event object.
+<P></P>
+<DT><STRONG><A NAME="item_pulse">$event-&gt;pulse</A></STRONG><BR>
+<DD>
+Signal the <CODE>$event</CODE> and then immediately reset it.  If <CODE>$event</CODE> is a
+manual-reset event, releases all threads currently blocking on it.  If
+it's an auto-reset event, releases just one thread.
+<P>If no threads are waiting, just resets the event.</P>
+<P></P>
+<DT><STRONG><A NAME="item_reset">$event-&gt;reset</A></STRONG><BR>
+<DD>
+Reset the <CODE>$event</CODE> to nonsignalled.
+<P></P>
+<DT><STRONG><A NAME="item_set">$event-&gt;set</A></STRONG><BR>
+<DD>
+Set the <CODE>$event</CODE> to signalled.
+<P></P>
+<DT><STRONG><A NAME="item_wait">$event-&gt;<CODE>wait([$timeout])</CODE></A></STRONG><BR>
+<DD>
+Wait for <CODE>$event</CODE> to be signalled.  See <A HREF="#win32::ipc">Win32::IPC</A>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Christopher J. Madsen &lt;<EM><A HREF="mailto:chris_madsen@geocities.com">chris_madsen@geocities.com</A></EM>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Event - Use Win32 event objects from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

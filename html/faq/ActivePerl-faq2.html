@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+<title>perlwin32faq11 - Using PPM to install modules</title>
+<link rev="made" href="mailto:support@ActiveState.com">
+<meta name="GENERATOR" charset="iso-8859-1" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<link rel="STYLESHEET" href="../Active.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl FAQ2 - PPM</p>
+      </strong></td>
+  </tr>
+</table>
+<ul>
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#what_is_ppm">What is the Perl Package Manager (PPM)?</a></li>
+      <li><a href="#how_do_i_install_ppm">How do I install PPM?</a></li>
+      <li><a href="#running_ppm">How do I run PPM?</a></li>
+      <li><a href="#using_ppm">How do I use PPM?</a></li>
+      <li><a href="#repositories">Where are the package repositories?</a></li>
+      <li><a href="#how_to_make_ppm_distribution">How do I make a PPM package?</a></li>
+      <li><a href="#ppm_and_proxies">PPM, Proxies and Firewalls</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR_AND_COPYRIGHT">AUTHOR AND COPYRIGHT</a></li>
+</ul>
+<hr>
+<h1><a name="NAME">NAME</a></h1>
+<p>ActivePerl-faq2 - Using PPM to install modules</p>
+<hr>
+<h1><a name="DESCRIPTION">DESCRIPTION</a></h1>
+<p>How to install and upgrade modules for ActivePerl using PPM</p>
+<a name="what_is_ppm"></a>
+<hr>
+<h1>What is the Perl Package Manager (PPM)?</h1>
+<p>The Perl Package Manager (PPM) provides a command line interface for managing
+your Perl modules and extensions (packages). PPM allows you to access package
+repositories, install and remove packages from your system, and update packages
+you previously installed using PPM with the latest versions.</p>
+<a name="how_do_i_install_ppm"></a>
+<hr>
+<h1>How do I install PPM?</h1>
+<p>PPM is installed when you install ActivePerl.</p>
+<a name="running_ppm"></a>
+<hr>
+<h1>How do I run PPM?</h1>
+<p>Before you run PPM, you should be connected to the Internet. If your Internet
+connection is via a firewall or proxy, you should set the environment variable 'HTTP_proxy'
+to the name of this proxy server. If your proxy server requires a username and
+password, the environment variables 'HTTP_proxy_user' and 'HTTP_proxy_pass'
+should be set to these values. See <a href="#ppm_and_proxies">PPM, Proxies and
+Firewalls</a> for more information.</p>
+<p>PPM can then be run by typing 'ppm' in a command prompt window.</p>
+<a name="using_ppm"></a>
+<hr>
+<h1>How do I use PPM?</h1>
+<p>Quick start: at the PPM command prompt, type '<code>search</code>' to get a
+listing of all available packages, then type '<code>install &lt;packagename&gt;</code>',
+where <code>&lt;packagename&gt;</code> is the name of a package displayed by the
+'<code>search</code>' command. To list the packages you have previously
+installed using PPM, use the '<code>query</code>' command.</p>
+<p>If you find the listing of packages scrolls by too quickly, you may want to
+use the command '<code>set more &lt;number&gt;</code>' to pause the listing
+after &lt;number&gt; packages have been displayed. Use the '<code>set save</code>'
+command to save this configuration for future PPM sessions.</p>
+<p>By default, PPM will use the ActiveState package repository, but this too can
+be configured using the '<code>set</code>' command. See below in <a href="#repositories">Where
+are the package repositories?</a>.</p>
+<p>Below is a listing of key PPM commands (you can type '<code>help
+&lt;command&gt;</code>' at the PPM prompt for usage details for a particular
+&lt;command&gt;). Items in [brackets] are optional.</p>
+<table cellpadding="5">
+  <tr>
+    <td bgcolor="#454545"><font color="#FFFFFF"><b>Command</b></font></td>
+    <td bgcolor="#454545"><font color="#FFFFFF"><b>Function</b></font></td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>genconfig</b></td>
+    <td bgcolor="#E5E4F0">prints a minimal PPM configuration file to STDOUT
+      [Note: genconfig only works from the command-line]</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>help [command]</b></td>
+    <td bgcolor="#E5E4F0">lists available commands, or help on 'command'.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>info [package1...]</b></td>
+    <td bgcolor="#E5E4F0">prints a summary of installed packages.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>install package1 [package2...]</b></td>
+    <td bgcolor="#E5E4F0">installs specified packages.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>quit</b></td>
+    <td bgcolor="#E5E4F0">exits the program.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>query [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists installed packages, or packages containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>query /abstract [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists descriptions of installed packages, or package
+      descriptions containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>remove package1 [package2...]</b></td>
+    <td bgcolor="#E5E4F0">removes the specified packages from the system.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>search [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists available packages, or packages containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>search /abstract [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists descriptions of available packages, or package
+      descriptions containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>set</b></td>
+    <td bgcolor="#E5E4F0">set/display current options.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>set save</b></td>
+    <td bgcolor="#E5E4F0">save current options.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>verify [package1...]</b></td>
+    <td bgcolor="#E5E4F0">verifies currently installed packages are up to date.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>verify /upgrade [package1...]</b></td>
+    <td bgcolor="#E5E4F0">installs available package upgrades.</td>
+  </tr>
+</table>
+<p>A pattern is a search string just like the regular expressions - for example
+if you search for with this command</p>
+<blockquote>
+  <p>search ODBC|DBI</p>
+</blockquote>
+<p>(which means <i>'search for packages in which the characters ODBC and/or the
+characters DBI are present in that order'</i>) you get a result like this</p>
+<blockquote>
+  <p>Apache-DBI<br>
+  DBD-ODBC<br>
+  DBI<br>
+  FindBin<br>
+  Win32-ODBC</p>
+</blockquote>
+<p>Note that if you use 'search /abstract [pattern]' the search will only
+include the ABSTRACT section of the package files.</p>
+<a name="repositories"></a>
+<hr>
+<h1>Where are the package repositories?</h1>
+<p>By default, PPM will use the ActiveState package repository, but there are
+other repositories on the Internet. At the moment there are these repositories:</p>
+<p><b>Note: most of these repositories are for ActivePerl 5xx builds only, and
+are not compatible with ActivePerl 6xx builds.</b></p>
+<blockquote>
+  <table border="0" cellspacing="10">
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://www.ActiveState.com/PPMPackages/5.6">http://www.ActiveState.com/PPMPackages/5.6</a></td>
+      <td valign="top" align="left" width="50%">The default package repository
+        from ActiveState</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://Jenda.Krynicky.cz/perl/">http://Jenda.Krynicky.cz/perl</a></td>
+      <td valign="top" align="left" width="50%">Jan Krynicky's package
+        repository</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://www.roth.net/perl/packages/">http://www.roth.net/perl/packages/</a></td>
+      <td valign="top" align="left" width="50%">Roth Consulting's package
+        repository</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://www.xray.mpe.mpg.de/~ach/ptk/ppm">http://www.xray.mpe.mpg.de/~ach/ptk/ppm</a></td>
+      <td valign="top" align="left" width="50%">Achim Bohnet's package
+        repository</td>
+    </tr>
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://rto.dk/packages/">http://rto.dk/packages/</a></td>
+      <td valign="top" align="left" width="50%">RTO's packages repository
+        (mostly mirrors of the above)</td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <hr width="50%">
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" align="left" width="50%"><a href="http://www.fastnetltd.ndirect.co.uk/Perl/zips/">http://www.fastnetltd.ndirect.co.uk/Perl/zips/</a></td>
+      <td valign="top" align="left" width="50%">Fastnet Software Ltd's packages
+        - not directly accessible from PPM at present</td>
+    </tr>
+  </table>
+</blockquote>
+<p>To use these package repositories you start PPM and at the prompt type</p>
+<blockquote>
+  <p>set repository <i>NAME</i> <i>URL</i></p>
+</blockquote>
+<p>where <i>NAME</i> is a name by which you want to reference the repository
+from PPM and <i>URL</i> is the URL to the repository. You could for example type</p>
+<blockquote>
+  <p>set repository JENDA http://Jenda.Krynicky.cz/perl</p>
+</blockquote>
+<p>The next time you do a 'search' you will not only search the ActiveState
+package repository but also the repositories you have added. Before you exit PPM
+you should save the changes to the configuration by issuing the command 'set
+save'.</p>
+<a name="how_to_make_ppm_distribution"></a>
+<hr>
+<h1>How do I make a PPM package?</h1>
+<p>If you want to make a PPM package for use on other machine you can do it like
+this:</p>
+<p>Specify the AUTHOR and ABSTRACT parameters in the Makefile.PL. However you
+should only pass them to WriteMakefile if the version of the perl is greater
+than 5.005 - older perls do not have these parameters added and do not expect to
+see them. This is an example Makefile.PL:</p>
+<blockquote>
+  <p><code>use ExtUtils::MakeMaker;<br>
+  # See lib/ExtUtils/MakeMaker.pm for details of how to influence<br>
+  # the contents of the Makefile that is written.<br>
+  WriteMakefile(<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;'NAME' =&gt; 'Term::Control',<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;'VERSION_FROM' =&gt; 'Control.pm', # finds $VERSION<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;($] ge '5.005') ? (<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'AUTHOR' =&gt; 'Johnny Doel (johnny@doel.org)',<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'ABSTRACT' =&gt; 'Control the
+  IO for terminals',<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;) : (),<br>
+  );</code></p>
+</blockquote>
+<p>Then you make the archive with the commands</p>
+<blockquote>
+  <p><code>perl Makefile.PL<br>
+  nmake</code></p>
+</blockquote>
+<p>The resulting files are placed in the blib directory that is created when you
+run nmake. These files should be packed into an archive like this:</p>
+<blockquote>
+  <p><code>tar cvf <i>package</i>.tar blib<br>
+  gzip --best <i>package</i>.tar</code></p>
+</blockquote>
+<p>You now have an archive called <i>package</i>.tar.gz. Then you generate the
+PPD file by:</p>
+<blockquote>
+  <p><code>nmake ppd</code></p>
+</blockquote>
+<p>You have to edit the resulting PPD file and add the location of the package
+archive into &lt;CODEBASE HREF=&quot;&quot; /&gt;. The location is relative to
+the PPD file.</p>
+<p>You can get nmake from <a href="ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe">ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe</a>.
+You can get tar and gzip from <a href="http://www.itribe.net/virtunix/">http://www.itribe.net/virtunix/</a>.</p>
+<hr>
+<a name="ppm_and_proxies"></a>
+<h1>PPM, Proxies and Firewalls</h1>
+<p>If you use a proxy server or firewall, you might have trouble running PPM.
+Here is the solution.</p>
+<blockquote>
+  <p><b><i>NOTE</i></b>: If none of the changes in this document work for you,
+  you may download individual packages from <a href="http://www.activestate.com/PPMpackages/5.6/zips">here
+  [ActivePerl 613 and later]</a> or <a href="http://www.activestate.com/PPMpackages/5.005/zips">here
+  [ActivePerl 522 and earlier]</a> and install them according to the directions
+  in the README file contained within the ZIP file. If you want, you can also
+  keep a local repository, with several .ppd files in a permanent repository
+  directory, and their .tar.gz files in an <i>x86</i> directory beneath that.</p>
+</blockquote>
+<ol start="1">
+  <li>
+    <p><b>Set Environment Vars</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>Up to three environment variables need to be set.</p>
+</blockquote>
+<blockquote>
+  <p><strong>Under Windows NT<br>
+  </strong>Right click on &quot;My Computer&quot;, click on
+  &quot;properties&quot;, select the &quot;environment&quot; tab. These are your
+  environment settings. Make the following changes:<br>
+  <br>
+  </p>
+  <ol>
+    <li>Add the setting HTTP_proxy, with your proxy name as the value (<em><strong>you
+      must include &quot;http://&quot;</strong></em> ), followed by a colon and
+      the proxy port, if applicable; e.g., &quot;http://proxy:8080&quot;</li>
+    <li>If you require a user name and/or password to access your proxy, add the
+      settings HTTP_proxy_user and HTTP_proxy_pass, with your user name and
+      password as the respective values</li>
+    <li style="list-style: none"><br>
+    </li>
+  </ol>
+</blockquote>
+<blockquote>
+  <p><strong>Under Windows 95<br>
+  </strong>In your AUTOEXEC.BAT file, place the following lines then reboot so
+  the changes can take effect:</p>
+</blockquote>
+<blockquote>
+  <ol start="1">
+    <li>SET HTTP_proxy=&lt;your proxy server (<strong><em>you must include
+      &quot;http://&quot;</em></strong> &gt;, followed by a colon and the proxy
+      port, if applicable; e.g., SET HTTP_proxy=http://proxy:8080</li>
+    <li>SET HTTP_proxy_user=&lt;your user name&gt; (if required)</li>
+    <li>SET HTTP_proxy_pass=&lt;your password&gt; (if required)<br>
+      <br>
+    </li>
+  </ol>
+</blockquote>
+<ol start="2">
+  <li>
+    <p><b>Try using PPM</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>With your internet connection active, try using PPM again. Try to install a
+  small package, like File-Slurp. You'll know that it still fails if you see an
+  error stating that it can't find a ppd file for the specified package.</p>
+</blockquote>
+<ol start="3">
+  <li>
+    <p><b>Further Information and Help</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>If there were problems with any of the above hints, please see <a href="../readme.html#More_Info">here</a>
+  on how to get further help.</p>
+</blockquote>
+<hr>
+<h1><a name="AUTHOR_AND_COPYRIGHT">AUTHOR AND COPYRIGHT</a></h1>
+<p>This FAQ was originally assembled and maintained by Evangelo Prodromou. It
+has been revised and updated by Brian Jepson of O'Reilly &amp; Associates, David
+Grove, David Dmytryshyn, and Murray Nesbitt of ActiveState, Henning Michael Møller-Nielsen
+of RTO, Kevin Meltzer, and David Sparks of ActiveState.</p>
+<p>This FAQ is in the public domain. If you use it, however, please ensure that
+you give credit to the original authors.</p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl FAQ</p>
+      </strong></td>
+  </tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+
+<HTML>
+<HEAD>
+<TITLE>lib - manipulate @INC at compile time</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;lib - manipulate @INC at compile time</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#adding directories to @inc">Adding directories to @INC</A></LI>
+		<LI><A HREF="#deleting directories from @inc">Deleting directories from @INC</A></LI>
+		<LI><A HREF="#restoring original @inc">Restoring original @INC</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>lib - manipulate @INC at compile time</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use lib LIST;</PRE>
+<PRE>
+    no lib LIST;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a small simple module which simplifies the manipulation of @INC
+at compile time.</P>
+<P>It is typically used to add extra directories to perl's search path so
+that later <A HREF="../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> or <A HREF="../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> statements will find modules which are
+not located on perl's default search path.</P>
+<P>
+<H2><A NAME="adding directories to @inc">Adding directories to @INC</A></H2>
+<P>The parameters to <CODE>use lib</CODE> are added to the start of the perl search
+path. Saying</P>
+<PRE>
+    use lib LIST;</PRE>
+<P>is <EM>almost</EM> the same as saying</P>
+<PRE>
+    BEGIN { unshift(@INC, LIST) }</PRE>
+<P>For each directory in LIST (called $dir here) the lib module also
+checks to see if a directory called $dir/$archname/auto exists.
+If so the $dir/$archname directory is assumed to be a corresponding
+architecture specific directory and is added to @INC in front of $dir.</P>
+<P>To avoid memory leaks, all trailing duplicate entries in @INC are
+removed.</P>
+<P>
+<H2><A NAME="deleting directories from @inc">Deleting directories from @INC</A></H2>
+<P>You should normally only add directories to @INC.  If you need to
+delete directories from @INC take care to only delete those which you
+added yourself or which you are certain are not needed by other modules
+in your script.  Other modules may have added directories which they
+need for correct operation.</P>
+<P>The <CODE>no lib</CODE> statement deletes all instances of each named directory
+from @INC.</P>
+<P>For each directory in LIST (called $dir here) the lib module also
+checks to see if a directory called $dir/$archname/auto exists.
+If so the $dir/$archname directory is assumed to be a corresponding
+architecture specific directory and is also deleted from @INC.</P>
+<P>
+<H2><A NAME="restoring original @inc">Restoring original @INC</A></H2>
+<P>When the lib module is first loaded it records the current value of @INC
+in an array <CODE>@lib::ORIG_INC</CODE>. To restore @INC to that value you
+can say</P>
+<PRE>
+    @INC = @lib::ORIG_INC;</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>FindBin - optional module which deals with paths relative to the source file.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tim Bunce, 2nd June 1995.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;lib - manipulate @INC at compile time</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

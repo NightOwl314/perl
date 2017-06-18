@@ -1,0 +1,83 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::Plainer - Perl extension for converting Pod to old style Pod.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Plainer - Perl extension for converting Pod to old style Pod.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#export">EXPORT</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Plainer - Perl extension for converting Pod to old style Pod.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Pod::Plainer;</PRE>
+<PRE>
+  my $parser = Pod::Plainer -&gt; new ();
+  $parser -&gt; parse_from_filehandle(\*STDIN);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Pod::Plainer uses Pod::Parser which takes Pod with the (new)
+'C&lt;&lt; .. &gt;&gt;' constructs
+and returns the <CODE>old(er)</CODE> style with just 'C&lt;&gt;';
+'&lt;' and '&gt;' are replaced by 'E&lt;lt&gt;' and 'E&lt;gt&gt;'.</P>
+<P>This can be used to pre-process Pod before using tools which do not
+recognise the new style Pods.</P>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Robin Barker, <A HREF="mailto:rmb1@cise.npl.co.uk">rmb1@cise.npl.co.uk</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Plainer - Perl extension for converting Pod to old style Pod.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

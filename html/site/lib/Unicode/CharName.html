@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<TITLE>Unicode::CharName - Look up Unicode character names</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Unicode::CharName - Look up Unicode character names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Unicode::CharName - Look up Unicode character names</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Unicode::CharName qw(uname ublock);
+ print uname(ord('%')), &quot;\n&quot;;
+ print ublock(0x0300), &quot;\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provide a two functions named <CODE>uname()</CODE> and ublock().  The
+<CODE>uname()</CODE> function will return the Unicode character name for the given
+code (a number between 0 and 0x10FFFF).  Unicode character names are
+written in upper-case ASCII letters, and are strings like:</P>
+<PRE>
+  LATIN CAPITAL LETTER A
+  LATIN SMALL LETTER A WITH RING ABOVE
+  CJK UNIFIED IDEOGRAPH 7C80
+  HANGUL SYLLABLE PWILH</PRE>
+<P>The <CODE>ublock()</CODE> will return the name of the Unicode
+character block that the given character belongs to.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Unicode/String.html">the Unicode::String manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1997 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>Name table extracted from the Unicode 2.0 Character
+Database. Copyright (c) 1991-1996 Unicode, Inc. All Rights reserved.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Unicode::CharName - Look up Unicode character names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

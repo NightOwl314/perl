@@ -1,0 +1,237 @@
+
+<HTML>
+<HEAD>
+<TITLE>Thread - manipulate threads in Perl</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread - manipulate threads in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#caveat">CAVEAT</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#limitations">LIMITATIONS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Thread - manipulate threads in Perl (EXPERIMENTAL, subject to change)</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>NOTE: The Thread extension requires Perl to be built in a particular
+way to enable the older 5.005 threading model.  ActivePerl is not built
+this way, which means this extension will not work under ActivePerl.
+If you wish to use the 5.005 threading model, you will need to compile
+Perl from the sources to enable this feature.</LI>
+</UL>
+</UL>
+
+<HR>
+<H1><A NAME="caveat">CAVEAT</A></H1>
+<P>The Thread extension requires Perl to be built in a particular way to
+enable the older 5.005 threading model.  Just to confuse matters, there
+is an alternate threading model known as ``ithreads'' that does NOT
+support this extension.  If you are using a binary distribution such
+as ActivePerl that is built with ithreads support, this extension CANNOT
+be used.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Thread;</PRE>
+<PRE>
+    my $t = new Thread \&amp;start_sub, @start_args;</PRE>
+<PRE>
+    $result = $t-&gt;join;
+    $result = $t-&gt;eval;
+    $t-&gt;detach;</PRE>
+<PRE>
+    if($t-&gt;equal($another_thread)) {
+        # ...
+    }</PRE>
+<PRE>
+    my $tid = Thread-&gt;self-&gt;tid; 
+    my $tlist = Thread-&gt;list;</PRE>
+<PRE>
+    lock($scalar);
+    yield();</PRE>
+<PRE>
+    use Thread 'async';</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+    WARNING: Threading is an experimental feature.  Both the interface
+    and implementation are subject to change drastically.  In fact, this
+    documentation describes the flavor of threads that was in version
+    5.005.  Perl 5.6.0 and later have the beginnings of support for
+    interpreter threads, which (when finished) is expected to be
+    significantly different from what is described here.  The information
+    contained here may therefore soon be obsolete.  Use at your own risk!</PRE>
+<P>The <CODE>Thread</CODE> module provides multithreading support for perl.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new_%5C%26start_sub">new \&amp;start_sub</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_new_%5C%26start_sub%2C_LIST">new \&amp;start_sub, LIST</A></STRONG><BR>
+<DD>
+<CODE>new</CODE> starts a new thread of execution in the referenced subroutine. The
+optional list is passed as parameters to the subroutine. Execution
+continues in both the subroutine and the code after the <CODE>new</CODE> call.
+<P><CODE>new Thread</CODE> returns a thread object representing the newly created
+thread.</P>
+<P></P>
+<DT><STRONG><A NAME="item_lock">lock VARIABLE</A></STRONG><BR>
+<DD>
+<A HREF="#item_lock"><CODE>lock</CODE></A> places a lock on a variable until the lock goes out of scope.  If
+the variable is locked by another thread, the <A HREF="#item_lock"><CODE>lock</CODE></A> call will block until
+it's available. <A HREF="#item_lock"><CODE>lock</CODE></A> is recursive, so multiple calls to <A HREF="#item_lock"><CODE>lock</CODE></A> are
+safe--the variable will remain locked until the outermost lock on the
+variable goes out of scope.
+<P>Locks on variables only affect <A HREF="#item_lock"><CODE>lock</CODE></A> calls--they do <EM>not</EM> affect normal
+access to a variable. (Locks on subs are different, and covered in a bit)
+If you really, <EM>really</EM> want locks to block access, then go ahead and tie
+them to something and manage this yourself. This is done on purpose. While
+managing access to variables is a good thing, perl doesn't force you out of
+its living room...</P>
+<P>If a container object, such as a hash or array, is locked, all the elements
+of that container are not locked. For example, if a thread does a <CODE>lock
+@a</CODE>, any other thread doing a <A HREF="#item_lock"><CODE>lock($a[12])</CODE></A> won't block.</P>
+<P>You may also <A HREF="#item_lock"><CODE>lock</CODE></A> a sub, using <CODE>lock &amp;sub</CODE>. Any calls to that sub from
+another thread will block until the lock is released. This behaviour is not
+equivalent to declaring the sub with the <CODE>locked</CODE> attribute.  The <CODE>locked</CODE>
+attribute serializes access to a subroutine, but allows different threads
+non-simultaneous access. <CODE>lock &amp;sub</CODE>, on the other hand, will not allow
+<EM>any</EM> other thread access for the duration of the lock.</P>
+<P>Finally, <A HREF="#item_lock"><CODE>lock</CODE></A> will traverse up references exactly <EM>one</EM> level.
+<A HREF="#item_lock"><CODE>lock(\$a)</CODE></A> is equivalent to <A HREF="#item_lock"><CODE>lock($a)</CODE></A>, while <A HREF="#item_lock"><CODE>lock(\\$a)</CODE></A> is not.</P>
+<P></P>
+<DT><STRONG><A NAME="item_async_BLOCK%3B">async BLOCK;</A></STRONG><BR>
+<DD>
+<CODE>async</CODE> creates a thread to execute the block immediately following
+it. This block is treated as an anonymous sub, and so must have a
+semi-colon after the closing brace. Like <CODE>new Thread</CODE>, <CODE>async</CODE> returns a
+thread object.
+<P></P>
+<DT><STRONG><A NAME="item_self">Thread-&gt;self</A></STRONG><BR>
+<DD>
+The <A HREF="#item_self"><CODE>Thread-&gt;self</CODE></A> function returns a thread object that represents
+the thread making the <A HREF="#item_self"><CODE>Thread-&gt;self</CODE></A> call.
+<P></P>
+<DT><STRONG><A NAME="item_list">Thread-&gt;list</A></STRONG><BR>
+<DD>
+<A HREF="#item_list"><CODE>Thread-&gt;list</CODE></A> returns a list of thread objects for all running and
+finished but un-<A HREF="#item_join"><CODE>join</CODE></A>ed threads.
+<P></P>
+<DT><STRONG><A NAME="item_cond_wait_VARIABLE">cond_wait VARIABLE</A></STRONG><BR>
+<DD>
+The <CODE>cond_wait</CODE> function takes a <STRONG>locked</STRONG> variable as a parameter,
+unlocks the variable, and blocks until another thread does a <CODE>cond_signal</CODE>
+or <CODE>cond_broadcast</CODE> for that same locked variable. The variable that
+<CODE>cond_wait</CODE> blocked on is relocked after the <CODE>cond_wait</CODE> is satisfied.
+If there are multiple threads <CODE>cond_wait</CODE>ing on the same variable, all but
+one will reblock waiting to reaquire the lock on the variable. (So if
+you're only using <CODE>cond_wait</CODE> for synchronization, give up the lock as
+soon as possible)
+<P></P>
+<DT><STRONG><A NAME="item_cond_signal_VARIABLE">cond_signal VARIABLE</A></STRONG><BR>
+<DD>
+The <CODE>cond_signal</CODE> function takes a locked variable as a parameter and
+unblocks one thread that's <CODE>cond_wait</CODE>ing on that variable. If more than
+one thread is blocked in a <CODE>cond_wait</CODE> on that variable, only one (and
+which one is indeterminate) will be unblocked.
+<P>If there are no threads blocked in a <CODE>cond_wait</CODE> on the variable, the
+signal is discarded.</P>
+<P></P>
+<DT><STRONG><A NAME="item_cond_broadcast_VARIABLE">cond_broadcast VARIABLE</A></STRONG><BR>
+<DD>
+The <CODE>cond_broadcast</CODE> function works similarly to <CODE>cond_signal</CODE>.
+<CODE>cond_broadcast</CODE>, though, will unblock <STRONG>all</STRONG> the threads that are blocked
+in a <CODE>cond_wait</CODE> on the locked variable, rather than only one.
+<P></P>
+<DT><STRONG><A NAME="item_yield">yield</A></STRONG><BR>
+<DD>
+The <A HREF="#item_yield"><CODE>yield</CODE></A> function allows another thread to take control of the
+CPU. The exact results are implementation-dependent.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_join">join</A></STRONG><BR>
+<DD>
+<A HREF="#item_join"><CODE>join</CODE></A> waits for a thread to end and returns any values the thread exited
+with. <A HREF="#item_join"><CODE>join</CODE></A> will block until the thread has ended, though it won't block
+if the thread has already terminated.
+<P>If the thread being <A HREF="#item_join"><CODE>join</CODE></A>ed <A HREF="../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A>d, the error it died with will be
+returned at this time. If you don't want the thread performing the <A HREF="#item_join"><CODE>join</CODE></A>
+to die as well, you should either wrap the <A HREF="#item_join"><CODE>join</CODE></A> in an <A HREF="#item_eval"><CODE>eval</CODE></A> or use the
+<A HREF="#item_eval"><CODE>eval</CODE></A> thread method instead of <A HREF="#item_join"><CODE>join</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_eval">eval</A></STRONG><BR>
+<DD>
+The <A HREF="#item_eval"><CODE>eval</CODE></A> method wraps an <A HREF="#item_eval"><CODE>eval</CODE></A> around a <A HREF="#item_join"><CODE>join</CODE></A>, and so waits for a
+thread to exit, passing along any values the thread might have returned.
+Errors, of course, get placed into <A HREF="../lib/Pod/perlvar.html#item_%24%40"><CODE>$@</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_detach">detach</A></STRONG><BR>
+<DD>
+<A HREF="#item_detach"><CODE>detach</CODE></A> tells a thread that it is never going to be joined i.e.
+that all traces of its existence can be removed once it stops running.
+Errors in detached threads will not be visible anywhere - if you want
+to catch them, you should use $SIG{__DIE__} or something like that.
+<P></P>
+<DT><STRONG><A NAME="item_equal">equal</A></STRONG><BR>
+<DD>
+<A HREF="#item_equal"><CODE>equal</CODE></A> tests whether two thread objects represent the same thread and
+returns true if they do.
+<P></P>
+<DT><STRONG><A NAME="item_tid">tid</A></STRONG><BR>
+<DD>
+The <A HREF="#item_tid"><CODE>tid</CODE></A> method returns the tid of a thread. The tid is a monotonically
+increasing integer assigned when a thread is created. The main thread of a
+program will have a tid of zero, while subsequent threads will have tids
+assigned starting with one.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="limitations">LIMITATIONS</A></H1>
+<P>The sequence number used to assign tids is a simple integer, and no
+checking is done to make sure the tid isn't currently in use. If a program
+creates more than 2^32 - 1 threads in a single run, threads may be assigned
+duplicate tids. This limitation may be lifted in a future version of Perl.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../lib/attributes.html">the attributes manpage</A>, <A HREF="../lib/Thread/Queue.html">the Thread::Queue manpage</A>, <A HREF="../lib/Thread/Semaphore.html">the Thread::Semaphore manpage</A>, <A HREF="../lib/Thread/Specific.html">the Thread::Specific manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread - manipulate threads in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

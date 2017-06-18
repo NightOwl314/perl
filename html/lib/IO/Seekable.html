@@ -1,0 +1,124 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Seekable - supply seek based methods for I/O objects</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Seekable - supply seek based methods for I/O objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Seekable - supply seek based methods for I/O objects</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::Seekable;
+    package IO::Something;
+    @ISA = qw(IO::Seekable);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::Seekable</CODE> does not have a constructor of its own as it is intended to
+be inherited by other <CODE>IO::Handle</CODE> based objects. It provides methods
+which allow seeking of the file descriptors.</P>
+<DL>
+<DT><STRONG><A NAME="item_getpos">$io-&gt;getpos</A></STRONG><BR>
+<DD>
+Returns an opaque value that represents the current position of the
+IO::File, or <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if this is not possible (eg an unseekable stream such
+as a terminal, pipe or socket). If the <CODE>fgetpos()</CODE> function is available in
+your C library it is used to implements getpos, else perl emulates getpos
+using C's <CODE>ftell()</CODE> function.
+<P></P>
+<DT><STRONG><A NAME="item_setpos">$io-&gt;setpos</A></STRONG><BR>
+<DD>
+Uses the value of a previous getpos call to return to a previously visited
+position. Returns ``0 but true'' on success, <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on failure.
+<P></P></DL>
+<PRE>
+
+See L&lt;<A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>&gt; for complete descriptions of each of the following
+supported C&lt;IO::Seekable&gt; methods, which are just front ends for the
+corresponding built-in functions:</PRE>
+<DL>
+<DT><STRONG>$io-&gt;setpos ( POS, WHENCE )</STRONG><BR>
+<DD>
+Seek the IO::File to position POS, relative to WHENCE:
+<DL>
+<DT><STRONG><A NAME="item_0">WHENCE=0 (SEEK_SET)</A></STRONG><BR>
+<DD>
+POS is absolute position. (Seek relative to the start of the file)
+<P></P>
+<DT><STRONG><A NAME="item_1">WHENCE=1 (SEEK_CUR)</A></STRONG><BR>
+<DD>
+POS is an offset from the current position. (Seek relative to current)
+<P></P>
+<DT><STRONG>WHENCE=1 (SEEK_END)</STRONG><BR>
+<DD>
+POS is an offset from the end of the file. (Seek relative to end)
+<P></P></DL>
+<P>The SEEK_* constants can be imported from the <CODE>Fcntl</CODE> module if you
+don't wish to use the numbers <CODE>0</CODE> <A HREF="#item_1"><CODE>1</CODE></A> or <CODE>2</CODE> in your code.</P>
+<P>Returns <A HREF="#item_1"><CODE>1</CODE></A> upon success, <CODE>0</CODE> otherwise.</P>
+<DT><STRONG><A NAME="item_sysseek">$io-&gt;sysseek( POS, WHENCE )</A></STRONG><BR>
+<DD>
+Similar to $io-&gt;seek, but sets the IO::File's position using the system
+call <CODE>lseek(2)</CODE> directly, so will confuse most perl IO operators except
+sysread and syswrite (see <A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A> for full details)
+<P>Returns the new position, or <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on failure.  A position
+of zero is returned as the string <CODE>&quot;0 but true&quot;</CODE></P>
+<P></P>
+<DT><STRONG><A NAME="item_tell">$io-&gt;tell</A></STRONG><BR>
+<DD>
+Returns the IO::File's current position, or -1 on error.
+<P></P></DL>
+<PRE>
+
+=head1 SEE ALSO</PRE>
+<P><A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A>, 
+<A HREF="../../lib/Pod/perlop.html#i/o operators">I/O Operators in the perlop manpage</A>,
+<A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>
+<A HREF="../../lib/IO/File.html">the IO::File manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>Derived from FileHandle.pm by Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Seekable - supply seek based methods for I/O objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

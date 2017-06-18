@@ -1,0 +1,86 @@
+
+<HTML>
+<HEAD>
+<TITLE>base - Establish IS-A relationship with base class at compile time</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;base - Establish IS-A relationship with base class at compile time</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>base - Establish IS-A relationship with base class at compile time</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    package Baz;
+    use base qw(Foo Bar);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Roughly similar in effect to</P>
+<PRE>
+    BEGIN {
+        require Foo;
+        require Bar;
+        push @ISA, qw(Foo Bar);
+    }</PRE>
+<P>Will also initialize the %FIELDS hash if one of the base classes has
+it.  Multiple inheritance of %FIELDS is not supported.  The 'base'
+pragma will croak if multiple base classes have a %FIELDS hash.  See
+<A HREF="../lib/fields.html">the fields manpage</A> for a description of this feature.</P>
+<P>When strict 'vars' is in scope <EM>base</EM> also let you assign to @ISA
+without having to declare @ISA with the 'vars' pragma first.</P>
+<P>If any of the base classes are not loaded yet, <EM>base</EM> silently
+<A HREF="../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>s them.  Whether to <A HREF="../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> a base class package is
+determined by the absence of a global $VERSION in the base package.
+If $VERSION is not detected even after loading it, &lt;base&gt; will
+define $VERSION in the base package, setting it to the string
+<CODE>-1, set by base.pm</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>This module was introduced with Perl 5.004_04.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../lib/fields.html">the fields manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;base - Establish IS-A relationship with base class at compile time</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

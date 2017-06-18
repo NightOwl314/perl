@@ -1,0 +1,139 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::DBD::Metadata - Generate the code and data for some DBI metadata methods</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::DBD::Metadata - Generate the code and data for some DBI metadata methods</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#generating a getinfo package for a driver">Generating a GetInfo package for a driver</A></LI>
+	<LI><A HREF="#generating a typeinfo package for a driver">Generating a TypeInfo package for a driver</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>DBI::DBD::Metadata - Generate the code and data for some DBI metadata methods</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>The idea is to extract metadata information from a good quality
+ODBC driver and use it to generate code and data to use in your own
+DBI driver for the same database.</P>
+<P>For generating code to support the get_info method:</P>
+<PRE>
+  perl -MDBI::DBD::Metadata -e &quot;write_getinfo_pm('dbi:ODBC:dsn-name','user','pass','Driver')&quot;</PRE>
+<PRE>
+  perl -MDBI::DBD::Metadata -e write_getinfo_pm dbi:ODBC:foo_db username password Driver</PRE>
+<P>For generating code to support the type_info method:</P>
+<PRE>
+  perl -MDBI::DBD::Metadata -e &quot;write_typeinfo_pm('dbi:ODBC:dsn-name','user','pass','Driver')&quot;</PRE>
+<PRE>
+  perl -MDBI::DBD::Metadata -e write_typeinfo_pm dbi:ODBC:dsn-name user pass Driver</PRE>
+<P>Where <CODE>dbi:ODBC:dsn-name</CODE> is the connection to use to extract the
+data, and <CODE>Driver</CODE> is the name of the driver you want the code
+generated for (the driver name gets embedded into the output in
+many places).</P>
+<P>
+<HR>
+<H1><A NAME="generating a getinfo package for a driver">Generating a GetInfo package for a driver</A></H1>
+<P>The <CODE>write_getinfo_pm</CODE> in the DBI::DBD::Metadata module generates a
+DBD::Driver::GetInfo package on standard output.</P>
+<P>This method generates a DBD::Driver::GetInfo package from the data
+source you specified in the parameter list or in the environment
+variable DBI_DSN.
+DBD::Driver::GetInfo should help a DBD author implementing the DBI
+<CODE>get_info()</CODE> method.
+Because you are just creating this package, it's very unlikely that
+DBD::Driver already provides a good implementation for get_info().
+Thus you will probably connect via DBD::ODBC.</P>
+<P>Once you are sure that it is producing semi-sane data, you would
+typically redirect the standard output to lib/DBD/Driver/GetInfo.pm, and
+then hand edit the result.
+Do not forget to update your Makefile.PL and MANIFEST to include this as
+an extra PM file that should be installed.</P>
+<P>If you connect via DBD::ODBC, you should use version 0.38 or greater;</P>
+<P>Please take a critical look at the data returned!
+ODBC drivers vary dramatically in their quality.</P>
+<P>The generator assumes that most values are static and places these
+values directly in the %info hash.
+A few examples show the use of CODE references and the implementation
+via subroutines.
+It is very likely that you have to write additional subroutines for
+values depending on the session state or server version, e.g.
+SQL_DBMS_VER.</P>
+<P>A possible implementation of DBD::Driver::db::get_info() may look like:</P>
+<PRE>
+  sub get_info {
+    my($dbh, $info_type) = @_;
+    require DBD::Driver::GetInfo;
+    my $v = $DBD::Driver::GetInfo::info{int($info_type)};
+    $v = $v-&gt;($dbh) if ref $v eq 'CODE';
+    return $v;
+  }</PRE>
+<P>Please replace Driver (or ``&lt;foo&gt;'') with the name of your driver.
+Note that this stub function is generated for you by write_getinfo_pm
+function, but you must manually transfer the code to Driver.pm.</P>
+<P>
+<HR>
+<H1><A NAME="generating a typeinfo package for a driver">Generating a TypeInfo package for a driver</A></H1>
+<P>The <CODE>write_typeinfo_pm</CODE> function in the DBI::DBD::Metadata module generates
+on standard output the data needed for a driver's type_info_all method.
+It also provides default implementations of the type_info_all
+method for inclusion in the driver's main implementation file.</P>
+<P>The driver parameter is the name of the driver for which the methods
+will be generated; for the sake of examples, this will be ``Driver''.
+Typically, the dsn parameter will be of the form ``dbi:ODBC:odbc_dsn'',
+where the odbc_dsn is a DSN for one of the driver's databases.
+The user and pass parameters are the other optional connection
+parameters that will be provided to the DBI connect method.</P>
+<P>Once you are sure that it is producing semi-sane data, you would
+typically redirect the standard output to lib/DBD/Driver/TypeInfo.pm,
+and then hand edit the result if necessary.
+Do not forget to update your Makefile.PL and MANIFEST to include this as
+an extra PM file that should be installed.</P>
+<P>Please take a critical look at the data returned!
+ODBC drivers vary dramatically in their quality.</P>
+<P>The generator assumes that all the values are static and places these
+values directly in the %info hash.</P>
+<P>A possible implementation of DBD::Driver::type_info_all() may look like:</P>
+<PRE>
+  sub type_info_all {
+    my ($dbh) = @_;
+    require DBD::Driver::TypeInfo;
+    return $DBD::Driver::TypeInfo::type_info_all;
+  }</PRE>
+<P>Please replace Driver (or ``&lt;foo&gt;'') with the name of your driver.
+Note that this stub function is generated for you by the write_typeinfo
+function, but you must manually transfer the code to Driver.pm.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Jonathan Leffler &lt;<A HREF="mailto:jleffler@us.ibm.com">jleffler@us.ibm.com</A>&gt; (previously &lt;<A HREF="mailto:jleffler@informix.com">jleffler@informix.com</A>&gt;),
+Jochen Wiedmann &lt;<A HREF="mailto:joe@ispsoft.de">joe@ispsoft.de</A>&gt;,
+Steffen Goeldner &lt;<A HREF="mailto:s.goeldner@eurodata.de">s.goeldner@eurodata.de</A>&gt;,
+and Tim Bunce &lt;<A HREF="mailto:dbi-users@perl.org">dbi-users@perl.org</A>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::DBD::Metadata - Generate the code and data for some DBI metadata methods</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

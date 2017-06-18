@@ -1,0 +1,108 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::CounterFile - Persistent counter class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::CounterFile - Persistent counter class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::CounterFile - Persistent counter class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use File::CounterFile;
+ $c = new File::CounterFile &quot;COUNTER&quot;, &quot;aa00&quot;;</PRE>
+<PRE>
+ $id = $c-&gt;inc;
+ open(F, &quot;&gt;F$id&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module implements a persistent counter class.  Each counter is
+represented by a separate file in the file system.  File locking is
+applied, so multiple processes might try to access the same counters
+at the same time without risk of counter destruction.</P>
+<P>You give the file name as the first parameter to the object
+constructor (<CODE>new</CODE>).  The file is created if it does not exist.</P>
+<P>If the file name does not start with ``/'' or ``.'', then it is
+interpreted as a file relative to <CODE>$File::CounterFile::DEFAULT_DIR</CODE>.
+The default value for this variable is initialized from the
+environment variable <CODE>TMPDIR</CODE>, or <EM>/usr/tmp</EM> is no environment
+variable is defined.  You may want to assign a different value to this
+variable before creating counters.</P>
+<P>If you pass a second parameter to the constructor, that sets the
+initial value for a new counter.  This parameter only takes effect
+when the file is created (i.e. it does not exist before the call).</P>
+<P>When you call the <CODE>inc()</CODE> method, you increment the counter value by
+one. When you call <CODE>dec()</CODE> the counter value is decrementd.  In both
+cases the new value is returned.  The <CODE>dec()</CODE> method only works for
+numerical counters (digits only).</P>
+<P>You can peek at the value of the counter (without incrementing it) by
+using the <CODE>value()</CODE> method.</P>
+<P>The counter can be locked and unlocked with the <A HREF="../../../lib/Pod/perlfunc.html#item_lock"><CODE>lock()</CODE></A> and
+<CODE>unlock()</CODE> methods.  Incrementing and value retrieval is faster when
+the counter is locked, because we do not have to update the counter
+file all the time.  You can query whether the counter is locked with
+the <CODE>locked()</CODE> method.</P>
+<P>There is also an operator overloading interface to the
+File::CounterFile object.  This means that you might use the <CODE>++</CODE>
+operator for incrementing the counter, <CODE>--</CODE> operator for decrementing
+and you can interpolate counters diretly into strings.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>It uses <A HREF="../../../lib/Pod/perlfunc.html#item_flock"><CODE>flock(2)</CODE></A> to lock the counter file.  This does not work on all
+systems.  Perhaps we should use the File::Lock module?</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1998 Gisle Aas. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Gisle Aas &lt;<A HREF="mailto:aas@sn.no">aas@sn.no</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::CounterFile - Persistent counter class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

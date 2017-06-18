@@ -1,0 +1,119 @@
+
+<HTML>
+<HEAD>
+<TITLE>AnyDBM_File - provide framework for multiple DBMs</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;AnyDBM_File - provide framework for multiple DBMs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#dbm comparisons">DBM Comparisons</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>AnyDBM_File - provide framework for multiple DBMs</P>
+<P>NDBM_File, DB_File, GDBM_File, SDBM_File, ODBM_File - various DBM implementations</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use AnyDBM_File;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module is a ``pure virtual base class''--it has nothing of its own.
+It's just there to inherit from one of the various DBM packages.  It
+prefers ndbm for compatibility reasons with Perl 4, then Berkeley DB (See
+<A HREF="../lib/DB_File.html">the DB_File manpage</A>), GDBM, SDBM (which is always there--it comes with Perl), and
+finally ODBM.   This way old programs that used to use NDBM via <A HREF="../lib/Pod/perlfunc.html#item_dbmopen"><CODE>dbmopen()</CODE></A>
+can still do so, but new ones can reorder @ISA:</P>
+<PRE>
+    BEGIN { @AnyDBM_File::ISA = qw(DB_File GDBM_File NDBM_File) }
+    use AnyDBM_File;</PRE>
+<P>Having multiple DBM implementations makes it trivial to copy database formats:</P>
+<PRE>
+    use POSIX; use NDBM_File; use DB_File;
+    tie %newhash,  'DB_File', $new_filename, O_CREAT|O_RDWR;
+    tie %oldhash,  'NDBM_File', $old_filename, 1, 0;
+    %newhash = %oldhash;</PRE>
+<P>
+<H2><A NAME="dbm comparisons">DBM Comparisons</A></H2>
+<P>Here's a partial table of features the different packages offer:</P>
+<PRE>
+                         odbm    ndbm    sdbm    gdbm    bsd-db
+                         ----    ----    ----    ----    ------
+ Linkage comes w/ perl   yes     yes     yes     yes     yes
+ Src comes w/ perl       no      no      yes     no      no
+ Comes w/ many unix os   yes     yes[0]  no      no      no
+ Builds ok on !unix      ?       ?       yes     yes     ?
+ Code Size               ?       ?       small   big     big
+ Database Size           ?       ?       small   big?    ok[1]
+ Speed                   ?       ?       slow    ok      fast
+ FTPable                 no      no      yes     yes     yes
+ Easy to build          N/A     N/A      yes     yes     ok[2]
+ Size limits             1k      4k      1k[3]   none    none
+ Byte-order independent  no      no      no      no      yes
+ Licensing restrictions  ?       ?       no      yes     no</PRE>
+<DL>
+<DT><STRONG><A NAME="item_%5B0%5D">[0]</A></STRONG><BR>
+<DD>
+on mixed universe machines, may be in the bsd compat library,
+which is often shunned.
+<P></P>
+<DT><STRONG><A NAME="item_%5B1%5D">[1]</A></STRONG><BR>
+<DD>
+Can be trimmed if you compile for one access method.
+<P></P>
+<DT><STRONG><A NAME="item_%5B2%5D">[2]</A></STRONG><BR>
+<DD>
+See <A HREF="../lib/DB_File.html">the DB_File manpage</A>. 
+Requires symbolic links.
+<P></P>
+<DT><STRONG><A NAME="item_%5B3%5D">[3]</A></STRONG><BR>
+<DD>
+By default, but can be redefined.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>dbm(3), ndbm(3), DB_File(3), <A HREF="../lib/Pod/perldbmfilter.html">the perldbmfilter manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;AnyDBM_File - provide framework for multiple DBMs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

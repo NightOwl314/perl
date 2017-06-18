@@ -1,0 +1,1366 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#exports">Exports</A></LI>
+		<LI><A HREF="#the win32api:: heirarchy">The Win32API:: heirarchy</A></LI>
+		<LI><A HREF="#buffer sizes">Buffer sizes</A></LI>
+		<LI><A HREF="#hungarian notation">Hungarian Notation</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32API::Registry 0.21 qw( :ALL );</PRE>
+<PRE>
+  RegOpenKeyEx( HKEY_LOCAL_MACHINE, &quot;SYSTEM\\Disk&quot;, 0, KEY_READ, $key );
+    or  die &quot;Can't open HKEY_LOCAL_MACHINE\\SYSTEM\\Disk: &quot;,
+            regLastError(),&quot;\n&quot;;
+  RegQueryValueEx( $key, &quot;Information&quot;, [], $type, $data, [] );
+    or  die &quot;Can't read HKEY_L*MACHINE\\SYSTEM\\Disk\\Information: &quot;,
+            regLastError(),&quot;\n&quot;;
+  [...]
+  RegCloseKey( $key )
+    or  die &quot;Can't close HKEY_LOCAL_MACHINE\\SYSTEM\\Disk: &quot;,
+            regLastError(),&quot;\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This provides fairly low-level access to the Win32 System API
+calls dealing with the Registry [mostly from WINREG.H].  This
+is mostly intended to be used by other modules such as
+<A HREF="#item_Win32%3A%3ATieRegistry"><CODE>Win32::TieRegistry</CODE></A> [which provides an extremely Perl-friendly
+method for using the Registry].</P>
+<P>For a description of the logical structure of the Registry, see
+the documentation for the <A HREF="#item_Win32%3A%3ATieRegistry"><CODE>Win32::TieRegistry</CODE></A> module.</P>
+<P>To pass in <CODE>NULL</CODE> as the pointer to an optional buffer, pass in
+an empty list reference, <CODE>[]</CODE>.</P>
+<P>Beyond raw access to the API calls and related constants, this module
+handles smart buffer allocation and translation of return codes.</P>
+<P>All calls return a true value for success and a false value for
+failure.  After any failure, <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> should automatically be set
+to indicate the reason.  However, current versions of Perl often
+overwrite <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> too quickly, so you can use <A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>
+instead, which is only set by Win32API::Registry routines. 
+<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A> is also good if you have a really old version
+of Perl that does not connect <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> to <CODE>GetLastError()</CODE> on
+Win32.</P>
+<P>Note that <A HREF="../../../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> is not set by these routines except by
+<CODE>Win32API::Registry::constant()</CODE> when a constant is not defined.</P>
+<P>
+<H2><A NAME="exports">Exports</A></H2>
+<P>Nothing is exported by default.  The following tags can be used to
+have sets of symbols exported.</P>
+<P>[Note that much of the following documentation refers to the
+behavior of the underlying API calls which may vary in current
+and future versions of the Win32 API without any changes to this
+module.  Therefore you should check the Win32 API documentation
+directly when needed.]</P>
+<DL>
+<DT><STRONG><A NAME="item_%3AFunc">:Func</A></STRONG><BR>
+<DD>
+The basic function names:
+<DL>
+<DT><STRONG><A NAME="item_AllowPriv">AllowPriv</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>AllowPriv( $sPrivName, $bEnable )</CODE></STRONG><BR>
+<DD>
+Not a Win32 API call.  Enables or disables a specific privilege for
+the current process.  Returns a true value if successful and a false
+value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.  This routine
+does not provide a way to tell if a privilege is currently enabled.
+<P><CODE>$sPrivname</CODE> is a Win32 privilege name [see <A HREF="#:se_">:SE_</A>].  For example,
+<CODE>&quot;SeBackupPrivilege&quot;</CODE> [a.k.a. <CODE>SE_BACKUP_NAME</CODE>] controls whether
+you can use <A HREF="#item_RegSaveKey"><CODE>RegSaveKey()</CODE></A> and <CODE>&quot;SeRestorePrivilege&quot;</CODE> [a.k.a.
+<CODE>SE_RESTORE_NAME</CODE>] controls whether you can use <A HREF="#item_RegLoadKey"><CODE>RegLoadKey()</CODE></A>.</P>
+<P>If <CODE>$bEnable</CODE> is true, then <A HREF="#item_AllowPriv"><CODE>AllowPriv()</CODE></A> tries to enable the
+privilege.  Otherwise it tries to disable the privilege.</P>
+<P></P>
+<DT><STRONG><A NAME="item_AbortSystemShutdown">AbortSystemShutdown</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>AbortSystemShutdown( $sComputerName )</CODE></STRONG><BR>
+<DD>
+Tries to abort a remote shutdown request previously made via
+<A HREF="#item_InitiateSystemShutdown"><CODE>InitiateSystemShutdown()</CODE></A>.  Returns a true value if successful
+and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P></P>
+<DT><STRONG><A NAME="item_InitiateSystemShutdown">InitiateSystemShutdown</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>InitiateSystemShutdown( $sComputer, $sMessage, $uTimeoutSecs, $bForce, $bReboot )</CODE></STRONG><BR>
+<DD>
+Requests that a [remote] computer be shutdown or rebooted.
+Returns a true value if successful and a false value [and
+sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$sComputer</CODE> is the name [or address] of the computer to be
+shutdown or rebooted.  You can use <CODE>[]</CODE> [for <CODE>NULL</CODE>] or <CODE>&quot;&quot;</CODE>
+to indicate the local computer.</P>
+<P><CODE>$sMessage</CODE> is the message to be displayed in a pop-up window
+on the desktop of the computer to be shutdown or rebooted until
+the timeout expires or the shutdown is aborted via
+<A HREF="#item_AbortSystemShutdown"><CODE>AbortSystemShutdown()</CODE></A>.  With <CODE>$iTimeoutSecs == 0</CODE>, the
+message will never be visible.</P>
+<P><CODE>$iTimeoutSecs</CODE> is the number of seconds to wait before starting
+the shutdown.</P>
+<P>If <CODE>$bForce</CODE> is false, then any applications running on the remote
+computer get a chance to prompt the remote user whether they want
+to save changes.  Also, for any applications that do not exit quickly
+enough, the operating system will prompt the user whether they wish
+to wait longer for the application to exit or force it to exit now.
+At any of these prompts the user can press <STRONG>CANCEL</STRONG> to abort the
+shutdown but if no applications have unsaved data, they will likely
+all exit quickly and the shutdown will progress with the remote user
+having no option to cancel the shutdown.</P>
+<P>If <CODE>$bForce</CODE> is true, all applications are told to exit immediately
+and so will not prompt the user even if there is unsaved data.  Any
+applications that take too long to exit will be forcibly killed after
+a short time.  The only way to abort the shutdown is to call
+<A HREF="#item_AbortSystemShutdown"><CODE>AbortSystemShutdown()</CODE></A> before the timeout expires and there is no
+way to abort the shutdown once it has begun.</P>
+<P>If <CODE>$bReboot</CODE> is true, the computer will automatically reboot once
+the shutdown is complete.  If <CODE>$bReboot</CODE> is false, then when the
+shutdown is complete the computer will halt at a screen indicating
+that the shutdown is complete and offering a way for the user to
+start to boot the computer.</P>
+<P>You must have the <CODE>&quot;SeRemoteShutdownPrivilege&quot;</CODE> privilege
+on the remote computer for this call to succeed.  If shutting
+down the local computer, then the calling process must have
+the <CODE>&quot;SeShutdownPrivilege&quot;</CODE> privilege and have it enabled.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegCloseKey">RegCloseKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegCloseKey( $hKey )</CODE></STRONG><BR>
+<DD>
+Closes the handle to a Registry key returned by <A HREF="#item_RegOpenKeyEx"><CODE>RegOpenKeyEx()</CODE></A>,
+<A HREF="#item_RegConnectRegistry"><CODE>RegConnectRegistry()</CODE></A>, <A HREF="#item_RegCreateKeyEx"><CODE>RegCreateKeyEx()</CODE></A>, or a few other
+routines.  Returns a true value if successful and a false value
+[and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P></P>
+<DT><STRONG><A NAME="item_RegConnectRegistry">RegConnectRegistry</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegConnectRegistry( $sComputer, $hRootKey, $ohKey )</CODE></STRONG><BR>
+<DD>
+Connects to one of the root Registry keys of a remote computer.
+Returns a true value if successful and a false value [and
+sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$sComputer</CODE> is the name [or address] of a remote computer
+whose Registry you wish to access.</P>
+<P><CODE>$hKey</CODE> must be either <CODE>HKEY_LOCAL_MACHINE</CODE> or <CODE>HKEY_USERS</CODE>
+and specifies which root Registry key on the remote computer
+you wish to have access to.</P>
+<P><CODE>$phKey</CODE> will be set to the handle to be used to access the
+remote Registry key if the call succeeds.</P>
+<P></P>
+<DT><STRONG><A NAME="item_regConstant">regConstant</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>$value= regConstant( $sConstantName )</CODE></STRONG><BR>
+<DD>
+Fetch the value of a constant.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if <CODE>$sConstantName</CODE>
+is not the name of a constant supported by this module.  Never sets
+<A HREF="../../../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> nor <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>.
+<P>This function is rarely used since you will usually get the value of a
+constant by having that constant imported into your package by listing
+the constant name in the <CODE>use Win32API::Registry</CODE> statement and then
+simply using the constant name in your code [perhaps followed by
+<CODE>()</CODE>].  This function is useful for verifying constant names not in
+Perl code, for example, after prompting a user to type in a constant
+name.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegCreateKey">RegCreateKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegCreateKey( $hKey, $sSubKey, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+This routine is meant only for compatibility with Windows version
+3.1.  Use <A HREF="#item_RegCreateKeyEx"><CODE>RegCreateKeyEx()</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_RegCreateKeyEx">RegCreateKeyEx</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegCreateKeyEx( $hKey, $sSubKey, $uZero, $sClass, $uOpts, $uAccess, $pSecAttr, $ohNewKey, $ouDisp )</CODE></STRONG><BR>
+<DD>
+Creates a new Registry subkey.  Returns a true value if successful and
+a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sSubKey</CODE> is the name of the new subkey to be created.</P>
+<P><CODE>$iZero</CODE> is reserved for future use and should always be specified
+as <CODE>0</CODE>.</P>
+<P><CODE>$sClass</CODE> is a string to be used as the class for the new
+subkey.  We are not aware of any current use for Registry key
+class information so the empty string, <CODE>&quot;&quot;</CODE>, should usually
+be used here.</P>
+<P><CODE>$iOpts</CODE> is a numeric value containing bits that control options
+used while creating the new subkey.  <CODE>REG_OPTION_NON_VOLATILE</CODE>
+is the default.  <CODE>REG_OPTION_VOLATILE</CODE> [which is ignored on
+Windows 95] means the data stored under this key is not kept
+in a file and will not be preserved when the system reboots.
+<CODE>REG_OPTION_BACKUP_RESTORE</CODE> [also ignored on Windows 95] means
+ignore the <CODE>$iAccess</CODE> parameter and try to open the new key with
+the access required to backup or restore the key.</P>
+<P><CODE>$iAccess</CODE> is a numeric mask of bits specifying what type of
+access is desired when opening the new subkey.  See <A HREF="#item_RegOpenKeyEx"><CODE>RegOpenKeyEx()</CODE></A>.</P>
+<P><CODE>$pSecAttr</CODE> is a <CODE>SECURITY_ATTRIBUTES</CODE> structure packed into
+a Perl string which controls whether the returned handle can be
+inherited by child processes.  Normally you would pass <CODE>[]</CODE> for
+this parameter to have <CODE>NULL</CODE> passed to the underlying API
+indicating that the handle cannot be inherited.  If not under
+Windows95, then <CODE>$pSecAttr</CODE> also allows you to specify
+<CODE>SECURITY_DESCRIPTOR</CODE> that controls which users will have
+what type of access to the new key -- otherwise the new key
+inherits its security from its parent key.</P>
+<P><CODE>$phKey</CODE> will be set to the handle to be used to access the new
+subkey if the call succeeds.</P>
+<P><CODE>$piDisp</CODE> will be set to either <CODE>REG_CREATED_NEW_KEY</CODE> or
+<CODE>REG_OPENED_EXISTING_KEY</CODE> to indicate for which reason the
+call succeeded.  Can be specified as <CODE>[]</CODE> if you don't care.</P>
+<P>If <CODE>$phKey</CODE> and <CODE>$piDisp</CODE> start out as integers, then they will
+probably remain unchanged if the call fails.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegDeleteKey">RegDeleteKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegDeleteKey( $hKey, $sSubKey )</CODE></STRONG><BR>
+<DD>
+Deletes a subkey of an open Registry key provided that the subkey
+contains no subkeys of its own [but the subkey may contain values].
+Returns a true value if successful and a false value [and sets
+<A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sSubKey</CODE> is the name of the subkey to be deleted.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegDeleteValue">RegDeleteValue</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegDeleteValue( $hKey, $sValueName )</CODE></STRONG><BR>
+<DD>
+Deletes a value from an open Registry key.  Returns a true value if
+successful and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on
+failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sValueKey</CODE> is the name of the value to be deleted.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumKey">RegEnumKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumKey( $hKey, $uIndex, $osName, $ilNameSize )</CODE></STRONG><BR>
+<DD>
+This routine is meant only for compatibility with Windows version
+3.1.  Use <A HREF="#item_RegEnumKeyEx"><CODE>RegEnumKeyEx()</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumKeyEx">RegEnumKeyEx</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumKeyEx( $hKey, $uIndex, $osName, $iolName, $pNull, $osClass, $iolClass, $opftLastWrite )</CODE></STRONG><BR>
+<DD>
+Lets you enumerate the names of all of the subkeys directly under
+an open Registry key.  Returns a true value if successful and a false
+value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$iIndex</CODE> is the sequence number of the immediate subkey that
+you want information on.  Start with this value as <CODE>0</CODE> then
+repeat the call incrementing this value each time until the
+call fails with <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A> numerically equal to
+<CODE>ERROR_NO_MORE_ITEMS</CODE>.</P>
+<P><CODE>$sName</CODE> will be set to the name of the subkey.  Can be <CODE>[]</CODE> if
+you don't care about the name.</P>
+<P><CODE>$plName</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sName</CODE>.  Will be set to the length of the subkey
+name if the requested subkey exists even if <CODE>$sName</CODE> isn't
+successfully set to the subkey name.  See <A HREF="#buffer sizes">Buffer sizes</A> for
+more information.</P>
+<P><CODE>$pNull</CODE> is reserved for future used and should be passed as <CODE>[]</CODE>.</P>
+<P><CODE>$sClass</CODE> will be set to the class name for the subkey.  Can be
+<CODE>[]</CODE> if you don't care about the class.</P>
+<P><CODE>$plClass</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sClass</CODE> and will be set to the length of the
+subkey class name if the requested subkey exists.  See <A HREF="#buffer sizes">Buffer sizes</A> for more information.</P>
+<P><CODE>$pftLastWrite</CODE> will be set to a <CODE>FILETIME</CODE> structure packed
+into a Perl string and indicating when the subkey was last changed.
+Can be <CODE>[]</CODE>.</P>
+<P>You may omit both <CODE>$plName</CODE> and <CODE>$plClass</CODE> to get the same effect
+as passing in <CODE>[]</CODE> for each of them.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumValue">RegEnumValue</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumValue( $hKey, $uIndex, $osValName, $iolValName, $pNull, $ouType, $opValData, $iolValData )</CODE></STRONG><BR>
+<DD>
+Lets you enumerate the names of all of the values contained in an
+open Registry key.  Returns a true value if successful and a false
+value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$iIndex</CODE> is the sequence number of the value that you want
+information on.  Start with this value as <CODE>0</CODE> then repeat the
+call incrementing this value each time until the call fails with
+<CODE>ERROR_NO_MORE_ITEMS</CODE>.</P>
+<P><CODE>$sValName</CODE> will be set to the name of the value.  Can be <CODE>[]</CODE>
+if you don't care about the name.</P>
+<P><CODE>$plValName</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sValName</CODE>.  Will be set to the length of the value
+name if the requested value exists even if <CODE>$sValName</CODE> isn't
+successfully set to the value name.  See <A HREF="#buffer sizes">Buffer sizes</A> for
+more information.</P>
+<P><CODE>$pNull</CODE> is reserved for future used and should be passed as <CODE>[]</CODE>.</P>
+<P><CODE>$piType</CODE> will be set to the type of data stored in the value data.
+If the call succeeds, it will be set to a <CODE>REG_*</CODE> value unless
+passed in as <CODE>[]</CODE>.</P>
+<P><CODE>$pValData</CODE> will be set to the data [packed into a Perl string]
+that is stored in the requested value.  Can be <CODE>[]</CODE> if you don't
+care about the value data.</P>
+<P><CODE>$plValData</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sValData</CODE> and will be set to the length of the
+value data if the requested value exists.  See <A HREF="#buffer sizes">Buffer sizes</A> for
+more information.</P>
+<P>You may omit both <CODE>$plValName</CODE> and <CODE>$plValData</CODE> to get the same
+effect as passing in <CODE>[]</CODE> for each of them.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegFlushKey">RegFlushKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegFlushKey( $hKey )</CODE></STRONG><BR>
+<DD>
+Forces the data stored under an open Registry key to be flushed
+to the disk file where the data is preserved between reboots.
+Forced flushing is not guaranteed to be efficient so this routine
+should almost never be called.  Returns a true value if successful
+and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegGetKeySecurity">RegGetKeySecurity</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegGetKeySecurity( $hKey, $uSecInfo, $opSecDesc, $iolSecDesc )</CODE></STRONG><BR>
+<DD>
+Retrieves one of the <CODE>SECURITY_DESCRIPTOR</CODE> structures describing
+part of the security for an open Registry key.  Returns a true value
+if successful and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>]
+on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$iSecInfo</CODE> is a numeric <CODE>SECURITY_INFORMATION</CODE> value that
+specifies which parts of the <CODE>SECURITY_DESCRIPTOR</CODE> structure
+to retrieve.  Should be <CODE>OWNER_SECURITY_INFORMATION</CODE>,
+<CODE>GROUP_SECURITY_INFORMATION</CODE>, <CODE>DACL_SECURITY_INFORMATION</CODE>, or
+or <CODE>SACL_SECURITY_INFORMATION</CODE> or two or more of these bits
+combined using <CODE>|</CODE>.</P>
+<P><CODE>$pSecDesc</CODE> will be set to the requested <CODE>SECURITY_DESCRIPTOR</CODE>
+structure [packed into a Perl string].</P>
+<P><CODE>$plSecDesc</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sSecDesc</CODE> and will be set to the length of the
+security descriptor.  See <A HREF="#buffer sizes">Buffer sizes</A> for more information.
+You may omit this parameter to get the same effect as passing in
+<CODE>[]</CODE> for it.</P>
+<P></P>
+<DT><STRONG><A NAME="item_regLastError">regLastError</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>$svError= regLastError();</CODE></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>regLastError( $uError );</CODE></STRONG><BR>
+<DD>
+Returns the last error encountered by a routine from this module. 
+It is just like <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> except it isn't changed by anything except
+routines from this module.  Ideally you could just use <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>, but
+current versions of Perl often overwrite <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> before you get a
+chance to check it and really old versions of Perl don't really
+support <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> under Win32.
+<P>Just like <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>, in a numeric context <A HREF="#item_regLastError"><CODE>regLastError()</CODE></A> returns
+the numeric error value while in a string context it returns a
+text description of the error [actually it returns a Perl scalar
+that contains both values so <A HREF="#item_regLastError"><CODE>$x= regLastError()</CODE></A> causes <CODE>$x</CODE>
+to give different values in string vs. numeric contexts].  On old
+versions of Perl where <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> isn't tied to <CODE>GetLastError()</CODE>,
+<A HREF="#item_regLastError"><CODE>regLastError</CODE></A> simply returns the number of the error and you'll
+need to use &lt;Win32::FormatMessage&gt; to get the error string.</P>
+<P>The last form sets the error returned by future calls to
+<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A> and should not be used often.  <CODE>$uError</CODE> must
+be a numeric error code.  Also returns the dual-valued version
+of <CODE>$uError</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegLoadKey">RegLoadKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegLoadKey( $hKey, $sSubKey, $sFileName )</CODE></STRONG><BR>
+<DD>
+Loads a hive file.  That is, it creates a new subkey in the
+Registry and associates that subkey with a disk file that contains
+a Registry hive so that the new subkey can be used to access the
+keys and values stored in that hive.  Hives are usually created
+via <A HREF="#item_RegSaveKey"><CODE>RegSaveKey()</CODE></A>.  Returns a true value if successful and a
+false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key that can have hives
+loaded to it.  This must be <CODE>HKEY_LOCAL_MACHINE</CODE>, <CODE>HKEY_USERS</CODE>,
+or a remote version of one of these from a call to
+<A HREF="#item_RegConnectRegistry"><CODE>RegConnectRegistry()</CODE></A>.</P>
+<P><CODE>$sSubKey</CODE> is the name of the new subkey to created and associated
+with the hive file.</P>
+<P><CODE>$sFileName</CODE> is the name of the hive file to be loaded.  This
+file name is interpretted relative to the
+<CODE>%SystemRoot%/System32/config</CODE> directory on the computer where
+the <CODE>$hKey</CODE> key resides.  If <CODE>$sFileName</CODE> is on a FAT file
+system, then its name must not have an extension.</P>
+<P>You must have the <CODE>SE_RESTORE_NAME</CODE> privilege to use this routine.</P>
+<P>WARNING:  Loading of hive files via a network share may silently
+corrupt the hive and so should not be attempted [this is a problem
+in at least some versions of the underlying API which this module
+does not try to fix or avoid].  To access a hive file located on a
+remote computer, connect to the remote computer's Registry and load
+the hive via that.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegNotifyChangeKeyValue">RegNotifyChangeKeyValue</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegNotifyChangeKeyValue( $hKey, $bWatchSubtree, $uNotifyFilter, $hEvent, $bAsync )</CODE></STRONG><BR>
+<DD>
+Arranges for your process to be notified when part of the Registry
+is changed.  Returns a true value if successful and a false value
+[and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call] for which you wish to be notified when any changes
+are made to it.</P>
+<P>If <CODE>$bWatchSubtree</CODE> is true, then changes to any subkey or
+descendant of <CODE>$hKey</CODE> are also reported.</P>
+<P><CODE>$iNotifyFilter</CODE> controllers what types of changes are reported.  It
+is a numeric value containing one or more of the following bit masks:</P>
+<DL>
+<DT><STRONG><A NAME="item_REG_NOTIFY_CHANGE_NAME"><CODE>REG_NOTIFY_CHANGE_NAME</CODE></A></STRONG><BR>
+<DD>
+Notify if a subkey is added or deleted to a monitored key.
+<P></P>
+<DT><STRONG><A NAME="item_REG_NOTIFY_CHANGE_LAST_SET"><CODE>REG_NOTIFY_CHANGE_LAST_SET</CODE></A></STRONG><BR>
+<DD>
+Notify if a value in a monitored key is added, deleted, or modified.
+<P></P>
+<DT><STRONG><A NAME="item_REG_NOTIFY_CHANGE_SECURITY"><CODE>REG_NOTIFY_CHANGE_SECURITY</CODE></A></STRONG><BR>
+<DD>
+Notify if a security descriptor of a monitored key is changed.
+<P></P>
+<DT><STRONG><A NAME="item_REG_NOTIFY_CHANGE_ATTRIBUTES"><CODE>REG_NOTIFY_CHANGE_ATTRIBUTES</CODE></A></STRONG><BR>
+<DD>
+Notify if any attributes of a monitored key are changed [class
+name or security descriptors].
+<P></P></DL>
+<P><CODE>$hEvent</CODE> is ignored unless <CODE>$bAsync</CODE> is true.  Otherwise, <CODE>$hEvent</CODE>
+is a handle to a Win32 <EM>event</EM> that will be signaled when changes are
+to be reported.</P>
+<P>If <CODE>$bAsync</CODE> is true, then <A HREF="#item_RegNotifyChangeKeyValue"><CODE>RegNotifyChangeKeyValue()</CODE></A> returns
+immediately and uses <CODE>$hEvent</CODE> to notify your process of changes.
+If <CODE>$bAsync</CODE> is false, then <A HREF="#item_RegNotifyChangeKeyValue"><CODE>RegNotifyChangeKeyValue()</CODE></A> does
+not return until there is a change to be notified of.</P>
+<P>This routine does not work with Registry keys on remote computers.</P>
+<DT><STRONG><A NAME="item_RegOpenKey">RegOpenKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegOpenKey( $hKey, $sSubKey, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+This routine is meant only for compatibility with Windows version
+3.1.  Use <A HREF="#item_RegOpenKeyEx"><CODE>RegOpenKeyEx()</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_RegOpenKeyEx">RegOpenKeyEx</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegOpenKeyEx( $hKey, $sSubKey, $uOptions, $uAccess, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+Opens an existing Registry key.  Returns a true value if successful
+and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sSubKey</CODE> is the name of an existing subkey to be opened.
+Can be <CODE>&quot;&quot;</CODE> or <CODE>[]</CODE> to open an additional handle to the
+key specified by <CODE>$hKey</CODE>.</P>
+<P><CODE>$iOptions</CODE> is a numeric value containing bits that control options
+used while opening the subkey.  There are currently no supported
+options so this parameter should be specified as <CODE>0</CODE>.</P>
+<P><CODE>$iAccess</CODE> is a numeric mask of bits specifying what type of
+access is desired when opening the new subkey.  Should be a
+combination of one or more of the following bit masks:</P>
+<DL>
+<DT><STRONG><A NAME="item_KEY_ALL_ACCESS"><CODE>KEY_ALL_ACCESS</CODE></A></STRONG><BR>
+<DD>
+<PRE>
+    KEY_READ | KEY_WRITE | KEY_CREATE_LINK</PRE>
+<DT><STRONG><A NAME="item_KEY_READ"><CODE>KEY_READ</CODE></A></STRONG><BR>
+<DD>
+<PRE>
+    KEY_QUERY_VALUE | KEY_ENUMERATE_SUBKEYS | KEY_NOTIFY | STANDARD_RIGHTS_READ</PRE>
+<DT><STRONG><A NAME="item_KEY_WRITE"><CODE>KEY_WRITE</CODE></A></STRONG><BR>
+<DD>
+<PRE>
+    KEY_SET_VALUE | KEY_CREATE_SUB_KEY | STANDARD_RIGHTS_WRITE</PRE>
+<DT><STRONG><A NAME="item_KEY_QUERY_VALUE"><CODE>KEY_QUERY_VALUE</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_KEY_SET_VALUE"><CODE>KEY_SET_VALUE</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_KEY_ENUMERATE_SUB_KEYS"><CODE>KEY_ENUMERATE_SUB_KEYS</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_KEY_CREATE_SUB_KEY"><CODE>KEY_CREATE_SUB_KEY</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_KEY_NOTIFY"><CODE>KEY_NOTIFY</CODE></A></STRONG><BR>
+<DD>
+Allows you to use <A HREF="#item_RegNotifyChangeKeyValue"><CODE>RegNotifyChangeKeyValue()</CODE></A> on the opened key.
+<P></P>
+<DT><STRONG><A NAME="item_KEY_EXECUTE"><CODE>KEY_EXECUTE</CODE></A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_KEY_READ"><CODE>KEY_READ</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_KEY_CREATE_LINK"><CODE>KEY_CREATE_LINK</CODE></A></STRONG><BR>
+<DD>
+Gives you permission to create a symbolic link like
+<CODE>HKEY_CLASSES_ROOT</CODE> and <CODE>HKEY_CURRENT_USER</CODE>, though the method for
+doing so is not documented [and probably requires use of the mostly
+undocumented ``native'' routines, <CODE>Nt*()</CODE> a.k.a. <CODE>Zw*()</CODE>].
+<P></P></DL>
+<P><CODE>$phKey</CODE> will be set to the handle to be used to access the new subkey
+if the call succeeds.</P>
+<DT><STRONG><A NAME="item_RegQueryInfoKey">RegQueryInfoKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryInfoKey( $hKey, $osClass, $iolClass, $pNull, $ocSubKeys, $olSubKey, $olSubClass, $ocValues, $olValName, $olValData, $olSecDesc, $opftTime )</CODE></STRONG><BR>
+<DD>
+Gets miscellaneous information about an open Registry key.
+Returns a true value if successful and a false value [and
+sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sClass</CODE> will be set to the class name for the key.  Can be
+<CODE>[]</CODE> if you don't care about the class.</P>
+<P><CODE>$plClass</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sClass</CODE> and will be set to the length of the
+key's class name.  See <A HREF="#buffer sizes">Buffer sizes</A> for more information.
+You may omit this parameter to get the same effect as passing in
+<CODE>[]</CODE> for it.</P>
+<P><CODE>$pNull</CODE> is reserved for future use and should be passed as <CODE>[]</CODE>.</P>
+<P><CODE>$pcSubKeys</CODE> will be set to the count of the number of subkeys
+directly under this key.  Can be <CODE>[]</CODE>.</P>
+<P><CODE>$plSubKey</CODE> will be set to the length of the longest subkey name.
+Can be <CODE>[]</CODE>.</P>
+<P><CODE>$plSubClass</CODE> will be set to the length of the longest class name
+used with an immediate subkey of this key.  Can be <CODE>[]</CODE>.</P>
+<P><CODE>$pcValues</CODE> will be set to the count of the number of values in
+this key.  Can be <CODE>[]</CODE>.</P>
+<P><CODE>$plValName</CODE> will be set to the length of the longest value name
+in this key.  Can be <CODE>[]</CODE>.</P>
+<P><CODE>$plValData</CODE> will be set to the length of the longest value data
+in this key.  Can be <CODE>[]</CODE>.</P>
+<P><CODE>$plSecDesc</CODE> will be set to the length of this key's full security
+descriptor.</P>
+<P><CODE>$pftTime</CODE> will be set to a <CODE>FILETIME</CODE> structure packed
+into a Perl string and indicating when this key was last changed.
+Can be <CODE>[]</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryMultipleValues">RegQueryMultipleValues</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryMultipleValues( $hKey, $ioarValueEnts, $icValueEnts, $opBuffer, $iolBuffer )</CODE></STRONG><BR>
+<DD>
+Allows you to use a single call to query several values from a single
+open Registry key to maximize efficiency.  Returns a true value if
+successful and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on
+failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$pValueEnts</CODE> should contain a list of <CODE>VALENT</CODE> structures packed
+into a single Perl string.  Each <CODE>VALENT</CODE> structure should have
+the <CODE>ve_valuename</CODE> entry [the first 4 bytes] pointing to a string
+containing the name of a value stored in this key.  The remaining
+fields are set if the function succeeds.</P>
+<P><CODE>$cValueEnts</CODE> should contain the count of the number of <CODE>VALENT</CODE>
+structures contained in <CODE>$pValueEnts</CODE>.</P>
+<P><CODE>$pBuffer</CODE> will be set to the data from all of the requested values
+concatenated into a single Perl string.</P>
+<P><CODE>$plBuffer</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sBuffer</CODE> and will be set to the total length of
+the data to be written to <CODE>$sBuffer</CODE>.  See <A HREF="#buffer sizes">Buffer sizes</A> for
+more information.  You may omit this parameter to get the same
+effect as passing in <CODE>[]</CODE> for it.</P>
+<P>Here is sample code to populate <CODE>$pValueEnts</CODE>:</P>
+<PRE>
+    # @ValueNames= ...list of value name strings...;
+    $cValueEnts= @ValueNames;
+    $pValueEnts= pack( &quot; p x4 x4 x4 &quot; x $cValueEnts, @ValueNames );</PRE>
+<P>Here is sample code to retrieve the data type and data length
+returned in <CODE>$pValueEnts</CODE>:</P>
+<PRE>
+    @Lengths= unpack( &quot; x4 L x4 x4 &quot; x $cValueEnts, $pValueEnts );
+    @Types=   unpack( &quot; x4 x4 x4 L &quot; x $cValueEnts, $pValueEnts );</PRE>
+<P>Given the above, and assuming you haven't modified <CODE>$sBuffer</CODE> since
+the call, you can also extract the value data strings from <CODE>$sBuffer</CODE>
+by using the pointers returned in <CODE>$pValueEnts</CODE>:</P>
+<PRE>
+    @Data=    unpack(  join( &quot;&quot;, map {&quot; x4 x4 P$_ x4 &quot;} @Lengths ),
+                $pValueEnts  );</PRE>
+<P>Much better is to use the lengths and extract directly from
+<CODE>$sBuffer</CODE> using <A HREF="../../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack()</CODE></A> [or <A HREF="../../../lib/Pod/perlvar.html#item_substr"><CODE>substr()</CODE></A>]:</P>
+<PRE>
+    @Data= unpack( join(&quot;&quot;,map(&quot;P$_&quot;,@Lengths)), $sBuffer );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryValue">RegQueryValue</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryValue( $hKey, $sSubKey, $osValueData, $iolValueData )</CODE></STRONG><BR>
+<DD>
+This routine is meant only for compatibility with Windows version
+3.1.  Use <A HREF="#item_RegQueryValueEx"><CODE>RegQueryValueEx()</CODE></A> instead.  This routine can only
+query unamed values [a.k.a. ``default values''], that is, values with
+a name of <CODE>&quot;&quot;</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryValueEx">RegQueryValueEx</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryValueEx( $hKey, $sValueName, $pNull, $ouType, $opValueData, $iolValueData )</CODE></STRONG><BR>
+<DD>
+Lets you look up value data stored in an open Registry key by
+specifying the value name.  Returns a true value if successful
+and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sValueName</CODE> is the name of the value whose data you wish to
+retrieve.</P>
+<P><CODE>$pNull</CODE> this parameter is reserved for future use and should be
+specified as <CODE>[]</CODE>.</P>
+<P><CODE>$piType</CODE> will be set to indicate what type of data is stored in
+the named value.  Will be set to a <CODE>REG_*</CODE> value if the function
+succeeds.</P>
+<P><CODE>$pValueData</CODE> will be set to the value data [packed into a Perl
+string] that is stored in the named value.  Can be <CODE>[]</CODE> if you
+don't care about the value data.</P>
+<P><CODE>$plValueData</CODE> initially specifies the [minimum] buffer size to be
+allocated for <CODE>$sValueData</CODE> and will be set to the size [always
+in bytes] of the data to be written to <CODE>$sValueData</CODE>, even if
+<CODE>$sValueData</CODE> is not successfully written to.  See <A HREF="#buffer sizes">Buffer sizes</A>
+for more information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegReplaceKey">RegReplaceKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegReplaceKey( $hKey, $sSubKey, $sNewFile, $sOldFile )</CODE></STRONG><BR>
+<DD>
+Lets you replace an entire hive when the system is next booted. 
+Returns a true value if successful and a false value [and sets
+<A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key that has <CODE>hive(s)</CODE>
+loaded in it.  This must be <CODE>HKEY_LOCAL_MACHINE</CODE>,
+<CODE>HKEY_USERS</CODE>, or a remote version of one of these from
+a call to <A HREF="#item_RegConnectRegistry"><CODE>RegConnectRegistry()</CODE></A>.</P>
+<P><CODE>$sSubKey</CODE> is the name of the subkey of <CODE>$hKey</CODE> whose hive
+you wish to have replaced on the next reboot.</P>
+<P><CODE>$sNewFile</CODE> is the name of a file that will replace the existing
+hive file when the system reboots.</P>
+<P><CODE>$sOldFile</CODE> is the file name to save the current hive file to
+when the system reboots.</P>
+<P><CODE>$sNewFile</CODE> and <CODE>$sOldFile</CODE> are interpretted relative to the
+<CODE>%SystemRoot%/System32/config</CODE> directory on the computer where
+the <CODE>$hKey</CODE> key resides [I think].  If either file is [would be]
+on a FAT file system, then its name must not have an extension.</P>
+<P>You must have the <CODE>SE_RESTORE_NAME</CODE> privilege to use this routine.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegRestoreKey">RegRestoreKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegRestoreKey( $hKey, $sFileName, $uFlags )</CODE></STRONG><BR>
+<DD>
+Reads in a hive file and copies its contents over an existing
+Registry tree.  Returns a true value if successful and a false
+value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sFileName</CODE> is the name of the hive file to be read.  For each
+value and subkey in this file, a value or subkey will be added
+or replaced in <CODE>$hKey</CODE>.</P>
+<P><CODE>$uFlags</CODE> is usally <CODE>0</CODE>.  It can also be <CODE>REG_WHOLE_HIVE_VOLATILE</CODE>
+which, rather than copying the hive over the existing key,
+replaces the existing key with a temporary, memory-only Registry
+key and then copies the hive contents into it.  This option only
+works if <CODE>$hKey</CODE> is <CODE>HKEY_LOCAL_MACHINE</CODE>, <CODE>HKEY_USERS</CODE>, or a
+remote version of one of these from a call to <A HREF="#item_RegConnectRegistry"><CODE>RegConnectRegistry()</CODE></A>.</P>
+<P><A HREF="#item_RegRestoreKey"><CODE>RegRestoreKey</CODE></A> does <EM>not</EM> delete values nor keys from the
+existing Registry tree when there is no corresponding value/key
+in the hive file.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegSaveKey">RegSaveKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSaveKey( $hKey, $sFileName, $pSecAttr )</CODE></STRONG><BR>
+<DD>
+Dumps any open Registry key and all of its subkeys and values into
+a new hive file.  Returns a true value if successful and a false
+value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sFileName</CODE> is the name of the file that the Registry tree
+should be saved to.  It is interpretted relative to the
+<CODE>%SystemRoot%/System32/config</CODE> directory on the computer where
+the <CODE>$hKey</CODE> key resides.  If <CODE>$sFileName</CODE> is on a FAT file system,
+then it must not have an extension.</P>
+<P><CODE>$pSecAttr</CODE> contains a <CODE>SECURITY_ATTRIBUTES</CODE> structure that specifies
+the permissions to be set on the new file that is created.  This can
+be <CODE>[]</CODE>.</P>
+<P>You must have the <CODE>SE_RESTORE_NAME</CODE> privilege to use this routine.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegSetKeySecurity">RegSetKeySecurity</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSetKeySecurity( $hKey, $uSecInfo, $pSecDesc )</CODE></STRONG><BR>
+<DD>
+Sets [part of] the <CODE>SECURITY_DESCRIPTOR</CODE> structure describing part
+of the security for an open Registry key.  Returns a true value if
+successful and a false value [and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on
+failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$uSecInfo</CODE> is a numeric <CODE>SECURITY_INFORMATION</CODE> value that
+specifies which <CODE>SECURITY_DESCRIPTOR</CODE> structure to set.  Should
+be <CODE>OWNER_SECURITY_INFORMATION</CODE>, <CODE>GROUP_SECURITY_INFORMATION</CODE>,
+<CODE>DACL_SECURITY_INFORMATION</CODE>, or <CODE>SACL_SECURITY_INFORMATION</CODE>
+or two or more of these bits combined using <CODE>|</CODE>.</P>
+<P><CODE>$pSecDesc</CODE> contains the new <CODE>SECURITY_DESCRIPTOR</CODE> structure
+packed into a Perl string.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegSetValue">RegSetValue</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSetValue( $hKey, $sSubKey, $uType, $sValueData, $lValueData )</CODE></STRONG><BR>
+<DD>
+This routine is meant only for compatibility with Windows version
+3.1.  Use <A HREF="#item_RegSetValueEx"><CODE>RegSetValueEx()</CODE></A> instead.  This routine can only
+set unamed values [a.k.a. ``default values''].
+<P></P>
+<DT><STRONG><A NAME="item_RegSetValueEx">RegSetValueEx</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSetValueEx( $hKey, $sName, $uZero, $uType, $pData, $lData )</CODE></STRONG><BR>
+<DD>
+Adds or replaces a value in an open Registry key.  Returns
+a true value if successful and a false value [and sets
+<A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key [either <CODE>HKEY_*</CODE> or from
+a previous call].</P>
+<P><CODE>$sName</CODE> is the name of the value to be set.</P>
+<P><CODE>$uZero</CODE> is reserved for future use and should be specified as <CODE>0</CODE>.</P>
+<P><CODE>$uType</CODE> is the type of data stored in <CODE>$pData</CODE>.  It should
+be a <CODE>REG_*</CODE> value.</P>
+<P><CODE>$pData</CODE> is the value data packed into a Perl string.</P>
+<P><CODE>$lData</CODE> is the length of the value data that is stored in <CODE>$pData</CODE>.
+You will usually omit this parameter or pass in <CODE>0</CODE> to have
+<A HREF="../../../lib/Pod/perlfunc.html#item_length"><CODE>length($pData)</CODE></A> used.  In both of these cases, if <CODE>$iType</CODE> is
+<CODE>REG_SZ</CODE> or <CODE>REG_EXPAND_SZ</CODE>, <A HREF="#item_RegSetValueEx"><CODE>RegSetValueEx()</CODE></A> will append a
+trailing <CODE>'\0'</CODE> to the end of <CODE>$pData</CODE> [unless there is already
+one].</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegUnLoadKey">RegUnLoadKey</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegUnLoadKey( $hKey, $sSubKey )</CODE></STRONG><BR>
+<DD>
+Unloads a previously loaded hive file.  That is, closes the
+hive file then deletes the subkey that was providing access
+to it.  Returns a true value if successful and a false value
+[and sets <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A>/<A HREF="#item_regLastError"><CODE>regLastError()</CODE></A>] on failure.
+<P><CODE>$hKey</CODE> is the handle to a Registry key that has hives
+loaded in it.  This must be <CODE>HKEY_LOCAL_MACHINE</CODE>, <CODE>HKEY_USERS</CODE>,
+or a remote version of one of these from a call to
+<A HREF="#item_RegConnectRegistry"><CODE>RegConnectRegistry()</CODE></A>.</P>
+<P><CODE>$sSubKey</CODE> is the name of the subkey whose hive you wish to
+have unloaded.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncA">:FuncA</A></STRONG><BR>
+<DD>
+The ASCII-specific function names.
+<P>Each of these is identical to the version listed above without the
+trailing ``A'':</P>
+<PRE>
+        AbortSystemShutdownA    InitiateSystemShutdownA
+        RegConnectRegistryA     RegCreateKeyA           RegCreateKeyExA
+        RegDeleteKeyA           RegDeleteValueA         RegEnumKeyA
+        RegEnumKeyExA           RegEnumValueA           RegLoadKeyA
+        RegOpenKeyA             RegOpenKeyExA           RegQueryInfoKeyA
+        RegQueryMultipleValuesA RegQueryValueA          RegQueryValueExA
+        RegReplaceKeyA          RegRestoreKeyA          RegSaveKeyA
+        RegSetValueA            RegSetValueExA          RegUnLoadKeyA</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncW">:FuncW</A></STRONG><BR>
+<DD>
+The UNICODE-specific function names.  These are the same as the
+versions listed above without the trailing ``W'' except that string
+parameters are UNICODE strings rather than ASCII strings, as
+indicated.
+<P></P>
+<DT><STRONG><A NAME="item_AbortSystemShutdownW">AbortSystemShutdownW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>AbortSystemShutdownW( $swComputerName )</CODE></STRONG><BR>
+<DD>
+<CODE>$swComputerName</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_InitiateSystemShutdownW">InitiateSystemShutdownW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>InitiateSystemShutdownW( $swComputer, $swMessage, $uTimeoutSecs, $bForce, $bReboot )</CODE></STRONG><BR>
+<DD>
+<CODE>$swComputer</CODE> and <CODE>$swMessage</CODE> are UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegConnectRegistryW">RegConnectRegistryW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegConnectRegistryW( $swComputer, $hRootKey, $ohKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swComputer</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegCreateKeyW">RegCreateKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegCreateKeyW( $hKey, $swSubKey, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegCreateKeyExW">RegCreateKeyExW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegCreateKeyExW( $hKey, $swSubKey, $uZero, $swClass, $uOpts, $uAccess, $pSecAttr, $ohNewKey, $ouDisp )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> and <CODE>$swClass</CODE> are UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegDeleteKeyW">RegDeleteKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegDeleteKeyW( $hKey, $swSubKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegDeleteValueW">RegDeleteValueW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegDeleteValueW( $hKey, $swValueName )</CODE></STRONG><BR>
+<DD>
+<CODE>$swValueName</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumKeyW">RegEnumKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumKeyW( $hKey, $uIndex, $oswName, $ilwNameSize )</CODE></STRONG><BR>
+<DD>
+<CODE>$oswName</CODE> is UNICODE and <CODE>$ilwNameSize</CODE> is measured as number of
+<CODE>WCHAR</CODE>s.
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumKeyExW">RegEnumKeyExW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumKeyExW( $hKey, $uIndex, $oswName, $iolwName, $pNull, $oswClass, $iolwClass, $opftLastWrite )</CODE></STRONG><BR>
+<DD>
+<CODE>$swName</CODE> and <CODE>$swClass</CODE> are UNICODE and <CODE>$iolwName</CODE> and <CODE>$iolwClass</CODE>
+are measured as number of <CODE>WCHAR</CODE>s.
+<P></P>
+<DT><STRONG><A NAME="item_RegEnumValueW">RegEnumValueW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegEnumValueW( $hKey, $uIndex, $oswName, $iolwName, $pNull, $ouType, $opData, $iolData )</CODE></STRONG><BR>
+<DD>
+<CODE>$oswName</CODE> is UNICODE and <CODE>$iolwName</CODE> is measured as number
+of <CODE>WCHAR</CODE>s.
+<P><CODE>$opData</CODE> is UNICODE if <CODE>$piType</CODE> is <CODE>REG_SZ</CODE>, <CODE>REG_EXPAND_SZ</CODE>,
+or <CODE>REG_MULTI_SZ</CODE>.  Note that <CODE>$iolData</CODE> is measured as number
+of bytes even in these cases.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegLoadKeyW">RegLoadKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegLoadKeyW( $hKey, $swSubKey, $swFileName )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> and <CODE>$swFileName</CODE> are UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegOpenKeyW">RegOpenKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegOpenKeyW( $hKey, $swSubKey, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegOpenKeyExW">RegOpenKeyExW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegOpenKeyExW( $hKey, $swSubKey, $uOptions, $uAccess, $ohSubKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryInfoKeyW">RegQueryInfoKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryInfoKeyW( $hKey, $oswClass, $iolwClass, $pNull, $ocSubKeys, $olwSubKey, $olwSubClass, $ocValues, $olwValName, $olValData, $olSecDesc, $opftTime )</CODE></STRONG><BR>
+<DD>
+<CODE>$swClass</CODE> is UNICODE.  <CODE>$iolwClass</CODE>, <CODE>$olwSubKey</CODE>, <CODE>$olwSubClass</CODE>,
+and <CODE>$olwValName</CODE> are measured as number of <CODE>WCHAR</CODE>s.  Note that
+<CODE>$olValData</CODE> is measured as number of bytes.
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryMultipleValuesW">RegQueryMultipleValuesW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryMultipleValuesW( $hKey, $ioarValueEnts, $icValueEnts, $opBuffer, $iolBuffer )</CODE></STRONG><BR>
+<DD>
+The <CODE>ve_valuename</CODE> fields of the <CODE>VALENT</CODE> [actually <CODE>VALENTW</CODE>]
+structures in <CODE>$ioarValueEnts</CODE> are UNICODE.  Values of type <CODE>REG_SZ</CODE>,
+<CODE>REG_EXPAND_SZ</CODE>, and <CODE>REG_MULTI_SZ</CODE> are written to <CODE>$opBuffer</CODE>
+in UNICODE.  Note that <CODE>$iolBuffer</CODE> and the <CODE>ve_valuelen</CODE> fields
+of the <CODE>VALENT</CODE> [<CODE>VALENTW</CODE>] structures are measured as number of
+bytes.
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryValueW">RegQueryValueW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryValueW( $hKey, $swSubKey, $oswValueData, $iolValueData )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> and <CODE>$oswValueData</CODE> are UNICODE.  Note that
+<CODE>$iolValueData</CODE> is measured as number of bytes.
+<P></P>
+<DT><STRONG><A NAME="item_RegQueryValueExW">RegQueryValueExW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegQueryValueExW( $hKey, $swName, $pNull, $ouType, $opData, $iolData )</CODE></STRONG><BR>
+<DD>
+<CODE>$swName</CODE> is UNICODE.
+<P><CODE>$opData</CODE> is UNICODE if <CODE>$ouType</CODE> is <CODE>REG_SZ</CODE>, <CODE>REG_EXPAND_SZ</CODE>,
+or <CODE>REG_MULTI_SZ</CODE>.  Note that <CODE>$iolData</CODE> is measured as number of
+bytes even in these cases.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegReplaceKeyW">RegReplaceKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegReplaceKeyW( $hKey, $swSubKey, $swNewFile, $swOldFile )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE>, <CODE>$swNewFile</CODE>, and <CODE>$swOldFile</CODE> are UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegRestoreKeyW">RegRestoreKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegRestoreKeyW( $hKey, $swFileName, $uFlags )</CODE></STRONG><BR>
+<DD>
+<CODE>$swFileName</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegSaveKeyW">RegSaveKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSaveKeyW( $hKey, $swFileName, $pSecAttr )</CODE></STRONG><BR>
+<DD>
+<CODE>$swFileName</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegSetValueW">RegSetValueW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSetValueW( $hKey, $swSubKey, $uType, $swValueData, $lValueData )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> and <CODE>$swValueData</CODE> are UNICODE.  Note that
+<CODE>$lValueData</CODE> is measured as number of bytes even though
+<CODE>$swValueData</CODE> is always UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_RegSetValueExW">RegSetValueExW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegSetValueExW( $hKey, $swName, $uZero, $uType, $pData, $lData )</CODE></STRONG><BR>
+<DD>
+<CODE>$swName</CODE> is UNICODE.
+<P><CODE>$pData</CODE> is UNICODE if <CODE>$uType</CODE> is <CODE>REG_SZ</CODE>, <CODE>REG_EXPAND_SZ</CODE>,
+or <CODE>REG_MULTI_SZ</CODE>.  Note that <CODE>$lData</CODE> is measured as number of
+bytes even in these cases.</P>
+<P></P>
+<DT><STRONG><A NAME="item_RegUnLoadKeyW">RegUnLoadKeyW</A></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>RegUnLoadKeyW( $hKey, $swSubKey )</CODE></STRONG><BR>
+<DD>
+<CODE>$swSubKey</CODE> is UNICODE.
+<P></P>
+<DT><STRONG><A NAME="item_%3AHKEY_">:HKEY_</A></STRONG><BR>
+<DD>
+All <CODE>HKEY_*</CODE> constants:
+<PRE>
+        HKEY_CLASSES_ROOT       HKEY_CURRENT_CONFIG     HKEY_CURRENT_USER
+        HKEY_DYN_DATA           HKEY_LOCAL_MACHINE      HKEY_PERFORMANCE_DATA
+        HKEY_USERS</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%3AKEY_">:KEY_</A></STRONG><BR>
+<DD>
+All <CODE>KEY_*</CODE> constants:
+<PRE>
+        KEY_QUERY_VALUE         KEY_SET_VALUE           KEY_CREATE_SUB_KEY
+        KEY_ENUMERATE_SUB_KEYS  KEY_NOTIFY              KEY_CREATE_LINK
+        KEY_READ                KEY_WRITE               KEY_EXECUTE
+        KEY_ALL_ACCESS</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%3AREG_">:REG_</A></STRONG><BR>
+<DD>
+All <CODE>REG_*</CODE> constants:
+<PRE>
+        REG_CREATED_NEW_KEY             REG_OPENED_EXISTING_KEY</PRE>
+<PRE>
+        REG_LEGAL_CHANGE_FILTER         REG_NOTIFY_CHANGE_ATTRIBUTES
+        REG_NOTIFY_CHANGE_NAME          REG_NOTIFY_CHANGE_LAST_SET
+        REG_NOTIFY_CHANGE_SECURITY      REG_LEGAL_OPTION</PRE>
+<PRE>
+        REG_OPTION_BACKUP_RESTORE       REG_OPTION_CREATE_LINK
+        REG_OPTION_NON_VOLATILE         REG_OPTION_OPEN_LINK
+        REG_OPTION_RESERVED             REG_OPTION_VOLATILE</PRE>
+<PRE>
+        REG_WHOLE_HIVE_VOLATILE         REG_REFRESH_HIVE
+        REG_NO_LAZY_FLUSH</PRE>
+<PRE>
+        REG_NONE                        REG_SZ
+        REG_EXPAND_SZ                   REG_BINARY
+        REG_DWORD                       REG_DWORD_LITTLE_ENDIAN
+        REG_DWORD_BIG_ENDIAN            REG_LINK
+        REG_MULTI_SZ                    REG_RESOURCE_LIST
+        REG_FULL_RESOURCE_DESCRIPTOR    REG_RESOURCE_REQUIREMENTS_LIST</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%3AALL">:ALL</A></STRONG><BR>
+<DD>
+All of the above.
+<P></P>
+<DT><STRONG><A NAME="item_%3ASE_">:SE_</A></STRONG><BR>
+<DD>
+The strings for the following privilege names:
+<PRE>
+        SE_ASSIGNPRIMARYTOKEN_NAME      SE_AUDIT_NAME
+        SE_BACKUP_NAME                  SE_CHANGE_NOTIFY_NAME
+        SE_CREATE_PAGEFILE_NAME         SE_CREATE_PERMANENT_NAME
+        SE_CREATE_TOKEN_NAME            SE_DEBUG_NAME
+        SE_INCREASE_QUOTA_NAME          SE_INC_BASE_PRIORITY_NAME
+        SE_LOAD_DRIVER_NAME             SE_LOCK_MEMORY_NAME
+        SE_MACHINE_ACCOUNT_NAME         SE_PROF_SINGLE_PROCESS_NAME
+        SE_REMOTE_SHUTDOWN_NAME         SE_RESTORE_NAME
+        SE_SECURITY_NAME                SE_SHUTDOWN_NAME
+        SE_SYSTEMTIME_NAME              SE_SYSTEM_ENVIRONMENT_NAME
+        SE_SYSTEM_PROFILE_NAME          SE_TAKE_OWNERSHIP_NAME
+        SE_TCB_NAME                     SE_UNSOLICITED_INPUT_NAME</PRE>
+<P>It can be difficult to successfully build this module in a way
+that makes these constants available.  So some builds of this
+module may not make them available.  For such builds, trying
+to export any of these constants will cause a fatal error.
+For this reason, none of these symbols are currently included
+in the <CODE>&quot;:ALL&quot;</CODE> grouping.</P>
+<P></P></DL>
+</DL>
+<P>
+<H2><A NAME="the win32api:: heirarchy">The Win32API:: heirarchy</A></H2>
+<P>This and the other Win32API:: modules are meant to expose the
+nearly raw API calls so they can be used from Perl code in any
+way they might be used from C code.  This provides the following
+advantages:</P>
+<DL>
+<DT><STRONG><A NAME="item_Many_modules_can_be_written_by_people_that_don%27t">Many modules can be written by people that don't have a C compiler.</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Encourages_more_module_code_to_be_written_in_Perl_">Encourages more module code to be written in Perl [not C].</A></STRONG><BR>
+<DD>
+Perl code is often much easier to inspect, debug, customize, and
+enhance than XS code.
+<P></P>
+<DT><STRONG><A NAME="item_Allows_those_already_familiar_with_the_Win32_API_t">Allows those already familiar with the Win32 API to get
+off to a quick start.</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Provides_an_interactive_tool_for_exploring_even_ob">Provides an interactive tool for exploring even obscure
+details of the Win32 API.</A></STRONG><BR>
+<DD>
+It can be very useful to interactively explore ad-hoc calls into
+parts of the Win32 API using:
+<PRE>
+    perl -de 0</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Ensures_that_native_Win32_data_structures_can_be_u">Ensures that native Win32 data structures can be used.</A></STRONG><BR>
+<DD>
+This allows maximum efficiency.  It also allows data from one
+module [for example, time or security information from the
+<CODE>Win32API::Registry</CODE> or <CODE>Win32API::File</CODE> modules] to be used
+with other modules [for example, <CODE>Win32API::Time</CODE> and
+<CODE>Win32API::SecDesc</CODE>].
+<P></P>
+<DT><STRONG><A NAME="item_Provides_a_single_version_of_the_XS_interface_to_e">Provides a single version of the XS interface to each API
+call where improvements can be collected.</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="buffer sizes">Buffer sizes</A></H2>
+<P>For each parameter that specifies a buffer size, a value of <CODE>0</CODE>
+can be passed.  For parameter that are pointers to buffer sizes,
+you can also pass in <CODE>NULL</CODE> by specifying an empty list reference,
+<CODE>[]</CODE>.  Both of these cases will ensure that the variable has
+&some; buffer space allocated to it and pass in that buffer's
+allocated size.  Many of the calls indicate, via <CODE>ERROR_MORE_DATA</CODE>,
+that the buffer size was not sufficient and the <EM>Registry.xs</EM>
+code will automatically enlarge the buffer to the required size
+and repeat the call.</P>
+<P>Numeric buffer sizes are used as minimum initial sizes for the
+buffers.  The larger of this size and the size of space already
+allocated to the scalar will be passed to the underlying routine. 
+If that size was insufficient, and the underlying call provides
+an easy method for determining the needed buffer size, then the
+buffer will be enlarged and the call repeated as above.</P>
+<P>The underlying calls define buffer size parameter as unsigned, so
+negative buffer sizes are treated as very large positive buffer
+sizes which usually cause <CODE>malloc()</CODE> to fail.</P>
+<P>To force the <EM>Registry.xs</EM> code to pass in a specific value for
+a buffer size, preceed the size with an equals sign via <CODE>&quot;=&quot;.</CODE>. 
+Buffer sizes that are passed in as strings starting with an equals
+sign will have the equal sign stripped and the remainder of the string
+interpretted as a number [via C's <CODE>strtoul()</CODE> using only base 10]
+which will be passed to the underlying routine [even if the allocated
+buffer is actually larger].  The <EM>Registry.xs</EM> code will enlarge the
+buffer to the specified size, if needed, but will not enlarge the
+buffer based on the underlying routine requesting more space.</P>
+<P>Some Reg*() calls may not currently set the buffer size when they
+return <CODE>ERROR_MORE_DATA</CODE>.  But some that are not documented as
+doing so, currently do so anyway.  So the code assumes that any
+routine &might; do this and resizes any buffers and repeats the
+call.   We hope that eventually all routines will provide this
+feature.</P>
+<P>When you use <CODE>[]</CODE> for a buffer size, you can still find the
+length of the data returned by using <A HREF="../../../lib/Pod/perlfunc.html#item_length"><CODE>length($buffer)</CODE></A>.  Note
+that this length will be in bytes while a few of the buffer
+sizes would have been in units of wide characters.</P>
+<P>Note that the RegQueryValueEx*() and RegEnumValue*() calls
+will trim the trailing <CODE>'\0'</CODE> [if present] from the returned data
+values of type <CODE>REG_SZ</CODE> or <CODE>REG_EXPAND_SZ</CODE> but only if the
+value data length parameter is omitted [or specified as <CODE>[]</CODE>].</P>
+<P>The RegSetValueEx*() calls will add a trailing <CODE>'\0'</CODE> [if
+missing] to the supplied data values of type <CODE>REG_SZ</CODE> and
+<CODE>REG_EXPAND_SZ</CODE> but only if the value data length parameter
+is omitted [or specified as <CODE>0</CODE>].</P>
+<P>
+<H2><A NAME="hungarian notation">Hungarian Notation</A></H2>
+<P>The following abbreviations are used at the start of each parameter
+name to hint at aspects of how the parameter is used.  The prefix
+is always in lower case and followed by a capital letter that starts
+the descriptive part of the parameter name.  Several of the following
+abbreviations can be combined into a single prefix.</P>
+<P>Probably not all of these prefix notations are used by this module. 
+This document section may be included in any <CODE>Win32API</CODE> module and
+so covers some notations not used by this specific module.</P>
+<DL>
+<DT><STRONG><A NAME="item_s">s</A></STRONG><BR>
+<DD>
+A string.  In C, a <CODE>'\0'</CODE>-terminated <CODE>char *</CODE>.  In Perl, just a
+string except that it will be truncated at the first <CODE>&quot;\0&quot;</CODE>, if
+it contains one.
+<P></P>
+<DT><STRONG><A NAME="item_sw">sw</A></STRONG><BR>
+<DD>
+A wide [UNICODE] string.  In C, a <CODE>L'\0'</CODE>-terminated <CODE>WCHAR *</CODE>.
+In Perl, a string that contains UNICODE data.  You can convert a
+string to UNICODE in Perl via:
+<PRE>
+    $string= &quot;This is an example string&quot;;
+    $unicode= pack( &quot;S*&quot;, unpack(&quot;C*&quot;,$string), 0 );</PRE>
+<P>Note how <CODE>, 0</CODE> above causes an explicit <CODE>L'\0'</CODE> to be added since
+Perl's implicit <CODE>'\0'</CODE> that it puts after each of its strings is not
+wide enough to terminate a UNICODE string.  So UNICODE strings are
+different than regular strings in that the Perl version of a regular
+string will not include the trialing <CODE>'\0'</CODE> while the Perl version
+of a UNICODE string must include the trailing <CODE>L'\0'</CODE>.</P>
+<P>If a UNICODE string contains no non-ASCII characters, then you
+can convert it back into a normal string via:</P>
+<PRE>
+    $string= pack( &quot;C*&quot;, unpack(&quot;S*&quot;,$unicode) );
+    $string =~ s/\0$//;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_p">p</A></STRONG><BR>
+<DD>
+A pointer to some buffer [usually containing some <CODE>struct</CODE>].  In C,
+a <CODE>void *</CODE> or some other pointer type.  In Perl, a string that is
+usually manipulated using <A HREF="../../../lib/Pod/perlfunc.html#item_pack"><CODE>pack</CODE></A> and <A HREF="../../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack</CODE></A>.  The ``p'' is usually
+followed by more prefix <CODE>character(s)</CODE> to indicate what type of data is
+stored in the bufffer.
+<P></P>
+<DT><STRONG><A NAME="item_a">a</A></STRONG><BR>
+<DD>
+A packed array.  In C, an array [usually of <CODE>struct</CODE>s].  In Perl, a
+string containing the packed data.  The ``a'' is usually followed by
+more prefix <CODE>character(s)</CODE> to indicate the data type of the elements.
+<P>These packed arrays are also called ``vectors'' in places to avoid
+confusion with Perl arrays.</P>
+<P></P>
+<DT><STRONG><A NAME="item_n">n</A></STRONG><BR>
+<DD>
+A generic number.   In C, any of the integer or floating point data
+types.  In Perl, a number; either an integer, unsigned, or double
+[IV, UV, or NV, respectively].  Usually an integer.
+<P></P>
+<DT><STRONG><A NAME="item_iv">iv</A></STRONG><BR>
+<DD>
+A signed integral value.  In C, any of the signed integer data types. 
+In Perl, an integer [IV].
+<P></P>
+<DT><STRONG><A NAME="item_u">u</A></STRONG><BR>
+<DD>
+An unsigned integral value.  In C, any of the unsigned integer data
+types.  In Perl, an unsigned integer [UV].
+<P></P>
+<DT><STRONG><A NAME="item_d">d</A></STRONG><BR>
+<DD>
+A floating-point number.  In C, a <CODE>float</CODE> or <CODE>double</CODE> or, perhaps,
+a <CODE>long double</CODE>.  In Perl, a double-precision floating-point number
+[NV].
+<P></P>
+<DT><STRONG><A NAME="item_b">b</A></STRONG><BR>
+<DD>
+A Boolean value.  In C, any integer data type, though usually via
+a type alias of <CODE>bool</CODE> or <CODE>BOOL</CODE>, containing either a 0 [false] or
+non-zero [true] value.  In Perl, a scalar containing a Boolean value
+[<CODE>0</CODE>, <CODE>&quot;&quot;</CODE>, or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> for ``false'' and anything else for ``true''].
+<P></P>
+<DT><STRONG><A NAME="item_c">c</A></STRONG><BR>
+<DD>
+A count of items.  In C, any integer data type.  In Perl, an unsigned
+integer [UV].  Usually used in conjunction with a ``vector'' parameter
+[see <A HREF="#a">a</A> above] to indicate the number of elements.
+<P></P>
+<DT><STRONG><A NAME="item_l">l</A></STRONG><BR>
+<DD>
+A length [in bytes].  In C, any integer data type.  In Perl, an
+unsigned integer [UV].  Usually used in conjunction with a ``string''
+or ``pointer'' parameter [see <A HREF="#s">s</A> and <A HREF="#p">p</A> above] to indicate the
+buffer size or the size of the value stored in the buffer.
+<P>For strings, there is no general rule as to whether the trailing
+<CODE>'\0'</CODE> is included in such sizes.  For this reason, the <CODE>Win32API</CODE>
+modules follow the Perl rule of always allocating one extra byte
+and reporting buffer sizes as being one smaller than allocated in
+case the <CODE>'\0'</CODE> is not included in the size.</P>
+<P></P>
+<DT><STRONG><A NAME="item_lw">lw</A></STRONG><BR>
+<DD>
+A length measured as number of UNICODE characters.  In C, a count
+of <CODE>WCHAR</CODE>s.  In Perl, an unsigned integer [UV] counting ``shorts''
+[see ``s'' and ``S'' in <A HREF="../../../lib/Pod/perlfunc.html#item_pack"><CODE>pack</CODE></A> and <A HREF="../../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack</CODE></A>].
+<P>For UNICODE strings, the trailing <CODE>L'\0'</CODE> may or may not be
+included in a length so, again, we always allocate extra room
+for one and don't report that extra space.</P>
+<P></P>
+<DT><STRONG><A NAME="item_h">h</A></STRONG><BR>
+<DD>
+A handle.  In C, a <CODE>HANDLE</CODE> or more-specific handle data type. 
+In Perl, an unsigned integer [UV].  In C, these handles are often
+actually some type of pointer, but Perl just treats them as opaque
+numbers, as it should.  This prefix is also used for other pointers
+that are treated as integers in Perl code.
+<P></P>
+<DT><STRONG><A NAME="item_r">r</A></STRONG><BR>
+<DD>
+A record.  In C, almost always a <CODE>struct</CODE> or perhaps <CODE>union</CODE>.  Note
+that C <CODE>struct</CODE>s are rarely passed by value so the ``r'' is almost
+always preceeded by a ``p'' or ``a'' [see <A HREF="#p">p</A> and <A HREF="#a">a</A> above].  For
+the very rare unadorned ``r'', Perl stores the record in the same way
+as a ``pr'', that is, in a string.  For the very rare case where Perl
+explicitly stores a pointer to the <CODE>struct</CODE> rather than storing the
+<CODE>struct</CODE> directly in a Perl string, the prefix ``pp'' or ``ppr'' or even
+``par'' is used.
+<P></P>
+<DT><STRONG><A NAME="item_sv">sv</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_rv">rv</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_hv">hv</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_av">av</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_cv">cv</A></STRONG><BR>
+<DD>
+A Perl data type.  Respectively, a scalar value [SV], a reference
+[RV] [usually to a scalar], a hash [HV], a Perl array [AV], or a Perl
+code reference [PVCV].  For the ``hv'', ``av'', and ``cv'' prefixes, a
+leading ``rv'' is usually assumed.  For a parameter to an XS subroutine,
+a prefix of ``sv'' means the parameter is a scalar and so may be a string
+or a number [or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>] or even both at the same time.  So ``sv''
+doesn't imply a leading ``rv''.
+<P></P>
+<DT><STRONG><A NAME="item_Input_or_Output">Input or Output</A></STRONG><BR>
+<DD>
+Whether a parameter is for input data, output data, or both is usually
+not reflected by the data type prefix.  In cases where this is not
+obvious nor reflected in the parameter name proper, we may use the
+following in front of the data type prefix.
+<DL>
+<DT><STRONG><A NAME="item_i">i</A></STRONG><BR>
+<DD>
+An input parameter given to the API [usually omitted].
+<P></P>
+<DT><STRONG><A NAME="item_o">o</A></STRONG><BR>
+<DD>
+An output-only parameter taken from the API.  You should not get a
+warning if such a parameter is <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> when you pass it into the
+function.  You should get an error if such a parameter is read-only.
+You can [usually] pass in <CODE>[]</CODE> for such a parameter to have the
+parameter silently ignored.
+<P>The output may be written directly into the Perl variable passed
+to the subroutine, the same way the buffer parameter to Perl's
+<A HREF="../../../lib/Pod/perlfunc.html#item_sysread"><CODE>sysread()</CODE></A>.  This method is often avoided in Perl because
+the call then lacks any visual cue that some parameters are being
+overwritten.   But this method closely matches the C API which is
+what we are trying to do.</P>
+<P></P>
+<DT><STRONG><A NAME="item_io">io</A></STRONG><BR>
+<DD>
+Input given to the API then overwritten with output taken from the
+API.  You should get a warning [if <STRONG>-w</STRONG> is in effect] if such a
+parameter is <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> when you pass it into the function [unless it
+is a buffer or buffer length parameter].  If the value is read-only,
+then [for most parameters] the output is silently not written.  This
+is because it is often convenient to pass in read-only constants for
+many such parameters.  You can also usually pass in <CODE>[]</CODE> for such
+parameters.
+<P></P></DL>
+<DT><STRONG><A NAME="item_pp">pp</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_ppr">ppr</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_par">par</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pap">pap</A></STRONG><BR>
+<DD>
+These are just unusual combinations of prefix characters described above.
+<P>For each, a pointer is stored in a [4-byte] Perl string.  You can
+usually use <CODE>unpack &quot;P&quot;</CODE> to access the real data from Perl.</P>
+<P>For ``ppr'' [and often for ``pp''], the pointer points directly at a
+C <CODE>struct</CODE>.  For ``par'', the pointer points to the first element
+of a C [packed] array of <CODE>struct</CODE>s.  For ``pap'', the pointer points
+to a C [packed] array of pointers to other things.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ap">ap</A></STRONG><BR>
+<DD>
+Here we have a list of pointers packed into a single Perl string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The old ActiveState ports of Perl for Win32 [but not, ActivePerl, the
+ActiveState distributions of standard Perl 5.004 and beyond] do not support
+the tools for building extensions and so do not support this extension.</P>
+<P>No routines are provided for using the data returned in the <CODE>FILETIME</CODE>
+buffers.  Those are in the <CODE>Win32API::Time</CODE> module.</P>
+<P>No routines are provided for dealing with UNICODE data effectively. 
+See <A HREF="#:funcw">:FuncW</A> above for some simple-minded UNICODE methods.</P>
+<P>Parts of the module test will fail if used on a version of Perl
+that does not yet set <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> based on <CODE>GetLastError()</CODE>.</P>
+<P>On NT 4.0 [at least], the RegEnum*() calls do not set the required
+buffer sizes when returning <CODE>ERROR_MORE_DATA</CODE> so this module will
+not grow the buffers in such cases.  <A HREF="#item_Win32%3A%3ATieRegistry"><CODE>Win32::TieRegistry</CODE></A> overcomes
+this by using values from <A HREF="#item_RegQueryInfoKey"><CODE>RegQueryInfoKey()</CODE></A> for buffer sizes in
+RegEnum* calls.</P>
+<P>On NT 4.0 [at least], <A HREF="#item_RegQueryInfoKey"><CODE>RegQueryInfoKey()</CODE></A> on <CODE>HKEY_PERFORMANCE_DATA</CODE>
+never succeeds.  Also, <A HREF="#item_RegQueryValueEx"><CODE>RegQueryValueEx()</CODE></A> on <CODE>HKEY_PERFORMANCE_DATA</CODE>
+never returns the required buffer size.  To access <CODE>HKEY_PERFORMANCE_DATA</CODE>
+you will need to keep growing the data buffer until the call succeeds.</P>
+<P>Because <CODE>goto &amp;subroutine</CODE> seems to be buggy under Win32 Perl,
+it is not used in the stubs in <EM>Registry.pm</EM>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tye McQueen, <A HREF="mailto:tye@metronet.com,">tye@metronet.com,</A> <A HREF="http://www.metronet.com/~tye/.">http://www.metronet.com/~tye/.</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Win32%3A%3ATieRegistry"><A HREF="../../../site/lib/Win32/TieRegistry.html">the Win32::TieRegistry manpage</A></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Win32%3A%3ARegistry"><A HREF="../../../site/lib/Win32/Registry.html">the Win32::Registry manpage</A></A></STRONG><BR>
+<DD>
+</DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

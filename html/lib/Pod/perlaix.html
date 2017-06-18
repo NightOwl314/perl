@@ -1,0 +1,198 @@
+<HTML>
+<HEAD>
+<TITLE>README.aix - Perl version 5 on IBM Unix systems</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.aix - Perl version 5 on IBM Unix systems</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#compiling perl 5 on aix">Compiling Perl 5 on AIX</A></LI>
+		<LI><A HREF="#os level">OS level</A></LI>
+		<LI><A HREF="#building dynamic extensions on aix">Building Dynamic Extensions on AIX</A></LI>
+		<LI><A HREF="#the ibm ansi c compiler">The IBM ANSI C Compiler</A></LI>
+		<LI><A HREF="#using gnu's gcc for building perl">Using GNU's gcc for building perl</A></LI>
+		<LI><A HREF="#using large files with perl">Using Large Files with Perl</A></LI>
+		<LI><A HREF="#threaded perl">Threaded Perl</A></LI>
+		<LI><A HREF="#64bit perl">64-bit Perl</A></LI>
+		<LI><A HREF="#gdbm and threads">GDBM and Threads</A></LI>
+		<LI><A HREF="#nfs filesystems and utime(2)">NFS filesystems and <A HREF="../../lib/Pod/perlfunc.html#item_utime"><CODE>utime(2)</CODE></A></A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#date">DATE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>README.aix - Perl version 5 on IBM Unix (AIX) systems</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This document describes various features of IBM's Unix operating
+system (AIX) that will affect how Perl version 5 (hereafter just Perl)
+is compiled and/or runs.</P>
+<P>
+<H2><A NAME="compiling perl 5 on aix">Compiling Perl 5 on AIX</A></H2>
+<P>When compiling Perl, you must use an ANSI C compiler. AIX does not ship
+an ANSI compliant C-compiler with AIX by default, but binary builds of
+gcc for AIX are widely available.</P>
+<P>At the moment of writing, AIX supports two different native C compilers,
+for which you have to pay: <STRONG>xlc</STRONG> and <STRONG>VAC</STRONG>. If you decide to use eiter
+of these two (which is quite a lot easier than using gcc), be sure to
+upgrade to the latest available patch level. Currently:</P>
+<PRE>
+    xlC.C     3.1.4.0
+    vac.C     4.4.0.3   (5.0 is already available)</PRE>
+<P>Perl can be compiled with either IBM's ANSI C compiler or with gcc.
+The former is recommended, as not only can it compile Perl with no
+difficulty, but also can take advantage of features listed later that
+require the use of IBM compiler-specific command-line flags.</P>
+<P>If you decide to use gcc, make sure your installation is recent and
+complete, and be sure to read the Perl README file for more gcc-specific
+details.</P>
+<P>
+<H2><A NAME="os level">OS level</A></H2>
+<P>Before installing the patches to the IBM C-compiler you need to know the
+level of patching for the Operating System. IBM's command 'oslevel' will
+show the base, but is not always complete:</P>
+<PRE>
+    # oslevel
+    4.3.0.0
+    # lslpp -l | grep 'bos.rte '
+    bos.rte      4.3.2.1  COMMITTED  Base Operating System Runtime
+    bos.rte      4.3.2.0  COMMITTED  Base Operating System Runtime
+    #</PRE>
+<P>
+<H2><A NAME="building dynamic extensions on aix">Building Dynamic Extensions on AIX</A></H2>
+<P>AIX supports dynamically loadable libraries (shared libraries).
+Shared libraries end with the suffix .a, which is a bit misleading,
+because *all* libraries are shared ;-).</P>
+<P>
+<H2><A NAME="the ibm ansi c compiler">The IBM ANSI C Compiler</A></H2>
+<P>All defaults for Configure can be used.</P>
+<P>If you've chosen to use vac 4, be sure to run 4.4.0.3. Older versions
+will turn up nasty later on.</P>
+<P>Here's a brief lead of how to upgrade the compiler to the latest
+level.  Of course this is subject to changes.  You can only upgrade
+versions from ftp-available updates if the first three digit groups
+are the same (in where you can skip intermediate unlike the patches
+in the developer snapshots of perl), or to one version up where the
+`base' is available.  In other words, the AIX compiler patches are
+cumulative.</P>
+<PRE>
+ vac.C.4.4.0.1 =&gt; vac.C.4.4.0.3  is OK     (vac.C.4.4.0.2 not needed)
+ xlC.C.3.1.3.3 =&gt; xlC.C.3.1.4.10 is NOT OK (xlC.C.3.1.4.0 is not available)</PRE>
+<PRE>
+ # ftp ftp.software.ibm.com
+ Connected to service.boulder.ibm.com.
+ : welcome message ...
+ Name (ftp.software.ibm.com:merijn): anonymous
+ 331 Guest login ok, send your complete e-mail address as password.
+ Password:
+ ... accepted login stuff
+ ftp&gt; cd /aix/fixes/v4/
+ ftp&gt; dir other other.ll
+ output to local-file: other.ll? y
+ 200 PORT command successful.
+ 150 Opening ASCII mode data connection for /bin/ls.
+ 226 Transfer complete.
+ ftp&gt; dir xlc xlc.ll
+ output to local-file: xlc.ll? y
+ 200 PORT command successful.
+ 150 Opening ASCII mode data connection for /bin/ls.
+ 226 Transfer complete.
+ ftp&gt; bye
+ ... goodbye messages
+ # ls -l *.ll
+ -rw-rw-rw-   1 merijn   system    1169432 Nov  2 17:29 other.ll
+ -rw-rw-rw-   1 merijn   system      29170 Nov  2 17:29 xlc.ll</PRE>
+<P>On AIX 4.2 using xlC, we continue:</P>
+<PRE>
+ # lslpp -l | fgrep 'xlC.C '
+   xlC.C                     3.1.4.9  COMMITTED  C for AIX Compiler
+   xlC.C                     3.1.4.0  COMMITTED  C for AIX Compiler
+ # grep 'xlC.C.3.1.4.*.bff' xlc.ll
+ -rw-r--r--   1 45776101 1        6286336 Jul 22 1996  xlC.C.3.1.4.1.bff
+ -rw-rw-r--   1 45776101 1        6173696 Aug 24 1998  xlC.C.3.1.4.10.bff
+ -rw-r--r--   1 45776101 1        6319104 Aug 14 1996  xlC.C.3.1.4.2.bff
+ -rw-r--r--   1 45776101 1        6316032 Oct 21 1996  xlC.C.3.1.4.3.bff
+ -rw-r--r--   1 45776101 1        6315008 Dec 20 1996  xlC.C.3.1.4.4.bff
+ -rw-rw-r--   1 45776101 1        6178816 Mar 28 1997  xlC.C.3.1.4.5.bff
+ -rw-rw-r--   1 45776101 1        6188032 May 22 1997  xlC.C.3.1.4.6.bff
+ -rw-rw-r--   1 45776101 1        6191104 Sep  5 1997  xlC.C.3.1.4.7.bff
+ -rw-rw-r--   1 45776101 1        6185984 Jan 13 1998  xlC.C.3.1.4.8.bff
+ -rw-rw-r--   1 45776101 1        6169600 May 27 1998  xlC.C.3.1.4.9.bff
+ # wget <A HREF="ftp://ftp.software.ibm.com/aix/fixes/v4/xlc/xlC.C.3.1.4.10.bff">ftp://ftp.software.ibm.com/aix/fixes/v4/xlc/xlC.C.3.1.4.10.bff</A>
+ #</PRE>
+<P>On AIX 4.3 using vac, we continue:</P>
+<PRE>
+ # lslpp -l | fgrep 'vac.C '
+   vac.C                      4.4.0.2  COMMITTED  C for AIX Compiler
+   vac.C                      4.4.0.0  COMMITTED  C for AIX Compiler
+ # grep 'vac.C.4.4.0.*.bff' other.ll
+ -rw-rw-r--   1 45776101 1        13466624 May 26 1999  vac.C.4.4.0.1.bff
+ -rw-rw-r--   1 45776101 1        13473792 Aug 31 1999  vac.C.4.4.0.2.bff
+ -rw-rw-r--   1 45776101 1        13480960 May 19 20:32 vac.C.4.4.0.3.bff
+ # wget <A HREF="ftp://ftp.software.ibm.com/aix/fixes/v4/other/vac.C.4.4.0.3.bff">ftp://ftp.software.ibm.com/aix/fixes/v4/other/vac.C.4.4.0.3.bff</A>
+ #</PRE>
+<P>Then execute the following command, and fill in its choices</P>
+<PRE>
+ # smit install_update
+  -&gt; Install and Update from LATEST Available Software
+  * INPUT device / directory for software [ vac.C.4.4.0.3.bff    ]
+  [ OK ]
+  [ OK ]</PRE>
+<P>Follow the messages ... and you're done.</P>
+<P>
+<H2><A NAME="using gnu's gcc for building perl">Using GNU's gcc for building perl</A></H2>
+<P>... ?</P>
+<P>
+<H2><A NAME="using large files with perl">Using Large Files with Perl</A></H2>
+<P>... ?</P>
+<P>
+<H2><A NAME="threaded perl">Threaded Perl</A></H2>
+<P>... ?</P>
+<P>
+<H2><A NAME="64bit perl">64-bit Perl</A></H2>
+<P>... ?</P>
+<P>
+<H2><A NAME="gdbm and threads">GDBM and Threads</A></H2>
+<P>... ?</P>
+<P>
+<H2><A NAME="nfs filesystems and utime(2)">NFS filesystems and <A HREF="../../lib/Pod/perlfunc.html#item_utime"><CODE>utime(2)</CODE></A></A></H2>
+<P>... ?</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>H.Merijn Brand &lt;<A HREF="mailto:h.m.brand@hccnet.nl">h.m.brand@hccnet.nl</A>&gt;</P>
+<P>Structure copied from README.hpux</P>
+<P>
+<HR>
+<H1><A NAME="date">DATE</A></H1>
+<P>Version 0.0.1: 16-10-2000</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.aix - Perl version 5 on IBM Unix systems</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,337 @@
+
+<HTML>
+<HEAD>
+<TITLE>Math::Trig - trigonometric functions</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::Trig - trigonometric functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#trigonometric functions">TRIGONOMETRIC FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#errors due to division by zero">ERRORS DUE TO DIVISION BY ZERO</A></LI>
+		<LI><A HREF="#simple (real) arguments, complex results">SIMPLE (REAL) ARGUMENTS, COMPLEX RESULTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#plane angle conversions">PLANE ANGLE CONVERSIONS</A></LI>
+	<LI><A HREF="#radial coordinate conversions">RADIAL COORDINATE CONVERSIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#coordinate systems">COORDINATE SYSTEMS</A></LI>
+		<LI><A HREF="#3d angle conversions">3-D ANGLE CONVERSIONS</A></LI>
+	</UL>
+
+	<LI><A HREF="#great circle distances">GREAT CIRCLE DISTANCES</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Math::Trig - trigonometric functions</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Math::Trig;</PRE>
+<PRE>
+        $x = tan(0.9);
+        $y = acos(3.7);
+        $z = asin(2.4);</PRE>
+<PRE>
+        $halfpi = pi/2;</PRE>
+<PRE>
+        $rad = deg2rad(120);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Math::Trig</CODE> defines many trigonometric functions not defined by the
+core Perl which defines only the <A HREF="../../lib/Pod/perlfunc.html#item_sin"><CODE>sin()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_cos"><CODE>cos()</CODE></A>.  The constant
+<STRONG>pi</STRONG> is also defined as are a few convenience functions for angle
+conversions.</P>
+<P>
+<HR>
+<H1><A NAME="trigonometric functions">TRIGONOMETRIC FUNCTIONS</A></H1>
+<P>The tangent</P>
+<DL>
+<DT><STRONG><A NAME="item_tan"><STRONG>tan</STRONG></A></STRONG><BR>
+<DD>
+</DL>
+<P>The cofunctions of the sine, cosine, and tangent (cosec/csc and cotan/cot
+are aliases)</P>
+<P><STRONG>csc</STRONG>, <STRONG>cosec</STRONG>, <STRONG>sec</STRONG>, <STRONG>sec</STRONG>, <STRONG>cot</STRONG>, <STRONG>cotan</STRONG></P>
+<P>The arcus (also known as the inverse) functions of the sine, cosine,
+and tangent</P>
+<P><STRONG>asin</STRONG>, <STRONG>acos</STRONG>, <STRONG>atan</STRONG></P>
+<P>The principal value of the arc tangent of y/x</P>
+<P><STRONG>atan2</STRONG>(y, x)</P>
+<P>The arcus cofunctions of the sine, cosine, and tangent (acosec/acsc
+and acotan/acot are aliases)</P>
+<P><STRONG>acsc</STRONG>, <STRONG>acosec</STRONG>, <STRONG>asec</STRONG>, <STRONG>acot</STRONG>, <STRONG>acotan</STRONG></P>
+<P>The hyperbolic sine, cosine, and tangent</P>
+<P><STRONG>sinh</STRONG>, <STRONG>cosh</STRONG>, <STRONG>tanh</STRONG></P>
+<P>The cofunctions of the hyperbolic sine, cosine, and tangent (cosech/csch
+and cotanh/coth are aliases)</P>
+<P><STRONG>csch</STRONG>, <STRONG>cosech</STRONG>, <STRONG>sech</STRONG>, <STRONG>coth</STRONG>, <STRONG>cotanh</STRONG></P>
+<P>The arcus (also known as the inverse) functions of the hyperbolic
+sine, cosine, and tangent</P>
+<P><STRONG>asinh</STRONG>, <STRONG>acosh</STRONG>, <STRONG>atanh</STRONG></P>
+<P>The arcus cofunctions of the hyperbolic sine, cosine, and tangent
+(acsch/acosech and acoth/acotanh are aliases)</P>
+<P><STRONG>acsch</STRONG>, <STRONG>acosech</STRONG>, <STRONG>asech</STRONG>, <STRONG>acoth</STRONG>, <STRONG>acotanh</STRONG></P>
+<P>The trigonometric constant <STRONG>pi</STRONG> is also defined.</P>
+<P>$pi2 = 2 * <STRONG>pi</STRONG>;</P>
+<P>
+<H2><A NAME="errors due to division by zero">ERRORS DUE TO DIVISION BY ZERO</A></H2>
+<P>The following functions</P>
+<PRE>
+        acoth
+        acsc
+        acsch
+        asec
+        asech
+        atanh
+        cot
+        coth
+        csc
+        csch
+        sec
+        sech
+        tan
+        tanh</PRE>
+<P>cannot be computed for all arguments because that would mean dividing
+by zero or taking logarithm of zero. These situations cause fatal
+runtime errors looking like this</P>
+<PRE>
+        cot(0): Division by zero.
+        (Because in the definition of cot(0), the divisor sin(0) is 0)
+        Died at ...</PRE>
+<P>or</P>
+<PRE>
+        atanh(-1): Logarithm of zero.
+        Died at...</PRE>
+<P>For the <CODE>csc</CODE>, <CODE>cot</CODE>, <CODE>asec</CODE>, <CODE>acsc</CODE>, <CODE>acot</CODE>, <CODE>csch</CODE>, <CODE>coth</CODE>,
+<CODE>asech</CODE>, <CODE>acsch</CODE>, the argument cannot be <CODE>0</CODE> (zero).  For the
+<CODE>atanh</CODE>, <CODE>acoth</CODE>, the argument cannot be <CODE>1</CODE> (one).  For the
+<CODE>atanh</CODE>, <CODE>acoth</CODE>, the argument cannot be <CODE>-1</CODE> (minus one).  For the
+<A HREF="#item_tan"><CODE>tan</CODE></A>, <CODE>sec</CODE>, <CODE>tanh</CODE>, <CODE>sech</CODE>, the argument cannot be <EM>pi/2 + k *
+pi</EM>, where <EM>k</EM> is any integer.</P>
+<P>
+<H2><A NAME="simple (real) arguments, complex results">SIMPLE (REAL) ARGUMENTS, COMPLEX RESULTS</A></H2>
+<P>Please note that some of the trigonometric functions can break out
+from the <STRONG>real axis</STRONG> into the <STRONG>complex plane</STRONG>. For example
+<CODE>asin(2)</CODE> has no definition for plain real numbers but it has
+definition for complex numbers.</P>
+<P>In Perl terms this means that supplying the usual Perl numbers (also
+known as scalars, please see <A HREF="../../lib/Pod/perldata.html">the perldata manpage</A>) as input for the
+trigonometric functions might produce as output results that no more
+are simple real numbers: instead they are complex numbers.</P>
+<P>The <CODE>Math::Trig</CODE> handles this by using the <CODE>Math::Complex</CODE> package
+which knows how to handle complex numbers, please see <A HREF="../../lib/Math/Complex.html">the Math::Complex manpage</A>
+for more information. In practice you need not to worry about getting
+complex numbers as results because the <CODE>Math::Complex</CODE> takes care of
+details like for example how to display complex numbers. For example:</P>
+<PRE>
+        print asin(2), &quot;\n&quot;;</PRE>
+<P>should produce something like this (take or leave few last decimals):</P>
+<PRE>
+        1.5707963267949-1.31695789692482i</PRE>
+<P>That is, a complex number with the real part of approximately <CODE>1.571</CODE>
+and the imaginary part of approximately <CODE>-1.317</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="plane angle conversions">PLANE ANGLE CONVERSIONS</A></H1>
+<P>(Plane, 2-dimensional) angles may be converted with the following functions.</P>
+<PRE>
+        $radians  = deg2rad($degrees);
+        $radians  = grad2rad($gradians);</PRE>
+<PRE>
+        $degrees  = rad2deg($radians);
+        $degrees  = grad2deg($gradians);</PRE>
+<PRE>
+        $gradians = deg2grad($degrees);
+        $gradians = rad2grad($radians);</PRE>
+<P>The full circle is 2 <EM>pi</EM> radians or <EM>360</EM> degrees or <EM>400</EM> gradians.
+The result is by default wrapped to be inside the [0, {2pi,360,400}[ circle.
+If you don't want this, supply a true second argument:</P>
+<PRE>
+        $zillions_of_radians  = deg2rad($zillions_of_degrees, 1);
+        $negative_degrees     = rad2deg($negative_radians, 1);</PRE>
+<P>You can also do the wrapping explicitly by rad2rad(), deg2deg(), and
+grad2grad().</P>
+<P>
+<HR>
+<H1><A NAME="radial coordinate conversions">RADIAL COORDINATE CONVERSIONS</A></H1>
+<P><STRONG>Radial coordinate systems</STRONG> are the <STRONG>spherical</STRONG> and the <STRONG>cylindrical</STRONG>
+systems, explained shortly in more detail.</P>
+<P>You can import radial coordinate conversion functions by using the
+<CODE>:radial</CODE> tag:</P>
+<PRE>
+    use Math::Trig ':radial';</PRE>
+<PRE>
+    ($rho, $theta, $z)     = cartesian_to_cylindrical($x, $y, $z);
+    ($rho, $theta, $phi)   = cartesian_to_spherical($x, $y, $z);
+    ($x, $y, $z)           = cylindrical_to_cartesian($rho, $theta, $z);
+    ($rho_s, $theta, $phi) = cylindrical_to_spherical($rho_c, $theta, $z);
+    ($x, $y, $z)           = spherical_to_cartesian($rho, $theta, $phi);
+    ($rho_c, $theta, $z)   = spherical_to_cylindrical($rho_s, $theta, $phi);</PRE>
+<P><STRONG>All angles are in radians</STRONG>.</P>
+<P>
+<H2><A NAME="coordinate systems">COORDINATE SYSTEMS</A></H2>
+<P><STRONG>Cartesian</STRONG> coordinates are the usual rectangular <EM>(x, y,
+z)</EM>-coordinates.</P>
+<P>Spherical coordinates, <EM>(rho, theta, pi)</EM>, are three-dimensional
+coordinates which define a point in three-dimensional space.  They are
+based on a sphere surface.  The radius of the sphere is <STRONG>rho</STRONG>, also
+known as the <EM>radial</EM> coordinate.  The angle in the <EM>xy</EM>-plane
+(around the <EM>z</EM>-axis) is <STRONG>theta</STRONG>, also known as the <EM>azimuthal</EM>
+coordinate.  The angle from the <EM>z</EM>-axis is <STRONG>phi</STRONG>, also known as the
+<EM>polar</EM> coordinate.  The `North Pole' is therefore <EM>0, 0, rho</EM>, and
+the `Bay of Guinea' (think of the missing big chunk of Africa) <EM>0,
+pi/2, rho</EM>.  In geographical terms <EM>phi</EM> is latitude (northward
+positive, southward negative) and <EM>theta</EM> is longitude (eastward
+positive, westward negative).</P>
+<P><STRONG>BEWARE</STRONG>: some texts define <EM>theta</EM> and <EM>phi</EM> the other way round,
+some texts define the <EM>phi</EM> to start from the horizontal plane, some
+texts use <EM>r</EM> in place of <EM>rho</EM>.</P>
+<P>Cylindrical coordinates, <EM>(rho, theta, z)</EM>, are three-dimensional
+coordinates which define a point in three-dimensional space.  They are
+based on a cylinder surface.  The radius of the cylinder is <STRONG>rho</STRONG>,
+also known as the <EM>radial</EM> coordinate.  The angle in the <EM>xy</EM>-plane
+(around the <EM>z</EM>-axis) is <STRONG>theta</STRONG>, also known as the <EM>azimuthal</EM>
+coordinate.  The third coordinate is the <EM>z</EM>, pointing up from the
+<STRONG>theta</STRONG>-plane.</P>
+<P>
+<H2><A NAME="3d angle conversions">3-D ANGLE CONVERSIONS</A></H2>
+<P>Conversions to and from spherical and cylindrical coordinates are
+available.  Please notice that the conversions are not necessarily
+reversible because of the equalities like <EM>pi</EM> angles being equal to
+<EM>-pi</EM> angles.</P>
+<DL>
+<DT><STRONG><A NAME="item_cartesian_to_cylindrical">cartesian_to_cylindrical</A></STRONG><BR>
+<DD>
+<PRE>
+        ($rho, $theta, $z) = cartesian_to_cylindrical($x, $y, $z);</PRE>
+<DT><STRONG><A NAME="item_cartesian_to_spherical">cartesian_to_spherical</A></STRONG><BR>
+<DD>
+<PRE>
+        ($rho, $theta, $phi) = cartesian_to_spherical($x, $y, $z);</PRE>
+<DT><STRONG><A NAME="item_cylindrical_to_cartesian">cylindrical_to_cartesian</A></STRONG><BR>
+<DD>
+<PRE>
+        ($x, $y, $z) = cylindrical_to_cartesian($rho, $theta, $z);</PRE>
+<DT><STRONG><A NAME="item_cylindrical_to_spherical">cylindrical_to_spherical</A></STRONG><BR>
+<DD>
+<PRE>
+        ($rho_s, $theta, $phi) = cylindrical_to_spherical($rho_c, $theta, $z);</PRE>
+<P>Notice that when <CODE>$z</CODE> is not 0 <CODE>$rho_s</CODE> is not equal to <CODE>$rho_c</CODE>.</P>
+<DT><STRONG><A NAME="item_spherical_to_cartesian">spherical_to_cartesian</A></STRONG><BR>
+<DD>
+<PRE>
+        ($x, $y, $z) = spherical_to_cartesian($rho, $theta, $phi);</PRE>
+<DT><STRONG><A NAME="item_spherical_to_cylindrical">spherical_to_cylindrical</A></STRONG><BR>
+<DD>
+<PRE>
+        ($rho_c, $theta, $z) = spherical_to_cylindrical($rho_s, $theta, $phi);</PRE>
+<P>Notice that when <CODE>$z</CODE> is not 0 <CODE>$rho_c</CODE> is not equal to <CODE>$rho_s</CODE>.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="great circle distances">GREAT CIRCLE DISTANCES</A></H1>
+<P>You can compute spherical distances, called <STRONG>great circle distances</STRONG>,
+by importing the <CODE>great_circle_distance</CODE> function:</P>
+<PRE>
+        use Math::Trig 'great_circle_distance'</PRE>
+<PRE>
+  $distance = great_circle_distance($theta0, $phi0, $theta1, $phi1, [, $rho]);</PRE>
+<P>The <EM>great circle distance</EM> is the shortest distance between two
+points on a sphere.  The distance is in <CODE>$rho</CODE> units.  The <CODE>$rho</CODE> is
+optional, it defaults to 1 (the unit sphere), therefore the distance
+defaults to radians.</P>
+<P>If you think geographically the <EM>theta</EM> are longitudes: zero at the
+Greenwhich meridian, eastward positive, westward negative--and the
+<EM>phi</EM> are latitudes: zero at the North Pole, northward positive,
+southward negative.  <STRONG>NOTE</STRONG>: this formula thinks in mathematics, not
+geographically: the <EM>phi</EM> zero is at the North Pole, not at the
+Equator on the west coast of Africa (Bay of Guinea).  You need to
+subtract your geographical coordinates from <EM>pi/2</EM> (also known as 90
+degrees).</P>
+<PRE>
+  $distance = great_circle_distance($lon0, pi/2 - $lat0,
+                                    $lon1, pi/2 - $lat1, $rho);</PRE>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>To calculate the distance between London (51.3N 0.5W) and Tokyo (35.7N
+139.8E) in kilometers:</P>
+<PRE>
+        use Math::Trig qw(great_circle_distance deg2rad);</PRE>
+<PRE>
+        # Notice the 90 - latitude: phi zero is at the North Pole.
+        @L = (deg2rad(-0.5), deg2rad(90 - 51.3));
+        @T = (deg2rad(139.8),deg2rad(90 - 35.7));</PRE>
+<PRE>
+        $km = great_circle_distance(@L, @T, 6378);</PRE>
+<P>The answer may be off by few percentages because of the irregular
+(slightly aspherical) form of the Earth.  The used formula</P>
+<PRE>
+        lat0 = 90 degrees - phi0
+        lat1 = 90 degrees - phi1
+        d = R * arccos(cos(lat0) * cos(lat1) * cos(lon1 - lon01) +
+                       sin(lat0) * sin(lat1))</PRE>
+<P>is also somewhat unreliable for small distances (for locations
+separated less than about five degrees) because it uses arc cosine
+which is rather ill-conditioned for values close to zero.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Saying <CODE>use Math::Trig;</CODE> exports many mathematical routines in the
+caller environment and even overrides some (<A HREF="../../lib/Pod/perlfunc.html#item_sin"><CODE>sin</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_cos"><CODE>cos</CODE></A>).  This is
+construed as a feature by the Authors, actually... ;-)</P>
+<P>The code is not optimized for speed, especially because we use
+<CODE>Math::Complex</CODE> and thus go quite near complex numbers while doing
+the computations even when the arguments are not. This, however,
+cannot be completely avoided if we want things like <CODE>asin(2)</CODE> to give
+an answer instead of giving a fatal runtime error.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Jarkko Hietaniemi &lt;<EM><A HREF="mailto:jhi@iki.fi">jhi@iki.fi</A></EM>&gt; and 
+Raphael Manfredi &lt;<EM><A HREF="mailto:Raphael_Manfredi@pobox.com">Raphael_Manfredi@pobox.com</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::Trig - trigonometric functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,125 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  perl -MExtUtils::Command -e cat files... &gt; destination
+  perl -MExtUtils::Command -e mv source... destination
+  perl -MExtUtils::Command -e cp source... destination
+  perl -MExtUtils::Command -e touch files...
+  perl -MExtUtils::Command -e rm_f file...
+  perl -MExtUtils::Command -e rm_rf directories...
+  perl -MExtUtils::Command -e mkpath directories...
+  perl -MExtUtils::Command -e eqtime source destination
+  perl -MExtUtils::Command -e chmod mode files...
+  perl -MExtUtils::Command -e test_f file</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The module is used in the Win32 port to replace common UNIX commands.
+Most commands are wrappers on generic modules File::Path and File::Basename.</P>
+<DL>
+<DT><STRONG><A NAME="item_cat">cat</A></STRONG><BR>
+<DD>
+Concatenates all files mentioned on command line to STDOUT.
+<P></P>
+<DT><STRONG><A NAME="item_eqtime_src_dst">eqtime src dst</A></STRONG><BR>
+<DD>
+Sets modified time of dst to that of src
+<P></P>
+<DT><STRONG><A NAME="item_rm_f_files%2E%2E%2E%2E">rm_f files....</A></STRONG><BR>
+<DD>
+Removes directories - recursively (even if readonly)
+<P></P>
+<DT><STRONG>rm_f files....</STRONG><BR>
+<DD>
+Removes files (even if readonly)
+<P></P>
+<DT><STRONG><A NAME="item_touch_files_%2E%2E%2E">touch files ...</A></STRONG><BR>
+<DD>
+Makes files exist, with current timestamp
+<P></P>
+<DT><STRONG><A NAME="item_mv_source%2E%2E%2E_destination">mv source... destination</A></STRONG><BR>
+<DD>
+Moves source to destination.
+Multiple sources are allowed if destination is an existing directory.
+<P></P>
+<DT><STRONG><A NAME="item_cp_source%2E%2E%2E_destination">cp source... destination</A></STRONG><BR>
+<DD>
+Copies source to destination.
+Multiple sources are allowed if destination is an existing directory.
+<P></P>
+<DT><STRONG><A NAME="item_chmod_mode_files%2E%2E%2E">chmod mode files...</A></STRONG><BR>
+<DD>
+Sets UNIX like permissions 'mode' on all the files.
+<P></P>
+<DT><STRONG><A NAME="item_mkpath_directory%2E%2E%2E">mkpath directory...</A></STRONG><BR>
+<DD>
+Creates directory, including any parent directories.
+<P></P>
+<DT><STRONG><A NAME="item_test_f_file">test_f file</A></STRONG><BR>
+<DD>
+Tests if a file exists
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Should probably be Auto/Self loaded.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>ExtUtils::MakeMaker, ExtUtils::MM_Unix, ExtUtils::MM_Win32</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Nick Ing-Simmons &lt;<EM><A HREF="mailto:nick@ni-s.u-net.com">nick@ni-s.u-net.com</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

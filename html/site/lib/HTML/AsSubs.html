@@ -1,0 +1,114 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::AsSubs - functions that construct a HTML syntax tree</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::AsSubs - functions that construct a HTML syntax tree</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#acknowledgement">ACKNOWLEDGEMENT</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::AsSubs - functions that construct a HTML syntax tree</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTML::AsSubs;
+ $h = body(
+           h1(&quot;This is the heading&quot;),
+           p(&quot;This is the first paragraph which contains a &quot;,
+             a({href=&gt;'link.html'}, &quot;link&quot;),
+             &quot; and an &quot;,
+             img({src=&gt;'img.gif', alt=&gt;'image'}),
+             &quot;.&quot;
+            ),
+          );
+ print $h-&gt;as_HTML;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module exports functions that can be used to construct various
+HTML elements. The functions are named after the tags of the
+correponding HTML element and are all written in lower case. If the
+first argument is a hash reference then it will be used to initialize the
+attributes of this element. The remaining arguments are regarded as
+content.</P>
+<P>For a similar idea (i.e., it's another case where the syntax tree
+of the Perl source mirrors the syntax tree of the HTML produced),
+see HTML::Element's <CODE>new_from_lol</CODE> method.</P>
+<P>For what I now think is a cleaner implementation of this same idea,
+see the excellent module <CODE>XML::Generator</CODE>, which is what I suggest
+for actual real-life use.  (I suggest this over <CODE>HTML::AsSubs</CODE> and
+over <CODE>CGI.pm</CODE>'s HTML-making functions.)</P>
+<P>
+<HR>
+<H1><A NAME="acknowledgement">ACKNOWLEDGEMENT</A></H1>
+<P>This module was inspired by the following message:</P>
+<PRE>
+ Date: Tue, 4 Oct 1994 16:11:30 +0100
+ Subject: Wow! I have a large lightbulb above my head!</PRE>
+<PRE>
+ Take a moment to consider these lines:</PRE>
+<PRE>
+ %OVERLOAD=( '&quot;&quot;' =&gt; sub { join(&quot;&quot;, @{$_[0]}) } );</PRE>
+<PRE>
+ sub html { my($type)=shift; bless [&quot;&lt;$type&gt;&quot;, @_, &quot;&lt;/$type&gt;&quot;]; }</PRE>
+<PRE>
+ :-)  I *love* Perl 5!  Thankyou Larry and Ilya.</PRE>
+<PRE>
+ Regards,
+ Tim Bunce.</PRE>
+<PRE>
+ p.s. If you didn't get it, think about recursive data types: html(html())
+ p.p.s. I'll turn this into a much more practical example in a day or two.
+ p.p.p.s. It's a pity that overloads are not inherited. Is this a bug?</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The exported <CODE>link()</CODE> function overrides the builtin <CODE>link()</CODE> function.
+The exported <CODE>tr()</CODE> function must be called using &amp;tr(...) syntax
+because it clashes with the builtin tr/../../ operator.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/HTML/Element.html">the HTML::Element manpage</A>, <A HREF="../../lib/XML/Generator.html">the XML::Generator manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::AsSubs - functions that construct a HTML syntax tree</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

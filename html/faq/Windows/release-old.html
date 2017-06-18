@@ -1,0 +1,926 @@
+<HTML>
+
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META name="GENERATOR" content="Microsoft FrontPage 4.0">
+<META name="ProgId" content="FrontPage.Editor.Document">
+<TITLE>ActivePerl Release Notes</TITLE>
+<LINK rel="STYLESHEET" href="../../Active.css" type="text/css" media="screen">
+</HEAD>
+
+<BODY bgcolor="#FFFFFF">
+
+<!-- beginning of leaf header-->
+
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%">
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><STRONG>
+      <P class="block">&nbsp;ActivePerl FAQ</P>
+      </STRONG></TD>
+  </TR>
+</TABLE>
+<P>&nbsp;</P>
+<P><FONT size="7">THIS FILE IS OUT OF DATE!</FONT></P>
+      <!-- end of leaf content-->
+
+<H1 align="center"><B>ActivePerl</B></H1>
+<H1 align="center"><B>Release Notes</B></H1>
+<P align="center"><B>Build 607 Tuesday, February 8, 2000</B></P>
+<P align="center">For the latest information on ActivePerl, please see:</P>
+<P align="center"><A href="http://www.ActiveState.com/ActivePerl/">http://www.ActiveState.com/ActivePerl/</A></P>
+<HR>
+<H1>Contents</H1>
+<UL>
+  <LI><A href="#Build607">Build 607 History</A></LI>
+  <LI><A href="#Build606">Build 606 History</A></LI>
+  <LI><A href="#Build604">Build 604 History</A></LI>
+  <LI><A href="#Build603">Build 603 History</A></LI>
+  <LI><A href="#Build602">Build 602 History</A></LI>
+  <LI><A href="#Build601">Build 601 History</A></LI>
+  <LI><A href="#Whats_New">What's New in the 600 Series</A></LI>
+  <LI><A href="#Build523">Build 523 History</A></LI>
+  <LI><A href="#Build522">Build 522 History</A></LI>
+  <LI><A href="#Build521">Build 521 History</A></LI>
+  <LI><A href="#Build520">Build 520 History</A></LI>
+  <LI><A href="#Build519">Build 519 History</A></LI>
+  <LI><A href="#Build518">Build 518 History</A></LI>
+  <LI><A href="#Build517">Build 517 History</A></LI>
+  <LI><A href="#Build516">Build 516 History</A></LI>
+  <LI><A href="#Build515">Build 515 History</A></LI>
+  <LI><A href="#Build514">Build 514 History</A></LI>
+  <LI><A href="#Build513">Build 513 History</A></LI>
+  <LI><A href="#Build509">Build 509 History</A></LI>
+  <LI><A href="#Build508">Build 508 History</A></LI>
+  <LI><A href="#Build507">Build 507 History</A></LI>
+  <LI><A href="#Build506">Build 506 History</A></LI>
+  <LI><A href="#Build505">Build 505 History</A></LI>
+  <LI><A href="#Build504">Build 504 History</A></LI>
+  <LI><A href="#Build503">Build 503 History</A></LI>
+  <LI><A href="#Build502">Build 502 History</A></LI>
+  <LI><A href="#Build501">Build 501 History</A></LI>
+  <LI><A href="#Build500">Build 500 History</A></LI>
+  <LI><A href="#Build476">Build 476 History</A></LI>
+  <LI><A href="#Build471">Build 471 History</A></LI>
+  <LI><A href="#Build469">Build 469 History</A></LI>
+  <LI><A href="#Whats_Changed">What's Changed From the 300 Series</A></LI>
+</UL>
+<HR>
+<H1><A name="Release_History">Release History</A></H1>
+<HR>
+<H2><A name="Build607">Build 607 Friday, February 11, 2000</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>This build corresponds to the public Perl 5.6 beta1 release, otherwise known as v5.5.650.</LI>
+  <LI>Several bugs in the Unicode support have been fixed.</LI>
+  <LI>Support for Unicode has changed from previous development versions. See perlunicode.pod for
+    details.</LI>
+  <LI>There is a new -C command-line switch to request that system calls use the wide-character
+    APIs. This can also be used in the shebang line.</LI>
+  <LI>The byte pragma can be used to force byte-semantics on Perl operations. When not used,
+    character semantics apply if the data is Unicode; otherwise, byte semantics are used.</LI>
+</UL>
+<P><STRONG>Known Issues</STRONG></P>
+<UL>
+  <LI>Conversions between Unicode and locale encoding don't work yet.</LI>
+  <LI>@ARGV does not contain Unicode strings, even when the -C switch is used. This will be
+    supported in a future release.</LI>
+  <LI>The known issues in Build 606 still apply.</LI>
+</UL>
+<HR>
+<H2><A name="Build606">Build 606 Friday, February 4, 2000</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>PPM can communicate with the package repository via SOAP. Currently PPM's and SOAP's
+    integration is somewhat limited; however, it serves as proof of concept.</LI>
+  <LI>New modules included with the distribution are:
+    <UL>
+      <LI>SOAP</LI>
+      <LI>File::CounterFile</LI>
+      <LI>Font::AFM</LI>
+    </UL>
+  </LI>
+  <LI>Support for Unicode has changed from previous versions. See perlunicode.pod for details.</LI>
+</UL>
+<P><STRONG>Known Issues</STRONG></P>
+<UL>
+  <LI>I/O support for Unicode is not yet fully functional.</LI>
+  <LI>When VPM is started, it also starts the PerlSock service, but the latter is not shut down when
+    VPM exits. The service will be shutdown when the system is rebooted and will no be started
+    automatically when the system comes up again.</LI>
+  <LI>PerlScript and Perl for ISAPI are lacking globalization support, but they are otherwise fully
+    functional.</LI>
+  <LI>Backticked `dir` and C<system( 'dir >  file.lst' );&gt; calls are not performed in Unicode
+    mode.</LI>
+  <LI>Adding an entry containing utf8 characters into %ENV{} modifies the output of `set`. As above,
+    the same conversion issue exists, resulting in a mismatch between the contents of `set` and %ENV{}.</LI>
+</UL>
+<HR>
+<H2><A name="Build604">Build 604 Friday, November 26, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>A few bugs in the fork() emulation have been fixed. perlfork.pod reflects these changes.</LI>
+</UL>
+<HR>
+<H2><A name="Build603">Build 603 Tuesday, November 23, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI><EM>NOTE:</EM>Build 603 is not binary compatible with earlier builds. If you have compiled
+    your own extensions with earlier builds, you will need to recompile all of them.</LI>
+  <LI>Build 603 corresponds to Perl 5.005_62. Additional patches available since 5.005_62 in the
+    public Perl repository have been incorporated.</LI>
+  <LI>Preliminary support for fork() is included. See the perlfork.pod document for details about
+    this functionality.</LI>
+  <LI>Documentation in fully searchable HTMLHelp format is included.</LI>
+  <LI>Many of the included extensions from CPAN have been updated to newer versions.</LI>
+  <LI>A large number of minor bugs in the Perl core have been fixed. See the Changes file in the
+    included sources for a detailed list.</LI>
+</UL>
+<HR>
+<H2><A name="Build602">Build 602 Thursday, August 5, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Build 602 corresponds to Perl 5.005_60. Additional patches available since 5.005_60 in the
+    public Perl repository have been incorporated.</LI>
+  <LI>A number of pre-built extensions from CPAN are included in this release. These may be
+    installed using PPM or VPM (both of which are included).</LI>
+</UL>
+<HR>
+<H2><A name="Build601">Build 601 Tuesday, July 13, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Build 601 corresponds to Perl 5.005_57. Additional patches available since 5.005_57 in the
+    public Perl repository have been incorporated.</LI>
+  <LI>This build features a major reworking of the API exposed by the PERL_OBJECT build option. The
+    result is a well-defined Perl API (restricted to C syntax) that provides very high degree of
+    compatibility for extensions available from CPAN.</LI>
+  <LI>Perl for ISAPI, PerlScript, PerlEz and PerlMsg have been modified to use the new PERL_OBJECT
+    API.</LI>
+  <LI>Visual Package Manager (VPM) is now available. VPM can be used to install pre-built binaries
+    from a package repository. One such is available at http://www.activestate.com/packages/perl5_6/.</LI>
+</UL>
+<HR>
+<H2><A name="Whats_New">What's new in the 600 Series</A></H2>
+<P><STRONG>Major Changes</STRONG></P>
+<UL>
+  <LI>This series is built around development versions of Perl 5.006. Build 600 corresponds to Perl
+    5.005_57.</LI>
+  <LI>Significant changes that have occurred in the 5.006 development track are documented in <A href="../../lib/Pod/perldelta.html">perldelta</A>.</LI>
+  <LI>Build 600 includes additional changes for supporting globalization. All Win32 API calls made
+    by Perl now follow the <CODE>utf8</CODE> mode of the interpreter. Wide versions of the API calls
+    are made when <CODE>utf8</CODE> is in effect. See <A href="../../lib/utf8.html">utf8</A> for
+    more information on enabling support for Unicode.</LI>
+  <LI><CODE>use caller</CODE> provides a way for modules to inherit the <CODE>utf8</CODE> mode of
+    the calling context. See <A href="../../lib/caller.html">caller</A> for more information.</LI>
+  <LI>The 600 series is <B>not</B> binary compatible with builds in the 500 series. Any extensions
+    built using binaries from the ActivePerl 500 series will need to be recompiled. Note especially
+    that this applies to PPDs that may have been built for 500 series builds.</LI>
+</UL>
+<HR>
+<HR>
+<H2><A name="Build523">Build 523 Thursday, November 4, 1999</A></H2>
+<P><STRONG>Changes</STRONG></P>
+<UL>
+  <LI>This build is for the the ActivePerl CDROM.</LI>
+</UL>
+<HR>
+<H2><A name="Build522">Build 522 Monday, November 1, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>eval &quot;STRING&quot; in a scalar context could return corrupt values on the stack. This has
+    been fixed. (perl#4401)</LI>
+  <LI>Syntax errors within a my declaration could result in subsequent spurious error messages. This
+    should now behave properly. (perl#3097)</LI>
+  <LI>use locale; did not work correctly in perl and other hosts due to a missing locale
+    initialization. Thanks to Jan Dubois for supplying the fix.</LI>
+  <LI>The results of utime() on directories did not account for daylight saving time. This has been
+    fixed, again thanks to Jan Dubois. (perl#4420)</LI>
+  <LI>utime() did not work on directories in PerlScript and the other hosts. This has now been
+    enabled.</LI>
+  <LI>unlink() could leave readonly files readable if it was unable to actually delete the files.
+    This has been corrected.</LI>
+  <LI>Using global variables in PerlScript could mask subroutines or methods of the same name from
+    being resolved correctly. This bug has been fixed.</LI>
+  <LI>A large number of repeated calls to PerlScript through Microsoft's ScriptControl could
+    sometimes crash the application due to a bug in PerlScript's internal handling of IDispatch IDs.
+    The problem has been fixed.</LI>
+  <LI>Win32::DomainName() now works correctly on Windows NT when the user has a local account of the
+    same name as on the domain. Windows 9x users are out of luck, because this is a problem with the
+    underlying API that cannot be easily worked around there. Thanks to Jan Dubois for this fix.
+    (perl#4504)</LI>
+  <LI>Some potential stack extension bugs in the Win32:: builtins have been corrected.
+    (perl#2990,3036)</LI>
+  <LI>PPM commands can now be abbreviated if they are unambiguous. The formatting of query results
+    has been improved. Queries will also provide additional information by default. More concise
+    output may be requested by disabling the new verbose option. The info and summary commands have
+    been removed; their functionality has been folded into the query and search commands. Multiple
+    queries should be faster, as the information retrieved from the repository is now cached by PPM.
+    The new version number is 1.1.1.</LI>
+  <LI>Jenda Krynicky supplied a patch to add a DESTROY() method to Win32::Registry. This should fix
+    bugs in scripts caused by failure to close open registry entries.</LI>
+</UL>
+<HR>
+<H2><A name="Build521">Build 521 Friday, October 15, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Perl did not call the Windows Sockets cleanup API when it terminated. This could use up system
+    resources in some cases.</LI>
+  <LI>PerlEz now enables more thorough global destruction phase cleanup of values allocated by the
+    Perl interpreter.</LI>
+  <LI>Use of %SIG (such as in Net::FTP) could lead to failures due to race conditions when multiple
+    interpreters ran concurrently. This problem has been corrected.</LI>
+  <LI>Win32::GetCwd() could sometimes return directories with a trailing backslash when called under
+    Perl for ISAPI or PerlScript. The backslash is now omitted for consistency.</LI>
+  <LI>Under Perl for ISAPI or PerlScript, setting %ENV entries to undef could result in them
+    reporting an empty string value instead of undef. This has been fixed.</LI>
+  <LI>Under Perl for ISAPI or PerlScript, rename() could sometimes move files rather than simply
+    renaming them in situ. This has been corrected.</LI>
+  <LI>CGI::Carp now recognizes that it is running under PerlEx when outputting error messages.</LI>
+  <LI>A improved version of perldoc from Perl 5.005_57 has been included. This version supports
+    using a pager when displaying results from the -f switch, and cleans up temporary files
+    properly.</LI>
+  <LI>XML-Parser has been upgraded to v2.27 from CPAN.</LI>
+  <LI>Pod documentation for Win32::Pipe has been added, thanks to David S Rosinger.</LI>
+  <LI>InstallShield 3 string size limitation has been worked around when setting the PATH
+    environment variable on WinNT by using Perl instead.</LI>
+</UL>
+<HR>
+<H2><A name="Build520">Build 520 Tuesday, September 28, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Most Win32:: modules have been updated; they correspond to the new libwin32 v0.151 release.
+    The following summary of changes is from the libwin32 changelog:
+    <UL>
+      <LI>Win32API-File-0.07 has been added (thanks to Tye McQueen). This module provides low-level
+        access to file and directory functions.</LI>
+      <LI>Win32-OLE has been upgraded to v0.1101 (thanks to Jan Dubois). Be sure to check out the
+        cool new component browser (needs IE5). Type &quot;perldoc Win32::OLE::NEWS&quot; and/or see
+        OLE/Changes for detailed notes.</LI>
+      <LI>Win32API-Net has been upgraded to v0.08 (thanks to Bret Giddings). NOTE: There is a
+        POTENTIAL INCOMPATIBILITY in how empty string values are handled in input hashes. See APINet/Changes
+        and the pod documentation for detailed notes.</LI>
+      <LI>Win32API-Registry has been upgraded to v0.17 (from Tye McQueen). See APIRegistry/Changes
+        for detailed notes.</LI>
+      <LI>Win32-TieRegistry has been upgraded to v0.23 (from Tye McQueen). See TieRegistry/Changes
+        for detailed notes.</LI>
+      <LI>Win32-Sound has been upgraded to v0.45 (from Aldo Calpini). The new version supports wave
+        devices and volume controls, and also sports pod documentation.</LI>
+      <LI>A few bugs in Win32-EventLog have been fixed (thanks to Bret Giddings and Jan Dubois).
+        There is also newer documentation in pod format. NOTE: There is a POTENTIAL INCOMPATIBILITY
+        in the Report() method, which will now use the &quot;Source&quot; and &quot;Computer&quot;
+        fields in the passed hashref if they exist. See EventLog/Changes and the pod documentation
+        for details.</LI>
+      <LI>A typo in Win32::Console::GenerateCtrlEvent() has been fixed. Documentation in pod format
+        has been added (from Jan Dubois).</LI>
+      <LI>Win32::NetResource::GetSharedResources() now continues the enumeration when there are
+        &quot;Access denied&quot; errors; on other errors, it enumerates all the resources seen
+        until the point the error occurred.</LI>
+      <LI>Minor changes in Win32-ODBC from various people have been included. See ODBC/Changes for a
+        summary.</LI>
+      <LI>Other small changes for Perl 5.005xx compatibility and minor bug fixes round out this
+        release.</LI>
+    </UL>
+    See the individual modules included in the libwin32 source distribution for detailed changes.</LI>
+  <LI>Besides libwin32 v0.151, the following bundled extensions have also been updated to newer
+    versions: URI v1.04, libwww-perl v5.45, HTML-Parser v2.23, XML-Parser v2.26.</LI>
+  <LI>Child GUI processes launched by system()/qx() were accidentally started with their windows
+    hidden. This has been corrected. (perl#4057)</LI>
+  <LI>Error messages reported via $^E were truncated. This bug has been fixed. (perl#3699)</LI>
+  <LI>Perl could leak memory when @_ is modified in subroutines. This has been fixed.
+    (perl#4102,4103)</LI>
+  <LI>Autoquoting of -foo was broken when the integer pragma was in effect. This has been corrected.
+    (perl#3588)</LI>
+  <LI>$Config{installarchlib}/CORE is now included as one of the default linker search paths for
+    extension builds. This allows the linker to find PerlCRT.lib and other Perl libraries properly.
+    (perl#4230)</LI>
+  <LI>Improved versions of Pod::Html, File::Spec and File::Compare from the latest Perl development
+    version have been included. These help generate better HTML documentation with fewer bogus links
+    and other formatting errors. (perl#2751,2821,2916,2930,2931,3033,3042,3061,3685,3785,3804)</LI>
+  <LI>Perl for ISAPI could sometimes go into an infinite loop when the connection is closed
+    prematurely. This has been fixed.</LI>
+  <LI>PerlScript would fail to report error messages correctly in some cases. This has been fixed.</LI>
+  <LI>IIS method exclusions set up by the installer assumed IIS version 3 style of exclusions. IIS
+    version 4 has a different (and incompatible) method inclusion setting. The installer now checks
+    the installed version of IIS and sets up &quot;PUT,DELETE&quot; exclusions or &quot;GET,POST&quot;
+    inclusions, as appropriate.</LI>
+</UL>
+<HR>
+<H2><A name="Build519">Build 519 Thursday, August 12, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Fix for new Win32::* functions which among other things will fix File::Copy in PerlScript and
+    Perl for ISAPI.</LI>
+  <LI>zlib now uses PerlIO_open() instead of fopen(); this enable proper translation of pathnames in
+    PerlScript and Perl for ISAPI.</LI>
+  <LI>PerlScript is now handling recursive event calls correctly.</LI>
+  <LI>Fixed buffer overrun caused by off by one error in PerlScript and Perl for ISAPI.</LI>
+  <LI>stat() related functionality in Perl for ISAPI and PerlScript were still affected by the bug
+    in the translation of relative paths. The fix for this that was in Build 518 was only partially
+    effective. This has been rectified.</LI>
+  <LI>MakeMaker could sometimes make wrong guesses about the layout of the Perl library. This has
+    been improved. (perl#3682,3811)</LI>
+  <LI>Optimizations sometimes bypassed strictures on barewords. This has been fixed. (perl#3897)</LI>
+  <LI>Build 518 shipped with Win32-TieRegistry v0.22, which was severely broken. That module has now
+    been updated to v0.23.</LI>
+</UL>
+<HR>
+<H2><A name="Build518">Build 518 Thursday, June 24, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Perl for ISAPI and PerlScript were sometimes affected by a bug in the translation of relative
+    paths. This has been rectified.</LI>
+  <LI>Failure of the constructs <CODE>truncate(FOO)</CODE> and <CODE>Foo-&gt;Bar(qw/.../)</CODE>
+    under <CODE>use strict</CODE> has been corrected. (perl#3533,3514)</LI>
+  <LI>A bug in the handling of bareword prototypes for subroutines prevented package name arguments
+    containing <CODE>::</CODE> from being passed correctly. This has been fixed. (perl#3493)</LI>
+  <LI>A race condition that affected extension bootstrapping in multiple interpreters running on
+    concurrent threads has been fixed.</LI>
+  <LI>Some formatting problems and factual errors in the Win32 FAQs have been corrected.</LI>
+  <LI>Perl used to generate an exception when the installation root happened to be the drive root.
+    This should now work as expected.</LI>
+  <LI>The installer now appends log messages to c:\APInstall.log to record any problems that may
+    have showed up during the installation.</LI>
+</UL>
+<HR>
+<H2><A name="Build517">Build 517 Wednesday, May 26, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>PerlScript and Perl for ISAPI now do extra checks for the length of path names passed to <CODE>open()</CODE>
+    to avoid bugs in IIS.</LI>
+  <LI>Backticks, glob() and pipe opens now work even when the standard handles are redirected in the
+    parent process that Perl was launched from. This used to result in lost output from
+    child-processes launched by CGI programs that were mapped to run using perl.exe under IIS.
+    (perl#3487)</LI>
+  <LI>A bug in spawning processes caused arguments with high-bit characters to not be passed
+    correctly to child programs. This is now fixed. (perl#3445)</LI>
+  <LI>A prototype bug that affected PerlApp and such things as <CODE>use fatal 'open'</CODE> has
+    been fixed. (perl#3446-3451)</LI>
+  <LI>The installer raised an exception on some versions of Windows 95. This has been fixed.</LI>
+  <LI>Invalid URLs in the table of contents for the online documentation have been corrected.</LI>
+</UL>
+<HR>
+<H2><A name="Build516">Build 516 Friday, May 14, 1999</A></H2>
+<P><STRONG>Perl Resource Kit Compatibility</STRONG></P>
+<P>ActivePerl can now be installed over the Perl Resource Kit (PRK) from O'Reilly and Associates.</P>
+<P>There is an important caveat: the PRK Service Pack 1 should <EM>not</EM> be applied <EM>after</EM>
+you have installed ActivePerl Build 516 over a PRK installation.</P>
+<P>We recommend that you follow this checklist:</P>
+<UL>
+  <LI>If you have just the PRK without PRK Service Pack 1: Install ActivePerl Build 516, followed by
+    the Perl Development Kit (PDK), in that order. PRK Service Pack 1 should <EM>not</EM> be applied
+    after this. Alternatively, you may install PRK Service Pack 1, and follow the instructions for
+    the next item.</LI>
+  <LI>If you have the PRK with PRK Service Pack 1 applied: Install ActivePerl Build 516, followed by
+    the PDK, or vice versa. The order does not matter.</LI>
+  <LI>If you have the PRK, PRK Service Pack 1, and the PDK: Simply install ActivePerl Build 516.</LI>
+</UL>
+<P>Note that the Perl Development Kit is a free upgrade for PRK customers. See <A href="http://www.activestate.com/pdk/">here</A>
+for more information.</P>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<P>NOTE: Fixes annotated with change numbers are from the Perl source repository. These are
+generally posted for discussion in the Perl development mailing lists (usually <CODE>&lt;perl5-porters@perl.org&gt;</CODE>
+and <CODE>&lt;perl-win32-porters@activestate.com&gt;</CODE>).</P>
+<P><STRONG>Perl</STRONG></P>
+<UL>
+  <LI>The <CODE>stat()</CODE> and <CODE>opendir()</CODE> builtins now behave reliably when given a
+    bare drive name (without a trailing slash) and with pathnames that end in a backslash.
+    (perl#3300)</LI>
+  <LI>The <CODE>uname()</CODE> builtin is now supported on win32. (perl#3134,3135)</LI>
+  <LI><CODE>Win32::GetTickCount()</CODE> used to return negative values for long running processes.
+    This has been fixed. However, note that the return value is still subject to wraparound, just as
+    it is in the corresponding Win32 API function. (perl#3316)</LI>
+  <LI>When launched from a 16-bit process, the perl executable could not find its libraries
+    correctly in certain configurations that used architecture-specific directories. The same
+    problem existed when the PATH was set with a shortname-mangled architecture directory. These
+    problems have been fixed. (perl#3345,3350,3353)</LI>
+  <LI><CODE>Win32::GetFullPathName()</CODE>, <CODE>Win32::SetLastError()</CODE>, <CODE>Win32::GetLongPathName()</CODE>,
+    and <CODE>Win32::CopyFile()</CODE> are now provided. See Win32.pod for documentation on these.
+    (perl#2937,3353,3362)</LI>
+  <LI>Perl could access freed memory in some rare situations involving values subject to &quot;autovivification&quot;.
+    This has been fixed. (perl#3270)</LI>
+  <LI><CODE>opendir(D, &quot;X:&quot;)</CODE> now faithfully follows the same rules as the <CODE>FindFirstFile()</CODE>
+    Win32 API. This means that the current directory on drive <CODE>X:</CODE> is opened, rather than
+    the root directory on drive <CODE>X:</CODE>. (perl#3396)</LI>
+  <LI>Fixed a small memory leak when embedding Perl in applications that repeatedly create and
+    destroy new interpreters. (perl#3419)</LI>
+  <LI>When there is a version component in the path to the site library, <CODE>@INC</CODE>
+    construction failed to allow for directories that are not &quot;subversion&quot;-specific. This
+    meant that perl failed to look for <CODE>$top/site/5.005/lib</CODE> if <CODE>$top/site/5.00503/lib</CODE>
+    wasn't found. This is now fixed. (perl#3423)</LI>
+  <LI>The default compiler flags (i.e. the keys <CODE>ccflags</CODE> and <CODE>optimize</CODE> in <CODE>Config.pm</CODE>)
+    used for building extensions have been set to <CODE>-Od</CODE> rather than <CODE>-O2</CODE>.
+    This works around a bug in the Visual C compiler known to exist in versions prior to 6.0.
+    ActivePerl itself is still built with <CODE>-O2</CODE>.</LI>
+</UL>
+<P><STRONG>PerlScript</STRONG></P>
+<UL>
+  <LI>PerlScript could trash memory when running large bodies of code that would reallocate the perl
+    stack.</LI>
+  <LI>PerlScript now calls any <CODE>END</CODE> blocks that may have been declared.</LI>
+</UL>
+<P><STRONG>Perl for ISAPI</STRONG></P>
+<UL>
+  <LI>Perl for ISAPI now correctly returns error 404 if the requested file does not exist.</LI>
+</UL>
+<P><STRONG>Other Extensions</STRONG></P>
+<UL>
+  <LI>Updated Win32::OLE to version 1.008. See the source distribution on CPAN for detailed change
+    logs.</LI>
+  <LI>Updated XML::Parser to version 2.23. See the source distribution on CPAN for detailed change
+    logs.</LI>
+  <LI>Fixed the return value from <CODE>Win32::NetResource::NetShareGetInfo()</CODE> if share is not
+    found.</LI>
+</UL>
+<P><STRONG>PPM</STRONG></P>
+<UL>
+  <LI>Fixed problems with <CODE>OPTIONS</CODE> attributes in PPM.</LI>
+  <LI><CODE>ppm.xml</CODE>, the running record of installed modules, was not being updated in some
+    cases, and in others, old history was being overwritten. History is now correctly propagated
+    into the future.</LI>
+  <LI>PPM now outputs more informative summaries of packages, accessible via the <CODE>summary</CODE>
+    and <CODE>info</CODE> commands.</LI>
+</UL>
+<P><STRONG>Installer</STRONG></P>
+<UL>
+  <LI>Fixed problems uninstalling ActivePerl on Windows 95/98.</LI>
+  <LI>The installer now correctly verifies that the user has administrative privileges before
+    proceeding further.</LI>
+  <LI>Changes to most configurable parameters (such as <CODE>$Config{make}</CODE>) in Config.pm are
+    now correctly propagated by the installer. A backup of the old Config.pm is also now made. The
+    PPM history file, <CODE>ppm.xml</CODE>, is similarly handled.</LI>
+</UL>
+<P><STRONG>Documentation</STRONG></P>
+<UL>
+  <LI>Added documentation on the builtin XSUBs in the <CODE>Win32::</CODE> namespace. See Win32.pod.
+    (perl#3363)</LI>
+  <LI>Links to style sheets have been fixed to be relative, to facilitate relocation.</LI>
+  <LI>Case distinctions in URLs are now maintained correctly, making it feasible to serve the
+    supplied documentation from systems that are case-sensitive.</LI>
+  <LI>Several broken links in the supporting documentation have been fixed. We are still aware of
+    broken links in the main perl documentation; these are expected to be resolved when we move to a
+    better pod2html than the one currently supplied with Perl.</LI>
+</UL>
+<HR>
+<H2><A name="Build515">Build 515 Friday, April 9, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Fixed a bug that caused <CODE>system()</CODE> to fail when called with a single argument.</LI>
+  <LI>Fixed incorrect use of tables in the HTML documentation that caused it to not wrap correctly.</LI>
+</UL>
+<HR>
+<H2><A name="Build514">Build 514 Wednesday, April 7, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Built around Perl 5.005_03, the latest production release. See the 'Changes' file in the Perl
+    source distribution for detailed changes.</LI>
+  <LI><CODE>system()</CODE> and <CODE>qx//</CODE> are fully implemented internally, and do not call
+    the CRT's <CODE>spawnvp()</CODE>. This means that <CODE>system(1,...)</CODE> now returns a real
+    process ID instead of a process handle as it used to.</LI>
+  <LI><CODE>kill()</CODE> now understands real process IDs.</LI>
+  <LI>Most of the bundled modules have been upgraded to the latest versions. <CODE>perldoc perllocal</CODE>
+    will show version information.</LI>
+  <LI>Uses PerlCRT version 1.04, which has a fix for a bug in 64-bit number conversions.</LI>
+</UL>
+<HR>
+<H2><A name="Build513">Build 513 (trial) Friday, February 26, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Built around 5.005_03 Maintenance Trial No. 5, which has a number of bug fixes to the previous
+    public release, 5.005_02. See the 'Changes' file in the source distribution for details. This <B>trial
+    build</B> is for testing purposes only.</LI>
+  <LI>Propagated <CODE>win32_recvfrom()</CODE> fix to perl hosts.</LI>
+  <LI>Fixed bug in PerlIS that only allowed small (&lt; 48K) files to be handled by the &quot;post
+    multipart form&quot; method.</LI>
+  <LI>Fixed bug in PerlIS stemming from the use of <CODE>GetServerVariable(..., &quot;PATH_TRANSLATED&quot;,...)</CODE>.
+    <CODE>ServerSupportFunction(..., HSE_REQ_MAP_URL_TO_PATH, ...)</CODE> is now used instead.</LI>
+  <LI>Fixed PerlScript startup script to call <CODE>Win32::OLE-&gt;Initialize()</CODE>.</LI>
+  <LI>Fixed PerlScript problem when passing IDispatch objects as a parameter to Perl functions. The
+    default method of the IDispatch is now called and the result passed as the parameter.</LI>
+  <LI>Uses PerlCRT version 1.03. This version fixes incorrect daylight saving time calculations, and
+    a bug that caused Perl's <CODE>tell()</CODE> operator to sometimes return incorrect values when
+    reading in textmode.</LI>
+  <LI>PPM now supports the 'trace' and 'tracefile' options, along with the 'genconfig' command.</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>Builds 510, 511 and 512 were never publically released.</LI>
+</UL>
+<HR>
+<H2><A name="Build509">Build 509 Monday, January 04, 1999</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Fixed a bug in PerlScript that rendered it unusable. In PerlSE.pl, Win32::OLE::Lite needed to
+    be 'use Win32::OLE::Lite;' instead of 'require Win32::OLE::Lite'.</LI>
+  <LI>Fixed a problem in Win32::EventLog that caused the extension to not build correctly on Alpha
+    systems.</LI>
+  <LI>rename() is capable of renaming directories.</LI>
+  <LI>rename() is capable of renaming files across volumes, this was not previously possible on
+    Windows systems. However this feature is not supported on Win95/98 systems.</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>The new rename() functionality, allowing the renaming of files across volumes, is not
+    available on Win95/98 systems.</LI>
+</UL>
+<HR>
+<H2><A name="Build508">Build 508 December 22, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Includes Win32::OLE v. 0.1005. See the Win32::OLE documentation for changes.</LI>
+  <LI>Fixed bug in rename($source, $target). It used to fail to rename $source if $target existed.</LI>
+  <LI>`backticks` now set the value of $? as documented.</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+</UL>
+<HR>
+<H2><A name="Build507">Build 507 November 13, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>New PPM capable of updating itself including dependent modules and extensions</LI>
+  <LI>New XML::Parser extension (v. 2.16)</LI>
+  <LI>Latest libwin32 bundle (v. 0.13)</LI>
+  <LI>Fixed corrupt table of contents in the online documentation</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>`backticks` do not set the value of $? correctly</LI>
+  <LI>You must upgrade to ActivePerl build 507 before attempting to install new versions of PPM.
+    Prior to build 507 PPM was incapable of updating DLL files that were in use.</LI>
+</UL>
+<HR>
+<H2><A name="Build506">Build 506 October 27, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>`Backticks` are fixed in PerlScript and Perl for ISAPI on Win95, Win98 and WinNT.</LI>
+  <LI>system() is fixed in PerlScript and Perl for ISAPI on Win95, Win98 and WinNT.</LI>
+  <LI>PerlScript sets the PERLXS environment variable to &quot;PerlScript&quot;. This is useful to
+    determine in what environment a script is being executed.</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>If you have the Perl Resource Kit -- Win32 Edition you should not install build 506 of
+    ActivePerl. ActiveState will be providing a service pack which will update your PRK installation
+    with build 506 of ActivePerl and revised utility binaries that address issues that some users
+    have encountered. More information about the PRK is available at <A href="http://www.activestate.com/PRK/">http://www.ActiveState.com/PRK</A>.
+    PRK related release information is posted to the <EM>perl-win32-prk</EM> mailing list. You can
+    join this list and receive timely information by emailing <A href="mailto:lyris@lyris.ActiveState.com">lyris@lyris.ActiveState.com</A>
+    with the following message in the body of the email:
+    <BLOCKQUOTE>
+      <P>subscribe perl-win32-prk</P>
+    </BLOCKQUOTE>
+  </LI>
+</UL>
+<HR>
+<H2><A name="Build505">Build 505 October 19, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Fixed problem with -d and -e file test operators when they are used on a UNC sharepoint.</LI>
+  <LI>Installation adds script mappings to IIS Metabase consitently. There should not be a need to
+    start the WWW Publishing Service before installing ActivePerl.</LI>
+  <LI>A stray version specific directory is no long pushed onto @INC. This directory showed
+    regardless of its existence.</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>`Backticks` are broken in PerlScript and Perl for ISAPI on Win95 and Win98.</LI>
+  <LI>`Backticks` are broken in Perl for ISAPI on WinNT when a full pathname is specified for the
+    executable.</LI>
+  <LI>system() is broken in PerlScript and Perl for ISAPI on Win95, Win98 and WinNT.</LI>
+</UL>
+<HR>
+<H2><A name="Build504">Build 504 October 12, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Uninstall removes documentation, directories added to the path, changes to IIS Metabase.
+  <LI>Fixed problem with extended formats in sprintf()
+  <LI>Win32::Process module and extension are now version synched.
+</UL>
+<HR>
+<H2><A name="Build503">Build 503 October 9, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<P><STRONG>Perl</STRONG></P>
+<UL>
+  <LI>ActivePerl is again built with -O2 compiler optimization turned on</LI>
+  <LI>Fixed bug in core when getting any port number in call to bind()</LI>
+  <LI>Updated core to support the latest version of Devel::Peek</LI>
+  <LI>Fixed $^X so that it now returns the name by which the Perl interpreter was invoked</LI>
+  <LI>perldoc now works for modules as well as POD</LI>
+  <LI>example.pl is now installed with the examples</LI>
+  <LI>Fixed problem with ProcessAffinity call in Process.dll on Win95</LI>
+  <LI>The path to PerlCRT.lib is now added to the 'libpth' value in Config.pm as well as any
+    directories specified in your LIB environment variable</LI>
+  <LI>Missing doucmentation for FileHandle.pm has been found</LI>
+  <LI>MakeMaker now supports PerlArchitecture and version dependency for PPD target</LI>
+  <LI>No need to reboot on WinNT after installing ActivePerl</LI>
+  <LI>Temporary files are deleted after installation is complete</LI>
+  <LI>Install does not create duplicate script maps in the IIS4.0 Metabase</LI>
+  <LI>Directory structure has been flattend so that the user is in control of whether to do a
+    versioned installation</LI>
+</UL>
+<P><STRONG>PerlScript</STRONG></P>
+<UL>
+  <LI>chdir now works</LI>
+  <LI>opendir now works</LI>
+  <LI>unlink now works</LI>
+  <LI>`backticks` now work</LI>
+  <LI>system() now works under</LI>
+  <LI>PerlScript now dynamically links to OLE.dll, so you must have version 0.1001 of Win32::OLE
+    installed</LI>
+</UL>
+<P><STRONG>Perl for ISAPI</STRONG></P>
+<UL>
+  <LI>chdir now works</LI>
+  <LI>opendir now works</LI>
+  <LI>unlink now works</LI>
+  <LI>`backticks` now work</LI>
+  <LI>system() now works</LI>
+</UL>
+<P><STRONG>PPM</STRONG></P>
+<UL>
+  <LI>PPM.pl gets turned in to a .BAT file during setup</LI>
+  <LI>PPM proxy support now works, see PPM documentation</LI>
+  <LI>PPM makes use of XML::Parser to read and write its data file</LI>
+</UL>
+<HR>
+<H2><A name="Build502">Build 502 August 11, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>New build based on Perl 5.005_02</LI>
+  <LI>Fixes made to maintain binary compatability with 5.005</LI>
+  <LI>Improved core docs</LI>
+</UL>
+<HR>
+<H2><A name="Build501">Build 501 August 4, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Win32-OLE and Registry modules included in their entirety.</LI>
+</UL>
+<HR>
+<H2><A name="Build500">Build 500 July 31, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>Alpha build now available</LI>
+  <LI>Setup will quit if you are running Windows 95 and DCOM for Windows 95 is not installed. (you
+    can get DCOM for Windows 95 from <A href="http://www.microsoft.com/com/dcom/dcom95/dcom1_3.asp">http://www.microsoft.com/com/dcom/dcom95/dcom1_3.asp
+    </A>)</LI>
+  <LI>A file type for Perl scripts is now being made</LI>
+</UL>
+<P><STRONG>Known Issues</STRONG></P>
+<UL>
+  <LI>After installation, temporary files are not deleted</LI>
+  <LI>If you are running IIS 4.x and selected to map extensions during setup, you may have to delete
+    duplicate mappings.</LI>
+  <LI><CODE>Response-&gt;End() </CODE>is not working properly with PerlScript. You should follow any
+    call to <CODE>Response-&gt;End() </CODE>with a call to <CODE>exit();</CODE></LI>
+  <LI>Uninstalling a package removes any modules installed but does not remove the directory in
+    which the module was installed.</LI>
+  <LI>Catching the interrupt signal and calling a handler does not work.</LI>
+  <LI>Proxy support may not work at all times with PPM. However, if the environment variable
+    HTTP_proxy is set, it will be used as the address of a proxy server for accessing the Internet
+    and this may resolve it.</LI>
+  <LI>ActivePerl should not be installed in a path that contains spaces in it, as the spaces may
+    cause problems for some of the programs that are part of ActivePerl. It is recommended that you
+    install ActivePerl in the default location.</LI>
+  <LI>In order to build some extensions, it is necessary to add your compiler's library path to the
+    'libpth' variable in Config.pm</LI>
+</UL>
+<HR>
+<H2><A name="Build476">Build 476 July 21, 1998</A></H2>
+<P><STRONG>Bug Fixes and Changes</STRONG></P>
+<UL>
+  <LI>When listing of packages is displayed in PPM, they no longer scroll off the top of the screen.</LI>
+  <LI>use DBI no longer causes a parse exception</LI>
+  <LI>TK and DB_File are now being built correctly</LI>
+  <LI>--location option in PPM now works properly</LI>
+  <LI>PerlIS is now getting environment variables</LI>
+  <LI>Filenames are now properly expanded on the command line, e.g. <CODE>perl -d &quot;print
+    join(',',@ARGV)&quot;</CODE></LI>
+  <LI>PPM turned into a batch file, so you can run it without being in your /perl/bin directory</LI>
+  <LI>If a LIB value is set in the system registry, it adds itself to the list of default LIB
+    directories</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>After installation, temporary files are not deleted</LI>
+  <LI>A file type for Perl scripts is currently not being made</LI>
+  <LI>There may be remaining problems using PPM if you are behind a firewall.</LI>
+  <LI>SIG{INT} doesn't work</LI>
+</UL>
+<HR>
+<H2><B><A name="Build471">Build 471 July 10, 1998</A></B></H2>
+<P><B>Bug Fixes and Changes</B></P>
+<UL>
+  <LI>%* in bat files now works under Win95</LI>
+  <LI>Broken HTML links in online documentation fixed</LI>
+  <LI>PATH value now created in system registry if it didn't already exist on Windows NT</LI>
+  <LI>HTMLHelp.pm and WinHTML.pm now installed (required for ppm)</LI>
+  <LI>PerlIS.dll (Perl for ISAP) now registered properly</LI>
+</UL>
+<P><B>Known Issues</B></P>
+<UL>
+  <LI>When listing of packages is displayed in PPM, they scroll off the top of the screen</LI>
+  <LI>After installation, temporary files are not deleted</LI>
+  <LI>LOCATION option in PPM does not work</LI>
+  <LI>Several modules, including TK and DB_File do not work</LI>
+  <LI>A file type for Perl scripts is not being made</LI>
+  <LI>PerlIS is no longer getting environment variables</LI>
+  <LI>If LIB value is set in the system registry, it replaces the default directories.</LI>
+</UL>
+<HR>
+<H2><B><A name="Build469">Build 469 July 2, 1998</A></B></H2>
+<UL>
+  <LI>First beta release of 5.005 / merged code</LI>
+  <LI>No alpha binaries - will be available in a future release</LI>
+</UL>
+<HR>
+<H2><A name="Whats_Changed"><B>What's changed from 300 series builds</B></A></H2>
+<P>Most modules can now be built on Win32 systems with little or no modification.</P>
+<P>PerlScript &amp; Perl for ISAPI are part of the ActivePerl Package.</P>
+<P>The Perl Package Manager for managing your Win32-compatible Perl modules is now included.</P>
+<P>The <CODE>Win32::OLE::Enum</CODE> module provides an interface to OLE collection objects from
+Perl. It defines an enumerator object closely mirroring the functionality of the IEnumVARIANT
+interface.</P>
+<P><B>Functions</B></P>
+<P>With this release, a few changes have had to be made. Some of your Perl for Win 32 3xx scripts
+may need a little tweaking to work, but these are minor. Here is where the changes come in:</P>
+<P><B>OLE</B></P>
+<P>The way in which OLE objects are created has changed.</P>
+<P><CODE>CreateObject OLE -&gt; new Win32::OLE</CODE><BR>
+<B>or</B><BR>
+<CODE>Win32::OLE-&gt;new</CODE></P>
+<P><B>Functions replaced by the Win32 module</B></P>
+<TABLE border="0" cellpadding="5" cellspacing="2">
+  <TR>
+    <TD bgcolor="#454545"><B>Old function</B></TD>
+    <TD bgcolor="#454545"><B>New replacement function</B></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>OLE</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::OLE</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>OLE::Variant</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::OLE::Variant</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>OLE::VT_*</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::OLE::VT_*</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::Reg*</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::Registry</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::OpenEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::OpenEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::OpenBackupEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::OpenBackupEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::BackupEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::BackupEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::ClearEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::ClearEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::CloseEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::CloseEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::GetNumberOfEventLogRecords</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::GetNumberOfEventLogRecords</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::ReadEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::ReadEventLog</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::WriteEventLog</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>Win32::EventLog::WriteEventLog</CODE></TD>
+  </TR>
+</TABLE>
+<P>&nbsp;</P>
+<P><B>Functions no longer available</B></P>
+<TABLE border="0" cellpadding="5" cellspacing="2">
+  <TR>
+    <TD bgcolor="#454545"><B>Old function</B></TD>
+    <TD bgcolor="#454545"><B>New replacement function</B></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::PerlVersion</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>$]</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::GetArchName</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>$ENV{PROCESSOR_ARCHITECTURE}</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="#D4F4A0"><CODE>Win32::GetChipName</CODE></TD>
+    <TD bgcolor="#E5E4F0"><CODE>$ENV{PROCESSOR_IDENTIFIER}</CODE></TD>
+  </TR>
+</TABLE>
+<P><B>Functions that are no longer built in and require &quot;use Win32&quot;</B></P>
+<TABLE border="0" cellpadding="5" cellspacing="2">
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::LookupAccountName</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::LookupAccountSID</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::InitiateSystemShutdown</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::AbortSystemShutdown</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::ExpandEnvironmentStrings</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::MsgBox</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::LoadLibrary</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::FreeLibrary</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetProcAddress</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::RegisterServer</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::UnregisterServer</CODE></TD>
+  </TR>
+</TABLE>
+<P><B>Functions that are still built in (do not require &quot;use Win32&quot;)</B></P>
+<TABLE border="0" cellpadding="5" cellspacing="2">
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetCwd</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::SetCwd</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetNextAvailDrive</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetLastError</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::LoginName</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::NodeName</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::DomainName</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::FsType</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetOSVersion</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::IsWinNT</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::IsWin95</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::FormatMessage</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::Spawn</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetTickCount</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::GetShortPathName</CODE></TD>
+  </TR>
+  <TR>
+    <TD bgcolor="E5E4F0"><CODE>Win32::Sleep</CODE></TD>
+  </TR>
+</TABLE>
+      <!-- beginning of leaf footer-->
+<P>&nbsp;</P>
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%">
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><STRONG>
+      <P class="block">&nbsp;ActivePerl FAQ</P>
+      </STRONG></TD>
+  </TR>
+</TABLE>
+<!-- end of leaf footer-->
+
+</BODY>
+
+</HTML>

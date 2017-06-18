@@ -1,0 +1,136 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::IPC - Base class for Win32 synchronization objects</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::IPC - Base class for Win32 synchronization objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+		<LI><A HREF="#functions">Functions</A></LI>
+		<LI><A HREF="#deprecated functions and methods">Deprecated Functions and Methods</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::IPC - Base class for Win32 synchronization objects</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Win32::Event 1.00 qw(wait_any);
+    #Create objects.</PRE>
+<PRE>
+    wait_any(@ListOfObjects,$timeout);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module is loaded by the other Win32 synchronization modules.  You
+shouldn't need to load it yourself.  It supplies the wait functions to
+those modules.</P>
+<P>The synchronization modules are <A HREF="#win32::changenotify">Win32::ChangeNotify</A>,
+<A HREF="#win32::event">Win32::Event</A>, <A HREF="#win32::mutex">Win32::Mutex</A>, &amp; <A HREF="#win32::semaphore">Win32::Semaphore</A>.</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<P><STRONG>Win32::IPC</STRONG> supplies one method to all synchronization objects.</P>
+<DL>
+<DT><STRONG><A NAME="item_wait">$obj-&gt;<CODE>wait([$timeout])</CODE></A></STRONG><BR>
+<DD>
+Waits for <CODE>$obj</CODE> to become signalled.  <CODE>$timeout</CODE> is the maximum time
+to wait (in milliseconds).  If <CODE>$timeout</CODE> is omitted, waits forever.
+If <CODE>$timeout</CODE> is 0, returns immediately.
+<P>Returns:</P>
+<PRE>
+   +1    The object is signalled
+   -1    The object is an abandoned mutex
+    0    Timed out
+  undef  An error occurred</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_wait_any">wait_any(@objects, [$timeout])</A></STRONG><BR>
+<DD>
+Waits for at least one of the <CODE>@objects</CODE> to become signalled.
+<CODE>$timeout</CODE> is the maximum time to wait (in milliseconds).  If
+<CODE>$timeout</CODE> is omitted, waits forever.  If <CODE>$timeout</CODE> is 0, returns
+immediately.
+<P>The return value indicates which object ended the wait:</P>
+<PRE>
+   +N    $object[N-1] is signalled
+   -N    $object[N-1] is an abandoned mutex
+    0    Timed out
+  undef  An error occurred</PRE>
+<P>If more than one object became signalled, the one with the lowest
+index is used.</P>
+<P></P>
+<DT><STRONG><A NAME="item_wait_all">wait_all(@objects, [$timeout])</A></STRONG><BR>
+<DD>
+This is the same as <A HREF="#item_wait_any"><CODE>wait_any</CODE></A>, but it waits for all the <CODE>@objects</CODE>
+to become signalled.  The return value indicates the last object to
+become signalled, and is negative if at least one of the <CODE>@objects</CODE>
+is an abandoned mutex.
+<P></P></DL>
+<P>
+<H2><A NAME="deprecated functions and methods">Deprecated Functions and Methods</A></H2>
+<P><STRONG>Win32::IPC</STRONG> still supports the ActiveWare syntax, but its use is
+deprecated.</P>
+<DL>
+<DT><STRONG><A NAME="item_INFINITE">INFINITE</A></STRONG><BR>
+<DD>
+Constant value for an infinite timeout.  Omit the <CODE>$timeout</CODE> argument
+instead.
+<P></P>
+<DT><STRONG><A NAME="item_WaitForMultipleObjects">WaitForMultipleObjects(\@objects, $wait_all, $timeout)</A></STRONG><BR>
+<DD>
+Warning: <A HREF="#item_WaitForMultipleObjects"><CODE>WaitForMultipleObjects</CODE></A> erases <CODE>@objects</CODE>!
+Use <A HREF="#item_wait_all"><CODE>wait_all</CODE></A> or <A HREF="#item_wait_any"><CODE>wait_any</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_Wait">$obj-&gt;<CODE>Wait($timeout)</CODE></A></STRONG><BR>
+<DD>
+Similar to <A HREF="#item_wait"><CODE>not $obj-&gt;wait($timeout)</CODE></A>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Christopher J. Madsen &lt;<EM><A HREF="mailto:chris_madsen@geocities.com">chris_madsen@geocities.com</A></EM>&gt;</P>
+<P>Loosely based on the original module by ActiveWare Internet Corp.,
+<EM><A HREF="http://www.ActiveWare.com">http://www.ActiveWare.com</A></EM></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::IPC - Base class for Win32 synchronization objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,197 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::PurePerl -- a DBI emulation using pure perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::PurePerl -- a DBI emulation using pure perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#experimental status">EXPERIMENTAL STATUS</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<LI><A HREF="#differences between dbi and dbi::pureperl">DIFFERENCES BETWEEN DBI AND DBI::PurePerl</A></LI>
+	<UL>
+
+		<LI><A HREF="#attributes">Attributes</A></LI>
+		<LI><A HREF="#tracing">Tracing</A></LI>
+		<LI><A HREF="#parameter usage checking">Parameter Usage Checking</A></LI>
+		<LI><A HREF="#speed">Speed</A></LI>
+		<LI><A HREF="#may not fully support hash()">May not fully support <CODE>hash()</CODE></A></LI>
+		<LI><A HREF="#doesn't support preparse()">Doesn't support <CODE>preparse()</CODE></A></LI>
+		<LI><A HREF="#doesn't support dbd::proxy">Doesn't support DBD::Proxy</A></LI>
+		<LI><A HREF="#undoubtedly others">Undoubtedly Others</A></LI>
+	</UL>
+
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+ DBI::PurePerl -- a DBI emulation using pure perl (no C/XS compilation required)</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ BEGIN { $ENV{DBI_PUREPERL} = 2 }
+ use DBI;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a pure perl emulation of the DBI internals.  In almost all
+cases you will be better off using standard DBI since the portions
+of the standard version written in C make it *much* faster.</P>
+<P>However, if you are in a situation where it isn't possible to install
+a compiled version of standard DBI, and you're using pure-perl DBD
+drivers, then this module allows you to use most common features
+of DBI without needing any changes in your scripts.</P>
+<P>
+<HR>
+<H1><A NAME="experimental status">EXPERIMENTAL STATUS</A></H1>
+<P>DBI::PurePerl is very new so please treat it as experimental pending
+more extensive testing.  So far it has passed all tests with DBD::CSV,
+DBD::AnyData, DBD::XBase, DBD::Sprite, DBD::mysqlPP.  Please send
+bug reports to Jeff Zucker at &lt;<A HREF="mailto:jeff@vpservices.com">jeff@vpservices.com</A>&gt; with a cc to
+&lt;<A HREF="mailto:dbi-dev@perl.org">dbi-dev@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>The usage is the same as for standard DBI with the exception
+that you need to set the enviornment variable DBI_PUREPERL if
+you want to use the PurePerl version.</P>
+<PRE>
+ DBI_PUREPERL == 0 (the default) Always use compiled DBI, die
+                   if it isn't properly compiled &amp; installed</PRE>
+<PRE>
+ DBI_PUREPERL == 1 Use compiled DBI if it is properly compiled
+                   &amp; installed, otherwise use PurePerl</PRE>
+<PRE>
+ DBI_PUREPERL == 2 Always use PurePerl</PRE>
+<P>You may set the enviornment variable in your shell (e.g. with
+set or setenv or export, etc) or else set it in your script like
+this:</P>
+<PRE>
+ BEGIN { $ENV{DBI_PUREPERL}=2 }</PRE>
+<P>before you <CODE>use DBI;</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<P>In most situations simply install DBI (see the DBI pod for details).</P>
+<P>In the situation in which you can not install DBI itself, you
+may manually copy DBI.pm and PurePerl.pm into the appropriate
+directories.</P>
+<P>For example:</P>
+<PRE>
+ cp DBI.pm      /usr/jdoe/mylibs/.
+ cp PurePerl.pm /usr/jdoe/mylibs/DBI/.</PRE>
+<P>Then add this to the top of scripts:</P>
+<PRE>
+ BEGIN {
+   $ENV{DBI_PUREPERL} = 1;      # or =2
+   unshift @INC, '/usr/jdoe/mylibs';
+ }</PRE>
+<P>(Or should we perhaps patch Makefile.PL so that if DBI_PUREPERL
+is set to 2 prior to make, the normal compile process is skipped
+and the files are installed automatically?)</P>
+<P>
+<HR>
+<H1><A NAME="differences between dbi and dbi::pureperl">DIFFERENCES BETWEEN DBI AND DBI::PurePerl</A></H1>
+<P>
+<H2><A NAME="attributes">Attributes</A></H2>
+<P>Boolean attributes still return boolean values but the actual values
+used may be different, i.e., 0 or undef instead of an empty string.</P>
+<P>Some handle attributes are either not supported or have very limited
+functionality:</P>
+<PRE>
+  ActiveKids
+  InactiveDestroy
+  Kids
+  Taint
+  TaintIn
+  TaintOut</PRE>
+<P>(and probably others)</P>
+<P>
+<H2><A NAME="tracing">Tracing</A></H2>
+<P>Trace functionality is more limited and the code to handle tracing is
+only embeded into DBI:PurePerl if the DBI_TRACE environment variable
+is defined.  To enable total tracing you can set the DBI_TRACE
+environment variable as usual.  But to enable individual handle
+tracing using the <CODE>trace()</CODE> method you also need to set the DBI_TRACE
+environment variable, but set it to 0.</P>
+<P>
+<H2><A NAME="parameter usage checking">Parameter Usage Checking</A></H2>
+<P>The DBI does some basic parameter count checking on method calls.
+DBI::PurePerl doesn't.</P>
+<P>
+<H2><A NAME="speed">Speed</A></H2>
+<P>DBI::PurePerl is slower. Although, with some drivers in some
+contexts this may not be very significant for you.</P>
+<P>By way of example... the test.pl script in the DBI source
+distribution has a simple benchmark that just does:</P>
+<PRE>
+    my $null_dbh = DBI-&gt;connect('dbi:NullP:','','');
+    my $i = 10_000;
+    $null_dbh-&gt;prepare('') while $i--;</PRE>
+<P>In other words just prepares a statement, creating and destroying
+a statement handle, over and over again.  Using the real DBI this
+runs at ~4550 handles per second whereas DBI::PurePerl manages
+~2800 per second on the same machine (not too bad really).</P>
+<P>
+<H2><A NAME="may not fully support hash()">May not fully support <CODE>hash()</CODE></A></H2>
+<P>If you want to use type 1 hash, i.e., <CODE>hash($string,1)</CODE> with
+DBI::PurePerl, you'll need version 1.56 or higher of Math::BigInt
+(available on CPAN).</P>
+<P>
+<H2><A NAME="doesn't support preparse()">Doesn't support <CODE>preparse()</CODE></A></H2>
+<P>The DBI-&gt;<CODE>preparse()</CODE> method isn't supported in DBI::PurePerl.</P>
+<P>
+<H2><A NAME="doesn't support dbd::proxy">Doesn't support DBD::Proxy</A></H2>
+<P>There's a subtle problem somewhere I've not been able to identify.
+DBI::ProxyServer seem to work fine with DBI::PurePerl but DBD::Proxy
+does not work 100% (which is sad because that would be far more useful :)
+Try re-enabling t/80proxy.t for DBI::PurePerl to see if the problem
+that remains will affect you're usage.</P>
+<P>
+<H2><A NAME="undoubtedly others">Undoubtedly Others</A></H2>
+<P>Please let us know if you find any other differences between DBI
+and DBI::PurePerl.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Tim Bunce and Jeff Zucker.</P>
+<P>Tim provided the direction and basis for the code.  The original
+idea for the module and most of the brute force porting from C to
+Perl was by Jeff. Tim then reworked some core parts to boost the
+performance and accuracy of the emulation. Thanks also to Randal
+Schwartz and John Tobey for patches.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2002  Tim Bunce  Ireland.</P>
+<P>See COPYRIGHT section in DBI.pm for usage and distribution rights.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::PurePerl -- a DBI emulation using pure perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

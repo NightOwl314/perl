@@ -1,0 +1,534 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::MM_Unix - methods used by ExtUtils::MakeMaker</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::MM_Unix - methods used by ExtUtils::MakeMaker</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#preloaded methods">Preloaded methods</A></LI>
+		<LI><A HREF="#selfloaded methods">SelfLoaded methods</A></LI>
+		<LI><A HREF="#methods to actually produce chunks of text for the makefile">Methods to actually produce chunks of text for the Makefile</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::MM_Unix - methods used by ExtUtils::MakeMaker</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><CODE>require ExtUtils::MM_Unix;</CODE></P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The methods provided by this package are designed to be used in
+conjunction with ExtUtils::MakeMaker. When MakeMaker writes a
+Makefile, it creates one or more objects that inherit their methods
+from a package <CODE>MM</CODE>. MM itself doesn't provide any methods, but it
+ISA ExtUtils::MM_Unix class. The inheritance tree of MM lets operating
+specific packages take the responsibility for all the methods provided
+by MM_Unix. We are trying to reduce the number of the necessary
+overrides by defining rather primitive operations within
+ExtUtils::MM_Unix.</P>
+<P>If you are going to write a platform specific MM package, please try
+to limit the necessary overrides to primitive methods, and if it is not
+possible to do so, let's work out how to achieve that gain.</P>
+<P>If you are overriding any of these methods in your Makefile.PL (in the
+MY class), please report that to the makemaker mailing list. We are
+trying to minimize the necessary method overrides and switch to data
+driven Makefile.PLs wherever possible. In the long run less methods
+will be overridable via the MY class.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following description of methods is still under
+development. Please refer to the code for not suitably documented
+sections and complain loudly to the makemaker mailing list.</P>
+<P>Not all of the methods below are overridable in a
+Makefile.PL. Overridable methods are marked as (o). All methods are
+overridable by a platform specific MM_*.pm file (See
+<A HREF="../../lib/ExtUtils/MM_VMS.html">the ExtUtils::MM_VMS manpage</A>) and <A HREF="../../lib/ExtUtils/MM_OS2.html">the ExtUtils::MM_OS2 manpage</A>).</P>
+<P>
+<H2><A NAME="preloaded methods">Preloaded methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_canonpath">canonpath</A></STRONG><BR>
+<DD>
+No physical check on the filesystem, but a logical cleanup of a
+path. On UNIX eliminated successive slashes and successive ``/.''.
+<P></P>
+<DT><STRONG><A NAME="item_catdir">catdir</A></STRONG><BR>
+<DD>
+Concatenate two or more directory names to form a complete path ending
+with a directory. But remove the trailing slash from the resulting
+string, because it doesn't look good, isn't necessary and confuses
+OS2. Of course, if this is the root directory, don't cut off the
+trailing slash :-)
+<P></P>
+<DT><STRONG><A NAME="item_catfile">catfile</A></STRONG><BR>
+<DD>
+Concatenate one or more directory names and a filename to form a
+complete path ending with a filename
+<P></P>
+<DT><STRONG><A NAME="item_curdir">curdir</A></STRONG><BR>
+<DD>
+Returns a string representing of the current directory.  ``.'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_rootdir">rootdir</A></STRONG><BR>
+<DD>
+Returns a string representing of the root directory.  ``/'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_updir">updir</A></STRONG><BR>
+<DD>
+Returns a string representing of the parent directory.  ``..'' on UNIX.
+<P></P></DL>
+<P>
+<H2><A NAME="selfloaded methods">SelfLoaded methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_c_o">c_o (o)</A></STRONG><BR>
+<DD>
+Defines the suffix rules to compile different flavors of C files to
+object files.
+<P></P>
+<DT><STRONG><A NAME="item_cflags">cflags (o)</A></STRONG><BR>
+<DD>
+Does very much the same as the cflags script in the perl
+distribution. It doesn't return the whole compiler command line, but
+initializes all of its parts. The const_cccmd method then actually
+returns the definition of the CCCMD macro which uses these parts.
+<P></P>
+<DT><STRONG><A NAME="item_clean">clean (o)</A></STRONG><BR>
+<DD>
+Defines the clean target.
+<P></P>
+<DT><STRONG><A NAME="item_const_cccmd">const_cccmd (o)</A></STRONG><BR>
+<DD>
+Returns the full compiler call for C programs and stores the
+definition in CONST_CCCMD.
+<P></P>
+<DT><STRONG><A NAME="item_const_config">const_config (o)</A></STRONG><BR>
+<DD>
+Defines a couple of constants in the Makefile that are imported from
+%Config.
+<P></P>
+<DT><STRONG><A NAME="item_const_loadlibs">const_loadlibs (o)</A></STRONG><BR>
+<DD>
+Defines EXTRALIBS, LDLOADLIBS, BSLOADLIBS, LD_RUN_PATH. See
+<A HREF="../../lib/ExtUtils/Liblist.html">the ExtUtils::Liblist manpage</A> for details.
+<P></P>
+<DT><STRONG><A NAME="item_constants">constants (o)</A></STRONG><BR>
+<DD>
+Initializes lots of constants and .SUFFIXES and .PHONY
+<P></P>
+<DT><STRONG><A NAME="item_depend">depend (o)</A></STRONG><BR>
+<DD>
+Same as macro for the depend attribute.
+<P></P>
+<DT><STRONG><A NAME="item_dir_target">dir_target (o)</A></STRONG><BR>
+<DD>
+Takes an array of directories that need to exist and returns a
+Makefile entry for a .exists file in these directories. Returns
+nothing, if the entry has already been processed. We're helpless
+though, if the same directory comes as $(FOO) _and_ as ``bar''. Both of
+them get an entry, that's why we use ``::''.
+<P></P>
+<DT><STRONG><A NAME="item_dist">dist (o)</A></STRONG><BR>
+<DD>
+Defines a lot of macros for distribution support.
+<P></P>
+<DT><STRONG><A NAME="item_dist_basics">dist_basics (o)</A></STRONG><BR>
+<DD>
+Defines the targets distclean, distcheck, skipcheck, manifest, veryclean.
+<P></P>
+<DT><STRONG><A NAME="item_dist_ci">dist_ci (o)</A></STRONG><BR>
+<DD>
+Defines a check in target for RCS.
+<P></P>
+<DT><STRONG><A NAME="item_dist_core">dist_core (o)</A></STRONG><BR>
+<DD>
+Defines the targets dist, tardist, zipdist, uutardist, shdist
+<P></P>
+<DT><STRONG><A NAME="item_dist_dir">dist_dir (o)</A></STRONG><BR>
+<DD>
+Defines the scratch directory target that will hold the distribution
+before tar-ing (or shar-ing).
+<P></P>
+<DT><STRONG><A NAME="item_dist_test">dist_test (o)</A></STRONG><BR>
+<DD>
+Defines a target that produces the distribution in the
+scratchdirectory, and runs 'perl Makefile.PL; make ;make test' in that
+subdirectory.
+<P></P>
+<DT><STRONG><A NAME="item_dlsyms">dlsyms (o)</A></STRONG><BR>
+<DD>
+Used by AIX and VMS to define DL_FUNCS and DL_VARS and write the *.exp
+files.
+<P></P>
+<DT><STRONG><A NAME="item_dynamic">dynamic (o)</A></STRONG><BR>
+<DD>
+Defines the dynamic target.
+<P></P>
+<DT><STRONG><A NAME="item_dynamic_bs">dynamic_bs (o)</A></STRONG><BR>
+<DD>
+Defines targets for bootstrap files.
+<P></P>
+<DT><STRONG><A NAME="item_dynamic_lib">dynamic_lib (o)</A></STRONG><BR>
+<DD>
+Defines how to produce the *.so (or equivalent) files.
+<P></P>
+<DT><STRONG><A NAME="item_exescan">exescan</A></STRONG><BR>
+<DD>
+Deprecated method. Use libscan instead.
+<P></P>
+<DT><STRONG><A NAME="item_extliblist">extliblist</A></STRONG><BR>
+<DD>
+Called by init_others, and calls ext ExtUtils::Liblist. See
+<A HREF="../../lib/ExtUtils/Liblist.html">the ExtUtils::Liblist manpage</A> for details.
+<P></P>
+<DT><STRONG><A NAME="item_file_name_is_absolute">file_name_is_absolute</A></STRONG><BR>
+<DD>
+Takes as argument a path and returns true, if it is an absolute path.
+<P></P>
+<DT><STRONG><A NAME="item_find_perl">find_perl</A></STRONG><BR>
+<DD>
+Finds the executables PERL and FULLPERL
+<P></P></DL>
+<P>
+<H2><A NAME="methods to actually produce chunks of text for the makefile">Methods to actually produce chunks of text for the Makefile</A></H2>
+<P>The methods here are called for each MakeMaker object in the order
+specified by @ExtUtils::MakeMaker::MM_Sections.</P>
+<DL>
+<DT><STRONG><A NAME="item_fixin">fixin</A></STRONG><BR>
+<DD>
+Inserts the sharpbang or equivalent magic number to a script
+<P></P>
+<DT><STRONG><A NAME="item_force">force (o)</A></STRONG><BR>
+<DD>
+Just writes FORCE:
+<P></P>
+<DT><STRONG><A NAME="item_guess_name">guess_name</A></STRONG><BR>
+<DD>
+Guess the name of this package by examining the working directory's
+name. MakeMaker calls this only if the developer has not supplied a
+NAME attribute.
+<P></P>
+<DT><STRONG><A NAME="item_has_link_code">has_link_code</A></STRONG><BR>
+<DD>
+Returns true if C, XS, MYEXTLIB or similar objects exist within this
+object that need a compiler. Does not descend into subdirectories as
+<A HREF="#item_needs_linking"><CODE>needs_linking()</CODE></A> does.
+<P></P>
+<DT><STRONG><A NAME="item_htmlifypods">htmlifypods (o)</A></STRONG><BR>
+<DD>
+Defines targets and routines to translate the pods into HTML manpages
+and put them into the INST_HTMLLIBDIR and INST_HTMLSCRIPTDIR
+directories.
+<P></P>
+<DT><STRONG><A NAME="item_init_dirscan">init_dirscan</A></STRONG><BR>
+<DD>
+Initializes DIR, XS, PM, C, O_FILES, H, PL_FILES, HTML*PODS, MAN*PODS, EXE_FILES.
+<P></P>
+<DT><STRONG><A NAME="item_init_main">init_main</A></STRONG><BR>
+<DD>
+Initializes NAME, FULLEXT, BASEEXT, PARENT_NAME, DLBASE, PERL_SRC,
+PERL_LIB, PERL_ARCHLIB, PERL_INC, INSTALLDIRS, INST_*, INSTALL*,
+PREFIX, CONFIG, AR, AR_STATIC_ARGS, LD, OBJ_EXT, LIB_EXT, EXE_EXT, MAP_TARGET,
+LIBPERL_A, VERSION_FROM, VERSION, DISTNAME, VERSION_SYM.
+<P></P>
+<DT><STRONG><A NAME="item_init_others">init_others</A></STRONG><BR>
+<DD>
+Initializes EXTRALIBS, BSLOADLIBS, LDLOADLIBS, LIBS, LD_RUN_PATH,
+OBJECT, BOOTDEP, PERLMAINCC, LDFROM, LINKTYPE, NOOP, FIRST_MAKEFILE,
+MAKEFILE, NOECHO, RM_F, RM_RF, TEST_F, TOUCH, CP, MV, CHMOD, UMASK_NULL
+<P></P>
+<DT><STRONG><A NAME="item_install">install (o)</A></STRONG><BR>
+<DD>
+Defines the install target.
+<P></P>
+<DT><STRONG><A NAME="item_installbin">installbin (o)</A></STRONG><BR>
+<DD>
+Defines targets to make and to install EXE_FILES.
+<P></P>
+<DT><STRONG><A NAME="item_libscan">libscan (o)</A></STRONG><BR>
+<DD>
+Takes a path to a file that is found by init_dirscan and returns false
+if we don't want to include this file in the library. Mainly used to
+exclude RCS, CVS, and SCCS directories from installation.
+<P></P>
+<DT><STRONG><A NAME="item_linkext">linkext (o)</A></STRONG><BR>
+<DD>
+Defines the linkext target which in turn defines the LINKTYPE.
+<P></P>
+<DT><STRONG><A NAME="item_lsdir">lsdir</A></STRONG><BR>
+<DD>
+Takes as arguments a directory name and a regular expression. Returns
+all entries in the directory that match the regular expression.
+<P></P>
+<DT><STRONG><A NAME="item_macro">macro (o)</A></STRONG><BR>
+<DD>
+Simple subroutine to insert the macros defined by the macro attribute
+into the Makefile.
+<P></P>
+<DT><STRONG><A NAME="item_makeaperl">makeaperl (o)</A></STRONG><BR>
+<DD>
+Called by staticmake. Defines how to write the Makefile to produce a
+static new perl.
+<P>By default the Makefile produced includes all the static extensions in
+the perl library. (Purified versions of library files, e.g.,
+DynaLoader_pure_p1_c0_032.a are automatically ignored to avoid link errors.)</P>
+<P></P>
+<DT><STRONG><A NAME="item_makefile">makefile (o)</A></STRONG><BR>
+<DD>
+Defines how to rewrite the Makefile.
+<P></P>
+<DT><STRONG><A NAME="item_manifypods">manifypods (o)</A></STRONG><BR>
+<DD>
+Defines targets and routines to translate the pods into manpages and
+put them into the INST_* directories.
+<P></P>
+<DT><STRONG><A NAME="item_maybe_command">maybe_command</A></STRONG><BR>
+<DD>
+Returns true, if the argument is likely to be a command.
+<P></P>
+<DT><STRONG><A NAME="item_maybe_command_in_dirs">maybe_command_in_dirs</A></STRONG><BR>
+<DD>
+method under development. Not yet used. Ask Ilya :-)
+<P></P>
+<DT><STRONG><A NAME="item_needs_linking">needs_linking (o)</A></STRONG><BR>
+<DD>
+Does this module need linking? Looks into subdirectory objects (see
+also <A HREF="#item_has_link_code"><CODE>has_link_code())</CODE></A>
+<P></P>
+<DT><STRONG><A NAME="item_nicetext">nicetext</A></STRONG><BR>
+<DD>
+misnamed method (will have to be changed). The MM_Unix method just
+returns the argument without further processing.
+<P>On VMS used to insure that colons marking targets are preceded by
+space - most Unix Makes don't need this, but it's necessary under VMS
+to distinguish the target delimiter from a colon appearing as part of
+a filespec.</P>
+<P></P>
+<DT><STRONG><A NAME="item_parse_version">parse_version</A></STRONG><BR>
+<DD>
+parse a file and return what you think is $VERSION in this file set to.
+It will return the string ``undef'' if it can't figure out what $VERSION
+is.
+<P></P>
+<DT><STRONG><A NAME="item_parse_abstract">parse_abstract</A></STRONG><BR>
+<DD>
+parse a file and return what you think is the ABSTRACT
+<P></P>
+<DT><STRONG><A NAME="item_pasthru">pasthru (o)</A></STRONG><BR>
+<DD>
+Defines the string that is passed to recursive make calls in
+subdirectories.
+<P></P>
+<DT><STRONG><A NAME="item_path">path</A></STRONG><BR>
+<DD>
+Takes no argument, returns the environment variable PATH as an array.
+<P></P>
+<DT><STRONG><A NAME="item_perl_script">perl_script</A></STRONG><BR>
+<DD>
+Takes one argument, a file name, and returns the file name, if the
+argument is likely to be a perl script. On MM_Unix this is true for
+any ordinary, readable file.
+<P></P>
+<DT><STRONG><A NAME="item_perldepend">perldepend (o)</A></STRONG><BR>
+<DD>
+Defines the dependency from all *.h files that come with the perl
+distribution.
+<P></P>
+<DT><STRONG><A NAME="item_ppd">ppd</A></STRONG><BR>
+<DD>
+Defines target that creates a PPD (Perl Package Description) file
+for a binary distribution.
+<P></P>
+<DT><STRONG><A NAME="item_perm_rw">perm_rw (o)</A></STRONG><BR>
+<DD>
+Returns the attribute <CODE>PERM_RW</CODE> or the string <CODE>644</CODE>.
+Used as the string that is passed
+to the <A HREF="../../lib/Pod/perlfunc.html#item_chmod"><CODE>chmod</CODE></A> command to set the permissions for read/writeable files.
+MakeMaker chooses <CODE>644</CODE> because it has turned out in the past that
+relying on the umask provokes hard-to-track bug reports.
+When the return value is used by the perl function <A HREF="../../lib/Pod/perlfunc.html#item_chmod"><CODE>chmod</CODE></A>, it is
+interpreted as an octal value.
+<P></P>
+<DT><STRONG><A NAME="item_perm_rwx">perm_rwx (o)</A></STRONG><BR>
+<DD>
+Returns the attribute <CODE>PERM_RWX</CODE> or the string <CODE>755</CODE>,
+i.e. the string that is passed
+to the <A HREF="../../lib/Pod/perlfunc.html#item_chmod"><CODE>chmod</CODE></A> command to set the permissions for executable files.
+See also perl_rw.
+<P></P>
+<DT><STRONG><A NAME="item_pm_to_blib">pm_to_blib</A></STRONG><BR>
+<DD>
+Defines target that copies all files in the hash PM to their
+destination and autosplits them. See <A HREF="../../lib/ExtUtils/Install.html#description">DESCRIPTION in the ExtUtils::Install manpage</A>
+<P></P>
+<DT><STRONG><A NAME="item_post_constants">post_constants (o)</A></STRONG><BR>
+<DD>
+Returns an empty string per default. Dedicated to overrides from
+within Makefile.PL after all constants have been defined.
+<P></P>
+<DT><STRONG><A NAME="item_post_initialize">post_initialize (o)</A></STRONG><BR>
+<DD>
+Returns an empty string per default. Used in Makefile.PLs to add some
+chunk of text to the Makefile after the object is initialized.
+<P></P>
+<DT><STRONG><A NAME="item_postamble">postamble (o)</A></STRONG><BR>
+<DD>
+Returns an empty string. Can be used in Makefile.PLs to write some
+text to the Makefile at the end.
+<P></P>
+<DT><STRONG><A NAME="item_prefixify">prefixify</A></STRONG><BR>
+<DD>
+Check a path variable in $self from %Config, if it contains a prefix,
+and replace it with another one.
+<P>Takes as arguments an attribute name, a search prefix and a
+replacement prefix. Changes the attribute in the object.</P>
+<P></P>
+<DT><STRONG><A NAME="item_processPL">processPL (o)</A></STRONG><BR>
+<DD>
+Defines targets to run *.PL files.
+<P></P>
+<DT><STRONG><A NAME="item_realclean">realclean (o)</A></STRONG><BR>
+<DD>
+Defines the realclean target.
+<P></P>
+<DT><STRONG><A NAME="item_replace_manpage_separator">replace_manpage_separator</A></STRONG><BR>
+<DD>
+Takes the name of a package, which may be a nested package, in the
+form Foo/Bar and replaces the slash with <CODE>::</CODE>. Returns the replacement.
+<P></P>
+<DT><STRONG><A NAME="item_static">static (o)</A></STRONG><BR>
+<DD>
+Defines the static target.
+<P></P>
+<DT><STRONG><A NAME="item_static_lib">static_lib (o)</A></STRONG><BR>
+<DD>
+Defines how to produce the *.a (or equivalent) files.
+<P></P>
+<DT><STRONG><A NAME="item_staticmake">staticmake (o)</A></STRONG><BR>
+<DD>
+Calls makeaperl.
+<P></P>
+<DT><STRONG><A NAME="item_subdir_x">subdir_x (o)</A></STRONG><BR>
+<DD>
+Helper subroutine for subdirs
+<P></P>
+<DT><STRONG><A NAME="item_subdirs">subdirs (o)</A></STRONG><BR>
+<DD>
+Defines targets to process subdirectories.
+<P></P>
+<DT><STRONG><A NAME="item_test">test (o)</A></STRONG><BR>
+<DD>
+Defines the test targets.
+<P></P>
+<DT><STRONG><A NAME="item_test_via_harness">test_via_harness (o)</A></STRONG><BR>
+<DD>
+Helper method to write the test targets
+<P></P>
+<DT><STRONG><A NAME="item_test_via_script">test_via_script (o)</A></STRONG><BR>
+<DD>
+Other helper method for test.
+<P></P>
+<DT><STRONG><A NAME="item_tool_autosplit">tool_autosplit (o)</A></STRONG><BR>
+<DD>
+Defines a simple perl call that runs autosplit. May be deprecated by
+pm_to_blib soon.
+<P></P>
+<DT><STRONG><A NAME="item_tools_other">tools_other (o)</A></STRONG><BR>
+<DD>
+Defines SHELL, LD, TOUCH, CP, MV, RM_F, RM_RF, CHMOD, UMASK_NULL in
+the Makefile. Also defines the perl programs MKPATH,
+WARN_IF_OLD_PACKLIST, MOD_INSTALL. DOC_INSTALL, and UNINSTALL.
+<P></P>
+<DT><STRONG><A NAME="item_tool_xsubpp">tool_xsubpp (o)</A></STRONG><BR>
+<DD>
+Determines typemaps, xsubpp version, prototype behaviour.
+<P></P>
+<DT><STRONG><A NAME="item_top_targets">top_targets (o)</A></STRONG><BR>
+<DD>
+Defines the targets all, subdirs, config, and O_FILES
+<P></P>
+<DT><STRONG><A NAME="item_writedoc">writedoc</A></STRONG><BR>
+<DD>
+Obsolete, deprecated method. Not used since Version 5.21.
+<P></P>
+<DT><STRONG><A NAME="item_xs_c">xs_c (o)</A></STRONG><BR>
+<DD>
+Defines the suffix rules to compile XS files to C.
+<P></P>
+<DT><STRONG><A NAME="item_xs_cpp">xs_cpp (o)</A></STRONG><BR>
+<DD>
+Defines the suffix rules to compile XS files to C++.
+<P></P>
+<DT><STRONG><A NAME="item_xs_o">xs_o (o)</A></STRONG><BR>
+<DD>
+Defines suffix rules to go from XS to object files directly. This is
+only intended for broken make implementations.
+<P></P>
+<DT><STRONG><A NAME="item_perl_archive">perl_archive</A></STRONG><BR>
+<DD>
+This is internal method that returns path to libperl.a equivalent
+to be linked to dynamic extensions. UNIX does not have one but OS2
+and Win32 do.
+<P></P>
+<DT><STRONG><A NAME="item_perl_archive_after">perl_archive_after</A></STRONG><BR>
+<DD>
+This is an internal method that returns path to a library which
+should be put on the linker command line <EM>after</EM> the external libraries
+to be linked to dynamic extensions.  This may be needed if the linker
+is one-pass, and Perl includes some overrides for C RTL functions,
+such as malloc().
+<P></P>
+<DT><STRONG><A NAME="item_export_list">export_list</A></STRONG><BR>
+<DD>
+This is internal method that returns name of a file that is
+passed to linker to define symbols to be exported.
+UNIX does not have one but OS2 and Win32 do.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/ExtUtils/MakeMaker.html">the ExtUtils::MakeMaker manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::MM_Unix - methods used by ExtUtils::MakeMaker</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

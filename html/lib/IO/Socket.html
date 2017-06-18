@@ -1,0 +1,171 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Socket - Object interface to socket communications</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Socket - Object interface to socket communications</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Socket - Object interface to socket communications</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::Socket;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::Socket</CODE> provides an object interface to creating and using sockets. It
+is built upon the <A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A> interface and inherits all the methods defined
+by <A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>.</P>
+<P><CODE>IO::Socket</CODE> only defines methods for those operations which are common to all
+types of socket. Operations which are specified to a socket in a particular 
+domain have methods defined in sub classes of <CODE>IO::Socket</CODE></P>
+<P><CODE>IO::Socket</CODE> will export all functions (and constants) defined by <A HREF="../../lib/Socket.html">the Socket manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [ARGS] )</A></STRONG><BR>
+<DD>
+Creates an <CODE>IO::Socket</CODE>, which is a reference to a
+newly created symbol (see the <CODE>Symbol</CODE> package). <A HREF="#item_new"><CODE>new</CODE></A>
+optionally takes arguments, these arguments are in key-value pairs.
+<A HREF="#item_new"><CODE>new</CODE></A> only looks for one key <CODE>Domain</CODE> which tells new which domain
+the socket will be in. All other arguments will be passed to the
+configuration method of the package for that domain, See below.
+<PRE>
+ NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE</PRE>
+<P>As of VERSION 1.18 all IO::Socket objects have autoflush turned on
+by default. This was not the case with earlier releases.</P>
+<PRE>
+ NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>See <A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A> for complete descriptions of each of the following
+supported <CODE>IO::Socket</CODE> methods, which are just front ends for the
+corresponding built-in functions:</P>
+<PRE>
+    socket
+    socketpair
+    bind
+    listen
+    accept
+    send
+    recv
+    peername (getpeername)
+    sockname (getsockname)
+    shutdown</PRE>
+<P>Some methods take slightly different arguments to those defined in <A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A>
+in attempt to make the interface more flexible. These are</P>
+<DL>
+<DT><STRONG><A NAME="item_accept"><CODE>accept([PKG])</CODE></A></STRONG><BR>
+<DD>
+perform the system call <A HREF="#item_accept"><CODE>accept</CODE></A> on the socket and return a new object. The
+new object will be created in the same class as the listen socket, unless
+<CODE>PKG</CODE> is specified. This object can be used to communicate with the client
+that was trying to connect. In a scalar context the new socket is returned,
+or undef upon failure. In a list context a two-element array is returned
+containing the new socket and the peer address; the list will
+be empty upon failure.
+<P></P>
+<DT><STRONG><A NAME="item_socketpair">socketpair(DOMAIN, TYPE, PROTOCOL)</A></STRONG><BR>
+<DD>
+Call <A HREF="#item_socketpair"><CODE>socketpair</CODE></A> and return a list of two sockets created, or an
+empty list on failure.
+<P></P></DL>
+<P>Additional methods that are provided are:</P>
+<DL>
+<DT><STRONG><A NAME="item_timeout"><CODE>timeout([VAL])</CODE></A></STRONG><BR>
+<DD>
+Set or get the timeout value associated with this socket. If called without
+any arguments then the current setting is returned. If called with an argument
+the current setting is changed and the previous value returned.
+<P></P>
+<DT><STRONG><A NAME="item_sockopt">sockopt(OPT [, VAL])</A></STRONG><BR>
+<DD>
+Unified method to both set and get options in the SOL_SOCKET level. If called
+with one argument then getsockopt is called, otherwise setsockopt is called.
+<P></P>
+<DT><STRONG><A NAME="item_sockdomain">sockdomain</A></STRONG><BR>
+<DD>
+Returns the numerical number for the socket domain type. For example, for
+a AF_INET socket the value of &amp;AF_INET will be returned.
+<P></P>
+<DT><STRONG><A NAME="item_socktype">socktype</A></STRONG><BR>
+<DD>
+Returns the numerical number for the socket type. For example, for
+a SOCK_STREAM socket the value of &amp;SOCK_STREAM will be returned.
+<P></P>
+<DT><STRONG><A NAME="item_protocol">protocol</A></STRONG><BR>
+<DD>
+Returns the numerical number for the protocol being used on the socket, if
+known. If the protocol is unknown, as with an AF_UNIX socket, zero
+is returned.
+<P></P>
+<DT><STRONG><A NAME="item_connected">connected</A></STRONG><BR>
+<DD>
+If the socket is in a connected state the the peer address is returned.
+If the socket is not in a connected state then undef will be returned.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Socket.html">the Socket manpage</A>, <A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>, <A HREF="../../lib/IO/Socket/INET.html">the IO::Socket::INET manpage</A>, <A HREF="../../lib/IO/Socket/UNIX.html">the IO::Socket::UNIX manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr. Currently maintained by the Perl Porters.  Please report all
+bugs to &lt;<A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-8 Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Socket - Object interface to socket communications</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

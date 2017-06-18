@@ -1,0 +1,119 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Socket::UNIX - Object interface for AF_UNIX domain sockets</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Socket::UNIX - Object interface for AF_UNIX domain sockets</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Socket::UNIX - Object interface for AF_UNIX domain sockets</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::Socket::UNIX;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::Socket::UNIX</CODE> provides an object interface to creating and using sockets
+in the AF_UNIX domain. It is built upon the <A HREF="../../../lib/IO/Socket.html">the IO::Socket manpage</A> interface and
+inherits all the methods defined by <A HREF="../../../lib/IO/Socket.html">the IO::Socket manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [ARGS] )</A></STRONG><BR>
+<DD>
+Creates an <CODE>IO::Socket::UNIX</CODE> object, which is a reference to a
+newly created symbol (see the <CODE>Symbol</CODE> package). <A HREF="#item_new"><CODE>new</CODE></A>
+optionally takes arguments, these arguments are in key-value pairs.
+<P>In addition to the key-value pairs accepted by <A HREF="../../../lib/IO/Socket.html">the IO::Socket manpage</A>,
+<CODE>IO::Socket::UNIX</CODE> provides.</P>
+<PRE>
+    Type        Type of socket (eg SOCK_STREAM or SOCK_DGRAM)
+    Local       Path to local fifo
+    Peer        Path to peer fifo
+    Listen      Create a listen socket</PRE>
+<P>If the constructor is only passed a single argument, it is assumed to
+be a <CODE>Peer</CODE> specification.</P>
+<PRE>
+ NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+</PRE>
+<PRE>
+
+As of VERSION 1.18 all IO::Socket objects have autoflush turned on
+by default. This was not the case with earlier releases.</PRE>
+<PRE>
+ NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_hostpath"><CODE>hostpath()</CODE></A></STRONG><BR>
+<DD>
+Returns the pathname to the fifo at the local end
+<P></P>
+<DT><STRONG><A NAME="item_peerpath"><CODE>peerpath()</CODE></A></STRONG><BR>
+<DD>
+Returns the pathanme to the fifo at the peer end
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/Socket.html">the Socket manpage</A>, <A HREF="../../../lib/IO/Socket.html">the IO::Socket manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr. Currently maintained by the Perl Porters.  Please report all
+bugs to &lt;<A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1996-8 Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Socket::UNIX - Object interface for AF_UNIX domain sockets</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

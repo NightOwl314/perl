@@ -1,0 +1,286 @@
+
+<HTML>
+<HEAD>
+<TITLE>B::Deparse - Perl compiler backend to produce perl code</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Deparse - Perl compiler backend to produce perl code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#using b::deparse as a module">USING B::Deparse AS A MODULE</A></LI>
+	<UL>
+
+		<LI><A HREF="#synopsis">Synopsis</A></LI>
+		<LI><A HREF="#description">Description</A></LI>
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#coderef2text">coderef2text</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>B::Deparse - Perl compiler backend to produce perl code</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><STRONG>perl</STRONG> <STRONG>-MO=Deparse</STRONG>[<STRONG>,-u</STRONG><EM>PACKAGE</EM>][<STRONG>,-p</STRONG>][<STRONG>,-q</STRONG>][<STRONG>,-l</STRONG>]
+        [<STRONG>,-s</STRONG><EM>LETTERS</EM>][<STRONG>,-x</STRONG><EM>LEVEL</EM>] <EM>prog.pl</EM></P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>B::Deparse is a backend module for the Perl compiler that generates
+perl source code, based on the internal compiled structure that perl
+itself creates after parsing a program. The output of B::Deparse won't
+be exactly the same as the original source, since perl doesn't keep
+track of comments or whitespace, and there isn't a one-to-one
+correspondence between perl's syntactical constructions and their
+compiled form, but it will often be close. When you use the <STRONG>-p</STRONG>
+option, the output also includes parentheses even when they are not
+required by precedence, which can make it easy to see if perl is
+parsing your expressions the way you intended.</P>
+<P>Please note that this module is mainly new and untested code and is
+still under development, so it may change in the future.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>As with all compiler backend options, these must follow directly after
+the '-MO=Deparse', separated by a comma but not any white space.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dl"><STRONG>-l</STRONG></A></STRONG><BR>
+<DD>
+Add '#line' declarations to the output based on the line and file
+locations of the original code.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dp"><STRONG>-p</STRONG></A></STRONG><BR>
+<DD>
+Print extra parentheses. Without this option, B::Deparse includes
+parentheses in its output only when they are needed, based on the
+structure of your program. With <STRONG>-p</STRONG>, it uses parentheses (almost)
+whenever they would be legal. This can be useful if you are used to
+LISP, or if you want to see how perl parses your input. If you say
+<PRE>
+    if ($var &amp; 0x7f == 65) {print &quot;Gimme an A!&quot;} 
+    print ($which ? $a : $b), &quot;\n&quot;;
+    $name = $ENV{USER} or &quot;Bob&quot;;</PRE>
+<P><CODE>B::Deparse,-p</CODE> will print</P>
+<PRE>
+    if (($var &amp; 0)) {
+        print('Gimme an A!')
+    };
+    (print(($which ? $a : $b)), '???');
+    (($name = $ENV{'USER'}) or '???')</PRE>
+<P>which probably isn't what you intended (the <CODE>'???'</CODE> is a sign that
+perl optimized away a constant value).</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dq"><STRONG>-q</STRONG></A></STRONG><BR>
+<DD>
+Expand double-quoted strings into the corresponding combinations of
+concatenation, uc, ucfirst, lc, lcfirst, quotemeta, and join. For
+instance, print
+<PRE>
+    print &quot;Hello, $world, @ladies, \u$gentlemen\E, \u\L$me!&quot;;</PRE>
+<P>as</P>
+<PRE>
+    print 'Hello, ' . $world . ', ' . join($&quot;, @ladies) . ', '
+          . ucfirst($gentlemen) . ', ' . ucfirst(lc $me . '!');</PRE>
+<P>Note that the expanded form represents the way perl handles such
+constructions internally -- this option actually turns off the reverse
+translation that B::Deparse usually does. On the other hand, note that
+<CODE>$x = &quot;$y&quot;</CODE> is not the same as <CODE>$x = $y</CODE>: the former makes the value
+of $y into a string before doing the assignment.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2DuPACKAGE"><STRONG>-u</STRONG><EM>PACKAGE</EM></A></STRONG><BR>
+<DD>
+Normally, B::Deparse deparses the main code of a program, all the subs
+called by the main program (and all the subs called by them,
+recursively), and any other subs in the main:: package. To include
+subs in other packages that aren't called directly, such as AUTOLOAD,
+DESTROY, other subs called automatically by perl, and methods (which
+aren't resolved to subs until runtime), use the <STRONG>-u</STRONG> option. The
+argument to <STRONG>-u</STRONG> is the name of a package, and should follow directly
+after the 'u'. Multiple <STRONG>-u</STRONG> options may be given, separated by
+commas.  Note that unlike some other backends, B::Deparse doesn't
+(yet) try to guess automatically when <STRONG>-u</STRONG> is needed -- you must
+invoke it yourself.
+<P></P>
+<DT><STRONG><A NAME="item_%2DsLETTERS"><STRONG>-s</STRONG><EM>LETTERS</EM></A></STRONG><BR>
+<DD>
+Tweak the style of B::Deparse's output. The letters should follow
+directly after the 's', with no space or punctuation. The following
+options are available:
+<DL>
+<DT><STRONG><A NAME="item_C"><STRONG>C</STRONG></A></STRONG><BR>
+<DD>
+Cuddle <CODE>elsif</CODE>, <CODE>else</CODE>, and <A HREF="../../lib/Pod/perlfunc.html#item_continue"><CODE>continue</CODE></A> blocks. For example, print
+<PRE>
+    if (...) {
+         ...
+    } else {
+         ...
+    }</PRE>
+<P>instead of</P>
+<PRE>
+    if (...) {
+         ...
+    }
+    else {
+         ...
+    }</PRE>
+<P>The default is not to cuddle.</P>
+<P></P>
+<DT><STRONG><A NAME="item_iNUMBER"><STRONG>i</STRONG><EM>NUMBER</EM></A></STRONG><BR>
+<DD>
+Indent lines by multiples of <EM>NUMBER</EM> columns. The default is 4 columns.
+<P></P>
+<DT><STRONG><A NAME="item_T"><STRONG>T</STRONG></A></STRONG><BR>
+<DD>
+Use tabs for each 8 columns of indent. The default is to use only spaces.
+For instance, if the style options are <STRONG>-si4T</STRONG>, a line that's indented
+3 times will be preceded by one tab and four spaces; if the options were
+<STRONG>-si8T</STRONG>, the same line would be preceded by three tabs.
+<P></P>
+<DT><STRONG><A NAME="item_vSTRING%2E"><STRONG>v</STRONG><EM>STRING</EM><STRONG>.</STRONG></A></STRONG><BR>
+<DD>
+Print <EM>STRING</EM> for the value of a constant that can't be determined
+because it was optimized away (mnemonic: this happens when a constant
+is used in <STRONG>v</STRONG>oid context). The end of the string is marked by a period.
+The string should be a valid perl expression, generally a constant.
+Note that unless it's a number, it probably needs to be quoted, and on
+a command line quotes need to be protected from the shell. Some
+conventional values include 0, 1, 42, '', 'foo', and
+'Useless use of constant omitted' (which may need to be
+<STRONG>-sv``'Useless use of constant omitted'.''</STRONG>
+or something similar depending on your shell). The default is '???'.
+If you're using B::Deparse on a module or other file that's require'd,
+you shouldn't use a value that evaluates to false, since the customary
+true constant at the end of a module will be in void context when the
+file is compiled as a main program.
+<P></P></DL>
+<DT><STRONG><A NAME="item_%2DxLEVEL"><STRONG>-x</STRONG><EM>LEVEL</EM></A></STRONG><BR>
+<DD>
+Expand conventional syntax constructions into equivalent ones that expose
+their internal operation. <EM>LEVEL</EM> should be a digit, with higher values
+meaning more expansion. As with <STRONG>-q</STRONG>, this actually involves turning off
+special cases in B::Deparse's normal operations.
+<P>If <EM>LEVEL</EM> is at least 3, for loops will be translated into equivalent
+while loops with continue blocks; for instance</P>
+<PRE>
+    for ($i = 0; $i &lt; 10; ++$i) {
+        print $i;
+    }</PRE>
+<P>turns into</P>
+<PRE>
+    $i = 0;
+    while ($i &lt; 10) {
+        print $i;
+    } continue {
+        ++$i
+    }</PRE>
+<P>Note that in a few cases this translation can't be perfectly carried back
+into the source code -- if the loop's initializer declares a my variable,
+for instance, it won't have the correct scope outside of the loop.</P>
+<P>If <EM>LEVEL</EM> is at least 7, if statements will be translated into equivalent
+expressions using <CODE>&amp;&amp;</CODE>, <CODE>?:</CODE> and <A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do {}</CODE></A>; for instance</P>
+<PRE>
+    print 'hi' if $nice;
+    if ($nice) {
+        print 'hi';
+    }
+    if ($nice) {
+        print 'hi';
+    } else {
+        print 'bye';
+    }</PRE>
+<P>turns into</P>
+<PRE>
+    $nice and print 'hi';
+    $nice and do { print 'hi' };
+    $nice ? do { print 'hi' } : do { print 'bye' };</PRE>
+<P>Long sequences of elsifs will turn into nested ternary operators, which
+B::Deparse doesn't know how to indent nicely.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="using b::deparse as a module">USING B::Deparse AS A MODULE</A></H1>
+<P>
+<H2><A NAME="synopsis">Synopsis</A></H2>
+<PRE>
+    use B::Deparse;
+    $deparse = B::Deparse-&gt;new(&quot;-p&quot;, &quot;-sC&quot;);
+    $body = $deparse-&gt;coderef2text(\&amp;func);
+    eval &quot;sub func $body&quot;; # the inverse operation</PRE>
+<P>
+<H2><A NAME="description">Description</A></H2>
+<P>B::Deparse can also be used on a sub-by-sub basis from other perl
+programs.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<PRE>
+    $deparse = B::Deparse-&gt;new(OPTIONS)</PRE>
+<P>Create an object to store the state of a deparsing operation and any
+options. The options are the same as those that can be given on the
+command line (see <A HREF="#options">OPTIONS</A>); options that are separated by commas
+after <STRONG>-MO=Deparse</STRONG> should be given as separate strings. Some
+options, like <STRONG>-u</STRONG>, don't make sense for a single subroutine, so
+don't pass them.</P>
+<P>
+<H2><A NAME="coderef2text">coderef2text</A></H2>
+<PRE>
+    $body = $deparse-&gt;coderef2text(\&amp;func)
+    $body = $deparse-&gt;coderef2text(sub ($$) { ... })</PRE>
+<P>Return source code for the body of a subroutine (a block, optionally
+preceded by a prototype in parens), given a reference to the
+sub. Because a subroutine can have no names, or more than one name,
+this method doesn't return a complete subroutine definition -- if you
+want to eval the result, you should prepend ``sub subname '', or ``sub ''
+for an anonymous function constructor. Unless the sub was defined in
+the main:: package, the code will include a package declaration.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>See the 'to do' list at the beginning of the module file.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Stephen McCamant &lt;<A HREF="mailto:smcc@CSUA.Berkeley.EDU">smcc@CSUA.Berkeley.EDU</A>&gt;, based on an earlier
+version by Malcolm Beattie &lt;<A HREF="mailto:mbeattie@sable.ox.ac.uk">mbeattie@sable.ox.ac.uk</A>&gt;, with
+contributions from Gisle Aas, James Duncan, Albert Dvornik, Hugo van
+der Sanden, Gurusamy Sarathy, and Nick Ing-Simmons.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Deparse - Perl compiler backend to produce perl code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

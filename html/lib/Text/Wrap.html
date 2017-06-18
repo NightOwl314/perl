@@ -1,0 +1,124 @@
+
+<HTML>
+<HEAD>
+<TITLE>Text::Wrap - line wrapping to form simple paragraphs</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Text::Wrap - line wrapping to form simple paragraphs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Text::Wrap - line wrapping to form simple paragraphs</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><STRONG>Example 1</STRONG></P>
+<PRE>
+        use Text::Wrap</PRE>
+<PRE>
+        $initial_tab = &quot;\t&quot;;    # Tab before first line
+        $subsequent_tab = &quot;&quot;;   # All other lines flush left</PRE>
+<PRE>
+        print wrap($initial_tab, $subsequent_tab, @text);
+        print fill($initial_tab, $subsequent_tab, @text);</PRE>
+<PRE>
+        @lines = wrap($initial_tab, $subsequent_tab, @text);</PRE>
+<PRE>
+        @paragraphs = fill($initial_tab, $subsequent_tab, @text);</PRE>
+<P><STRONG>Example 2</STRONG></P>
+<PRE>
+        use Text::Wrap qw(wrap $columns $huge);</PRE>
+<PRE>
+        $columns = 132;         # Wrap at 132 characters
+        $huge = 'die';
+        $huge = 'wrap';
+        $huge = 'overflow';</PRE>
+<P><STRONG>Example 3</STRONG>
+</P>
+<PRE>
+
+        use Text::Wrap</PRE>
+<PRE>
+        $Text::Wrap::columns = 72;
+        print wrap('', '', @text);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Text::Wrap::wrap() is a very simple paragraph formatter.  It formats a
+single paragraph at a time by breaking lines at word boundries.
+Indentation is controlled for the first line (<CODE>$initial_tab</CODE>) and
+all subsquent lines (<CODE>$subsequent_tab</CODE>) independently.  Please note: 
+<CODE>$initial_tab</CODE> and <CODE>$subsequent_tab</CODE> are the literal strings that will
+be used: it is unlikley you would want to pass in a number.</P>
+<P>Lines are wrapped at <CODE>$Text::Wrap::columns</CODE> columns.  <CODE>$Text::Wrap::columns</CODE>
+should be set to the full width of your output device.  In fact,
+every resulting line will have length of no more than <CODE>$columns - 1</CODE>.</P>
+<P>Beginner note: In example 2, above <CODE>$columns</CODE> is imported into
+the local namespace, and set locally.  In example 3,
+<CODE>$Text::Wrap::columns</CODE> is set in its own namespace without importing it.</P>
+<P>When words that are longer than <CODE>$columns</CODE> are encountered, they
+are broken up.  <CODE>wrap()</CODE> adds a <CODE>&quot;\n&quot;</CODE> at column <CODE>$columns</CODE>.
+This behavior can be overridden by setting <CODE>$huge</CODE> to
+'die' or to 'overflow'.  When set to 'die', large words will cause
+<A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> to be called.  When set to 'overflow', large words will be
+left intact.</P>
+<P>Text::Wrap::fill() is a simple multi-paragraph formatter.  It formats
+each paragraph separately and then joins them together when it's done.  It
+will destory any whitespace in the original text.  It breaks text into
+paragraphs by looking for whitespace after a newline.  In other respects
+it acts like wrap().</P>
+<P>When called in list context, <CODE>wrap()</CODE> will return a list of lines and 
+<CODE>fill()</CODE> will return a list of paragraphs.</P>
+<P>Historical notes: Older versions of <CODE>wrap()</CODE> and <CODE>fill()</CODE> always 
+returned strings.  Also, 'die' used to be the default value of
+<CODE>$huge</CODE>.  Now, 'wrap' is the default value.</P>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<PRE>
+        print wrap(&quot;\t&quot;,&quot;&quot;,&quot;This is a bit of text that forms 
+                a normal book-style paragraph&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>David Muir Sharnoff &lt;<A HREF="mailto:muir@idiom.com">muir@idiom.com</A>&gt; with help from Tim Pierce and
+many many others.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Text::Wrap - line wrapping to form simple paragraphs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

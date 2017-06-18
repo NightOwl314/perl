@@ -1,0 +1,121 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::OLE::Enum - OLE Automation Collection Objects</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::Enum - OLE Automation Collection Objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#functions/methods">Functions/Methods</A></LI>
+	</UL>
+
+	<LI><A HREF="#authors/copyright">AUTHORS/COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::OLE::Enum - OLE Automation Collection Objects</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    my $Sheets = $Excel-&gt;Workbooks(1)-&gt;Worksheets;
+    my $Enum = Win32::OLE::Enum-&gt;new($Sheets);
+    my @Sheets = $Enum-&gt;All;</PRE>
+<PRE>
+    while (defined(my $Sheet = $Enum-&gt;Next)) { ... }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides an interface to OLE collection objects from
+Perl.  It defines an enumerator object closely mirroring the
+functionality of the IEnumVARIANT interface.</P>
+<P>Please note that the <A HREF="#item_Reset"><CODE>Reset()</CODE></A> method is not available in all implementations
+of OLE collections (like Excel 7).  In that case the Enum object is good
+only for a single walk through of the collection.</P>
+<P>
+<H2><A NAME="functions/methods">Functions/Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">Win32::OLE::Enum-&gt;<CODE>new($object)</CODE></A></STRONG><BR>
+<DD>
+Creates an enumerator for $object, which must be a valid OLE collection
+object.  Note that correctly implemented collection objects must support
+the <CODE>Count</CODE> and <CODE>Item</CODE> methods, so creating an enumerator is not always
+necessary.
+<P></P>
+<DT><STRONG><A NAME="item_All">$Enum-&gt;<CODE>All()</CODE></A></STRONG><BR>
+<DD>
+Returns a list of all objects in the collection.  You have to call
+$Enum-&gt;<A HREF="#item_Reset"><CODE>Reset()</CODE></A> before the enumerator can be used again.  The previous
+position in the collection is lost.
+<P>This method can also be called as a class method:</P>
+<PRE>
+        my @list = Win32::OLE::Enum-&gt;All($Collection);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Clone">$Enum-&gt;<CODE>Clone()</CODE></A></STRONG><BR>
+<DD>
+Returns a clone of the enumerator maintaining the current position within
+the collection (if possible).  Note that the <A HREF="#item_Clone"><CODE>Clone</CODE></A> method is often not
+implemented.  Use $Enum-&gt;<A HREF="#item_Clone"><CODE>Clone()</CODE></A> in an eval block to avoid dying if you
+are not sure that Clone is supported.
+<P></P>
+<DT><STRONG><A NAME="item_Next">$Enum-&gt;Next( [$count] )</A></STRONG><BR>
+<DD>
+Returns the next element of the collection.  In a list context the optional
+$count argument specifies the number of objects to be returned.  In a scalar
+context only the last of at most $count retrieved objects is returned.  The
+default for $count is 1.
+<P></P>
+<DT><STRONG><A NAME="item_Reset">$Enum-&gt;<CODE>Reset()</CODE></A></STRONG><BR>
+<DD>
+Resets the enumeration sequence to the beginning.  There is no guarantee that
+the exact same set of objects will be enumerated again (e.g. when enumerating
+files in a directory).  The methods return value indicates the success of the
+operation.  (Note that the <A HREF="#item_Reset"><CODE>Reset()</CODE></A> method seems to be unimplemented in some
+applications like Excel 7.  Use it in an eval block to avoid dying.)
+<P></P>
+<DT><STRONG><A NAME="item_Skip">$Enum-&gt;Skip( [$count] )</A></STRONG><BR>
+<DD>
+Skip the next $count elements of the enumeration.  The default for $count is 1.
+The functions returns TRUE if at least $count elements could be skipped.  It
+returns FALSE if not enough elements were left.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="authors/copyright">AUTHORS/COPYRIGHT</A></H1>
+<P>This module is part of the Win32::OLE distribution.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::Enum - OLE Automation Collection Objects</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,169 @@
+
+<HTML>
+<HEAD>
+<TITLE>B::C - Perl compiler's C backend</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::C - Perl compiler's C backend</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>B::C - Perl compiler's C backend</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        perl -MO=C[,OPTIONS] foo.pl</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This compiler backend takes Perl source and generates C source code
+corresponding to the internal structures that perl uses to run
+your program. When the generated C source is compiled and run, it
+cuts out the time which perl would have taken to load and parse
+your program into its internal semi-compiled form. That means that
+compiling with this backend will not help improve the runtime
+execution speed of your program but may improve the start-up time.
+Depending on the environment in which your program runs this may be
+either a help or a hindrance.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>If there are any non-option arguments, they are taken to be
+names of objects to be saved (probably doesn't work properly yet).
+Without extra arguments, it saves the main program.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dofilename"><STRONG>-ofilename</STRONG></A></STRONG><BR>
+<DD>
+Output to filename instead of STDOUT
+<P></P>
+<DT><STRONG><A NAME="item_%2Dv"><STRONG>-v</STRONG></A></STRONG><BR>
+<DD>
+Verbose compilation (currently gives a few compilation statistics).
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2D"><STRONG>--</STRONG></A></STRONG><BR>
+<DD>
+Force end of options
+<P></P>
+<DT><STRONG><A NAME="item_%2DuPackname"><STRONG>-uPackname</STRONG></A></STRONG><BR>
+<DD>
+Force apparently unused subs from package Packname to be compiled.
+This allows programs to use eval ``foo()'' even when sub foo is never
+seen to be used at compile time. The down side is that any subs which
+really are never used also have code generated. This option is
+necessary, for example, if you have a signal handler foo which you
+initialise with <CODE>$SIG{BAR} = &quot;foo&quot;</CODE>.  A better fix, though, is just
+to change it to <CODE>$SIG{BAR} = \&amp;foo</CODE>. You can have multiple <STRONG>-u</STRONG>
+options. The compiler tries to figure out which packages may possibly
+have subs in which need compiling but the current version doesn't do
+it very well. In particular, it is confused by nested packages (i.e.
+of the form <CODE>A::B</CODE>) where package <A HREF="../../lib/Pod/perlguts.html#item_A"><CODE>A</CODE></A> does not contain any subs.
+<P></P>
+<DT><STRONG><A NAME="item_%2DD"><STRONG>-D</STRONG></A></STRONG><BR>
+<DD>
+Debug options (concatenated or separate flags like <CODE>perl -D</CODE>).
+<P></P>
+<DT><STRONG><A NAME="item_%2DDo"><STRONG>-Do</STRONG></A></STRONG><BR>
+<DD>
+OPs, prints each OP as it's processed
+<P></P>
+<DT><STRONG><A NAME="item_%2DDc"><STRONG>-Dc</STRONG></A></STRONG><BR>
+<DD>
+COPs, prints COPs as processed (incl. file &amp; line num)
+<P></P>
+<DT><STRONG><A NAME="item_%2DDA"><STRONG>-DA</STRONG></A></STRONG><BR>
+<DD>
+prints AV information on saving
+<P></P>
+<DT><STRONG><A NAME="item_%2DDC"><STRONG>-DC</STRONG></A></STRONG><BR>
+<DD>
+prints CV information on saving
+<P></P>
+<DT><STRONG><A NAME="item_%2DDM"><STRONG>-DM</STRONG></A></STRONG><BR>
+<DD>
+prints MAGIC information on saving
+<P></P>
+<DT><STRONG><A NAME="item_%2Df"><STRONG>-f</STRONG></A></STRONG><BR>
+<DD>
+Force optimisations on or off one at a time.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dfcog"><STRONG>-fcog</STRONG></A></STRONG><BR>
+<DD>
+Copy-on-grow: PVs declared and initialised statically.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dfno%2Dcog"><STRONG>-fno-cog</STRONG></A></STRONG><BR>
+<DD>
+No copy-on-grow.
+<P></P>
+<DT><STRONG><A NAME="item_%2DOn"><STRONG>-On</STRONG></A></STRONG><BR>
+<DD>
+Optimisation level (n = 0, 1, 2, ...). <STRONG>-O</STRONG> means <STRONG>-O1</STRONG>.  Currently,
+<STRONG>-O1</STRONG> and higher set <STRONG>-fcog</STRONG>.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dllimit"><STRONG>-llimit</STRONG></A></STRONG><BR>
+<DD>
+Some C compilers impose an arbitrary limit on the length of string
+constants (e.g. 2048 characters for Microsoft Visual C++).  The
+<STRONG>-llimit</STRONG> options tells the C backend not to generate string literals
+exceeding that limit.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+    perl -MO=C,-ofoo.c foo.pl
+    perl cc_harness -o foo foo.c</PRE>
+<P>Note that <CODE>cc_harness</CODE> lives in the <CODE>B</CODE> subdirectory of your perl
+library directory. The utility called <CODE>perlcc</CODE> may also be used to
+help make use of this compiler.</P>
+<PRE>
+    perl -MO=C,-v,-DcA,-l2048 bar.pl &gt; /dev/null</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Plenty. Current status: experimental.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Malcolm Beattie, <CODE>mbeattie@sable.ox.ac.uk</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::C - Perl compiler's C backend</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

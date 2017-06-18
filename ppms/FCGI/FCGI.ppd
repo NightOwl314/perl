@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="FCGI" VERSION="0,67,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="sun4-solaris-thread-multi/FCGI.tar.gz" />
+    <ARCHITECTURE NAME="sun4-solaris-thread-multi" />
+    <OS NAME="solaris" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="MSWin32-x86-multi-thread/FCGI.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="i686-linux-thread-multi/FCGI.tar.gz" />
+    <ARCHITECTURE NAME="i686-linux-thread-multi" />
+    <OS NAME="linux" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Fast CGI module</ABSTRACT>
+  <AUTHOR>Sven Verdoolaege (skimo@kotnet.org)</AUTHOR>
+  <TITLE>FCGI</TITLE>
+</SOFTPKG>

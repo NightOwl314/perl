@@ -1,0 +1,122 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPM::XML::Element - Base element class for XML elements</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::Element - Base element class for XML elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#limitations">LIMITATIONS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>PPM::XML::Element - Base element class for XML elements</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use PPM::XML::Element;
+ @ISA = qw( PPM::XML::Element );</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Base element class for XML elements.  To be derived from to create your own
+elements for use with the XML::Parser module.  Supports output of empty
+elements using &lt;.... /&gt;.</P>
+<P>It is recommended that you use a version of the XML::Parser module which 
+includes support for Styles; by deriving your own elements from 
+PPM::XML::Element and using the 'Objects' style it becomes <STRONG>much</STRONG> easier 
+to create your own parser.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_add_text">add_text ($text)</A></STRONG><BR>
+<DD>
+Adds character data to the end of the element.  The element created is placed
+within the same package space as the element it was created under (e.g. adding
+text to a XML::Foobar::Stuff element would put the character data into an
+XML::Foobar::Characters element).  If successful, this method returns a
+reference to the newly created element.
+<P></P>
+<DT><STRONG><A NAME="item_as_text">as_text</A></STRONG><BR>
+<DD>
+Returns a string value containing the entire XML document from this element on
+down.
+<P></P>
+<DT><STRONG><A NAME="item_content">content</A></STRONG><BR>
+<DD>
+Returns a string value containing the entire content of this XML element.  Note
+that this is quite similar to the <A HREF="#item_as_text"><CODE>as_text()</CODE></A> method except that it does not
+include any information about this element in particular.
+<P></P>
+<DT><STRONG><A NAME="item_output">output</A></STRONG><BR>
+<DD>
+Recursively outputs the structure of the XML document from this element on
+down.
+<P></P>
+<DT><STRONG><A NAME="item_add_child">add_child ($elemref)</A></STRONG><BR>
+<DD>
+Adds the child element to the list of children for this element.  Note that
+the element given must be a reference to an object derived from 
+<CODE>PPM::XML::Element</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_remove_child">remove_child ($elemref)</A></STRONG><BR>
+<DD>
+Removes the given child element from the list of children for this element.
+This method returns non-zero if it is able to locate and remove the child
+element, returning zero if it is unable to do so.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="limitations">LIMITATIONS</A></H1>
+<P>The <CODE>PPM::XML::Element</CODE> module has no provisions for outputting processor
+directives or external entities.  It only outputs child elements and any
+character data which the elements may contain.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Graham TerMarsch &lt;<A HREF="mailto:gtermars@activestate.com">gtermars@activestate.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../../site/lib/XML/Parser.html">the XML::Parser manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::Element - Base element class for XML elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

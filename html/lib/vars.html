@@ -1,0 +1,74 @@
+
+<HTML>
+<HEAD>
+<TITLE>vars - Perl pragma to predeclare global variable names</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;vars - Perl pragma to predeclare global variable names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>vars - Perl pragma to predeclare global variable names (obsolete)</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use vars qw($frob @mung %seen);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>NOTE: The functionality provided by this pragma has been superseded
+by <A HREF="../lib/Pod/perlfunc.html#item_our"><CODE>our</CODE></A> declarations, available in Perl v5.6.0 or later.  See
+<A HREF="../lib/Pod/perlfunc.html#our">our in the perlfunc manpage</A>.</P>
+<P>This will predeclare all the variables whose names are 
+in the list, allowing you to use them under ``use strict'', and
+disabling any typo warnings.</P>
+<P>Unlike pragmas that affect the <A HREF="../lib/Pod/perlvar.html#item_%24%5EH"><CODE>$^H</CODE></A> hints variable, the <CODE>use vars</CODE> and
+<CODE>use subs</CODE> declarations are not BLOCK-scoped.  They are thus effective
+for the entire file in which they appear.  You may not rescind such
+declarations with <CODE>no vars</CODE> or <CODE>no subs</CODE>.</P>
+<P>Packages such as the <STRONG>AutoLoader</STRONG> and <STRONG>SelfLoader</STRONG> that delay
+loading of subroutines within packages can create problems with
+package lexicals defined using <A HREF="../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A>. While the <STRONG>vars</STRONG> pragma
+cannot duplicate the effect of package lexicals (total transparency
+outside of the package), it can act as an acceptable substitute by
+pre-declaring global symbols, ensuring their availability to the
+later-loaded routines.</P>
+<P>See <A HREF="../lib/Pod/perlmodlib.html#pragmatic modules">Pragmatic Modules in the perlmodlib manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;vars - Perl pragma to predeclare global variable names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

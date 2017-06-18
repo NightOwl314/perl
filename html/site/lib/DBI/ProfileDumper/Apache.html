@@ -1,0 +1,135 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::ProfileDumper::Apache - capture DBI profiling data from Apache/mod_perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileDumper::Apache - capture DBI profiling data from Apache/mod_perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<UL>
+
+		<LI><A HREF="#loading the module">LOADING THE MODULE</A></LI>
+		<LI><A HREF="#gathering profile data">GATHERING PROFILE DATA</A></LI>
+		<LI><A HREF="#cleaning up">CLEANING UP</A></LI>
+	</UL>
+
+	<LI><A HREF="#memory usage">MEMORY USAGE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT AND LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>DBI::ProfileDumper::Apache - capture DBI profiling data from Apache/mod_perl</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>Add this line to your <EM>httpd.conf</EM>:</P>
+<PRE>
+  PerlSetEnv DBI_PROFILE DBI::ProfileDumper::Apache</PRE>
+<P>Then restart your server.  Access the code you wish to test using a
+web browser, then shutdown your server.  This will create a set of
+<EM>dbi.prof.*</EM> files in your Apache log directory.  Get a profiling
+report with <A HREF="..\..\..\..\bin/dbiprof.html">dbiprof</A>:</P>
+<PRE>
+  dbiprof /usr/local/apache/logs/dbi.prof.*</PRE>
+<P>When you're ready to perform another profiling run, delete the old
+files</P>
+<PRE>
+  rm /usr/local/apache/logs/dbi.prof.*</PRE>
+<P>and start again.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module interfaces DBI::ProfileDumper to Apache/mod_perl.  Using
+this module you can collect profiling data from mod_perl applications.
+It works by creating a DBI::ProfileDumper data file for each Apache
+process.  These files are created in your Apache log directory.  You
+can then use dbiprof to analyze the profile files.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>
+<H2><A NAME="loading the module">LOADING THE MODULE</A></H2>
+<P>The easiest way to use this module is just to set the DBI_PROFILE
+environment variable in your <EM>httpd.conf</EM>:</P>
+<PRE>
+  PerlSetEnv DBI_PROFILE DBI::ProfileDumper::Apache</PRE>
+<P>If you want to use one of DBI::Profile's other Path settings, you can
+use a string like:</P>
+<PRE>
+  PerlSetEnv DBI_PROFILE 2/DBI::ProfileDumper::Apache</PRE>
+<P>It's also possible to use this module by setting the Profile attribute
+of any DBI handle:</P>
+<PRE>
+  $dbh-&gt;{Profile} = &quot;DBI::ProfileDumper::Apache&quot;;</PRE>
+<P>See <A HREF="..\..\..\..\site\lib/DBI/ProfileDumper.html">the DBI::ProfileDumper manpage</A> for more possibilities.</P>
+<P>
+<H2><A NAME="gathering profile data">GATHERING PROFILE DATA</A></H2>
+<P>Once you have the module loaded, use your application as you normally
+would.  Stop the webserver when your tests are complete.  Profile data
+files will be produced when Apache exits and you'll see something like
+this in your error_log:</P>
+<PRE>
+  DBI::ProfileDumper::Apache writing to /usr/local/apache/logs/dbi.prof.2619</PRE>
+<P>Now you can use dbiprof to examine the data:</P>
+<PRE>
+  dbiprof /usr/local/apache/logs/dbi.prof.*</PRE>
+<P>By passing dbiprof a list of all generated files, dbiprof will
+automatically merge them into one result set.  You can also pass
+dbiprof sorting and querying options, see <A HREF="..\..\..\..\bin/dbiprof.html">the dbiprof manpage</A> for details.</P>
+<P>
+<H2><A NAME="cleaning up">CLEANING UP</A></H2>
+<P>Once you've made some code changes, you're ready to start again.
+First, delete the old profile data files:</P>
+<PRE>
+  rm /usr/local/apache/logs/dbi.prof.*</PRE>
+<P>Then restart your server and get back to work.</P>
+<P>
+<HR>
+<H1><A NAME="memory usage">MEMORY USAGE</A></H1>
+<P>DBI::Profile can use a lot of memory for very active applications.  It
+collects profiling data in memory for each distinct query your
+application runs.  You can avoid this problem with a call like this:</P>
+<PRE>
+  $dbh-&gt;{Profile}-&gt;flush_to_disk() if $dbh-&gt;{Profile};</PRE>
+<P>Calling <CODE>flush_to_disk()</CODE> will clear out the profile data and write
+it to disk.  Put this someplace where it will run on every request,
+like a CleanupHandler, and your memory troubles should go away.  Well,
+at least the ones caused by DBI::Profile anyway.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Sam Tregar &lt;<A HREF="mailto:sam@tregar.com">sam@tregar.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT AND LICENSE</A></H1>
+<P>Copyright (C) 2002 Sam Tregar</P>
+<P>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileDumper::Apache - capture DBI profiling data from Apache/mod_perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

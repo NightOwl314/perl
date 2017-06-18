@@ -1,0 +1,164 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec::VMS - methods for VMS file specs</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::VMS - methods for VMS file specs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods always loaded">Methods always loaded</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec::VMS - methods for VMS file specs</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require File::Spec::VMS; # Done internally by File::Spec if needed</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>See File::Spec::Unix for a documentation of the methods provided
+there. This package overrides the implementation of these methods, not
+the semantics.</P>
+<DL>
+<DT><STRONG><A NAME="item_eliminate_macros">eliminate_macros</A></STRONG><BR>
+<DD>
+Expands MM[KS]/Make macros in a text string, using the contents of
+identically named elements of <CODE>%$self</CODE>, and returns the result
+as a file specification in Unix syntax.
+<P></P>
+<DT><STRONG><A NAME="item_fixpath">fixpath</A></STRONG><BR>
+<DD>
+Catchall routine to clean up problem MM[SK]/Make macros.  Expands macros
+in any directory specification, in order to avoid juxtaposing two
+VMS-syntax directories when MM[SK] is run.  Also expands expressions which
+are all macro, so that we can tell how long the expansion is, and avoid
+overrunning DCL's command buffer when MM[KS] is running.
+<P>If optional second argument has a TRUE value, then the return string is
+a VMS-syntax directory specification, if it is FALSE, the return string
+is a VMS-syntax file specification, and if it is not specified, <A HREF="#item_fixpath"><CODE>fixpath()</CODE></A>
+checks to see whether it matches the name of a directory in the current
+default directory, and returns a directory or file specification accordingly.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="methods always loaded">Methods always loaded</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_canonpath">canonpath (override)</A></STRONG><BR>
+<DD>
+Removes redundant portions of file specifications according to VMS syntax.
+<P></P>
+<DT><STRONG><A NAME="item_catdir">catdir</A></STRONG><BR>
+<DD>
+Concatenates a list of file specifications, and returns the result as a
+VMS-syntax directory specification.  No check is made for ``impossible''
+cases (e.g. elements other than the first being absolute filespecs).
+<P></P>
+<DT><STRONG><A NAME="item_catfile">catfile</A></STRONG><BR>
+<DD>
+Concatenates a list of file specifications, and returns the result as a
+VMS-syntax file specification.
+<P></P>
+<DT><STRONG><A NAME="item_curdir">curdir (override)</A></STRONG><BR>
+<DD>
+Returns a string representation of the current directory: '[]'
+<P></P>
+<DT><STRONG><A NAME="item_devnull">devnull (override)</A></STRONG><BR>
+<DD>
+Returns a string representation of the null device: '_NLA0:'
+<P></P>
+<DT><STRONG><A NAME="item_rootdir">rootdir (override)</A></STRONG><BR>
+<DD>
+Returns a string representation of the root directory: 'SYS$DISK:[000000]'
+<P></P>
+<DT><STRONG><A NAME="item_tmpdir">tmpdir (override)</A></STRONG><BR>
+<DD>
+Returns a string representation of the first writable directory
+from the following list or '' if none are writable:
+<PRE>
+    sys$scratch:
+    $ENV{TMPDIR}</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_updir">updir (override)</A></STRONG><BR>
+<DD>
+Returns a string representation of the parent directory: '[-]'
+<P></P>
+<DT><STRONG><A NAME="item_case_tolerant">case_tolerant (override)</A></STRONG><BR>
+<DD>
+VMS file specification syntax is case-tolerant.
+<P></P>
+<DT><STRONG><A NAME="item_path">path (override)</A></STRONG><BR>
+<DD>
+Translate logical name DCL$PATH as a searchlist, rather than trying
+to <A HREF="../../../lib/Pod/perlfunc.html#item_split"><CODE>split</CODE></A> string value of <CODE>$ENV{'PATH'}</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_file_name_is_absolute">file_name_is_absolute (override)</A></STRONG><BR>
+<DD>
+Checks for VMS directory spec as well as Unix separators.
+<P></P>
+<DT><STRONG><A NAME="item_splitpath">splitpath (override)</A></STRONG><BR>
+<DD>
+Splits using VMS syntax.
+<P></P>
+<DT><STRONG><A NAME="item_splitdir">splitdir (override)</A></STRONG><BR>
+<DD>
+Split dirspec using VMS syntax.
+<P></P>
+<DT><STRONG><A NAME="item_catpath">catpath (override)</A></STRONG><BR>
+<DD>
+Construct a complete filespec using VMS syntax
+<P></P>
+<DT><STRONG><A NAME="item_abs2rel">abs2rel (override)</A></STRONG><BR>
+<DD>
+Use VMS syntax when converting filespecs.
+<P></P>
+<DT><STRONG><A NAME="item_rel2abs">rel2abs (override)</A></STRONG><BR>
+<DD>
+Use VMS syntax when converting filespecs.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/File/Spec.html">the File::Spec manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::VMS - methods for VMS file specs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,276 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::EventLog - Process Win32 Event Logs from Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::EventLog - Process Win32 Event Logs from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#the eventlog object and its methods">The EventLog Object and its Methods</A></LI>
+	<LI><A HREF="#other win32::eventlog functions.">Other Win32::EventLog functions.</A></LI>
+	<LI><A HREF="#example 1">Example 1</A></LI>
+	<LI><A HREF="#example 2">Example 2</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::EventLog - Process Win32 Event Logs from Perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Win32::EventLog
+        $handle=Win32::EventLog-&gt;new(&quot;Application&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module implements most of the functionality available from the
+Win32 API for accessing and manipulating Win32 Event Logs. The access
+to the EventLog routines is divided into those that relate to an
+EventLog object and its associated methods and those that relate other
+EventLog tasks (like adding an EventLog record).</P>
+<P>
+<HR>
+<H1><A NAME="the eventlog object and its methods">The EventLog Object and its Methods</A></H1>
+<P>The following methods are available to open, read, close and backup
+EventLogs.</P>
+<DL>
+<DT><STRONG><A NAME="item_new">Win32::EventLog-&gt;new(SOURCENAME [,SERVERNAME]);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new()</CODE></A> method creates a new EventLog object and returns a handle
+to it. This hande is then used to call the methods below.
+<P>The method is overloaded in that if the supplied SOURCENAME
+argument contains one or more literal '\' characters (an illegal
+character in a SOURCENAME), it assumes that you are trying to open
+a backup eventlog and uses SOURCENAME as the backup eventlog to
+open. Note that when opening a backup eventlog, the SERVERNAME
+argument is ignored (as it is in the underlying Win32 API). For
+EventLogs on remote machines, the SOURCENAME parameter must
+therefore be specified as a UNC path.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Backup">$handle-&gt;Backup(FILENAME);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Backup"><CODE>Backup()</CODE></A> method backs up the EventLog represented by $handle. It
+takes a single arguemt, FILENAME. When $handle represents an
+EventLog on a remote machine, FILENAME is filename on the remote
+machine and cannot be a UNC path (i.e you must use <EM>C:\TEMP\App.EVT</EM>).
+The method will fail if the log file already exists.
+<P></P>
+<DT><STRONG><A NAME="item_Read">$handle-&gt;Read(FLAGS, OFFSET, HASHREF);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Read"><CODE>Read()</CODE></A> method read an EventLog entry from the EventLog represented
+by $handle.
+<P></P>
+<DT><STRONG><A NAME="item_Close">$handle-&gt;Close();</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Close"><CODE>Close()</CODE></A> method closes the EventLog represented by $handle. After
+<A HREF="#item_Close"><CODE>Close()</CODE></A> has been called, any further attempt to use the EventLog
+represented by $handle will fail.
+<P></P>
+<DT><STRONG><A NAME="item_GetOldest">$handle-&gt;GetOldest(SCALARREF);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_GetOldest"><CODE>GetOldest()</CODE></A> method number of the the oldest EventLog record in
+the EventLog represented by $handle. This is required to correctly
+compute the OFFSET required by the <A HREF="#item_Read"><CODE>Read()</CODE></A> method.
+<P></P>
+<DT><STRONG><A NAME="item_GetNumber">$handle-&gt;GetNumber(SCALARREF);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_GetNumber"><CODE>GetNumber()</CODE></A> method returns the number of EventLog records in
+the EventLog represented by $handle. The number of the most recent
+record in the EventLog is therefore computed by
+<PRE>
+        $handle-&gt;GetOldest($oldest);
+        $handle-&gt;GetNumber($lastRec);
+        $lastRecOffset=$oldest+$lastRec;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Clear">$handle-&gt;Clear(FILENAME);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Clear"><CODE>Clear()</CODE></A> method clears the EventLog represented by $handle.  If
+you provide a non-null FILENAME, the EventLog will be backed up
+into FILENAME before the EventLog is cleared. The method will fail
+if FILENAME is specified and the file refered to exists. Note also
+that FILENAME specifies a file local to the machine on which the
+EventLog resides and cannot be specified as a UNC name.
+<P></P>
+<DT><STRONG><A NAME="item_Report">$handle-&gt;Report(HASHREF);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Report"><CODE>Report()</CODE></A> method generates an EventLog entry. The HASHREF should
+contain the following keys:
+<DL>
+<DT><STRONG><A NAME="item_Computer"><CODE>Computer</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Computer"><CODE>Computer</CODE></A> field specfies which computer you want the EventLog
+entry recorded.  If this key doesn't exist, the server name used to
+create the $handle is used.
+<P></P>
+<DT><STRONG><A NAME="item_Source"><CODE>Source</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Source"><CODE>Source</CODE></A> field specifies the source that generated the EventLog
+entry.  If this key doesn't exist, the source name used to create the
+$handle is used.
+<P></P>
+<DT><STRONG><A NAME="item_EventType"><CODE>EventType</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_EventType"><CODE>EventType</CODE></A> field should be one of the constants
+<DL>
+<DT><STRONG><A NAME="item_EVENTLOG_ERROR_TYPE"><CODE>EVENTLOG_ERROR_TYPE</CODE></A></STRONG><BR>
+<DD>
+An Error event is being logged.
+<P></P>
+<DT><STRONG><A NAME="item_EVENTLOG_WARNING_TYPE"><CODE>EVENTLOG_WARNING_TYPE</CODE></A></STRONG><BR>
+<DD>
+A Warning event is being logged.
+<P></P>
+<DT><STRONG><A NAME="item_EVENTLOG_INFORMATION_TYPE"><CODE>EVENTLOG_INFORMATION_TYPE</CODE></A></STRONG><BR>
+<DD>
+An Information event is being logged.
+<P></P>
+<DT><STRONG><A NAME="item_EVENTLOG_AUDIT_SUCCESS"><CODE>EVENTLOG_AUDIT_SUCCESS</CODE></A></STRONG><BR>
+<DD>
+A Success Audit event is being logged (typically in the Security
+EventLog).
+<P></P>
+<DT><STRONG><A NAME="item_EVENTLOG_AUDIT_FAILURE"><CODE>EVENTLOG_AUDIT_FAILURE</CODE></A></STRONG><BR>
+<DD>
+A Failure Audit event is being logged (typically in the Security
+EventLog).
+<P></P></DL>
+<P>These constants are exported into the main namespace by default.</P>
+<DT><STRONG><A NAME="item_Category"><CODE>Category</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Category"><CODE>Category</CODE></A> field can have any value you want. It is specific to
+the particular Source.
+<P></P>
+<DT><STRONG><A NAME="item_EventID"><CODE>EventID</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_EventID"><CODE>EventID</CODE></A> field should contain the ID of the message that this
+event pertains too. This assumes that you have an associated message
+file (indirectly referenced by the field <A HREF="#item_Source"><CODE>Source</CODE></A>).
+<P></P>
+<DT><STRONG><A NAME="item_Data"><CODE>Data</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Data"><CODE>Data</CODE></A> field contains raw data associated with this event.
+<P></P>
+<DT><STRONG><A NAME="item_Strings"><CODE>Strings</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Strings"><CODE>Strings</CODE></A> field contains the single string that itself contains
+NUL terminated sub-strings. This are used with the EventID to generate
+the message as seen from (for example) the Event Viewer application.
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="other win32::eventlog functions.">Other Win32::EventLog functions.</A></H1>
+<P>The following functions are part of the Win32::EventLog package but
+are not callable from an EventLog object.</P>
+<DL>
+<DT><STRONG><A NAME="item_GetMessageText">GetMessageText(HASHREF);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_GetMessageText"><CODE>GetMessageText()</CODE></A> function assumes that HASHREF was obtained by
+a call to <A HREF="#item_Read"><CODE>$handle-&gt;Read()</CODE></A>. It returns the formatted string that
+represents the fully resolved text of the EventLog message (such as
+would be seen in the Windows NT Event Viewer). For convenience, the
+key 'Message' in the supplied HASHREF is also set to the return value
+of this function.
+<P>If you set the variable $Win32::EventLog::GetMessageText to 1 then
+each call to <A HREF="#item_Read"><CODE>$handle-&gt;Read()</CODE></A> will call this function automatically.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example 1">Example 1</A></H1>
+<P>The following example illustrates the way in which the EventLog module
+can be used. It opens the System EventLog and reads through it from
+oldest to newest records. For each record from the <STRONG>Source</STRONG> EventLog
+it extracts the full text of the Entry and prints the EventLog message
+text out.</P>
+<PRE>
+ use Win32::EventLog;</PRE>
+<PRE>
+ $handle=Win32::EventLog-&gt;new(&quot;System&quot;, $ENV{ComputerName})
+        or die &quot;Can't open Application EventLog\n&quot;;
+ $handle-&gt;GetNumber($recs)
+        or die &quot;Can't get number of EventLog records\n&quot;;
+ $handle-&gt;GetOldest($base)
+        or die &quot;Can't get number of oldest EventLog record\n&quot;;</PRE>
+<PRE>
+ while ($x &lt; $recs) {
+        $handle-&gt;Read(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,
+                                  $base+$x,
+                                  $hashRef)
+                or die &quot;Can't read EventLog entry #$x\n&quot;;
+        if ($hashRef-&gt;{Source} eq &quot;EventLog&quot;) {
+                Win32::EventLog::GetMessageText($hashRef);
+                print &quot;Entry $x: $hashRef-&gt;{Message}\n&quot;;
+        }
+        $x++;
+ }</PRE>
+<P>
+<HR>
+<H1><A NAME="example 2">Example 2</A></H1>
+<P>To backup and clear the EventLogs on a remote machine, do the following :-</P>
+<PRE>
+ use Win32::EventLog;</PRE>
+<PRE>
+ $myServer=&quot;\\\\my-server&quot;;     # your servername here.
+ my($date)=join(&quot;-&quot;, ((split(/\s+/, scalar(localtime)))[0,1,2,4]));
+ my($dest);</PRE>
+<PRE>
+ for my $eventLog (&quot;Application&quot;, &quot;System&quot;, &quot;Security&quot;) {
+        $handle=Win32::EventLog-&gt;new($eventLog, $myServer)
+                or die &quot;Can't open Application EventLog on $myServer\n&quot;;</PRE>
+<PRE>
+        $dest=&quot;C:\\BackupEventLogs\\$eventLog\\$date.evt&quot;;
+        $handle-&gt;Backup($dest)
+                or warn &quot;Could not backup and clear the $eventLog EventLog on $myServer ($^E)\n&quot;;</PRE>
+<PRE>
+        $handle-&gt;Close;
+ }</PRE>
+<P>Note that only the Clear method is required. Note also that if the
+file $dest exists, the function will fail.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>None currently known.</P>
+<P>The test script for 'make test' should be re-written to use the
+EventLog object.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Original code by Jesse Dougherty for HiP Communications. Additional
+fixes and updates attributed to Martin Pauley
+&lt;<A HREF="mailto:martin.pauley@ulsterbank.ltd.uk">martin.pauley@ulsterbank.ltd.uk</A>&gt;) and Bret Giddings (<A HREF="mailto:bret@essex.ac.uk">bret@essex.ac.uk</A>)</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::EventLog - Process Win32 Event Logs from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

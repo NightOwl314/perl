@@ -1,0 +1,1173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Text::Autoformat - Automatic and manual text wrapping and reformating formatting</title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Text::Autoformat - Automatic and manual text wrapping and reformating formatting</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#background">BACKGROUND</a></li>
+	<ul>
+
+		<li><a href="#the_problem">The problem</a></li>
+		<li><a href="#the_solution">The solution</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#paragraphs">Paragraphs</a></li>
+		<li><a href="#bulleting_and_(re)numbering">Bulleting and (re-)numbering</a></li>
+		<li><a href="#quoting">Quoting</a></li>
+		<li><a href="#widow_control">Widow control</a></li>
+		<li><a href="#justification">Justification</a></li>
+		<li><a href="#implicit_centring">Implicit centring</a></li>
+		<li><a href="#case_transformations">Case transformations</a></li>
+	</ul>
+
+	<li><a href="#other_features">OTHER FEATURES</a></li>
+	<ul>
+
+		<li><a href="#the_form_sub">The <code>form</code> sub</a></li>
+		<li><a href="#controlling_line_filling.">Controlling line filling.</a></li>
+		<li><a href="#temporary_and_permanent_default_options">Temporary and permanent default options</a></li>
+		<li><a href="#how_form_hyphenates">How <code>form</code> hyphenates</a></li>
+		<li><a href="#the_form_formatting_algorithm">The <code>form</code> formatting algorithm</a></li>
+		<li><a href="#form_examples"><code>form</code> examples</a></li>
+		<li><a href="#how_form_consumes_strings">How <code>form</code> consumes strings</a></li>
+		<li><a href="#numerical_formatting">Numerical formatting</a></li>
+		<li><a href="#filling_block_fields_with_lists_of_values">Filling block fields with lists of values</a></li>
+		<li><a href="#headers,_footers,_and_pages">Headers, footers, and pages</a></li>
+		<li><a href="#the_tag_sub">The <code>tag</code> sub</a></li>
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Text::Autoformat - Automatic and manual text wrapping and reformating formatting</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>This document describes version 1.04 of Text::Autoformat,
+released December  5, 2000.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ # Minimal use: read from STDIN, format to STDOUT...</pre>
+<pre>
+        use Text::Autoformat;
+        autoformat;</pre>
+<pre>
+ # In-memory formatting...</pre>
+<pre>
+        $formatted = autoformat $rawtext;</pre>
+<pre>
+ # Configuration...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { %options };</pre>
+<pre>
+ # Margins (1..72 by default)...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { left=&gt;8, right=&gt;70 };</pre>
+<pre>
+ # Justification (left by default)...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { justify =&gt; 'left' };
+        $formatted = autoformat $rawtext, { justify =&gt; 'right' };
+        $formatted = autoformat $rawtext, { justify =&gt; 'full' };
+        $formatted = autoformat $rawtext, { justify =&gt; 'centre' };</pre>
+<pre>
+ # Filling (does so by default)...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { fill=&gt;0 };</pre>
+<pre>
+ # Squeezing whitespace (does so by default)...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { squeeze=&gt;0 };</pre>
+<pre>
+ # Case conversions...</pre>
+<pre>
+        $formatted = autoformat $rawtext, { case =&gt; 'lower' };
+        $formatted = autoformat $rawtext, { case =&gt; 'upper' };
+        $formatted = autoformat $rawtext, { case =&gt; 'sentence' };
+        $formatted = autoformat $rawtext, { case =&gt; 'title' };
+        $formatted = autoformat $rawtext, { case =&gt; 'highlight' };</pre>
+<p>
+</p>
+<hr />
+<h1><a name="background">BACKGROUND</a></h1>
+<p>
+</p>
+<h2><a name="the_problem">The problem</a></h2>
+<p>Perl plaintext formatters just aren't smart enough. Given a typical
+piece of plaintext in need of formatting:</p>
+<pre>
+        In comp.lang.perl.misc you wrote:
+        : &gt; &lt;CN = Clooless Noobie&gt; writes:
+        : &gt; CN&gt; PERL sux because:
+        : &gt; CN&gt;    * It doesn't have a switch statement and you have to put $
+        : &gt; CN&gt;signs in front of everything
+        : &gt; CN&gt;    * There are too many OR operators: having |, || and 'or'
+        : &gt; CN&gt;operators is confusing
+        : &gt; CN&gt;    * VB rools, yeah!!!!!!!!!
+        : &gt; CN&gt; So anyway, how can I stop reloads on a web page?
+        : &gt; CN&gt; Email replies only, thanks - I don't read this newsgroup.
+        : &gt;
+        : &gt; Begone, sirrah! You are a pathetic, Bill-loving, microcephalic
+        : &gt; script-infant.
+        : Sheesh, what's with this group - ask a question, get toasted! And how
+        : *dare* you accuse me of Ianuphilia!</pre>
+<p>both the venerable Unix <em>fmt</em> tool and Perl's standard Text::Wrap module
+produce:</p>
+<pre>
+        In comp.lang.perl.misc you wrote:  : &gt; &lt;CN = Clooless Noobie&gt;
+        writes:  : &gt; CN&gt; PERL sux because:  : &gt; CN&gt;    * It doesn't
+        have a switch statement and you have to put $ : &gt; CN&gt;signs in
+        front of everything : &gt; CN&gt;    * There are too many OR
+        operators: having |, || and 'or' : &gt; CN&gt;operators is confusing
+        : &gt; CN&gt;    * VB rools, yeah!!!!!!!!!  : &gt; CN&gt; So anyway, how
+        can I stop reloads on a web page?  : &gt; CN&gt; Email replies only,
+        thanks - I don't read this newsgroup.  : &gt; : &gt; Begone, sirrah!
+        You are a pathetic, Bill-loving, microcephalic : &gt;
+        script-infant.  : Sheesh, what's with this group - ask a
+        question, get toasted! And how : *dare* you accuse me of
+        Ianuphilia!</pre>
+<p>Other formatting modules -- such as Text::Correct and Text::Format --
+provide more control over their output, but produce equally poor results
+when applied to arbitrary input. They simply don't understand the
+structural conventions of the text they're reformatting.</p>
+<p>
+</p>
+<h2><a name="the_solution">The solution</a></h2>
+<p>The Text::Autoformat module provides a subroutine named <code>autoformat</code> that
+wraps text to specified margins. However, <code>autoformat</code> reformats its
+input by analysing the text's structure, so it wraps the above example
+like so:</p>
+<pre>
+        In comp.lang.perl.misc you wrote:
+        : &gt; &lt;CN = Clooless Noobie&gt; writes:
+        : &gt; CN&gt; PERL sux because:
+        : &gt; CN&gt;    * It doesn't have a switch statement and you
+        : &gt; CN&gt;      have to put $ signs in front of everything
+        : &gt; CN&gt;    * There are too many OR operators: having |, ||
+        : &gt; CN&gt;      and 'or' operators is confusing
+        : &gt; CN&gt;    * VB rools, yeah!!!!!!!!! So anyway, how can I
+        : &gt; CN&gt;      stop reloads on a web page? Email replies
+        : &gt; CN&gt;      only, thanks - I don't read this newsgroup.
+        : &gt;
+        : &gt; Begone, sirrah! You are a pathetic, Bill-loving,
+        : &gt; microcephalic script-infant.
+        : Sheesh, what's with this group - ask a question, get toasted!
+        : And how *dare* you accuse me of Ianuphilia!</pre>
+<p>Note that the various quoting conventions have been observed. In fact,
+their structure has been used to determine where some paragraphs begin.
+Furthermore <code>autoformat</code> correctly distinguished between the leading
+'*' bullets of the nested list (which were outdented) and the leading
+emphatic '*' of ``*dare*'' (which was inlined).</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<h2><a name="paragraphs">Paragraphs</a></h2>
+<p>The fundamental task of the <code>autoformat</code> subroutine is to identify and
+rearrange independent paragraphs in a text. Paragraphs typically consist
+of a series of lines containing at least one non-whitespace character,
+followed by one or more lines containing only optional whitespace.
+This is a more liberal definition than many other formatters
+use: most require an empty line to terminate a paragraph. Paragraphs may
+also be denoted by bulleting, numbering, or quoting (see the following
+sections).</p>
+<p>Once a paragraph has been isolated, <code>autoformat</code> fills and re-wraps its
+lines according to the margins that are specified in its argument list.
+These are placed after the text to be formatted, in a hash reference:</p>
+<pre>
+        $tidied = autoformat($messy, {left=&gt;20, right=&gt;60});</pre>
+<p>By default, <code>autoformat</code> uses a left margin of 1 (first column) and a
+right margin of 72.</p>
+<p>Normally, <code>autoformat</code> only reformats the first paragraph it encounters,
+and leaves the remainder of the text unaltered. This behaviour is useful
+because it allows a one-liner invoking the subroutine to be mapped
+onto a convenient keystroke in a text editor, to provide 
+one-paragraph-at-a-time reformatting:</p>
+<pre>
+        % cat .exrc</pre>
+<pre>
+        map f !Gperl -MText::Autoformat -e'autoformat'</pre>
+<p>(Note that to facilitate such one-liners, if <code>autoformat</code> is called
+in a void context without any text data, it takes its text from
+<code>STDIN</code> and writes its result to <code>STDOUT</code>).</p>
+<p>To enable <code>autoformat</code> to rearrange the entire input text at once, the
+<code>all</code> argument is used:</p>
+<pre>
+        $tidied_all = autoformat($messy, {left=&gt;20, right=&gt;60, all=&gt;1});</pre>
+<p>
+</p>
+<h2><a name="bulleting_and_(re)numbering">Bulleting and (re-)numbering</a></h2>
+<p>Often plaintext will include lists that are either:</p>
+<pre>
+        * bulleted,
+        * simply numbered (i.e. 1., 2., 3., etc.), or
+        * hierarchically numbered (1, 1.1, 1.2, 1.3, 2, 2.1. and so forth).</pre>
+<p>In such lists, each bulleted item is implicitly a separate paragraph,
+and is formatted individually, with the appropriate indentation:</p>
+<pre>
+        * bulleted,
+        * simply numbered (i.e. 1., 2., 3.,
+          etc.), or
+        * hierarchically numbered (1, 1.1,
+          1.2, 1.3, 2, 2.1. and so forth).</pre>
+<p>More importantly, if the points are numbered, the numbering is
+checked and reordered. For example, a list whose points have been
+rearranged:</p>
+<pre>
+        2. Analyze problem
+        3. Design algorithm
+        1. Code solution
+        5. Test
+        4. Ship</pre>
+<p>would be renumbered automatically by <code>autoformat</code>:</p>
+<pre>
+        1. Analyze problem
+        2. Design algorithm
+        3. Code solution
+        4. Ship
+        5. Test</pre>
+<p>The same reordering would be performed if the ``numbering'' was by letters
+(<code>a.</code> <code>b.</code> <code>c.</code> etc.) or Roman numerals (<code>i.</code> <code>ii.</code> <code>iii.)</code> or by
+some combination of these (<code>1a.</code> <code>1b.</code> <code>2a.</code> <code>2b.</code> etc.) Handling
+disordered lists of letters and Roman numerals presents an interesting
+challenge. A list such as:</p>
+<pre>
+        C. Put cat in box.
+        D. Close lid.
+        E. Activate Geiger counter.</pre>
+<p>should be reordered as <code>A.</code> <code>B.</code> <code>C.,</code> whereas:</p>
+<pre>
+        C. Put cat in box.
+        D. Close lid.
+        XLI. Activate Geiger counter.</pre>
+<p>should be reordered <code>I.</code> <code>II.</code> <code>III.</code></p>
+<p>The <code>autoformat</code> subroutine solves this problem by always interpreting 
+alphabetic bullets as being letters, unless the full list consists
+only of valid Roman numerals, at least one of which is two or
+more characters long.</p>
+<p>
+</p>
+<h2><a name="quoting">Quoting</a></h2>
+<p>Another case in which contiguous lines may be interpreted as belonging
+to different paragraphs, is where they are quoted with distinct
+quoters. For example:</p>
+<pre>
+        : &gt; CN&gt; So anyway, how can I stop reloads on a web page?
+        : &gt; CN&gt; Email replies only, thanks - I don't read this newsgroup.
+        : &gt; Begone, sirrah! You are a pathetic, Bill-loving,
+        : &gt; microcephalic script-infant.
+        : Sheesh, what's with this group - ask a question, get toasted!
+        : And how *dare* you accuse me of Ianuphilia!</pre>
+<p><code>autoformat</code> recognizes the various quoting conventions used in this example
+and treats it as three paragraphs to be independently reformatted.</p>
+<p>Block quotations present a different challenge. A typical formatter would
+render the following quotation:</p>
+<pre>
+        &quot;We are all of us in the gutter,
+         but some of us are looking at the stars&quot;
+                                -- Oscar Wilde</pre>
+<p>like so:</p>
+<pre>
+        &quot;We are all of us in the gutter, but some of us are looking at
+        the stars&quot; -- Oscar Wilde</pre>
+<p><code>autoformat</code> recognizes the quotation structure by matching the following regular
+expression against the text component of each paragraph:</p>
+<pre>
+        / \A(\s*)               # leading whitespace for quotation
+          ([&quot;']|``)             # opening quotemark
+          (.*)                  # quotation
+          (''|\2)               # closing quotemark
+          \s*?\n                # trailing whitespace after quotation
+          (\1[ ]+)              # leading whitespace for attribution
+                                #   (must be indented more than quotation)
+          (--|-)                # attribution introducer
+          ([^\n]*?\n)           # first attribution line
+          ((\5[^\n]*?$)*)       # other attribution lines 
+                                #   (indented no less than first line)
+          \s*\Z                 # optional whitespace to end of paragraph
+        /xsm</pre>
+<p>When reformatted (see below), the indentation and the attribution
+structure will be preserved:</p>
+<pre>
+        &quot;We are all of us in the gutter, but some of us are looking
+         at the stars&quot;
+                                -- Oscar Wilde</pre>
+<p>
+</p>
+<h2><a name="widow_control">Widow control</a></h2>
+<p>Note that in the last example, <code>autoformat</code> broke the line at column
+68, four characters earlier than it should have. It did so because, if
+the full margin width had been used, the formatting would have left the
+last two words by themselves on an oddly short last line:</p>
+<pre>
+        &quot;We are all of us in the gutter, but some of us are looking at
+         the stars&quot;</pre>
+<p>This phenomenon is known as ``widowing'' and is heavily frowned upon in
+typesetting circles. It looks ugly in plaintext too, so <code>autoformat</code> 
+avoids it by stealing extra words from earlier lines in a
+paragraph, so as to leave enough for a reasonable last line. The heuristic
+used is that final lines must be at least 10 characters long (though
+this number may be adjusted by passing a <code>widow =&gt; minlength</code>
+argument to <code>autoformat</code>).</p>
+<p>If the last line is too short,
+the paragraph's right margin is reduced by one column, and the paragraph
+is reformatted. This process iterates until either the last line exceeds
+nine characters or the margins have been narrowed by 10% of their
+original separation. In the latter case, the reformatter gives up and uses its
+original formatting.</p>
+<p>
+</p>
+<h2><a name="justification">Justification</a></h2>
+<p>The <code>autoformat</code> subroutine also takes a named argument: <code>{justify
+=E&lt;gt&gt; I&lt;type&gt;}</code>, which specifies how each paragraph is to be justified.
+The options are: <code>'left'</code> (the default), <code>'right',</code> <code>'centre'</code> (or
+<code>'center'</code>), and <code>'full'</code>. These act on the complete paragraph text
+(but <em>not</em> on any quoters before that text). For example, with <code>'right'</code>
+justification:</p>
+<pre>
+        R3&gt;     Now is the Winter of our discontent made
+        R3&gt; glorious Summer by this son of York. And all
+        R3&gt; the clouds that lour'd upon our house In the
+        R3&gt;              deep bosom of the ocean buried.</pre>
+<p>Full justification is interesting in a fixed-width medium like plaintext
+because it usually results in uneven spacing between words. Typically,
+formatters provide this by distributing the extra spaces into the first
+available gaps of each line:</p>
+<pre>
+        R3&gt; Now  is  the  Winter  of our discontent made
+        R3&gt; glorious Summer by this son of York. And all
+        R3&gt; the  clouds  that  lour'd  upon our house In
+        R3&gt; the deep bosom of the ocean buried.</pre>
+<p>This produces a rather jarring visual effect, so <code>autoformat</code> reverses
+the strategy and inserts extra spaces at the end of lines:</p>
+<pre>
+        R3&gt; Now is the Winter  of  our  discontent  made
+        R3&gt; glorious Summer by this son of York. And all
+        R3&gt; the clouds that lour'd  upon  our  house  In
+        R3&gt; the deep bosom of the ocean buried.</pre>
+<p>Most readers find this less disconcerting.</p>
+<p>
+</p>
+<h2><a name="implicit_centring">Implicit centring</a></h2>
+<p>Even if explicit centring is not specified, <code>autoformat</code> will attempt
+to automatically detect centred paragraphs and preserve their
+justification. It does this by examining each line of the paragraph and
+asking: ``if this line were part of a centred paragraph, where would the
+centre line have been?''</p>
+<p>The answer can be determined by adding the length of leading whitespace
+before the first word, plus half the length of the full set of words
+on the line. That is, for a single line:</p>
+<pre>
+        $line =~ /^(\s*)(.*?)(\s*)$/
+        $centre = length($1)+0.5*length($2);</pre>
+<p>By making the same estimate for every line, and then comparing the
+estimates, it is possible to deduce whether all the lines are centred
+with respect to the same axis of symmetry (with an allowance of
+&plusminus;1 to cater for the inevitable rounding when the centre
+positions of even-length rows were originally computed). If a common
+axis of symmetry is detected, <code>autoformat</code> assumes that the lines are
+supposed to be centred, and switches to centre-justification mode for
+that paragraph.</p>
+<p>
+</p>
+<h2><a name="case_transformations">Case transformations</a></h2>
+<p>The <code>autoformat</code> subroutine can also optionally perform case conversions
+on the text it processes. The <code>{case =&gt; type}</code> argument allows the
+user to specify five different conversions:</p>
+<dl>
+<dt><strong><a name="item_%27upper%27"><code>'upper'</code></a></strong><br />
+</dt>
+<dd>
+This mode unconditionally converts every letter in the reformatted text to upper-case;
+</dd>
+<p></p>
+<dt><strong><a name="item_%27lower%27"><code>'lower'</code></a></strong><br />
+</dt>
+<dd>
+This mode unconditionally converts every letter in the reformatted text to lower-case;
+</dd>
+<p></p>
+<dt><strong><a name="item_%27sentence%27"><code>'sentence'</code></a></strong><br />
+</dt>
+<dd>
+This mode attempts to generate correctly-cased sentences from the input text.
+That is, the first letter after a sentence-terminating punctuator is converted
+to upper-case. Then, each subsequent word in the sentence is converted to
+lower-case, unless that word is originally mixed-case or contains punctuation.
+For example, under <code>{case =&gt; 'sentence'}</code>:
+</dd>
+<dd>
+<pre>
+        'POVERTY, MISERY, ETC. are the lot of the PhD candidate. alas!'</pre>
+</dd>
+<dd>
+<p>becomes:</p>
+</dd>
+<dd>
+<pre>
+        'Poverty, misery, etc. are the lot of the PhD candidate. Alas!'</pre>
+</dd>
+<dd>
+<p>Note that <code>autoformat</code> is clever enough to recognize that the period after abbreviations such as <code>etc.</code> is not a sentence terminator.</p>
+</dd>
+<dd>
+<p>If the argument is specified as <code>'sentence  '</code> (with one or more trailing
+whitespace characters) those characters are used to replace the single space
+that appears at the end of the sentence. For example,
+<code>autoformat($text, {case=&gt;'sentence  '}</code>) would produce:</p>
+</dd>
+<dd>
+<pre>
+        'Poverty, misery, etc. are the lot of the PhD candidate.  Alas!'</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_%27title%27"><code>'title'</code></a></strong><br />
+</dt>
+<dd>
+This mode behaves like <a href="#item_%27sentence%27"><code>'sentence'</code></a> except that the first letter of
+<em>every</em> word is capitalized:
+</dd>
+<dd>
+<pre>
+        'What I Did On My Summer Vacation In Monterey'</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_%27highlight%27"><code>'highlight'</code></a></strong><br />
+</dt>
+<dd>
+This mode behaves like <a href="#item_%27title%27"><code>'title'</code></a> except that trivial words are not
+capitalized:
+</dd>
+<dd>
+<pre>
+        'What I Did on my Summer Vacation in Monterey'</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="other_features">OTHER FEATURES</a></h1>
+<p>
+</p>
+<h2><a name="the_form_sub">The <code>form</code> sub</a></h2>
+<p>The <code>form()</code> subroutine may be exported from the module.
+It takes a series of format (or ``picture'') strings followed by
+replacement values, interpolates those values into each picture string,
+and returns the result. The effect is similar to the inbuilt perl
+<a href="../../../lib/Pod/perlfunc.html#item_format"><code>format</code></a> mechanism, although the field specification syntax is
+simpler and some of the formatting behaviour is more sophisticated.</p>
+<p>A picture string consists of sequences of the following characters:</p>
+<dl>
+<dt><strong><a name="item_%3c">&lt;</a></strong><br />
+</dt>
+<dd>
+Left-justified field indicator.
+A series of sequential &lt;'s specify
+a left-justified field to be filled by a subsequent value.
+</dd>
+<p></p>
+<dt><strong><a name="item_%3e">&gt;</a></strong><br />
+</dt>
+<dd>
+Right-justified field indicator.
+A series of sequential &gt;'s specify
+a right-justified field to be filled by a subsequent value.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5e">^</a></strong><br />
+</dt>
+<dd>
+Centre-justified field indicator.
+A series of sequential ^'s specify
+a centred field to be filled by a subsequent value.
+</dd>
+<p></p>
+<dt><strong><a name="item_%3e%3e%3e%2e%3c%3c%3c%3c">&gt;&gt;&gt;.&lt;&lt;&lt;&lt;</a></strong><br />
+</dt>
+<dd>
+A numerically formatted field with the specified number of digits to
+either side of the decimal place. See <a href="#numerical_formatting">Numerical formatting</a> below.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b">[</a></strong><br />
+</dt>
+<dd>
+Left-justified block field indicator.
+Just like a &lt; field, except it repeats as required on subsequent lines. See
+below.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5d">]</a></strong><br />
+</dt>
+<dd>
+Right-justified block field indicator.
+Just like a &gt; field, except it repeats as required on subsequent lines. See
+below.
+</dd>
+<p></p>
+<dt><strong><a name="item_%7c">|</a></strong><br />
+</dt>
+<dd>
+Centre-justified block field indicator.
+Just like a ^ field, except it repeats as required on subsequent lines. See
+below.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5d%5d%5d%2e%5b%5b%5b%5b">]]].[[[[</a></strong><br />
+</dt>
+<dd>
+A numerically formatted block field with the specified number of digits to
+either side of the decimal place.
+Just like a &gt;&gt;&gt;.&lt;&lt;&lt;&lt; field, except it repeats as required on
+subsequent lines. See below.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5c">\</a></strong><br />
+</dt>
+<dd>
+Literal escape of next character (e.g. <code>\|</code> is formatted as '|', not a one
+character wide centre-justified block field).
+</dd>
+<p></p>
+<dt><strong><a name="item_any_other_character">Any other character</a></strong><br />
+</dt>
+<dd>
+That literal character.
+</dd>
+<p></p></dl>
+<p>Any substitution value which is <a href="../../../lib/Pod/perlfunc.html#item_undef"><code>undef</code></a> (either explicitly so, or because it
+is missing) is replaced by an empty string.</p>
+<p>
+</p>
+<h2><a name="controlling_line_filling.">Controlling line filling.</a></h2>
+<p>Note that, unlike the a perl <a href="../../../lib/Pod/perlfunc.html#item_format"><code>format</code></a>, <code>form</code> preserves whitespace
+(including newlines) unless called with certain options.</p>
+<p>The ``squeeze'' option (when specified with a true value) causes any sequence
+of spaces and/or tabs (but not newlines) in an interpolated string to be
+replaced with a single space.</p>
+<p>The ``fill'' option causes newlines to also be squeezed.</p>
+<p>Hence:</p>
+<pre>
+        $frmt = &quot;# [[[[[[[[[[[[[[[[[[[[[&quot;;
+        $data = &quot;h  e\t \tl lo\nworld\t\t\t\t\t&quot;;</pre>
+<pre>
+        print form $frmt, $data;
+        # h  e            l lo
+        # world</pre>
+<pre>
+        print form {squeeze=&gt;1}, $frmt, $data;
+        # h e l lo
+        # world</pre>
+<pre>
+        print form {fill=&gt;1}, $frmt, $data;
+        # h  e            l lo world</pre>
+<pre>
+        print form {squeeze=&gt;1, fill=&gt;1}, $frmt, $data;
+        # h e l lo world</pre>
+<p>Whether or not filling or squeezing is in effect, <code>form</code> can also be
+directed to trim any extra whitespace from the end of each line it
+formats, using the ``trim'' option. If this option is specified with a
+true value, every line returned by <code>form</code> will automatically have the
+substitution <a href="../../../lib/Pod/perlfunc.html#item_s/"><code>s/[ \t]+$//gm</code></a> applied to it.</p>
+<p>Hence:</p>
+<pre>
+        print length form &quot;[[[[[[[[[[&quot;, &quot;short&quot;;
+        # 11</pre>
+<pre>
+        print length form {trim=&gt;1}, &quot;[[[[[[[[[[&quot;, &quot;short&quot;;
+        # 6</pre>
+<p>
+</p>
+<h2><a name="temporary_and_permanent_default_options">Temporary and permanent default options</a></h2>
+<p>If <code>form</code> is called with options, but no template string or data, it resets
+it's defaults to the options specified. If called in a void context:</p>
+<pre>
+        form { squeeze =&gt; 1, trim =&gt; 1 };</pre>
+<p>the options become permanent defaults.</p>
+<p>However, when called with only options in non-void context, <code>form</code>
+resets its defaults to those options and returns an object. The reset
+default values persist only until that returned object is destroyed.
+Hence to temporarily reset <code>form</code>'s defaults within a single subroutine:</p>
+<pre>
+        sub single {
+                my $tmp = form { squeeze =&gt; 1, trim =&gt; 1 };</pre>
+<pre>
+                # do formatting with the obove defaults</pre>
+<pre>
+        } # form's defaults revert to previous values as $tmp object destroyed</pre>
+<p>
+</p>
+<h2><a name="how_form_hyphenates">How <code>form</code> hyphenates</a></h2>
+<p>Any line with a block field repeats on subsequent lines until all block fields
+on that line have consumed all their data. Non-block fields on these lines are
+replaced by the appropriate number of spaces.</p>
+<p>Words are wrapped whole, unless they will not fit into the field at
+all, in which case they are broken and (by default) hyphenated. Simple
+hyphenation is used (i.e. break at the <em>N-1</em>th character and insert a
+'-'), unless a suitable alternative subroutine is specified instead.</p>
+<p>Words will not be broken if the break would leave less than 2 characters on
+the current line. This minimum can be varied by setting the 'minbreak' option
+to a numeric value indicating the minumum total broken characters (including
+hyphens) required on the current line. Note that, for very narrow fields,
+words will still be broken (but <em>unhyphenated</em>). For example:</p>
+<pre>
+        print form '|', 'split';</pre>
+<p>would print:</p>
+<pre>
+        s
+        p
+        l
+        i
+        t</pre>
+<p>whilst:</p>
+<pre>
+        print form {minbreak=&gt;1}, '|', 'split';</pre>
+<p>would print:</p>
+<pre>
+        s-
+        p-
+        l-
+        i-
+        t</pre>
+<p>Alternative breaking subroutines can be specified using the ``break'' option in a
+configuration hash. For example:</p>
+<pre>
+        form { break =&gt; \&amp;my_line_breaker }
+             $format_str,
+             @data;</pre>
+<p><code>form</code> expects any user-defined line-breaking subroutine to take three
+arguments (the string to be broken, the maximum permissible length of
+the initial section, and the total width of the field being filled).
+The <code>hypenate</code> sub must return a list of two strings: the initial
+(broken) section of the word, and the remainder of the string
+respectively).</p>
+<p>For example:</p>
+<pre>
+        sub tilde_break = sub($$$)
+        {
+                (substr($_[0],0,$_[1]-1).'~', substr($_[0],$_[1]-1));
+        }</pre>
+<pre>
+        form { break =&gt; \&amp;tilde_break }
+             $format_str,
+             @data;</pre>
+<p>makes '~' the hyphenation character, whilst:</p>
+<pre>
+        sub wrap_and_slop = sub($$$)
+        {
+                my ($text, $reqlen, $fldlen) = @_;
+                if ($reqlen==$fldlen) { $text =~ m/\A(\s*\S*)(.*)/s }
+                else                  { (&quot;&quot;, $text) }
+        }</pre>
+<pre>
+        form { break =&gt; \&amp;wrap_and_slop }
+             $format_str,
+             @data;</pre>
+<p>wraps excessively long words to the next line and ``slops'' them over
+the right margin if necessary.</p>
+<p>The Text::Autoformat package provides three functions to simplify the use
+of variant hyphenation schemes. The exportable subroutine
+<code>Text::Autoformat::break_wrap</code> generates a reference to a subroutine
+implementing the ``wrap-and-slop'' algorithm shown in the last example,
+which could therefore be rewritten:</p>
+<pre>
+        use Text::Autoformat qw( form break_wrap );</pre>
+<pre>
+        form { break =&gt; break_wrap }
+             $format_str,
+             @data;</pre>
+<p>The subroutine <code>Text::Autoformat::break_with</code> takes a single string
+argument and returns a reference to a sub which hyphenates with that
+string. Hence the first of the two examples could be rewritten:</p>
+<pre>
+        use Text::Autoformat qw( form break_wrap );</pre>
+<pre>
+        form { break =&gt; break_with('~') }
+             $format_str,
+             @data;</pre>
+<p>The subroutine <code>Text::Autoformat::break_TeX</code> 
+returns a reference to a sub which hyphenates using 
+Jan Pazdziora's TeX::Hyphen module. For example:</p>
+<pre>
+        use Text::Autoformat qw( form break_wrap );</pre>
+<pre>
+        form { break =&gt; break_TeX }
+             $format_str,
+             @data;</pre>
+<p>Note that in the previous examples there is no leading '\&amp;' before
+<code>break_wrap</code>, <code>break_with</code>, or <code>break_TeX</code>, since each is being
+directly <em>called</em> (and returns a reference to some other suitable
+subroutine);</p>
+<p>
+</p>
+<h2><a name="the_form_formatting_algorithm">The <code>form</code> formatting algorithm</a></h2>
+<p>The algorithm <code>form</code> uses is:</p>
+<pre>
+        1. split the first string in the argument list
+           into individual format lines and add a terminating
+           newline (unless one is already present).</pre>
+<pre>
+        2. for each format line...</pre>
+<pre>
+                2.1. determine the number of fields and shift
+                     that many values off the argument list and
+                     into the filling list. If insufficient
+                     arguments are available, generate as many 
+                     empty strings as are required.</pre>
+<pre>
+                2.2. generate a text line by filling each field
+                     in the format line with the initial contents
+                     of the corresponding arg in the filling list
+                     (and remove those initial contents from the arg).</pre>
+<pre>
+                2.3. replace any &lt;,&gt;, or ^ fields by an equivalent
+                     number of spaces. Splice out the corresponding
+                     args from the filling list.</pre>
+<pre>
+                2.4. Repeat from step 2.2 until all args in the
+                     filling list are empty.</pre>
+<pre>
+        3. concatenate the text lines generated in step 2</pre>
+<pre>
+        4. repeat from step 1 until the argument list is empty</pre>
+<p>
+</p>
+<h2><a name="form_examples"><code>form</code> examples</a></h2>
+<p>As an example of the use of <code>form</code>, the following:</p>
+<pre>
+        $count = 1;
+        $text = &quot;A big long piece of text to be formatted exquisitely&quot;;</pre>
+<pre>
+        print form q
+        {
+                ||||  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                ----------------
+                ^^^^  ]]]]]]]]]]\|
+                                =
+                ]]].[[[
+                
+        }, $count, $text, $count+11, $text, &quot;123 123.4\n123.456789&quot;;</pre>
+<p>produces the following output:</p>
+<pre>
+                 1    A big long
+                ----------------
+                 12     piece of|
+                      text to be|
+                       formatted|
+                      exquisite-|
+                              ly|
+                                =
+                123.0
+                123.4
+                123.456</pre>
+<p>Picture strings and replacement values can be interleaved in the
+traditional <a href="../../../lib/Pod/perlfunc.html#item_format"><code>format</code></a> format, but care is needed to ensure that the
+correct number of substitution values are provided. For example:</p>
+<pre>
+        $report = form
+                'Name           Rank    Serial Number',
+                '====           ====    =============',
+                '&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;  ^^^^    &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;',
+                 $name,         $rank,  $serial_number,
+                ''
+                'Age    Sex     Description',
+                '===    ===     ===========',
+                '^^^    ^^^     [[[[[[[[[[[',
+                 $age,  $sex,   $description;</pre>
+<p>
+</p>
+<h2><a name="how_form_consumes_strings">How <code>form</code> consumes strings</a></h2>
+<p>Unlike <a href="../../../lib/Pod/perlfunc.html#item_format"><code>format</code></a>, within <code>form</code> non-block fields <em>do</em> consume the text
+they format, so the following:</p>
+<pre>
+        $text = &quot;a line of text to be formatted over three lines&quot;;
+        print form &quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n    &lt;&lt;&lt;&lt;&lt;&lt;\n&quot;,
+                    $text,        $text,        $text;</pre>
+<p>produces:</p>
+<pre>
+        a line of
+          text to
+            be fo-</pre>
+<p>not:</p>
+<pre>
+        a line of
+          a line 
+            a line</pre>
+<p>To achieve the latter effect, convert the variable arguments
+to independent literals (by double-quoted interpolation):</p>
+<pre>
+        $text = &quot;a line of text to be formatted over three lines&quot;;
+        print form &quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n    &lt;&lt;&lt;&lt;&lt;&lt;\n&quot;,
+                   &quot;$text&quot;,      &quot;$text&quot;,      &quot;$text&quot;;</pre>
+<p>Although values passed from variable arguments are progressively consumed
+<em>within</em> <code>form</code>, the values of the original variables passed to <code>form</code>
+are <em>not</em> altered.  Hence:</p>
+<pre>
+        $text = &quot;a line of text to be formatted over three lines&quot;;
+        print form &quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n    &lt;&lt;&lt;&lt;&lt;&lt;\n&quot;,
+                    $text,        $text,        $text;
+        print $text, &quot;\n&quot;;</pre>
+<p>will print:</p>
+<pre>
+        a line of
+          text to
+            be fo-
+        a line of text to be formatted over three lines</pre>
+<p>To cause <code>form</code> to consume the values of the original variables passed to
+it, pass them as references. Thus:</p>
+<pre>
+        $text = &quot;a line of text to be formatted over three lines&quot;;
+        print form &quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;\n    &lt;&lt;&lt;&lt;&lt;&lt;\n&quot;,
+                    \$text,       \$text,       \$text;
+        print $text, &quot;\n&quot;;</pre>
+<p>will print:</p>
+<pre>
+        a line of
+          text to
+            be fo-
+        rmatted over three lines</pre>
+<p>Note that, for safety, the ``non-consuming'' behaviour takes precedence,
+so if a variable is passed to <code>form</code> both by reference <em>and</em> by value,
+its final value will be unchanged.</p>
+<p>
+</p>
+<h2><a name="numerical_formatting">Numerical formatting</a></h2>
+<p>The ``&gt;&gt;&gt;.&lt;&lt;&lt;'' and ``]]].[[['' field specifiers may be used to format
+numeric values about a fixed decimal place marker. For example:</p>
+<pre>
+        print form '(]]]]].[[)', &lt;&lt;EONUMS;
+                   1
+                   1.0
+                   1.001
+                   1.009
+                   123.456
+                   1234567
+                   one two
+        EONUMS</pre>
+<p>would print:
+</p>
+<pre>
+
+        (    1.0 )
+        (    1.0 )
+        (    1.00)
+        (    1.01)
+        (  123.46)
+        (#####.##)
+        (?????.??)
+        (?????.??)</pre>
+<p>Fractions are rounded to the specified number of places after the
+decimal, but only significant digits are shown. That's why, in the
+above example, 1 and 1.0 are formatted as ``1.0'', whilst 1.001 is
+formatted as ``1.00''.</p>
+<p>You can specify that the maximal number of decimal places always be used
+by giving the configuration option 'numeric' a value that matches
+/\bAllPlaces\b/i. For example:</p>
+<pre>
+        print form { numeric =&gt; AllPlaces },
+                   '(]]]]].[[)', &lt;&lt;'EONUMS';
+                   1
+                   1.0
+        EONUMS</pre>
+<p>would print:
+</p>
+<pre>
+
+        (    1.00)
+        (    1.00)</pre>
+<p>Note that although decimal digits are rounded to fit the specified width, the
+integral part of a number is never modified. If there are not enough places
+before the decimal place to represent the number, the entire number is 
+replaced with hashes.</p>
+<p>If a non-numeric sequence is passed as data for a numeric field, it is
+formatted as a series of question marks. This querulous behaviour can be
+changed by giving the configuration option 'numeric' a value that
+matches /\bSkipNaN\b/i in which case, any invalid numeric data is simply
+ignored. For example:</p>
+<pre>
+        print form { numeric =&gt; 'SkipNaN' }
+                   '(]]]]].[[)',
+                   &lt;&lt;EONUMS;
+                   1
+                   two three
+                   4
+        EONUMS</pre>
+<p>would print:
+</p>
+<pre>
+
+        (    1.0 )
+        (    4.0 )</pre>
+<p>
+</p>
+<h2><a name="filling_block_fields_with_lists_of_values">Filling block fields with lists of values</a></h2>
+<p>If an argument corresponding to a field is an array reference, then <code>form</code>
+automatically joins the elements of the array into a single string, separating
+each element with a newline character. As a result, a call like this:</p>
+<pre>
+        @values = qw( 1 10 100 1000 );
+        print form &quot;(]]]].[[)&quot;, \@values;</pre>
+<p>will print out</p>
+<pre>
+         (   1.00)
+         (  10.00)
+         ( 100.00)
+         (1000.00)</pre>
+<p>as might be expected.</p>
+<p>Note however that arrays must be passed by reference (so that <code>form</code>
+knows that the entire array holds data for a single field). If the previous
+example had not passed @values by reference:</p>
+<pre>
+        @values = qw( 1 10 100 1000 );
+        print form &quot;(]]]].[[)&quot;, @values;</pre>
+<p>the output would have been:</p>
+<pre>
+         (   1.00)
+         10
+         100
+         1000</pre>
+<p>This is because @values would have been interpolated into <code>form</code>'s
+argument list, so only $value[0] would have been used as the data for
+the initial format string. The remaining elements of @value would have
+been treated as separate format strings, and printed out ``verbatim''.</p>
+<p>Note too that, because arrays must be passed using a reference, their
+original contents are consumed by <code>form</code>, just like the contents of
+scalars passed by reference.</p>
+<p>To avoid having an array consumed by <code>form</code>, pass it as an anonymous
+array:</p>
+<pre>
+        print form &quot;(]]]].[[)&quot;, [@values];</pre>
+<p>
+</p>
+<h2><a name="headers,_footers,_and_pages">Headers, footers, and pages</a></h2>
+<p>The <code>form</code> subroutine can also insert headers, footers, and page-feeds
+as it formats. These features are controlled by the ``header'', ``footer'',
+``pagefeed'', ``pagelen'', and ``pagenum'' options.</p>
+<p>The ``pagenum'' option takes a scalar value or a reference to a scalar
+variable and starts page numbering at that value. If a reference to a
+scalar variable is specified, the value of that variable is updated as
+the formatting proceeds, so that the final page number is available in
+it after formatting. This can be useful for multi-part reports.</p>
+<p>The ``pagelen'' option specifies the total number of lines in a page (including
+headers, footers, and page-feeds).</p>
+<p>If the ``header'' option is specified with a string value, that string is
+used as the header of every page generated. If it is specified as a reference
+to a subroutine, that subroutine is called at the start of every page and
+its return value used as the header string. When called, the subroutine is
+passed the current page number.</p>
+<p>Likewise, if the ``footer'' option is specified with a string value, that
+string is used as the footer of every page generated. If it is specified
+as a reference to a subroutine, that subroutine is called at the <em>start</em>
+of every page and its return value used as the footer string. When called,
+the footer subroutine is passed the current page number. If the option is
+specified as a hash, it acts as described above for the ``header'' option.</p>
+<p>Both the header and footer options can also be specified as hash references.
+In this case the hash entires for keys ``left'', ``centre'' (or ``center''), and
+``right'' specify what is to appear on the left, centre, and right of the
+header/footer. The entry for the key ``width'' specifies how wide the
+footer is to be. The  ``left'', ``centre'', and ``right'' values may be literal
+strings, or subroutines (just as a normal header/footer specification may
+be.) See the second example, below.</p>
+<p>The ``pagefeed'' option acts in exactly the same way, to produce a
+pagefeed which is appended after the footer. But note that the pagefeed
+is not counted as part of the page length.</p>
+<p>All three of these page components are recomputed at the start of each
+new page, before the page contents are formatted (recomputing the header
+and footer makes it possible to determine how many lines of data to
+format so as to adhere to the specified page length).</p>
+<p>When the call to <code>form</code> is complete and the data has been fully formatted,
+the footer subroutine is called one last time, with an extra argument of 1.
+The string returned by this final call is used as the final footer.</p>
+<p>So for example, a 60-line per page report, starting at page 7,
+with appropriate headers and footers might be set up like so:</p>
+<pre>
+        $page = 7;</pre>
+<pre>
+        form { header =&gt; sub { &quot;Page $_[0]\n\n&quot; },
+               footer =&gt; sub { return &quot;&quot; if $_[1];
+                               &quot;-&quot;x50 . &quot;\n&quot; . form &quot;&gt;&quot;x50&quot;, &quot;...&quot;.($_[0]+1);
+                             },
+               pagefeed =&gt; &quot;\n\n&quot;,
+               pagelen  =&gt; 60
+               pagenum  =&gt; \$page,
+             },
+             $template,
+             @data;</pre>
+<p>Note the recursive use of <code>form</code> within the ``footer'' option.</p>
+<p>Alternatively, to set up headers and footers such that the running
+head is right justified in the header and the page number is centred
+in the footer:</p>
+<pre>
+        form { header =&gt; { right =&gt; &quot;Running head&quot; },
+               footer =&gt; { centre =&gt; sub { &quot;Page $_[0]&quot; } },
+               pagelen  =&gt; 60
+             },
+             $template,
+             @data;</pre>
+<p>
+</p>
+<h2><a name="the_tag_sub">The <code>tag</code> sub</a></h2>
+<p>The <code>tag</code> subroutine may be exported from the module.
+It takes two arguments: a tag specifier and a text to be
+entagged. The tag specifier indicates the indenting of the tag, and of the
+text. The sub generates an end-tag (using the usual ``/<em>tag</em>'' variant),
+unless an explicit end-tag is provided as the third argument.</p>
+<p>The tag specifier consists of the following components (in order):</p>
+<dl>
+<dt><strong><a name="item_spacer">An optional vertical spacer (zero or more whitespace-separated newlines)</a></strong><br />
+</dt>
+<dd>
+One or more whitespace characters up to a final mandatory newline. This
+vertical space is inserted before the tag and after the end-tag
+</dd>
+<p></p>
+<dt><strong><a name="item_an_optional_tag_indent">An optional tag indent</a></strong><br />
+</dt>
+<dd>
+Zero or more whitespace characters. Both the tag and the end-tag are indented
+by this whitespace.
+</dd>
+<p></p>
+<dt><strong><a name="item_left">An optional left (opening) tag delimiter</a></strong><br />
+</dt>
+<dd>
+Zero or more non-``word'' characters (not alphanumeric or '_').
+If the opening delimiter is omitted, the character '&lt;' is used.
+</dd>
+<p></p>
+<dt><strong><a name="item_a_tag">A tag</a></strong><br />
+</dt>
+<dd>
+One or more ``word'' characters (alphanumeric or '_').
+</dd>
+<p></p>
+<dt><strong><a name="item_optional_tag_arguments">Optional tag arguments</a></strong><br />
+</dt>
+<dd>
+Any number of any characters
+</dd>
+<p></p>
+<dt><strong><a name="item_right">An optional right (closing) tag delimiter</a></strong><br />
+</dt>
+<dd>
+Zero or more non-``word'' characters which balance some sequential portion
+of the opening tag delimiter. For example, if the opening delimiter
+is ``&lt;-('' then any of the following are acceptible closing delimiters:
+``)-&gt;'', ``-&gt;'', or ``&gt;''.
+If the closing delimiter is omitted, the ``inverse'' of the opening delimiter 
+is used (for example, ``)-&gt;''),
+</dd>
+<p></p>
+<dt><strong>An optional vertical spacer (zero or more newlines)</strong><br />
+</dt>
+<dd>
+One or more whitespace characters up to a mandatory newline. This
+vertical space is inserted before and after the complete text.
+</dd>
+<p></p>
+<dt><strong><a name="item_an_optional_text_indent">An optional text indent</a></strong><br />
+</dt>
+<dd>
+Zero or more space of tab characters. Each line of text is indented
+by this whitespace (in addition to the tag indent).
+</dd>
+<p></p></dl>
+<p>For example:</p>
+<pre>
+        $text = &quot;three lines\nof tagged\ntext&quot;;</pre>
+<pre>
+        print tag &quot;A HREF=#nextsection&quot;, $text;</pre>
+<p>prints:</p>
+<pre>
+        &lt;A HREF=#nextsection&gt;three lines
+        of tagged
+        text&lt;/A&gt;</pre>
+<p>whereas:</p>
+<pre>
+        print tag &quot;[-:GRIN&gt;&gt;&gt;\n&quot;, $text;</pre>
+<p>prints:</p>
+<pre>
+        [-:GRIN&gt;&gt;&gt;:-]
+        three lines
+        of tagged
+        text
+        [-:/GRIN&gt;&gt;&gt;:-]</pre>
+<p>and:</p>
+<pre>
+        print tag &quot;\n\n   &lt;BOLD&gt;\n\n   &quot;, $text, &quot;&lt;END BOLD&gt;&quot;;</pre>
+<p>prints:</p>
+<p>&nbsp;</p>
+<pre>
+           &lt;BOLD&gt;</pre>
+<pre>
+              three lines
+              of tagged
+              text</pre>
+<pre>
+           &lt;END BOLD&gt;</pre>
+<p>&nbsp;</p>
+<p>(with the indicated spacing fore and aft).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Damian Conway (<a href="mailto:damian@conway.org">damian@conway.org</a>)</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>There are undoubtedly serious bugs lurking somewhere in code this funky :-)
+Bug reports and other feedback are most welcome.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 1997-2000, Damian Conway. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+  (see <a href="http://www.perl.com/perl/misc/Artistic.html)">http://www.perl.com/perl/misc/Artistic.html)</a>
+</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Text::Autoformat - Automatic and manual text wrapping and reformating formatting</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

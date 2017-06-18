@@ -1,0 +1,324 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32 - Interfaces to some Win32 API Functions</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32 - Interfaces to some Win32 API Functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#alphabetical listing of win32 functions">Alphabetical Listing of Win32 Functions</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32 - Interfaces to some Win32 API Functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Perl on Win32 contains several functions to access Win32 APIs. Some
+are included in Perl itself (on Win32) and some are only available
+after explicitly requesting the Win32 module with:</P>
+<PRE>
+        use Win32;</PRE>
+<P>The builtin functions are marked as [CORE] and the other ones
+as [EXT] in the following alphabetical listing. The <CODE>Win32</CODE> module
+is not part of the Perl source distribution; it is distributed in
+the libwin32 bundle of Win32::* modules on CPAN. The module is
+already preinstalled in binary distributions like ActivePerl.</P>
+<P>
+<H2><A NAME="alphabetical listing of win32 functions">Alphabetical Listing of Win32 Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_AbortSystemShutdown">Win32::AbortSystemShutdown(MACHINE)</A></STRONG><BR>
+<DD>
+[EXT] Aborts a system shutdown (started by the
+InitiateSystemShutdown function) on the specified MACHINE.
+<P></P>
+<DT><STRONG><A NAME="item_BuildNumber">Win32::BuildNumber()</A></STRONG><BR>
+<DD>
+[CORE] Returns the ActivePerl build number. This function is
+only available in the ActivePerl binary distribution.
+<P></P>
+<DT><STRONG><A NAME="item_CopyFile">Win32::CopyFile(FROM, TO, OVERWRITE)</A></STRONG><BR>
+<DD>
+[CORE] The Win32::CopyFile() function copies an existing file to a new
+file. All file information like creation time and file attributes will
+be copied to the new file. However it will <STRONG>not</STRONG> copy the security
+information. If the destination file already exists it will only be
+overwritten when the OVERWRITE parameter is true. But even this will
+not overwrite a read-only file; you have to <A HREF="../lib/Pod/perlfunc.html#item_unlink"><CODE>unlink()</CODE></A> it first
+yourself.
+<P></P>
+<DT><STRONG><A NAME="item_DomainName">Win32::DomainName()</A></STRONG><BR>
+<DD>
+[CORE] Returns the name of the Microsoft Network domain that the
+owner of the current perl process is logged into.  This function does
+<STRONG>not</STRONG> work on Windows 9x.
+<P></P>
+<DT><STRONG><A NAME="item_ExpandEnvironmentStrings">Win32::ExpandEnvironmentStrings(STRING)</A></STRONG><BR>
+<DD>
+[EXT] Takes STRING and replaces all referenced environment variable
+names with their defined values. References to environment variables
+take the form <CODE>%VariableName%</CODE>. Case is ignored when looking up the
+VariableName in the environment. If the variable is not found then the
+original <CODE>%VariableName%</CODE> text is retained.  Has the same effect
+as the following:
+<PRE>
+        $string =~ s/%([^%]*)%/$ENV{$1} || &quot;%$1%&quot;/eg</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_FormatMessage">Win32::FormatMessage(ERRORCODE)</A></STRONG><BR>
+<DD>
+[CORE] Converts the supplied Win32 error number (e.g. returned by
+Win32::GetLastError()) to a descriptive string.  Analogous to the
+<CODE>perror()</CODE> standard-C library function.  Note that <A HREF="../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> used
+in a string context has much the same effect.
+<PRE>
+        C:\&gt; perl -e &quot;$^E = 26; print $^E;&quot;
+        The specified disk or diskette cannot be accessed</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_FsType">Win32::FsType()</A></STRONG><BR>
+<DD>
+[CORE] Returns the name of the filesystem of the currently active
+drive (like 'FAT' or 'NTFS'). In list context it returns three values:
+(FSTYPE, FLAGS, MAXCOMPLEN). FSTYPE is the filesystem type as
+before. FLAGS is a combination of values of the following table:
+<PRE>
+        0x00000001  supports case-sensitive filenames
+        0x00000002  preserves the case of filenames
+        0x00000004  supports Unicode in filenames
+        0x00000008  preserves and enforces ACLs
+        0x00000010  supports file-based compression
+        0x00000020  supports disk quotas
+        0x00000040  supports sparse files
+        0x00000080  supports reparse points
+        0x00000100  supports remote storage
+        0x00008000  is a compressed volume (e.g. DoubleSpace)
+        0x00010000  supports object identifiers
+        0x00020000  supports the Encrypted File System (EFS)</PRE>
+<P>MAXCOMPLEN is the maximum length of a filename component (the part
+between two backslashes) on this file system.</P>
+<P></P>
+<DT><STRONG><A NAME="item_FreeLibrary">Win32::FreeLibrary(HANDLE)</A></STRONG><BR>
+<DD>
+[EXT] Unloads a previously loaded dynamic-link library. The HANDLE is
+no longer valid after this call. See <A HREF="../Win32/LoadLibrary(LIBNAME).html">LoadLibrary</A>
+for information on dynamically loading a library.
+<P></P>
+<DT><STRONG><A NAME="item_GetArchName">Win32::GetArchName()</A></STRONG><BR>
+<DD>
+[EXT] Use of this function is deprecated. It is equivalent with
+$ENV{PROCESSOR_ARCHITECTURE}. This might not work on Win9X.
+<P></P>
+<DT><STRONG><A NAME="item_GetChipName">Win32::GetChipName()</A></STRONG><BR>
+<DD>
+[EXT] Returns the processor type: 386, 486 or 586 for Intel processors,
+21064 for the Alpha chip.
+<P></P>
+<DT><STRONG><A NAME="item_GetCwd">Win32::GetCwd()</A></STRONG><BR>
+<DD>
+[CORE] Returns the current active drive and directory. This function
+does not return a UNC path, since the functionality required for such
+a feature is not available under Windows 95.
+<P></P>
+<DT><STRONG><A NAME="item_GetFullPathName">Win32::GetFullPathName(FILENAME)</A></STRONG><BR>
+<DD>
+[CORE] GetFullPathName combines the FILENAME with the current drive
+and directory name and returns a fully qualified (aka, absolute)
+path name. In list context it returns two elements: (PATH, FILE) where
+PATH is the complete pathname component (including trailing backslash)
+and FILE is just the filename part.  Note that no attempt is made to
+convert 8.3 components in the supplied FILENAME to longnames or
+vice-versa.  Compare with Win32::GetShortPathName and
+Win32::GetLongPathName.
+<P>This function has been added for Perl 5.6.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetLastError">Win32::GetLastError()</A></STRONG><BR>
+<DD>
+[CORE] Returns the last error value generated by a call to a Win32 API
+function.  Note that <A HREF="../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> used in a numeric context amounts to the
+same value.
+<P></P>
+<DT><STRONG><A NAME="item_GetLongPathName">Win32::GetLongPathName(PATHNAME)</A></STRONG><BR>
+<DD>
+[CORE] Returns a representation of PATHNAME composed of longname
+components (if any).  The result may not necessarily be longer
+than PATHNAME.  No attempt is made to convert PATHNAME to the
+absolute path.  Compare with Win32::GetShortPathName and
+Win32::GetFullPathName.
+<P>This function has been added for Perl 5.6.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetNextAvailDrive">Win32::GetNextAvailDrive()</A></STRONG><BR>
+<DD>
+[CORE] Returns a string in the form of ``&lt;d&gt;:'' where &lt;d&gt; is the first
+available drive letter.
+<P></P>
+<DT><STRONG><A NAME="item_GetOSVersion">Win32::GetOSVersion()</A></STRONG><BR>
+<DD>
+[CORE] Returns the array (STRING, MAJOR, MINOR, BUILD, ID), where
+the elements are, respectively: An arbitrary descriptive string, the
+major version number of the operating system, the minor version
+number, the build number, and a digit indicating the actual operating
+system. For ID, the values are 0 for Win32s, 1 for Windows 9X and 2
+for Windows NT. In scalar context it returns just the ID.
+<P></P>
+<DT><STRONG><A NAME="item_GetShortPathName">Win32::GetShortPathName(PATHNAME)</A></STRONG><BR>
+<DD>
+[CORE] Returns a representation of PATHNAME composed only of
+short (8.3) path components.  The result may not necessarily be
+shorter than PATHNAME.  Compare with Win32::GetFullPathName and
+Win32::GetLongPathName.
+<P></P>
+<DT><STRONG><A NAME="item_GetProcAddress">Win32::GetProcAddress(INSTANCE, PROCNAME)</A></STRONG><BR>
+<DD>
+[EXT] Returns the address of a function inside a loaded library. The
+information about what you can do with this address has been lost in
+the mist of time. Use the Win32::API module instead of this deprecated
+function.
+<P></P>
+<DT><STRONG><A NAME="item_GetTickCount">Win32::GetTickCount()</A></STRONG><BR>
+<DD>
+[CORE] Returns the number of milliseconds elapsed since the last
+system boot. Resolution is limited to system timer ticks (about 10ms
+on WinNT and 55ms on Win9X).
+<P></P>
+<DT><STRONG><A NAME="item_Win32%3A%3AInitiateSystemShutdown">Win32::InitiateSystemShutdown</A></STRONG><BR>
+<DD>
+(MACHINE, MESSAGE, TIMEOUT, FORCECLOSE, REBOOT)
+<P>[EXT] Shutsdown the specified MACHINE, notifying users with the
+supplied MESSAGE, within the specified TIMEOUT interval. Forces
+closing of all documents without prompting the user if FORCECLOSE is
+true, and reboots the machine if REBOOT is true. This function works
+only on WinNT.</P>
+<P></P>
+<DT><STRONG><A NAME="item_IsWinNT">Win32::IsWinNT()</A></STRONG><BR>
+<DD>
+[CORE] Returns non zero if the Win32 subsystem is Windows NT.
+<P></P>
+<DT><STRONG><A NAME="item_IsWin95">Win32::IsWin95()</A></STRONG><BR>
+<DD>
+[CORE] Returns non zero if the Win32 subsystem is Windows 95.
+<P></P>
+<DT><STRONG><A NAME="item_LoadLibrary">Win32::LoadLibrary(LIBNAME)</A></STRONG><BR>
+<DD>
+[EXT] Loads a dynamic link library into memory and returns its module
+handle. This handle can be used with Win32::GetProcAddress and
+Win32::FreeLibrary. This function is deprecated. Use the Win32::API
+module instead.
+<P></P>
+<DT><STRONG><A NAME="item_LoginName">Win32::LoginName()</A></STRONG><BR>
+<DD>
+[CORE] Returns the username of the owner of the current perl process.
+<P></P>
+<DT><STRONG><A NAME="item_LookupAccountName">Win32::LookupAccountName(SYSTEM, ACCOUNT, DOMAIN, SID, SIDTYPE)</A></STRONG><BR>
+<DD>
+[EXT] Looks up ACCOUNT on SYSTEM and returns the domain name the SID and
+the SID type.
+<P></P>
+<DT><STRONG><A NAME="item_LookupAccountSID">Win32::LookupAccountSID(SYSTEM, SID, ACCOUNT, DOMAIN, SIDTYPE)</A></STRONG><BR>
+<DD>
+[EXT] Looks up SID on SYSTEM and returns the account name, domain name,
+and the SID type.
+<P></P>
+<DT><STRONG><A NAME="item_MsgBox">Win32::MsgBox(MESSAGE [, FLAGS [, TITLE]])</A></STRONG><BR>
+<DD>
+[EXT] Create a dialogbox containing MESSAGE. FLAGS specifies the
+required icon and buttons according to the following table:
+<PRE>
+        0 = OK
+        1 = OK and Cancel
+        2 = Abort, Retry, and Ignore
+        3 = Yes, No and Cancel
+        4 = Yes and No
+        5 = Retry and Cancel</PRE>
+<PRE>
+        MB_ICONSTOP          &quot;X&quot; in a red circle
+        MB_ICONQUESTION      question mark in a bubble
+        MB_ICONEXCLAMATION   exclamation mark in a yellow triangle
+        MB_ICONINFORMATION   &quot;i&quot; in a bubble</PRE>
+<P>TITLE specifies an optional window title. The default is ``Perl''.</P>
+<P>The function returns the menu id of the selected push button:</P>
+<PRE>
+        0  Error</PRE>
+<PRE>
+        1  OK
+        2  Cancel
+        3  Abort
+        4  Retry
+        5  Ignore
+        6  Yes
+        7  No</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_NodeName">Win32::NodeName()</A></STRONG><BR>
+<DD>
+[CORE] Returns the Microsoft Network node-name of the current machine.
+<P></P>
+<DT><STRONG><A NAME="item_RegisterServer">Win32::RegisterServer(LIBRARYNAME)</A></STRONG><BR>
+<DD>
+[EXT] Loads the DLL LIBRARYNAME and calls the function DllRegisterServer.
+<P></P>
+<DT><STRONG><A NAME="item_SetCwd">Win32::SetCwd(NEWDIRECTORY)</A></STRONG><BR>
+<DD>
+[CORE] Sets the current active drive and directory. This function does not
+work with UNC paths, since the functionality required to required for
+such a feature is not available under Windows 95.
+<P></P>
+<DT><STRONG><A NAME="item_SetLastError">Win32::SetLastError(ERROR)</A></STRONG><BR>
+<DD>
+[CORE] Sets the value of the last error encountered to ERROR. This is
+that value that will be returned by the Win32::GetLastError()
+function. This functions has been added for Perl 5.6.
+<P></P>
+<DT><STRONG><A NAME="item_Sleep">Win32::Sleep(TIME)</A></STRONG><BR>
+<DD>
+[CORE] Pauses for TIME milliseconds. The timeslices are made available
+to other processes and threads.
+<P></P>
+<DT><STRONG><A NAME="item_Spawn">Win32::Spawn(COMMAND, ARGS, PID)</A></STRONG><BR>
+<DD>
+[CORE] Spawns a new process using the supplied COMMAND, passing in
+arguments in the string ARGS. The pid of the new process is stored in
+PID. This function is deprecated. Please use the Win32::Process module
+instead.
+<P></P>
+<DT><STRONG><A NAME="item_UnregisterServer">Win32::UnregisterServer(LIBRARYNAME)</A></STRONG><BR>
+<DD>
+[EXT] Loads the DLL LIBRARYNAME and calls the function
+DllUnregisterServer.
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32 - Interfaces to some Win32 API Functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

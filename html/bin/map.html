@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+<TITLE>map - An utility to map texts from and to unicode</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;map - An utility to map texts from and to unicode</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>map - An utility to map texts from and to unicode</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ map - recode from and to various character sets.
+       Reads from STDIN, writes to STDOUT.
+ usage: map [--from cset] [--to cset] &lt; input.txt &gt; output.txt</PRE>
+<PRE>
+ from s  Encoding of input files (default &quot;ISO-8859-1&quot;)
+ list    Lists available character sets and their alias names.
+ to   s  Encoding of output files (default &quot;ISO-8859-1&quot;)</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Maps text from one character set representation to another. This work is
+actually long time very well done by <CODE>recode</CODE>, but unfortunately recode
+does not support Unicode and eastern asia character sets. But, if you have
+pure 8 bit things to do, recode will still be the best solution.</P>
+<P>Examples:</P>
+<P>Conversion from ISO-8859-1 to Unicode:</P>
+<PRE>
+ map --to unicode &lt; iso-8859-1.txt &gt; unicode.txt</PRE>
+<P>Conversion from GB2312 to CP936:</P>
+<PRE>
+ map --from cp936 --to GB2312 &lt; gb2312.txt &gt; cp936.txt</PRE>
+<P>Conversion from CP850 to Unicode:</P>
+<PRE>
+ map --from cp850 --to unicode &lt; cp850.txt &gt; unicode.txt</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>recode(1), Unicode::Map(3), Unicode::Map8(3), Unicode::String(3)</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Martin Schwartz &lt;<EM><A HREF="mailto:martin@nacho.de">martin@nacho.de</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;map - An utility to map texts from and to unicode</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

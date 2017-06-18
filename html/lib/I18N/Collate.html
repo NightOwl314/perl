@@ -1,0 +1,96 @@
+
+<HTML>
+<HEAD>
+<TITLE>I18N::Collate - compare 8-bit scalar data according to the current locale</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;I18N::Collate - compare 8-bit scalar data according to the current locale</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>I18N::Collate - compare 8-bit scalar data according to the current locale</P>
+<PRE>
+  ***</PRE>
+<PRE>
+  WARNING: starting from the Perl version 5.003_06
+  the I18N::Collate interface for comparing 8-bit scalar data
+  according to the current locale</PRE>
+<PRE>
+        HAS BEEN DEPRECATED</PRE>
+<PRE>
+  That is, please do not use it anymore for any new applications
+  and please migrate the old applications away from it because its
+  functionality was integrated into the Perl core language in the
+  release 5.003_06.</PRE>
+<PRE>
+  See the <A HREF="../../lib/Pod/perllocale.html">perllocale</A> manual page for further information.</PRE>
+<PRE>
+  ***</PRE>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use I18N::Collate;
+    setlocale(LC_COLLATE, 'locale-of-your-choice'); 
+    $s1 = new I18N::Collate &quot;scalar_data_1&quot;;
+    $s2 = new I18N::Collate &quot;scalar_data_2&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides you with objects that will collate 
+according to your national character set, provided that the 
+POSIX <CODE>setlocale()</CODE> function is supported on your system.</P>
+<P>You can compare $s1 and $s2 above with</P>
+<PRE>
+    $s1 le $s2</PRE>
+<P>to extract the data itself, you'll need a dereference: $$s1</P>
+<P>This module uses POSIX::setlocale(). The basic collation conversion is
+done by <CODE>strxfrm()</CODE> which terminates at NUL characters being a decent C
+routine.  <CODE>collate_xfrm()</CODE> handles embedded NUL characters gracefully.</P>
+<P>The available locales depend on your operating system; try whether
+<CODE>locale -a</CODE> shows them or man pages for ``locale'' or ``nlsinfo'' or the
+direct approach <CODE>ls /usr/lib/nls/loc</CODE> or <CODE>ls /usr/lib/nls</CODE> or
+<CODE>ls /usr/lib/locale</CODE>.  Not all the locales that your vendor supports
+are necessarily installed: please consult your operating system's
+documentation and possibly your local system administration.  The
+locale names are probably something like <CODE>xx_XX.(ISO)?8859-N</CODE> or
+<CODE>xx_XX.(ISO)?8859N</CODE>, for example <CODE>fr_CH.ISO8859-1</CODE> is the Swiss (CH)
+variant of French (fr), ISO Latin (8859) 1 (-1) which is the Western
+European character set.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;I18N::Collate - compare 8-bit scalar data according to the current locale</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

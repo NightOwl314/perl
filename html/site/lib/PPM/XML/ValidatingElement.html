@@ -1,0 +1,172 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPM::XML::ValidatingElement - XML Element with DTD-like validation rules</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::ValidatingElement - XML Element with DTD-like validation rules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#validation rules">VALIDATION RULES</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#limitations">LIMITATIONS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>PPM::XML::ValidatingElement - XML Element with DTD-like validation rules</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use PPM::XML::ValidatingElement;</PRE>
+<PRE>
+ package PPM::XML::MyElement;
+ @ISA = qw( PPM::XML::ValidatingElement );
+ @oattrs = qw( BAR );       # Allow for both FOO and BAR attributes
+ @rattrs = qw( FOO );
+ @okids  = qw( BLEARGH );   # Allow for both BLEARGH and FOOBAR children
+ @rkids  = qw( FOOBAR );</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>PPM::XML::ValidatingElement inherits from PPM::XML::Element.  It extends 
+this class to support methods for validation to allow for DTD-like 
+restrictions to be places on documents read in with the XML::Parser module.</P>
+<P>
+<HR>
+<H1><A NAME="validation rules">VALIDATION RULES</A></H1>
+<P>In order to set up rules for validation of elements, each element should
+define four list values in it's own package namespace.  When validating, this
+module will check to ensure that any parsed attributes or child elements are
+actually ones that are possible for this element, as well as checking to see
+that any required attributes/child elements are present.</P>
+<P>Note that an attribute/child element only has to be present in either the
+optional or required list; when checking for possible attributes/children,
+these lists will be combined.</P>
+<P>Validation lists:</P>
+<DL>
+<DT><STRONG><A NAME="item_%40oattrs">@oattrs</A></STRONG><BR>
+<DD>
+List of optional attributes.
+<P></P>
+<DT><STRONG><A NAME="item_%40rattrs">@rattrs</A></STRONG><BR>
+<DD>
+List of required attributes.
+<P></P>
+<DT><STRONG><A NAME="item_%40opkids">@opkids</A></STRONG><BR>
+<DD>
+List of optional child elements.
+<P></P>
+<DT><STRONG><A NAME="item_%40rkids">@rkids</A></STRONG><BR>
+<DD>
+List of required child elements.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_validate">validate( err_handler )</A></STRONG><BR>
+<DD>
+Validates the current element.  This method calls four other methods to
+validate all of requirements for the element.  Returns non-zero on success and
+zero if any errors occurred.
+<P></P>
+<DT><STRONG><A NAME="item_rvalidate">rvalidate( err_handler )</A></STRONG><BR>
+<DD>
+Validates the current element, and recursively validates all child elements.
+This method calls four other methods to validate all of the requirements for
+the element.  Returns non-zero on success and zero if any errors occurred.
+<P></P>
+<DT><STRONG><A NAME="item_validate_possible_attrs">validate_possible_attrs( err_handler )</A></STRONG><BR>
+<DD>
+Checks against the list of attributes possible for this element (taken from
+@oattr and @rattr) to ensure that all of the parsed attributes are valid.  If
+any parsed attributes are not in the list of possible attributes for this
+element, err_handler will be called with a message stating the error.  Returns
+non-zero on success and zero if any errors occurred.
+<P></P>
+<DT><STRONG><A NAME="item_validate_required_attrs">validate_required_attrs( err_handler )</A></STRONG><BR>
+<DD>
+Checks against the list of required attributes (taken from @rattr) to ensure
+that all of the required attributes are present and have been parsed.  If any
+required attributes are missing, err_handler will be called with a message
+stating the error.  Returns non-zero on success and zero if any errors
+occurred.
+<P></P>
+<DT><STRONG><A NAME="item_validate_possible_kids">validate_possible_kids( err_handler )</A></STRONG><BR>
+<DD>
+Checks against the list of child elements this element can contain (taken from
+@okids and @rkids) to ensure that any child elements that have been read in are
+valid.  If any child elements have been parsed which are not in the list of
+possible children, err_handler will be called with a message stating the
+error.  Returns non-zero on success and zero if any errors occurred.
+<P></P>
+<DT><STRONG><A NAME="item_validate_required_kids">validate_required_kids( err_handler )</A></STRONG><BR>
+<DD>
+Checks against the lsit of required child elements (taken from @rkids) to
+ensure that all of the required child elements are present and have been
+parsed.  If any of the required child elements are missing, err_handler will be
+called with a message stating the error.  Returns non-zero on success and zero
+if any errors occurred.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="limitations">LIMITATIONS</A></H1>
+<P>The PPM::XML::ValidatingElement module only provides checks for determining
+whether or not the possible/required attributes/children are present.  This 
+module currently has no support for determining whether or not the values 
+provided are actually valid (although I imagine it wouldn't be too hard to
+add this in somewhere).  This also includes elements which have been declared
+in a DTD as being 'EMPTY' elements.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Graham TerMarsch &lt;<A HREF="mailto:grahamt@activestate.com">grahamt@activestate.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>v0.2 - Added failure return values to each of the methods.</P>
+<P>v0.1 - Initial version</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../../site/lib/PPM/XML/Element.html">the PPM::XML::Element manpage</A>,
+<A HREF="../../../../site/lib/XML/Parser.html">the XML::Parser manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::ValidatingElement - XML Element with DTD-like validation rules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,79 @@
+
+<HTML>
+<HEAD>
+<TITLE>Tie::SubstrHash - Fixed-table-size, fixed-key-length hashing</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::SubstrHash - Fixed-table-size, fixed-key-length hashing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#caveats">CAVEATS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tie::SubstrHash - Fixed-table-size, fixed-key-length hashing</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    require Tie::SubstrHash;</PRE>
+<PRE>
+    tie %myhash, 'Tie::SubstrHash', $key_len, $value_len, $table_size;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <STRONG>Tie::SubstrHash</STRONG> package provides a hash-table-like interface to
+an array of determinate size, with constant key size and record size.</P>
+<P>Upon tying a new hash to this package, the developer must specify the
+size of the keys that will be used, the size of the value fields that the
+keys will index, and the size of the overall table (in terms of key-value
+pairs, not size in hard memory). <EM>These values will not change for the
+duration of the tied hash</EM>. The newly-allocated hash table may now have
+data stored and retrieved. Efforts to store more than <CODE>$table_size</CODE>
+elements will result in a fatal error, as will efforts to store a value
+not exactly <CODE>$value_len</CODE> characters in length, or reference through a
+key not exactly <CODE>$key_len</CODE> characters in length. While these constraints
+may seem excessive, the result is a hash table using much less internal
+memory than an equivalent freely-allocated hash table.</P>
+<P>
+<HR>
+<H1><A NAME="caveats">CAVEATS</A></H1>
+<P>Because the current implementation uses the table and key sizes for the
+hashing algorithm, there is no means by which to dynamically change the
+value of any of the initialization parameters.</P>
+<P>The hash does not support exists().</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::SubstrHash - Fixed-table-size, fixed-key-length hashing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

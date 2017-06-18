@@ -1,0 +1,250 @@
+<HTML>
+
+<HEAD>
+<TITLE>New ActivePerl Directory Structure</TITLE>
+<LINK rel="stylesheet" href="../../Active.css" type="text/css">
+<META name="GENERATOR" content="Microsoft FrontPage 4.0">
+<META name="ProgId" content="FrontPage.Editor.Document">
+</HEAD>
+
+<BODY bgcolor="FFFFFF">
+
+	<!-- beginning of leaf header-->
+
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%">
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><FONT size="+1"><STRONG>
+      <P class="block">&nbsp;ActivePerl Directory Structure</P>
+      </STRONG></FONT></TD>
+  </TR>
+  <TR>
+    <TD>
+      <P>&nbsp;</P>
+      <P><FONT size="7">THIS FILE IS OUT OF DATE!</FONT></P>
+	  <!-- end of leaf content-->
+      <!-- INDEX BEGIN -->
+
+      <UL>
+        <LI><A href="#New_ActivePerl_Directory_Structu">New ActivePerl Directory Structure</A></LI>
+        <UL>
+          <LI><A href="#Introduction">Introduction</A></LI>
+          <LI><A href="#Potential_Users">Potential Users</A></LI>
+          <LI><A href="#The_possibilities">The possibilities</A></LI>
+          <LI><A href="#The_New_Directory_Structure">The New Directory Structure</A></LI>
+          <LI><A href="#Multiple_Versions_and_Architectu">Multiple Versions and Architectures</A></LI>
+          <LI><A href="#Installing_Modules_in_a_Differen">Installing Modules in a Different sitelib</A></LI>
+          <LI><A href="#Some_additional_information">Some additional information</A></LI>
+          <LI><A href="#Conclusion">Conclusion</A></LI>
+        </UL>
+      </UL>
+      <!-- INDEX END -->
+
+      <HR>
+      <P>&nbsp;
+      <H1><A name="New_ActivePerl_Directory_Structu">New ActivePerl Directory Structure</A></H1>
+      <P>&nbsp;
+      <HR>
+      <H2><A name="Introduction">Introduction</A></H2>
+      <P>This document describes the new ActivePerl directory structure, and how to use it, and how
+      to maniuplate @INC, to make it work better for you.</P>
+      <P>ActiveState has received numerous comments and requests concerning the directory structure
+      of ActivePerl. With the newly designed installation directory structure and building of @INC,
+      we worked on addressing the following issues:</P>
+      <UL>
+        <LI>Allow for installation of multiple simultaneous versions</LI>
+        <LI>Allow for installation of multiple architectures, such as perl OBJECT and perl THREAD</LI>
+        <LI>Preserve the site libraries among installations</LI>
+        <LI>Allow for networked installations with shared lib and site directories</LI>
+        <LI>Allow for easy upgrading of ActivePerl releases</LI>
+      </UL>
+      <HR>
+      <H2><A name="Potential_Users">Potential Users</A></H2>
+      <P>In determining our options we have tried to consider the position of the following groups
+      of users:</P>
+      <UL>
+        <LI>Web Developers</LI>
+        <LI>Small-site System Administrators</LI>
+        <LI>Module/Extension Developers</LI>
+        <LI>Perl Developers</LI>
+        <LI>Large-site System Administrators / Enterprise Admins</LI>
+      </UL>
+      <HR>
+      <H2><A name="The_possibilities">The possibilities</A></H2>
+      <P>The following possibilities were considered:</P>
+      <UL>
+        <LI>The core gets installed into a version, subversion, patch specific sub directory of the
+          perl root</LI>
+        <LI>The core gets installed into a version and subversion specific sub directory of the perl
+          root</LI>
+        <LI>The core gets installed into any directory the user desires</LI>
+        <LI>Perl executables are subdivided into architecture and non-architecture dependent
+          directories</LI>
+        <LI>Perl executables are all installed in the same directory</LI>
+        <LI>sitelib is installed at the same level as lib or as a subdirectory of lib</LI>
+        <LI>sitelib is installed outside or at a level above lib</LI>
+        <LI>sitelib has version, subversion, patch specific sub directory</LI>
+        <LI>sitelib has version, subversion specific sub directory</LI>
+        <LI>sitelib has no version specific directories in the path</LI>
+      </UL>
+      <P>Essentially these options are all the same. What it means for you is, &quot;Where do you
+      want to install?&quot;</P>
+      <P><STRONG>Our solution supports all of these configurations.</STRONG></P>
+      <P>&nbsp;
+      <HR>
+      <H2><A name="The_New_Directory_Structure">The New Directory Structure</A></H2>
+      <P>With earlier builds, we followed the core directory structure which gave us directories
+      such as c:\perl\5.00502\bin\mswin32-x86-object. This is good for people who have a need for
+      multiple versions or types of perl installed at a time. We quickly found that the Win32 public
+      didn't like this at all, except for a rare few who actually used and needed this. People
+      decided they wanted a plain old c:\perl\bin\perl.exe just like they were used to, fewer
+      characters in their PATH, site libraries that were in a directory not dependent on a version,
+      and architecture depended libraries worked in with the regular libraries where they could find
+      them. As a result, we have simplified the directory structure significantly.</P>
+      <P>We are now using the following default directory structure:</P>
+      <PRE> c:\perl
+    bin                     ... all perl binaries and util scripts
+    lib                     ... core modules
+    site
+       lib                  ... default site modules location
+</PRE>
+      <P>This is like what people are accustomed to from previous versions of Perl for Win32 and
+      from the GSAR port of 5.004. However, if more explicit directory names are called for, you can
+      still implement them as described below. If you are new to perl, or don't need anything more
+      complicated than this, then just installing using ``c:\perl'' (or ``d:\perl'' for you NT
+      multibooters) is simplified and things are where you have asked for them to be.</P>
+      <P>&nbsp;
+      <HR>
+      <H2><A name="Multiple_Versions_and_Architectu">Multiple Versions and Architectures</A></H2>
+      <P>On the other hand, you can still support the versioned installs like 500-502 were, to
+      support multiple simultaneous versions. If you want multiple Perl versions installed you can
+      change 'c:\perl' to 'c:\perl\whatever' when you install.</P>
+      <P><STRONG>Installation 1:</STRONG></P>
+      <PRE>    c:\perl\
+        bin                                 ... all perl binaries and util scripts
+        lib                                 ... core modules
+        site
+           lib                              ... default site modules location
+</PRE>
+      <P><STRONG>Installation 2:</STRONG></P>
+      <PRE>    c:\perl\
+       site 
+           lib                              ... default site modules location
+       5.00501-thread
+           bin                              ... all perl binaries and util scripts
+           lib                              ... core modules
+</PRE>
+      <P><STRONG>Shared site:</STRONG></P>
+      <PRE>    c:\perl
+        site
+           lib                              ... global site modules location
+        5.005
+           bin
+           lib
+        5.00501
+           bin
+           lib
+        5.00501-thread
+           bin
+           lib
+</PRE>
+      <P>The ActivePerl installer recognizes if you are installing in a
+      &lt;version&gt;.&lt;sub-version&gt;* specific directory, and automatically moves site up a
+      level so that you can share your site libraries between versions. If you want to change this
+      default location, you have to set the following system registry values:</P>
+      <PRE>    \\HKLM\Software\Perl
+        lib-5.005=c:\perl\site\lib
+</PRE>
+      <BR>
+      <PRE>    \\HKLM\Software\Perl
+        lib-5.00501=c:\perl\site\lib
+</PRE>
+      <BR>
+      <P>or set PERL5LIB in your environment.</P>
+      <P>You can use this method to reset your perl system to use a site directory shared across a
+      network for multiple workstations.</P>
+      <HR>
+      <H2><A name="Installing_Modules_in_a_Differen">Installing Modules in a Different sitelib</A></H2>
+      <P>If you want PPM to install into a different site lib, you need to set the following values
+      in 'Config.pm':</P>
+      <PRE>    installsitelib='c:\Perl\site\lib'
+    installarchlib='c:\Perl\site\lib\arch' (if using arch-specific dir)
+</PRE>
+      <P>If you don't use PPM, which you may well not if you are a module developer, you can pass
+      the LIB parameter to 'perl makefile.pl LIB=c:\perl\site\lib'.</P>
+      <HR>
+      <H2><A name="Some_additional_information">Some additional information</A></H2>
+      <P>Additional suggestions have been submitted regarding the architecture specific directory
+      for binaries in the core tree. Most people would like to see everything go into 'c:\perl\bin'.</P>
+      <P>The default directory structure for an ActivePerl installation is as follows</P>
+      <PRE>    c:\perl
+       bin
+       lib
+       site
+         lib
+</PRE>
+      <P>If you install ActivePerl into a directory such as 'c:\perl\5.005', the directory structure
+      will be as follows</P>
+      <PRE>    c:\perl
+       5.005
+         bin
+         lib
+       site
+         lib
+</PRE>
+      <P><CODE>@INC</CODE> can be configured by modifying the following values:</P>
+      <PRE>    PERLLIB environment variable
+    PERL5LIB environment variable
+    \\HKLM\Software\Perl\lib-&lt;version&gt;
+    \\HKLM\Software\Perl\sitelib-&lt;version&gt;
+    \\HKLM\Software\Perl\lib
+    \\HKLM\Software\Perl\sitelib
+</PRE>
+      <P>In the algorithm for building <CODE>@INC</CODE> we define the following values:</P>
+      <UL>
+        <LI><CODE>$Reg_Lib_Version</CODE> = the actual value of \\HKLM\Software\Perl\lib-{$]}</LI>
+        <LI><CODE>$Reg_Site_Version</CODE> = the actual value of \\HKLM\Software\Perl\sitelib-{$]}</LI>
+        <LI><CODE>$Reg_Lib</CODE> = the actual value of \\HKLM\Software\Perl\lib</LI>
+        <LI><CODE>$Reg_Site</CODE> = the actual value of \\HKLM\Software\Perl\sitelib</LI>
+        <LI><CODE>$Perl_Dir</CODE> = the directory into which Perl was installed and contains 'bin'
+          and 'lib' directories</LI>
+        <LI><CODE>$Arch</CODE> = Perl architecture ex. 'MSWin32-x86-object', 'MSWin32-ALPHA-object'</LI>
+        <LI>$] = the Perl variable containing Perl's version, sub-version and patch level</LI>
+        <LI><CODE>$Perl_Version</CODE> = Complete Perl &lt;version&gt;.&lt;sub-version&gt; with no
+          patch level, for example: <CODE>$Perl_Version</CODE> == 5.005 for Perl 5.005_02</LI>
+      </UL>
+      <P>The algorithm for building <CODE>@INC</CODE> is as follows (this shows precedence):</P>
+      <PRE>    # This gets rid of a version in the path if one exists
+    ($Perl_Site) = ($Perl_Dir =~ /(.*?)(?:[\/\\]$Perl_Version.*)?$/);
+    $Perl_Site .= '/site';
+</PRE>
+      <BR>
+      <PRE>    push @INC, split /;/, ($ENV{PERL5LIB} || $ENV{PERLLIB});
+    push @INC, split /;/, ($Reg_Lib_Version || $Reg_Lib);
+    push @INC, (&quot;$Perl_Dir/lib/$Arch&quot;, &quot;$Perl_Dir/lib);
+    push @INC, (&quot;$Perl_Site/$]/lib/$Arch&quot;, &quot;$Perl_Site/$]/lib&quot;);
+    push @INC, split /;/, ($Reg_Site_Version || $Reg_Site);
+    push @INC, (&quot;$Perl_Site/lib/$Arch&quot;, &quot;$Perl_Site/lib&quot;);
+    push @INC, '.';
+</PRE>
+      <P>Of course if a directory does not exist it does not get added to @INC.</P>
+      <HR>
+      <H2><A name="Conclusion">Conclusion</A></H2>
+      <P>We hope that this simplified directory structure, and the ability to easily reconfigure the
+      installation locations, greatly improves your ability to use ActivePerl to the fullest. Enjoy!</P>
+      <P>We welcome comments and suggestions.</P>
+
+
+      <!-- beginning of leaf footer-->
+      <P>&nbsp;</P>
+    </TD>
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><FONT size="+1"><STRONG>
+      <P class="block">&nbsp;ActivePerl Directory Structure</P>
+      </STRONG></FONT></TD>
+  </TR>
+</TABLE>
+<!-- end of leaf footer-->
+
+</BODY>
+
+</HTML>

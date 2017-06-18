@@ -1,0 +1,135 @@
+
+<HTML>
+<HEAD>
+<TITLE>syslog - Perl interface to the UNIX syslog calls</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;syslog - Perl interface to the UNIX syslog calls</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Sys::Syslog, openlog, closelog, setlogmask, syslog - Perl interface to the UNIX <CODE>syslog(3)</CODE> calls</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Sys::Syslog;                          # all except setlogsock, or:
+    use Sys::Syslog qw(:DEFAULT setlogsock);  # default set, plus setlogsock</PRE>
+<PRE>
+    setlogsock $sock_type;
+    openlog $ident, $logopt, $facility;
+    syslog $priority, $format, @args;
+    $oldmask = setlogmask $mask_priority;
+    closelog;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Sys::Syslog is an interface to the UNIX <CODE>syslog(3)</CODE> program.
+Call <CODE>syslog()</CODE> with a string priority and a list of <A HREF="../../lib/Pod/perlfunc.html#item_printf"><CODE>printf()</CODE></A> args
+just like <CODE>syslog(3)</CODE>.</P>
+<P>Syslog provides the functions:</P>
+<DL>
+<DT><STRONG><A NAME="item_openlog_%24ident%2C_%24logopt%2C_%24facility">openlog $ident, $logopt, $facility</A></STRONG><BR>
+<DD>
+<EM>$ident</EM> is prepended to every message.
+<EM>$logopt</EM> contains zero or more of the words <EM>pid</EM>, <EM>ndelay</EM>, <EM>cons</EM>, <EM>nowait</EM>.
+<EM>$facility</EM> specifies the part of the system
+<P></P>
+<DT><STRONG><A NAME="item_syslog_%24priority%2C_%24format%2C_%40args">syslog $priority, $format, @args</A></STRONG><BR>
+<DD>
+If <EM>$priority</EM> permits, logs <EM>($format, @args)</EM>
+printed as by <A HREF="../../lib/Pod/perlfunc.html#item_printf"><CODE>printf(3V)</CODE></A>, with the addition that <EM>%m</EM>
+is replaced with <CODE>&quot;$!&quot;</CODE> (the latest error message).
+<P></P>
+<DT><STRONG><A NAME="item_setlogmask_%24mask_priority">setlogmask $mask_priority</A></STRONG><BR>
+<DD>
+Sets log mask <EM>$mask_priority</EM> and returns the old mask.
+<P></P>
+<DT><STRONG><A NAME="item_sock_type">setlogsock $sock_type (added in 5.004_02)</A></STRONG><BR>
+<DD>
+Sets the socket type to be used for the next call to
+<CODE>openlog()</CODE> or <CODE>syslog()</CODE> and returns TRUE on success,
+undef on failure.
+<P>A value of 'unix' will connect to the UNIX domain socket returned by the
+<CODE>_PATH_LOG</CODE> macro (if you system defines it) in <EM>syslog.h</EM>.  A value of
+'inet' will connect to an INET socket returned by getservbyname().  If
+<CODE>_PATH_LOG</CODE> is unavailable or if <A HREF="../../lib/Pod/perlfunc.html#item_getservbyname"><CODE>getservbyname()</CODE></A> fails, returns undef.  Any
+other value croaks.</P>
+<P>The default is for the INET socket to be used.</P>
+<P></P>
+<DT><STRONG><A NAME="item_closelog">closelog</A></STRONG><BR>
+<DD>
+Closes the log file.
+<P></P></DL>
+<P>Note that <CODE>openlog</CODE> now takes three arguments, just like <CODE>openlog(3)</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+    openlog($program, 'cons,pid', 'user');
+    syslog('info', 'this is another test');
+    syslog('mail|warning', 'this is a better test: %d', time);
+    closelog();</PRE>
+<PRE>
+    syslog('debug', 'this is the last test');</PRE>
+<PRE>
+    setlogsock('unix');
+    openlog(&quot;$program $$&quot;, 'ndelay', 'user');
+    syslog('notice', 'fooprogram: this is really done');</PRE>
+<PRE>
+    setlogsock('inet');
+    $! = 55;
+    syslog('info', 'problem was %m'); # %m == $! in syslog(3)</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>syslog(3)</EM></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen &lt;<EM><A HREF="mailto:tchrist@perl.com">tchrist@perl.com</A></EM>&gt; and Larry Wall
+&lt;<EM><A HREF="mailto:larry@wall.org">larry@wall.org</A></EM>&gt;.</P>
+<P>UNIX domain sockets added by Sean Robinson
+&lt;<EM><A HREF="mailto:robinson_s@sc.maricopa.edu">robinson_s@sc.maricopa.edu</A></EM>&gt; with support from Tim Bunce
+&lt;<EM><A HREF="mailto:Tim.Bunce@ig.co.uk">Tim.Bunce@ig.co.uk</A></EM>&gt; and the perl5-porters mailing list.</P>
+<P>Dependency on <EM>syslog.ph</EM> replaced with XS code by Tom Hughes
+&lt;<EM><A HREF="mailto:tom@compton.nu">tom@compton.nu</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;syslog - Perl interface to the UNIX syslog calls</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,193 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Response - Class encapsulating HTTP Responses</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Response - Class encapsulating HTTP Responses</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Response - Class encapsulating HTTP Responses</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require HTTP::Response;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>HTTP::Response</CODE> class encapsulates HTTP style responses.  A
+response consists of a response line, some headers, and (potentially
+empty) content. Note that the LWP library also uses HTTP style
+responses for non-HTTP protocol schemes.</P>
+<P>Instances of this class are usually created and returned by the
+<A HREF="#item_request"><CODE>request()</CODE></A> method of an <CODE>LWP::UserAgent</CODE> object:</P>
+<PRE>
+ #...
+ $response = $ua-&gt;request($request)
+ if ($response-&gt;is_success) {
+     print $response-&gt;content;
+ } else {
+     print $response-&gt;error_as_HTML;
+ }</PRE>
+<P><CODE>HTTP::Response</CODE> is a subclass of <CODE>HTTP::Message</CODE> and therefore
+inherits its methods.  The inherited methods most often used are header(),
+push_header(), remove_header(), headers_as_string(), and content().
+The header convenience methods are also available.  See
+<A HREF="../../../site/lib/HTTP/Message.html">the HTTP::Message manpage</A> for details.</P>
+<P>The following additional methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$r = HTTP::Response-&gt;new($rc, [$msg, [$header, [$content]]])</A></STRONG><BR>
+<DD>
+Constructs a new <CODE>HTTP::Response</CODE> object describing a response with
+response code <CODE>$rc</CODE> and optional message <CODE>$msg</CODE>.  The message is a
+short human readable single line string that explains the response
+code.
+<P></P>
+<DT><STRONG><A NAME="item_code">$r-&gt;<CODE>code([$code])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_message">$r-&gt;<CODE>message([$message])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_request">$r-&gt;<CODE>request([$request])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_previous">$r-&gt;<CODE>previous([$previousResponse])</CODE></A></STRONG><BR>
+<DD>
+These methods provide public access to the object attributes.  The
+first two contain respectively the response code and the message
+of the response.
+<P>The request attribute is a reference the request that caused this
+response.  It does not have to be the same request as passed to the
+$ua-&gt;<A HREF="#item_request"><CODE>request()</CODE></A> method, because there might have been redirects and
+authorization retries in between.</P>
+<P>The previous attribute is used to link together chains of responses.
+You get chains of responses if the first response is redirect or
+unauthorized.</P>
+<P></P>
+<DT><STRONG><A NAME="item_status_line">$r-&gt;status_line</A></STRONG><BR>
+<DD>
+Returns the string ``&lt;code&gt; &lt;message&gt;''.  If the message attribute
+is not set then the official name of &lt;code&gt; (see <A HREF="../../../site/lib/HTTP/Status.html">the HTTP::Status manpage</A>)
+is substituted.
+<P></P>
+<DT><STRONG><A NAME="item_base">$r-&gt;base</A></STRONG><BR>
+<DD>
+Returns the base URI for this response.  The return value will be a
+reference to a URI object.
+<P>The base URI is obtained from one the following sources (in priority
+order):</P>
+<OL>
+<LI>
+Embedded in the document content, for instance &lt;BASE HREF=``...''&gt;
+in HTML documents.
+<P></P>
+<LI>
+A ``Content-Base:'' or a ``Content-Location:'' header in the response.
+<P>For backwards compatability with older HTTP implementations we will
+also look for the ``Base:'' header.</P>
+<P></P>
+<LI>
+The URI used to request this response. This might not be the original
+URI that was passed to $ua-&gt;<A HREF="#item_request"><CODE>request()</CODE></A> method, because we might have
+received some redirect responses first.
+<P></P></OL>
+<P>When the LWP protocol modules produce the HTTP::Response object, then
+any base URI embedded in the document (step 1) will already have
+initialized the ``Content-Base:'' header. This means that this method
+only performs the last 2 steps (the content is not always available
+either).</P>
+<DT><STRONG><A NAME="item_as_string">$r-&gt;as_string</A></STRONG><BR>
+<DD>
+Returns a textual representation of the response.  Mainly
+useful for debugging purposes. It takes no arguments.
+<P></P>
+<DT><STRONG><A NAME="item_is_info">$r-&gt;is_info</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_is_success">$r-&gt;is_success</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_is_redirect">$r-&gt;is_redirect</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_is_error">$r-&gt;is_error</A></STRONG><BR>
+<DD>
+These methods indicate if the response was informational, sucessful, a
+redirection, or an error.
+<P></P>
+<DT><STRONG><A NAME="item_error_as_HTML">$r-&gt;<CODE>error_as_HTML()</CODE></A></STRONG><BR>
+<DD>
+Returns a string containing a complete HTML document indicating what
+error occurred.  This method should only be called when $r-&gt;is_error
+is TRUE.
+<P></P>
+<DT><STRONG><A NAME="item_current_age">$r-&gt;current_age</A></STRONG><BR>
+<DD>
+Calculates the ``current age'' of the response as
+specified by &lt;draft-ietf-http-v11-spec-07&gt; section 13.2.3.  The
+age of a response is the time since it was sent by the origin server.
+The returned value is a number representing the age in seconds.
+<P></P>
+<DT><STRONG><A NAME="item_freshness_lifetime">$r-&gt;freshness_lifetime</A></STRONG><BR>
+<DD>
+Calculates the ``freshness lifetime'' of the response
+as specified by &lt;draft-ietf-http-v11-spec-07&gt; section 13.2.4.  The
+``freshness lifetime'' is the length of time between the generation of a
+response and its expiration time.  The returned value is a number
+representing the freshness lifetime in seconds.
+<P>If the response does not contain an ``Expires'' or a ``Cache-Control''
+header, then this function will apply some simple heuristic based on
+'Last-Modified' to determine a suitable lifetime.</P>
+<P></P>
+<DT><STRONG><A NAME="item_is_fresh">$r-&gt;is_fresh</A></STRONG><BR>
+<DD>
+Returns TRUE if the response is fresh, based on the values of
+<A HREF="#item_freshness_lifetime"><CODE>freshness_lifetime()</CODE></A> and current_age().  If the response is no longer
+fresh, then it has to be refetched or revalidated by the origin
+server.
+<P></P>
+<DT><STRONG><A NAME="item_fresh_until">$r-&gt;fresh_until</A></STRONG><BR>
+<DD>
+Returns the time when this entiy is no longer fresh.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1997 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Response - Class encapsulating HTTP Responses</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

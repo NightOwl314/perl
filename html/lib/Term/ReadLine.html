@@ -1,0 +1,196 @@
+
+<HTML>
+<HEAD>
+<TITLE>Term::ReadLine - Perl interface to various C<readline> packages. If
+no real package is found, substitutes stubs instead of basic functions.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::ReadLine - Perl interface to various C<readline> packages. If
+no real package is found, substitutes stubs instead of basic functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#minimal set of supported functions">Minimal set of supported functions</A></LI>
+	<LI><A HREF="#additional supported functions">Additional supported functions</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#environment">ENVIRONMENT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Term::ReadLine - Perl interface to various <A HREF="#item_readline"><CODE>readline</CODE></A> packages. If
+no real package is found, substitutes stubs instead of basic functions.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Term::ReadLine;
+  $term = new Term::ReadLine 'Simple Perl calc';
+  $prompt = &quot;Enter your arithmetic expression: &quot;;
+  $OUT = $term-&gt;OUT || STDOUT;
+  while ( defined ($_ = $term-&gt;readline($prompt)) ) {
+    $res = eval($_), &quot;\n&quot;;
+    warn $@ if $@;
+    print $OUT $res, &quot;\n&quot; unless $@;
+    $term-&gt;addhistory($_) if /\S/;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This package is just a front end to some other packages. At the moment
+this description is written, the only such package is Term-ReadLine,
+available on CPAN near you. The real target of this stub package is to
+set up a common interface to whatever Readline emerges with time.</P>
+<P>
+<HR>
+<H1><A NAME="minimal set of supported functions">Minimal set of supported functions</A></H1>
+<P>All the supported functions should be called as methods, i.e., either as</P>
+<PRE>
+  $term = new Term::ReadLine 'name';</PRE>
+<P>or as</P>
+<PRE>
+  $term-&gt;addhistory('row');</PRE>
+<P>where $term is a return value of Term::ReadLine-&gt;Init.</P>
+<DL>
+<DT><STRONG><A NAME="item_ReadLine"><CODE>ReadLine</CODE></A></STRONG><BR>
+<DD>
+returns the actual package that executes the commands. Among possible
+values are <CODE>Term::ReadLine::Gnu</CODE>, <CODE>Term::ReadLine::Perl</CODE>,
+<CODE>Term::ReadLine::Stub Exporter</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_new"><CODE>new</CODE></A></STRONG><BR>
+<DD>
+returns the handle for subsequent calls to following
+functions. Argument is the name of the application. Optionally can be
+followed by two arguments for <CODE>IN</CODE> and <CODE>OUT</CODE> filehandles. These
+arguments should be globs.
+<P></P>
+<DT><STRONG><A NAME="item_readline"><CODE>readline</CODE></A></STRONG><BR>
+<DD>
+gets an input line, <EM>possibly</EM> with actual <A HREF="#item_readline"><CODE>readline</CODE></A>
+support. Trailing newline is removed. Returns <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on <CODE>EOF</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_addhistory"><CODE>addhistory</CODE></A></STRONG><BR>
+<DD>
+adds the line to the history of input, from where it can be used if
+the actual <A HREF="#item_readline"><CODE>readline</CODE></A> is present.
+<P></P>
+<DT><STRONG><A NAME="item_IN%2C_%24OUT"><CODE>IN</CODE>, $<CODE>OUT</CODE></A></STRONG><BR>
+<DD>
+return the filehandles for input and output or <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if <A HREF="#item_readline"><CODE>readline</CODE></A>
+input and output cannot be used for Perl.
+<P></P>
+<DT><STRONG><A NAME="item_MinLine"><CODE>MinLine</CODE></A></STRONG><BR>
+<DD>
+If argument is specified, it is an advice on minimal size of line to
+be included into history.  <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> means do not include anything into
+history. Returns the old value.
+<P></P>
+<DT><STRONG><A NAME="item_findConsole"><CODE>findConsole</CODE></A></STRONG><BR>
+<DD>
+returns an array with two strings that give most appropriate names for
+files for input and output using conventions <CODE>&quot;&lt;$in&quot;</CODE>, <CODE>&quot;&gt;out&quot;</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Attribs">Attribs</A></STRONG><BR>
+<DD>
+returns a reference to a hash which describes internal configuration
+of the package. Names of keys in this hash conform to standard
+conventions with the leading <CODE>rl_</CODE> stripped.
+<P></P>
+<DT><STRONG><A NAME="item_Features"><CODE>Features</CODE></A></STRONG><BR>
+<DD>
+Returns a reference to a hash with keys being features present in
+current implementation. Several optional features are used in the
+minimal interface: <CODE>appname</CODE> should be present if the first argument
+to <A HREF="#item_new"><CODE>new</CODE></A> is recognized, and <CODE>minline</CODE> should be present if
+<A HREF="#item_MinLine"><CODE>MinLine</CODE></A> method is not dummy.  <CODE>autohistory</CODE> should be present if
+lines are put into history automatically (maybe subject to
+<A HREF="#item_MinLine"><CODE>MinLine</CODE></A>), and <A HREF="#item_addhistory"><CODE>addhistory</CODE></A> if <A HREF="#item_addhistory"><CODE>addhistory</CODE></A> method is not dummy.
+<P>If <A HREF="#item_Features"><CODE>Features</CODE></A> method reports a feature <CODE>attribs</CODE> as present, the
+method <A HREF="#item_Attribs"><CODE>Attribs</CODE></A> is not dummy.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="additional supported functions">Additional supported functions</A></H1>
+<P>Actually <CODE>Term::ReadLine</CODE> can use some other package, that will
+support reacher set of commands.</P>
+<P>All these commands are callable via method interface and have names
+which conform to standard conventions with the leading <CODE>rl_</CODE> stripped.</P>
+<P>The stub package included with the perl distribution allows some
+additional methods:</P>
+<DL>
+<DT><STRONG><A NAME="item_tkRunning"><CODE>tkRunning</CODE></A></STRONG><BR>
+<DD>
+makes Tk event loop run when waiting for user input (i.e., during
+<A HREF="#item_readline"><CODE>readline</CODE></A> method).
+<P></P>
+<DT><STRONG><A NAME="item_ornaments"><CODE>ornaments</CODE></A></STRONG><BR>
+<DD>
+makes the command line stand out by using termcap data.  The argument
+to <A HREF="#item_ornaments"><CODE>ornaments</CODE></A> should be 0, 1, or a string of a form
+<CODE>&quot;aa,bb,cc,dd&quot;</CODE>.  Four components of this string should be names of
+<EM>terminal capacities</EM>, first two will be issued to make the prompt
+standout, last two to make the input line standout.
+<P></P>
+<DT><STRONG><A NAME="item_newTTY"><CODE>newTTY</CODE></A></STRONG><BR>
+<DD>
+takes two arguments which are input filehandle and output filehandle.
+Switches to use these filehandles.
+<P></P></DL>
+<P>One can check whether the currently loaded ReadLine package supports
+these methods by checking for corresponding <A HREF="#item_Features"><CODE>Features</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>None</P>
+<P>
+<HR>
+<H1><A NAME="environment">ENVIRONMENT</A></H1>
+<P>The environment variable <CODE>PERL_RL</CODE> governs which ReadLine clone is
+loaded. If the value is false, a dummy interface is used. If the value
+is true, it should be tail of the name of the package to use, such as
+<CODE>Perl</CODE> or <CODE>Gnu</CODE>.</P>
+<P>As a special case, if the value of this variable is space-separated,
+the tail might be used to disable the ornaments by setting the tail to
+be <CODE>o=0</CODE> or <CODE>ornaments=0</CODE>.  The head should be as described above, say</P>
+<P>If the variable is not set, or if the head of space-separated list is
+empty, the best available package is loaded.</P>
+<PRE>
+  export &quot;PERL_RL=Perl o=0&quot;     # Use Perl ReadLine without ornaments
+  export &quot;PERL_RL= o=0&quot;         # Use best available ReadLine without ornaments</PRE>
+<P>(Note that processing of <CODE>PERL_RL</CODE> for ornaments is in the discretion of the 
+particular used <CODE>Term::ReadLine::*</CODE> package).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::ReadLine - Perl interface to various C<readline> packages. If
+no real package is found, substitutes stubs instead of basic functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,104 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::DummyInetd - A dummy Inetd server</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::DummyInetd - A dummy Inetd server</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::DummyInetd - A dummy Inetd server</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::DummyInetd;
+    use Net::SMTP;
+</PRE>
+<PRE>
+
+    $inetd = new Net::DummyInetd qw(/usr/lib/sendmail -ba -bs);</PRE>
+<PRE>
+
+    $smtp  = Net::SMTP-&gt;new('localhost', Port =&gt; $inetd-&gt;port);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::DummyInetd</CODE> is just what it's name says, it is a dummy inetd server.
+Creation of a <CODE>Net::DummyInetd</CODE> will cause a child process to be spawned off
+which will listen to a socket. When a connection arrives on this socket
+the specified command is fork'd and exec'd with STDIN and STDOUT file
+descriptors duplicated to the new socket.</P>
+<P>This package was added as an example of how to use <CODE>Net::SMTP</CODE> to connect
+to a <CODE>sendmail</CODE> process, which is not the default, via SIDIN and STDOUT.
+A <CODE>Net::Inetd</CODE> package will be available in the next release of <CODE>libnet</CODE></P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( CMD )</A></STRONG><BR>
+<DD>
+Creates a new object and spawns a child process which listens to a socket.
+<CODE>CMD</CODE> is a list, which will be passed to <A HREF="../../../lib/Pod/perlfunc.html#item_exec"><CODE>exec</CODE></A> when a new process needs
+to be created.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_port">port</A></STRONG><BR>
+<DD>
+Returns the port number on which the <EM>DummyInetd</EM> object is listening
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::DummyInetd - A dummy Inetd server</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

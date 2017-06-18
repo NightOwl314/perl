@@ -1,0 +1,386 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::InputObjects - objects representing POD input paragraphs, commands, etc.</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::InputObjects - objects representing POD input paragraphs, commands, etc.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#requires">REQUIRES</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#pod::inputsource"><STRONG>Pod::InputSource</STRONG></A></LI>
+	<UL>
+
+		<LI><A HREF="#new()"><STRONG>new()</STRONG></A></LI>
+		<LI><A HREF="#name()"><STRONG>name()</STRONG></A></LI>
+		<LI><A HREF="#handle()"><STRONG>handle()</STRONG></A></LI>
+		<LI><A HREF="#was_cutting()"><STRONG>was_cutting()</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#pod::paragraph"><STRONG>Pod::Paragraph</STRONG></A></LI>
+	<UL>
+
+		<LI><A HREF="#pod::paragraph>new()">Pod::Paragraph-&gt;<STRONG>new()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>cmd_name()">$pod_para-&gt;<STRONG>cmd_name()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>text()">$pod_para-&gt;<STRONG>text()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>raw_text()">$pod_para-&gt;<STRONG>raw_text()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>cmd_prefix()">$pod_para-&gt;<STRONG>cmd_prefix()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>cmd_separator()">$pod_para-&gt;<STRONG>cmd_separator()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>parse_tree()">$pod_para-&gt;<STRONG>parse_tree()</STRONG></A></LI>
+		<LI><A HREF="#$pod_para>file_line()">$pod_para-&gt;<STRONG>file_line()</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#pod::interiorsequence"><STRONG>Pod::InteriorSequence</STRONG></A></LI>
+	<UL>
+
+		<LI><A HREF="#pod::interiorsequence>new()">Pod::InteriorSequence-&gt;<STRONG>new()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>cmd_name()">$pod_seq-&gt;<STRONG>cmd_name()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>prepend()">$pod_seq-&gt;<STRONG>prepend()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>append()">$pod_seq-&gt;<STRONG>append()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>nested()">$pod_seq-&gt;<STRONG>nested()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>raw_text()">$pod_seq-&gt;<STRONG>raw_text()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>left_delimiter()">$pod_seq-&gt;<STRONG>left_delimiter()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>right_delimiter()">$pod_seq-&gt;<STRONG>right_delimiter()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>parse_tree()">$pod_seq-&gt;<STRONG>parse_tree()</STRONG></A></LI>
+		<LI><A HREF="#$pod_seq>file_line()">$pod_seq-&gt;<STRONG>file_line()</STRONG></A></LI>
+		<LI><A HREF="#pod::interiorsequence::destroy()">Pod::InteriorSequence::<STRONG>DESTROY()</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#pod::parsetree"><STRONG>Pod::ParseTree</STRONG></A></LI>
+	<UL>
+
+		<LI><A HREF="#pod::parsetree>new()">Pod::ParseTree-&gt;<STRONG>new()</STRONG></A></LI>
+		<LI><A HREF="#$ptree>top()">$ptree-&gt;<STRONG>top()</STRONG></A></LI>
+		<LI><A HREF="#$ptree>children()">$ptree-&gt;<STRONG>children()</STRONG></A></LI>
+		<LI><A HREF="#$ptree>prepend()">$ptree-&gt;<STRONG>prepend()</STRONG></A></LI>
+		<LI><A HREF="#$ptree>append()">$ptree-&gt;<STRONG>append()</STRONG></A></LI>
+		<LI><A HREF="#$ptree>raw_text()">$ptree-&gt;<STRONG>raw_text()</STRONG></A></LI>
+		<LI><A HREF="#pod::parsetree::destroy()">Pod::ParseTree::<STRONG>DESTROY()</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::InputObjects - objects representing POD input paragraphs, commands, etc.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::InputObjects;</PRE>
+<P>
+<HR>
+<H1><A NAME="requires">REQUIRES</A></H1>
+<P>perl5.004, Carp</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>Nothing.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module defines some basic input objects used by <STRONG>Pod::Parser</STRONG> when
+reading and parsing POD text from an input source. The following objects
+are defined:</P>
+<DL>
+<DT><STRONG><A NAME="item_package_Pod%3A%3AParagraph">package <STRONG>Pod::Paragraph</STRONG></A></STRONG><BR>
+<DD>
+An object corresponding to a paragraph of POD input text. It may be a
+plain paragraph, a verbatim paragraph, or a command paragraph (see
+<A HREF="../../lib/Pod/perlpod.html">the perlpod manpage</A>).
+<P></P>
+<DT><STRONG><A NAME="item_package_Pod%3A%3AInteriorSequence">package <STRONG>Pod::InteriorSequence</STRONG></A></STRONG><BR>
+<DD>
+An object corresponding to an interior sequence command from the POD
+input text (see <A HREF="../../lib/Pod/perlpod.html">the perlpod manpage</A>).
+<P></P>
+<DT><STRONG><A NAME="item_package_Pod%3A%3AParseTree">package <STRONG>Pod::ParseTree</STRONG></A></STRONG><BR>
+<DD>
+An object corresponding to a tree of parsed POD text. Each ``node'' in
+a parse-tree (or <EM>ptree</EM>) is either a text-string or a reference to
+a <STRONG>Pod::InteriorSequence</STRONG> object. The nodes appear in the parse-tree
+in the order in which they were parsed from left-to-right.
+<P></P></DL>
+<P>Each of these input objects are described in further detail in the
+sections which follow.</P>
+<P>
+<HR>
+<H1><A NAME="pod::paragraph"><STRONG>Pod::Paragraph</STRONG></A></H1>
+<P>An object representing a paragraph of POD input text.
+It has the following methods/attributes:</P>
+<P>
+<H2><A NAME="pod::paragraph>new()">Pod::Paragraph-&gt;<STRONG>new()</STRONG></A></H2>
+<PRE>
+        my $pod_para1 = Pod::Paragraph-&gt;new(-text =&gt; $text);
+        my $pod_para2 = Pod::Paragraph-&gt;new(-name =&gt; $cmd,
+                                            -text =&gt; $text);
+        my $pod_para3 = new Pod::Paragraph(-text =&gt; $text);
+        my $pod_para4 = new Pod::Paragraph(-name =&gt; $cmd,
+                                           -text =&gt; $text);
+        my $pod_para5 = Pod::Paragraph-&gt;new(-name =&gt; $cmd,
+                                            -text =&gt; $text,
+                                            -file =&gt; $filename,
+                                            -line =&gt; $line_number);</PRE>
+<P>This is a class method that constructs a <CODE>Pod::Paragraph</CODE> object and
+returns a reference to the new paragraph object. It may be given one or
+two keyword arguments. The <CODE>-text</CODE> keyword indicates the corresponding
+text of the POD paragraph. The <CODE>-name</CODE> keyword indicates the name of
+the corresponding POD command, such as <CODE>head1</CODE> or <CODE>item</CODE> (it should
+<EM>not</EM> contain the <CODE>=</CODE> prefix); this is needed only if the POD
+paragraph corresponds to a command paragraph. The <CODE>-file</CODE> and <CODE>-line</CODE>
+keywords indicate the filename and line number corresponding to the
+beginning of the paragraph</P>
+<P>
+<H2><A NAME="$pod_para>cmd_name()">$pod_para-&gt;<STRONG>cmd_name()</STRONG></A></H2>
+<PRE>
+        my $para_cmd = $pod_para-&gt;cmd_name();</PRE>
+<P>If this paragraph is a command paragraph, then this method will return 
+the name of the command (<EM>without</EM> any leading <CODE>=</CODE> prefix).</P>
+<P>
+<H2><A NAME="$pod_para>text()">$pod_para-&gt;<STRONG>text()</STRONG></A></H2>
+<PRE>
+        my $para_text = $pod_para-&gt;text();</PRE>
+<P>This method will return the corresponding text of the paragraph.</P>
+<P>
+<H2><A NAME="$pod_para>raw_text()">$pod_para-&gt;<STRONG>raw_text()</STRONG></A></H2>
+<PRE>
+        my $raw_pod_para = $pod_para-&gt;raw_text();</PRE>
+<P>This method will return the <EM>raw</EM> text of the POD paragraph, exactly
+as it appeared in the input.</P>
+<P>
+<H2><A NAME="$pod_para>cmd_prefix()">$pod_para-&gt;<STRONG>cmd_prefix()</STRONG></A></H2>
+<PRE>
+        my $prefix = $pod_para-&gt;cmd_prefix();</PRE>
+<P>If this paragraph is a command paragraph, then this method will return 
+the prefix used to denote the command (which should be the string ``=''
+or ``=='').</P>
+<P>
+<H2><A NAME="$pod_para>cmd_separator()">$pod_para-&gt;<STRONG>cmd_separator()</STRONG></A></H2>
+<PRE>
+        my $separator = $pod_para-&gt;cmd_separator();</PRE>
+<P>If this paragraph is a command paragraph, then this method will return
+the text used to separate the command name from the rest of the
+paragraph (if any).</P>
+<P>
+<H2><A NAME="$pod_para>parse_tree()">$pod_para-&gt;<STRONG>parse_tree()</STRONG></A></H2>
+<PRE>
+        my $ptree = $pod_parser-&gt;parse_text( $pod_para-&gt;text() );
+        $pod_para-&gt;parse_tree( $ptree );
+        $ptree = $pod_para-&gt;parse_tree();</PRE>
+<P>This method will get/set the corresponding parse-tree of the paragraph's text.</P>
+<P>
+<H2><A NAME="$pod_para>file_line()">$pod_para-&gt;<STRONG>file_line()</STRONG></A></H2>
+<PRE>
+        my ($filename, $line_number) = $pod_para-&gt;file_line();
+        my $position = $pod_para-&gt;file_line();</PRE>
+<P>Returns the current filename and line number for the paragraph
+object.  If called in a list context, it returns a list of two
+elements: first the filename, then the line number. If called in
+a scalar context, it returns a string containing the filename, followed
+by a colon (':'), followed by the line number.</P>
+<P>
+<HR>
+<H1><A NAME="pod::interiorsequence"><STRONG>Pod::InteriorSequence</STRONG></A></H1>
+<P>An object representing a POD interior sequence command.
+It has the following methods/attributes:</P>
+<P>
+<H2><A NAME="pod::interiorsequence>new()">Pod::InteriorSequence-&gt;<STRONG>new()</STRONG></A></H2>
+<PRE>
+        my $pod_seq1 = Pod::InteriorSequence-&gt;new(-name =&gt; $cmd
+                                                  -ldelim =&gt; $delimiter);
+        my $pod_seq2 = new Pod::InteriorSequence(-name =&gt; $cmd,
+                                                 -ldelim =&gt; $delimiter);
+        my $pod_seq3 = new Pod::InteriorSequence(-name =&gt; $cmd,
+                                                 -ldelim =&gt; $delimiter,
+                                                 -file =&gt; $filename,
+                                                 -line =&gt; $line_number);</PRE>
+<PRE>
+        my $pod_seq4 = new Pod::InteriorSequence(-name =&gt; $cmd, $ptree);
+        my $pod_seq5 = new Pod::InteriorSequence($cmd, $ptree);</PRE>
+<P>This is a class method that constructs a <CODE>Pod::InteriorSequence</CODE> object
+and returns a reference to the new interior sequence object. It should
+be given two keyword arguments.  The <CODE>-ldelim</CODE> keyword indicates the
+corresponding left-delimiter of the interior sequence (e.g. '&lt;').
+The <CODE>-name</CODE> keyword indicates the name of the corresponding interior
+sequence command, such as <CODE>I</CODE> or <CODE>B</CODE> or <CODE>C</CODE>. The <CODE>-file</CODE> and
+<CODE>-line</CODE> keywords indicate the filename and line number corresponding
+to the beginning of the interior sequence. If the <CODE>$ptree</CODE> argument is
+given, it must be the last argument, and it must be either string, or
+else an array-ref suitable for passing to <STRONG>Pod::ParseTree::new</STRONG> (or
+it may be a reference to an Pod::ParseTree object).</P>
+<P>
+<H2><A NAME="$pod_seq>cmd_name()">$pod_seq-&gt;<STRONG>cmd_name()</STRONG></A></H2>
+<PRE>
+        my $seq_cmd = $pod_seq-&gt;cmd_name();</PRE>
+<P>The name of the interior sequence command.</P>
+<P>
+<H2><A NAME="$pod_seq>prepend()">$pod_seq-&gt;<STRONG>prepend()</STRONG></A></H2>
+<PRE>
+        $pod_seq-&gt;prepend($text);
+        $pod_seq1-&gt;prepend($pod_seq2);</PRE>
+<P>Prepends the given string or parse-tree or sequence object to the parse-tree
+of this interior sequence.</P>
+<P>
+<H2><A NAME="$pod_seq>append()">$pod_seq-&gt;<STRONG>append()</STRONG></A></H2>
+<PRE>
+        $pod_seq-&gt;append($text);
+        $pod_seq1-&gt;append($pod_seq2);</PRE>
+<P>Appends the given string or parse-tree or sequence object to the parse-tree
+of this interior sequence.</P>
+<P>
+<H2><A NAME="$pod_seq>nested()">$pod_seq-&gt;<STRONG>nested()</STRONG></A></H2>
+<PRE>
+        $outer_seq = $pod_seq-&gt;nested || print &quot;not nested&quot;;</PRE>
+<P>If this interior sequence is nested inside of another interior
+sequence, then the outer/parent sequence that contains it is
+returned. Otherwise <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> is returned.</P>
+<P>
+<H2><A NAME="$pod_seq>raw_text()">$pod_seq-&gt;<STRONG>raw_text()</STRONG></A></H2>
+<PRE>
+        my $seq_raw_text = $pod_seq-&gt;raw_text();</PRE>
+<P>This method will return the <EM>raw</EM> text of the POD interior sequence,
+exactly as it appeared in the input.</P>
+<P>
+<H2><A NAME="$pod_seq>left_delimiter()">$pod_seq-&gt;<STRONG>left_delimiter()</STRONG></A></H2>
+<PRE>
+        my $ldelim = $pod_seq-&gt;left_delimiter();</PRE>
+<P>The leftmost delimiter beginning the argument text to the interior
+sequence (should be ``&lt;'').</P>
+<P>
+<H2><A NAME="$pod_seq>right_delimiter()">$pod_seq-&gt;<STRONG>right_delimiter()</STRONG></A></H2>
+<P>The rightmost delimiter beginning the argument text to the interior
+sequence (should be ``&gt;'').</P>
+<P>
+<H2><A NAME="$pod_seq>parse_tree()">$pod_seq-&gt;<STRONG>parse_tree()</STRONG></A></H2>
+<PRE>
+        my $ptree = $pod_parser-&gt;parse_text($paragraph_text);
+        $pod_seq-&gt;parse_tree( $ptree );
+        $ptree = $pod_seq-&gt;parse_tree();</PRE>
+<P>This method will get/set the corresponding parse-tree of the interior
+sequence's text.</P>
+<P>
+<H2><A NAME="$pod_seq>file_line()">$pod_seq-&gt;<STRONG>file_line()</STRONG></A></H2>
+<PRE>
+        my ($filename, $line_number) = $pod_seq-&gt;file_line();
+        my $position = $pod_seq-&gt;file_line();</PRE>
+<P>Returns the current filename and line number for the interior sequence
+object.  If called in a list context, it returns a list of two
+elements: first the filename, then the line number. If called in
+a scalar context, it returns a string containing the filename, followed
+by a colon (':'), followed by the line number.</P>
+<P>
+<H2><A NAME="pod::interiorsequence::destroy()">Pod::InteriorSequence::<STRONG>DESTROY()</STRONG></A></H2>
+<P>This method performs any necessary cleanup for the interior-sequence.
+If you override this method then it is <STRONG>imperative</STRONG> that you invoke
+the parent method from within your own method, otherwise
+<EM>interior-sequence storage will not be reclaimed upon destruction!</EM></P>
+<P>
+<HR>
+<H1><A NAME="pod::parsetree"><STRONG>Pod::ParseTree</STRONG></A></H1>
+<P>This object corresponds to a tree of parsed POD text. As POD text is
+scanned from left to right, it is parsed into an ordered list of
+text-strings and <STRONG>Pod::InteriorSequence</STRONG> objects (in order of
+appearance). A <STRONG>Pod::ParseTree</STRONG> object corresponds to this list of
+strings and sequences. Each interior sequence in the parse-tree may
+itself contain a parse-tree (since interior sequences may be nested).</P>
+<P>
+<H2><A NAME="pod::parsetree>new()">Pod::ParseTree-&gt;<STRONG>new()</STRONG></A></H2>
+<PRE>
+        my $ptree1 = Pod::ParseTree-&gt;new;
+        my $ptree2 = new Pod::ParseTree;
+        my $ptree4 = Pod::ParseTree-&gt;new($array_ref);
+        my $ptree3 = new Pod::ParseTree($array_ref);</PRE>
+<P>This is a class method that constructs a <CODE>Pod::Parse_tree</CODE> object and
+returns a reference to the new parse-tree. If a single-argument is given,
+it must be a reference to an array, and is used to initialize the root
+(top) of the parse tree.</P>
+<P>
+<H2><A NAME="$ptree>top()">$ptree-&gt;<STRONG>top()</STRONG></A></H2>
+<PRE>
+        my $top_node = $ptree-&gt;top();
+        $ptree-&gt;top( $top_node );
+        $ptree-&gt;top( @children );</PRE>
+<P>This method gets/sets the top node of the parse-tree. If no arguments are
+given, it returns the topmost node in the tree (the root), which is also
+a <STRONG>Pod::ParseTree</STRONG>. If it is given a single argument that is a reference,
+then the reference is assumed to a parse-tree and becomes the new top node.
+Otherwise, if arguments are given, they are treated as the new list of
+children for the top node.</P>
+<P>
+<H2><A NAME="$ptree>children()">$ptree-&gt;<STRONG>children()</STRONG></A></H2>
+<P>This method gets/sets the children of the top node in the parse-tree.
+If no arguments are given, it returns the list (array) of children
+(each of which should be either a string or a <STRONG>Pod::InteriorSequence</STRONG>.
+Otherwise, if arguments are given, they are treated as the new list of
+children for the top node.</P>
+<P>
+<H2><A NAME="$ptree>prepend()">$ptree-&gt;<STRONG>prepend()</STRONG></A></H2>
+<P>This method prepends the given text or parse-tree to the current parse-tree.
+If the first item on the parse-tree is text and the argument is also text,
+then the text is prepended to the first item (not added as a separate string).
+Otherwise the argument is added as a new string or parse-tree <EM>before</EM>
+the current one.</P>
+<P>
+<H2><A NAME="$ptree>append()">$ptree-&gt;<STRONG>append()</STRONG></A></H2>
+<P>This method appends the given text or parse-tree to the current parse-tree.
+If the last item on the parse-tree is text and the argument is also text,
+then the text is appended to the last item (not added as a separate string).
+Otherwise the argument is added as a new string or parse-tree <EM>after</EM>
+the current one.</P>
+<P>
+<H2><A NAME="$ptree>raw_text()">$ptree-&gt;<STRONG>raw_text()</STRONG></A></H2>
+<PRE>
+        my $ptree_raw_text = $ptree-&gt;raw_text();</PRE>
+<P>This method will return the <EM>raw</EM> text of the POD parse-tree
+exactly as it appeared in the input.</P>
+<P>
+<H2><A NAME="pod::parsetree::destroy()">Pod::ParseTree::<STRONG>DESTROY()</STRONG></A></H2>
+<P>This method performs any necessary cleanup for the parse-tree.
+If you override this method then it is <STRONG>imperative</STRONG>
+that you invoke the parent method from within your own method,
+otherwise <EM>parse-tree storage will not be reclaimed upon destruction!</EM></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A>, <A HREF="../../lib/Pod/Select.html">the Pod::Select manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brad Appleton &lt;<A HREF="mailto:bradapp@enteract.com">bradapp@enteract.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::InputObjects - objects representing POD input paragraphs, commands, etc.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,120 @@
+
+<HTML>
+<HEAD>
+<TITLE>strict - Perl pragma to restrict unsafe constructs</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;strict - Perl pragma to restrict unsafe constructs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>strict - Perl pragma to restrict unsafe constructs</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use strict;</PRE>
+<PRE>
+    use strict &quot;vars&quot;;
+    use strict &quot;refs&quot;;
+    use strict &quot;subs&quot;;</PRE>
+<PRE>
+    use strict;
+    no strict &quot;vars&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>If no import list is supplied, all possible restrictions are assumed.
+(This is the safest mode to operate in, but is sometimes too strict for
+casual programming.)  Currently, there are three possible things to be
+strict about:  ``subs'', ``vars'', and ``refs''.</P>
+<DL>
+<DT><STRONG><A NAME="item_strict_refs"><CODE>strict refs</CODE></A></STRONG><BR>
+<DD>
+This generates a runtime error if you 
+use symbolic references (see <A HREF="../lib/Pod/perlref.html">the perlref manpage</A>).
+<PRE>
+    use strict 'refs';
+    $ref = \$foo;
+    print $$ref;        # ok
+    $ref = &quot;foo&quot;;
+    print $$ref;        # runtime error; normally ok
+    $file = &quot;STDOUT&quot;;
+    print $file &quot;Hi!&quot;;  # error; note: no comma after $file</PRE>
+<P>There is one exception to this rule:</P>
+<PRE>
+    $bar = \&amp;{'foo'};
+    &amp;$bar;</PRE>
+<P>is allowed so that <CODE>goto &amp;$AUTOLOAD</CODE> would not break under stricture.</P>
+<P></P>
+<DT><STRONG><A NAME="item_strict_vars"><CODE>strict vars</CODE></A></STRONG><BR>
+<DD>
+This generates a compile-time error if you access a variable that wasn't
+declared via ``our'' or <CODE>use vars</CODE>,
+localized via <A HREF="../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A>, or wasn't fully qualified.  Because this is to avoid
+variable suicide problems and subtle dynamic scoping issues, a merely
+<A HREF="../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> variable isn't good enough.  See <A HREF="../lib/Pod/perlfunc.html#my">my in the perlfunc manpage</A> and
+<A HREF="../lib/Pod/perlfunc.html#local">local in the perlfunc manpage</A>.
+<PRE>
+    use strict 'vars';
+    $X::foo = 1;         # ok, fully qualified
+    my $foo = 10;        # ok, my() var
+    local $foo = 9;      # blows up</PRE>
+<PRE>
+    package Cinna;
+    our $bar;                   # Declares $bar in current package
+    $bar = 'HgS';               # ok, global declared via pragma</PRE>
+<P>The <A HREF="../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> generated a compile-time error because you just touched a global
+name without fully qualifying it.</P>
+<P>Because of their special use by sort(), the variables $a and $b are
+exempted from this check.</P>
+<P></P>
+<DT><STRONG><A NAME="item_strict_subs"><CODE>strict subs</CODE></A></STRONG><BR>
+<DD>
+This disables the poetry optimization, generating a compile-time error if
+you try to use a bareword identifier that's not a subroutine, unless it
+appears in curly braces or on the left hand side of the ``=&gt;'' symbol.
+<PRE>
+    use strict 'subs';
+    $SIG{PIPE} = Plumber;       # blows up
+    $SIG{PIPE} = &quot;Plumber&quot;;     # just fine: bareword in curlies always ok
+    $SIG{PIPE} = \&amp;Plumber;     # preferred form</PRE>
+<P></P></DL>
+<P>See <A HREF="../lib/Pod/perlmodlib.html#pragmatic modules">Pragmatic Modules in the perlmodlib manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;strict - Perl pragma to restrict unsafe constructs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

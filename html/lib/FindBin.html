@@ -1,0 +1,108 @@
+
+<HTML>
+<HEAD>
+<TITLE>FindBin - Locate directory of original perl script</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;FindBin - Locate directory of original perl script</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#exportable variables">EXPORTABLE VARIABLES</A></LI>
+	<LI><A HREF="#known bugs">KNOWN BUGS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>FindBin - Locate directory of original perl script</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use FindBin;
+ use lib &quot;$FindBin::Bin/../lib&quot;;</PRE>
+<PRE>
+ or</PRE>
+<PRE>
+ use FindBin qw($Bin);
+ use lib &quot;$Bin/../lib&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Locates the full path to the script bin directory to allow the use
+of paths relative to the bin directory.</P>
+<P>This allows a user to setup a directory tree for some software with
+directories &lt;root&gt;/bin and &lt;root&gt;/lib and then the above example will allow
+the use of modules in the lib directory without knowing where the software
+tree is installed.</P>
+<P>If perl is invoked using the <STRONG>-e</STRONG> option or the perl script is read from
+<CODE>STDIN</CODE> then FindBin sets both <CODE>$Bin</CODE> and <CODE>$RealBin</CODE> to the current
+directory.</P>
+<P>
+<HR>
+<H1><A NAME="exportable variables">EXPORTABLE VARIABLES</A></H1>
+<PRE>
+ $Bin         - path to bin directory from where script was invoked
+ $Script      - basename of script from which perl was invoked
+ $RealBin     - $Bin with all links resolved
+ $RealScript  - $Script with all links resolved</PRE>
+<P>
+<HR>
+<H1><A NAME="known bugs">KNOWN BUGS</A></H1>
+<P>if perl is invoked as</P>
+<PRE>
+   perl filename</PRE>
+<P>and <EM>filename</EM> does not have executable rights and a program called <EM>filename</EM>
+exists in the users <CODE>$ENV{PATH}</CODE> which satisfies both <STRONG>-x</STRONG> and <STRONG>-T</STRONG> then FindBin
+assumes that it was invoked via the <CODE>$ENV{PATH}</CODE>.</P>
+<P>Workaround is to invoke perl as</P>
+<PRE>
+ perl ./filename</PRE>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>FindBin is supported as part of the core perl distribution. Please send bug
+reports to &lt;<EM><A HREF="mailto:perlbug@perl.org">perlbug@perl.org</A></EM>&gt; using the perlbug program included with perl.</P>
+<P>Graham Barr &lt;<EM><A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A></EM>&gt;
+Nick Ing-Simmons &lt;<EM><A HREF="mailto:nik@tiuk.ti.com">nik@tiuk.ti.com</A></EM>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995 Graham Barr &amp; Nick Ing-Simmons. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;FindBin - Locate directory of original perl script</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

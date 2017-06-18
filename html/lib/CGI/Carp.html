@@ -1,0 +1,242 @@
+
+<HTML>
+<HEAD>
+<TITLE>B<CGI::Carp> - CGI routines for writing to the HTTPD error log</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B<CGI::Carp> - CGI routines for writing to the HTTPD error log</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#redirecting error messages">REDIRECTING ERROR MESSAGES</A></LI>
+	<LI><A HREF="#making perl errors appear in the browser window">MAKING PERL ERRORS APPEAR IN THE BROWSER WINDOW</A></LI>
+	<UL>
+
+		<LI><A HREF="#changing the default message">Changing the default message</A></LI>
+	</UL>
+
+	<LI><A HREF="#making warnings appear as html comments">MAKING WARNINGS APPEAR AS HTML COMMENTS</A></LI>
+	<LI><A HREF="#change log">CHANGE LOG</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P><STRONG>CGI::Carp</STRONG> - CGI routines for writing to the HTTPD (or other) error log</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use CGI::Carp;</PRE>
+<PRE>
+    croak &quot;We're outta here!&quot;;
+    confess &quot;It was my fault: $!&quot;;
+    carp &quot;It was your fault!&quot;;   
+    warn &quot;I'm confused&quot;;
+    die  &quot;I'm dying.\n&quot;;</PRE>
+<PRE>
+    use CGI::Carp qw(cluck);
+    cluck &quot;I wouldn't do that if I were you&quot;;</PRE>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser);
+    die &quot;Fatal error messages are now sent to browser&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>CGI scripts have a nasty habit of leaving warning messages in the error
+logs that are neither time stamped nor fully identified.  Tracking down
+the script that caused the error is a pain.  This fixes that.  Replace
+the usual</P>
+<PRE>
+    use Carp;</PRE>
+<P>with</P>
+<PRE>
+    use CGI::Carp</PRE>
+<P>And the standard warn(), die (), croak(), <CODE>confess()</CODE> and <CODE>carp()</CODE> calls
+will automagically be replaced with functions that write out nicely
+time-stamped messages to the HTTP server error log.</P>
+<P>For example:</P>
+<PRE>
+   [Fri Nov 17 21:40:43 1995] test.pl: I'm confused at test.pl line 3.
+   [Fri Nov 17 21:40:43 1995] test.pl: Got an error message: Permission denied.
+   [Fri Nov 17 21:40:43 1995] test.pl: I'm dying.</PRE>
+<P>
+<HR>
+<H1><A NAME="redirecting error messages">REDIRECTING ERROR MESSAGES</A></H1>
+<P>By default, error messages are sent to STDERR.  Most HTTPD servers
+direct STDERR to the server's error log.  Some applications may wish
+to keep private error logs, distinct from the server's error log, or
+they may wish to direct error messages to STDOUT so that the browser
+will receive them.</P>
+<P>The <CODE>carpout()</CODE> function is provided for this purpose.  Since
+<CODE>carpout()</CODE> is not exported by default, you must import it explicitly by
+saying</P>
+<PRE>
+   use CGI::Carp qw(carpout);</PRE>
+<P>The <CODE>carpout()</CODE> function requires one argument, which should be a
+reference to an open filehandle for writing errors.  It should be
+called in a <CODE>BEGIN</CODE> block at the top of the CGI application so that
+compiler errors will be caught.  Example:</P>
+<PRE>
+   BEGIN {
+     use CGI::Carp qw(carpout);
+     open(LOG, &quot;&gt;&gt;/usr/local/cgi-logs/mycgi-log&quot;) or
+       die(&quot;Unable to open mycgi-log: $!\n&quot;);
+     carpout(LOG);
+   }</PRE>
+<P><CODE>carpout()</CODE> does not handle file locking on the log for you at this point.</P>
+<P>The real STDERR is not closed -- it is moved to CGI::Carp::SAVEERR.  Some
+servers, when dealing with CGI scripts, close their connection to the
+browser when the script closes STDOUT and STDERR.  CGI::Carp::SAVEERR is there to
+prevent this from happening prematurely.</P>
+<P>You can pass filehandles to <CODE>carpout()</CODE> in a variety of ways.  The ``correct''
+way according to Tom Christiansen is to pass a reference to a filehandle 
+GLOB:</P>
+<PRE>
+    carpout(\*LOG);</PRE>
+<P>This looks weird to mere mortals however, so the following syntaxes are
+accepted as well:</P>
+<PRE>
+    carpout(LOG);
+    carpout(main::LOG);
+    carpout(main'LOG);
+    carpout(\LOG);
+    carpout(\'main::LOG');</PRE>
+<PRE>
+    ... and so on</PRE>
+<P>FileHandle and other objects work as well.</P>
+<P>Use of <CODE>carpout()</CODE> is not great for performance, so it is recommended
+for debugging purposes or for moderate-use applications.  A future
+version of this module may delay redirecting STDERR until one of the
+CGI::Carp methods is called to prevent the performance hit.</P>
+<P>
+<HR>
+<H1><A NAME="making perl errors appear in the browser window">MAKING PERL ERRORS APPEAR IN THE BROWSER WINDOW</A></H1>
+<P>If you want to send fatal (die, confess) errors to the browser, ask to 
+import the special ``fatalsToBrowser'' subroutine:</P>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser);
+    die &quot;Bad error here&quot;;</PRE>
+<P>Fatal errors will now be echoed to the browser as well as to the log.  CGI::Carp
+arranges to send a minimal HTTP header to the browser so that even errors that
+occur in the early compile phase will be seen.
+Nonfatal errors will still be directed to the log file only (unless redirected
+with carpout).</P>
+<P>
+<H2><A NAME="changing the default message">Changing the default message</A></H2>
+<P>By default, the software error message is followed by a note to
+contact the Webmaster by e-mail with the time and date of the error.
+If this message is not to your liking, you can change it using the
+<CODE>set_message()</CODE> routine.  This is not imported by default; you should
+import it on the <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use()</CODE></A> line:</P>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser set_message);
+    set_message(&quot;It's not a bug, it's a feature!&quot;);</PRE>
+<P>You may also pass in a code reference in order to create a custom
+error message.  At run time, your code will be called with the text
+of the error message that caused the script to die.  Example:</P>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser set_message);
+    BEGIN {
+       sub handle_errors {
+          my $msg = shift;
+          print &quot;&lt;h1&gt;Oh gosh&lt;/h1&gt;&quot;;
+          print &quot;Got an error: $msg&quot;;
+      }
+      set_message(\&amp;handle_errors);
+    }</PRE>
+<P>In order to correctly intercept compile-time errors, you should call
+<CODE>set_message()</CODE> from within a BEGIN{} block.</P>
+<P>
+<HR>
+<H1><A NAME="making warnings appear as html comments">MAKING WARNINGS APPEAR AS HTML COMMENTS</A></H1>
+<P>It is now also possible to make non-fatal errors appear as HTML
+comments embedded in the output of your program.  To enable this
+feature, export the new ``warningsToBrowser'' subroutine.  Since sending
+warnings to the browser before the HTTP headers have been sent would
+cause an error, any warnings are stored in an internal buffer until
+you call the <CODE>warningsToBrowser()</CODE> subroutine with a true argument:</P>
+<PRE>
+    use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+    use CGI qw(:standard);
+    print header();
+    warningsToBrowser(1);</PRE>
+<P>You may also give a false argument to <CODE>warningsToBrowser()</CODE> to prevent
+warnings from being sent to the browser while you are printing some
+content where HTML comments are not allowed:</P>
+<PRE>
+    warningsToBrowser(0);    # disable warnings
+    print &quot;&lt;SCRIPT type=javascript&gt;&lt;!--\n&quot;;
+    print_some_javascript_code();
+    print &quot;//--&gt;&lt;/SCRIPT&gt;\n&quot;;
+    warningsToBrowser(1);    # re-enable warnings</PRE>
+<P>Note: In this respect <CODE>warningsToBrowser()</CODE> differs fundamentally from
+fatalsToBrowser(), which you should never call yourself!</P>
+<P>
+<HR>
+<H1><A NAME="change log">CHANGE LOG</A></H1>
+<P>1.05 <CODE>carpout()</CODE> added and minor corrections by Marc Hedlund
+     &lt;<A HREF="mailto:hedlund@best.com">hedlund@best.com</A>&gt; on 11/26/95.</P>
+<P>1.06 <CODE>fatalsToBrowser()</CODE> no longer aborts for fatal errors within
+     <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> statements.</P>
+<P>1.08 <CODE>set_message()</CODE> added and <CODE>carpout()</CODE> expanded to allow for FileHandle
+     objects.</P>
+<P>1.09 <CODE>set_message()</CODE> now allows users to pass a code REFERENCE for 
+     really custom error messages.  croak and carp are now
+     exported by default.  Thanks to Gunther Birznieks for the
+     patches.</P>
+<P>1.10 Patch from Chris Dean (<A HREF="mailto:ctdean@cogit.com">ctdean@cogit.com</A>) to allow 
+     module to run correctly under mod_perl.</P>
+<P>1.11 Changed order of &amp;gt; and &amp;lt; escapes.</P>
+<P>1.12 Changed <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> on line 217 to CORE::die to avoid <STRONG>-w</STRONG> warning.</P>
+<P>1.13 Added <CODE>cluck()</CODE> to make the module orthogonal with Carp.
+     More mod_perl related fixes.</P>
+<P>1.20 Patch from Ilmari Karonen (<A HREF="mailto:perl@itz.pp.sci.fi">perl@itz.pp.sci.fi</A>)  Added
+     warningsToBrowser().  Replaced &lt;CODE&gt; tags with &lt;PRE&gt; in
+     <CODE>fatalsToBrowser()</CODE> output.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>Address bug reports and comments to: <A HREF="mailto:lstein@cshl.org">lstein@cshl.org</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Carp, CGI::Base, CGI::BasePlus, CGI::Request, CGI::MiniSvr, CGI::Form,
+CGI::Response</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B<CGI::Carp> - CGI routines for writing to the HTTPD error log</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

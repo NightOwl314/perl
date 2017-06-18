@@ -1,0 +1,356 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPM::XML::PPMConfig - PPMConfig file format and XML parsing elements</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::PPMConfig - PPMConfig file format and XML parsing elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#major elements">MAJOR ELEMENTS</A></LI>
+	<UL>
+
+		<LI><A HREF="#ppmconfig">PPMCONFIG</A></LI>
+		<LI><A HREF="#package">PACKAGE</A></LI>
+	</UL>
+
+	<LI><A HREF="#minor elements">MINOR ELEMENTS</A></LI>
+	<UL>
+
+		<LI><A HREF="#ppmver">PPMVER</A></LI>
+		<LI><A HREF="#platform">PLATFORM</A></LI>
+		<LI><A HREF="#repository">REPOSITORY</A></LI>
+		<LI><A HREF="#options">OPTIONS</A></LI>
+		<LI><A HREF="#ppmprecious">PPMPRECIOUS</A></LI>
+		<LI><A HREF="#location">LOCATION</A></LI>
+		<LI><A HREF="#instdate">INSTDATE</A></LI>
+		<LI><A HREF="#instroot">INSTROOT</A></LI>
+		<LI><A HREF="#instpacklist">INSTPACKLIST</A></LI>
+		<LI><A HREF="#instppd">INSTPPD</A></LI>
+	</UL>
+
+	<LI><A HREF="#document type definition">DOCUMENT TYPE DEFINITION</A></LI>
+	<LI><A HREF="#sample ppmconfig file">SAMPLE PPMConfig FILE</A></LI>
+	<LI><A HREF="#known bugs/issues">KNOWN BUGS/ISSUES</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>PPM::XML::PPMConfig - PPMConfig file format and XML parsing elements</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use XML::Parser;
+ use PPM::XML::PPMConfig;</PRE>
+<PRE>
+ $p = new PPM::XML::Parser( Style =&gt; 'Objects', Pkg =&gt; 'PPM::XML::PPMConfig' );
+ ...</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides a set of classes for parsing PPM configuration files 
+using the <CODE>XML::Parser</CODE> module.  All of the elements unique to a PPM
+configuration file are derived from <CODE>PPM::XML::ValidatingElement</CODE>. 
+There are also several classes rebuilt here which are derived from 
+elements in <CODE>PPM::XML::PPD</CODE> as we can include a PPD file within our own 
+INSTPPD element.</P>
+<P>
+<HR>
+<H1><A NAME="major elements">MAJOR ELEMENTS</A></H1>
+<P>
+<H2><A NAME="ppmconfig">PPMCONFIG</A></H2>
+<P>Defines a PPM configuration file.  The root of a PPMConfig document is
+<STRONG>always</STRONG> a PPMCONFIG element.</P>
+<P>
+<H2><A NAME="package">PACKAGE</A></H2>
+<P>Child of PPMCONFIG, used to describe a Perl Package which has already been
+installed.  Multiple instances are valid.  The PACKAGE element allows for the
+following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_NAME">NAME</A></STRONG><BR>
+<DD>
+Name of the package as given in it's PPD
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="minor elements">MINOR ELEMENTS</A></H1>
+<P>
+<H2><A NAME="ppmver">PPMVER</A></H2>
+<P>Child of PPMCONFIG, used to state the version of PPM for which this
+configuration file is valid.  A single instance should be present.</P>
+<P>
+<H2><A NAME="platform">PLATFORM</A></H2>
+<P>Child of PPMCONFIG, used to specify the platform of the target machine.  A
+single instance should be present.  The PLATFORM element allows for the
+following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_OSVALUE">OSVALUE</A></STRONG><BR>
+<DD>
+Description of the local operating system as defined in the Config.pm file
+under 'osname'.
+<P></P>
+<DT><STRONG><A NAME="item_OSVERSION">OSVERSION</A></STRONG><BR>
+<DD>
+Version of the local operating system.
+<P></P>
+<DT><STRONG><A NAME="item_CPU">CPU</A></STRONG><BR>
+<DD>
+Description of the CPU in the local system.  The following list of possible
+values was taken from the OSD Specification:
+<PRE>
+ x86 mips alpha ppc sparc 680x0</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LANGUAGE">LANGUAGE</A></STRONG><BR>
+<DD>
+Description of the language used on the local system as specified by the
+language codes in ISO 639.
+<P></P></DL>
+<P>
+<H2><A NAME="repository">REPOSITORY</A></H2>
+<P>Child of PPMCONFIG, used to specify a repository where Perl Packages can be
+found.  Multiple instances are valid.  The REPOSITORY element allows for the
+following attributes:</P>
+<DL>
+<DT><STRONG>NAME</STRONG><BR>
+<DD>
+Name by which the repository will be known (e.g.  ``ActiveState'').
+<P></P>
+<DT><STRONG><A NAME="item_LOCATION">LOCATION</A></STRONG><BR>
+<DD>
+An URL or directory where the repository can be found.
+<P></P>
+<DT><STRONG><A NAME="item_USERNAME">USERNAME</A></STRONG><BR>
+<DD>
+Optional username for a repository requiring authenticated connection.
+<P></P>
+<DT><STRONG><A NAME="item_PASSWORD">PASSWORD</A></STRONG><BR>
+<DD>
+Optional password for a repository requiring authenticated connection.
+<P></P>
+<DT><STRONG><A NAME="item_SUMMARYFILE">SUMMARYFILE</A></STRONG><BR>
+<DD>
+Optional package summary filename.
+<P>If this file exists on the repository, its contents can be retrieved
+using PPM::RepositorySummary().  The contents are not strictly enforced
+by PPM.pm, however ppm expects this to be a file with the following
+format (for display with the 'summary' command):</P>
+<P>Agent [2.91]:   supplies agentspace methods for perl5.
+Apache-OutputChain [0.06]:      chain stacked Perl handlers
+[etc.]</P>
+<P></P></DL>
+<P>
+<H2><A NAME="options">OPTIONS</A></H2>
+<P>Child of PPMCONFIG, used to specify the current configuration options for PPM.
+A single instance should be present.  The OPTIONS element allows for the
+following attributes:</P>
+<DL>
+<DT><STRONG><A NAME="item_IGNORECASE">IGNORECASE</A></STRONG><BR>
+<DD>
+Sets case-sensitive searching.  Can be either '1' or '0'.
+<P></P>
+<DT><STRONG><A NAME="item_CLEAN">CLEAN</A></STRONG><BR>
+<DD>
+Sets removal of temporarily files.  Can be either '1' or '0'.
+<P></P>
+<DT><STRONG><A NAME="item_CONFIRM">CONFIRM</A></STRONG><BR>
+<DD>
+Sets confirmation of all installs/removals/upgrades.  Can be either '1' or
+'0'.
+<P></P>
+<DT><STRONG><A NAME="item_BUILDDIR">BUILDDIR</A></STRONG><BR>
+<DD>
+Directory in which packages will be unpacked before their installation.
+<P></P>
+<DT><STRONG><A NAME="item_ROOT">ROOT</A></STRONG><BR>
+<DD>
+Directory under which packages should be installed on the local system.
+<P></P>
+<DT><STRONG><A NAME="item_TRACE">TRACE</A></STRONG><BR>
+<DD>
+Level of tracing (0 is no tracing, 4 is max tracing).
+<P></P>
+<DT><STRONG><A NAME="item_TRACEFILE">TRACEFILE</A></STRONG><BR>
+<DD>
+File to which trace information will be written.
+<P></P>
+<DT><STRONG><A NAME="item_VERBOSE">VERBOSE</A></STRONG><BR>
+<DD>
+Controls whether query and search results are verbose (1 == verbose, 0 == no).
+<P></P></DL>
+<P>
+<H2><A NAME="ppmprecious">PPMPRECIOUS</A></H2>
+<P>Child of PPMCONFIG, used to specify the modules which PPM itself is dependant
+upon.  A single instance should be present.</P>
+<P>
+<H2><A NAME="location">LOCATION</A></H2>
+<P>Child of PACKAGE, used to specify locations at which to search for updated
+versions of the PPD file for this package.  Its value can be either a
+directory or an Internet address.  A single instance should be present.</P>
+<P>
+<H2><A NAME="instdate">INSTDATE</A></H2>
+<P>Child of PACKAGE, used to specify the date on which the Perl Package was
+installed.  A single instance should be present.</P>
+<P>
+<H2><A NAME="instroot">INSTROOT</A></H2>
+<P>Child of PACKAGE, used to specify the root directory that the Perl Package was
+installed into.  A single instance should be present.</P>
+<P>
+<H2><A NAME="instpacklist">INSTPACKLIST</A></H2>
+<P>Child of PACKAGE, used to specify a reference to the packlist for this Perl
+Package; a file containing a list of all of the files which were installed.  A
+single instance should be present.</P>
+<P>
+<H2><A NAME="instppd">INSTPPD</A></H2>
+<P>Child of PACKAGE, used to hold a copy of the PPD from which Perl Packages
+were installed.  Multiple instances are valid.</P>
+<P>
+<HR>
+<H1><A NAME="document type definition">DOCUMENT TYPE DEFINITION</A></H1>
+<P>The DTD for PPMConfig documents is available from the ActiveState website and
+the latest version can be found at:
+    <A HREF="http://www.ActiveState.com/PPM/DTD/ppmconfig.dtd">http://www.ActiveState.com/PPM/DTD/ppmconfig.dtd</A></P>
+<P>This revision of the <CODE>PPM::XML::PPMConfig</CODE> module implements the following DTD:</P>
+<PRE>
+ &lt;!ELEMENT PPMCONFIG (PPMVER | PLATFORM | REPOSITORY | OPTIONS |
+                      PPMPRECIOUS | PACKAGE)*&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PPMVER   (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PLATFORM  EMPTY&gt;
+ &lt;!ATTLIST PLATFORM  OSVALUE     CDATA   #REQUIRED
+                     OSVERSION   CDATA   #REQUIRED
+                     CPU         CDATA   #REQUIRED
+                     LANGUAGE    CDATA   #IMPLIED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT REPOSITORY    EMPTY&gt;
+ &lt;!ATTLIST REPOSITORY    NAME     CDATA  #REQUIRED
+                         LOCATION CDATA  #REQUIRED
+                         USERNAME CDATA  #IMPLIED
+                         PASSWORD CDATA  #IMPLIED
+                         SUMMARYFILE CDATA #IMPLIED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT OPTIONS   EMPTY&gt;
+ &lt;!ATTLIST OPTIONS   IGNORECASE      CDATA   #REQUIRED
+                     CLEAN           CDATA   #REQUIRED
+                     CONFIRM         CDATA   #REQUIRED
+                     FORCEINSTALL    CDATA   #REQUIRED
+                     ROOT            CDATA   #REQUIRED
+                     BUILDDIR        CDATA   #REQUIRED
+                     MORE            CDATA   #REQUIRED
+                     DOWNLOADSTATUS  CDATA   #IMPLIED
+                     TRACE           CDATA   #IMPLIED
+                     TRACEFILE       CDATA   #IMPLIED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PPMPRECIOUS (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT PACKAGE   (LOCATION | INSTDATE | INSTROOT | INSTPACKLIST |
+                      INSTPPD)*&gt;
+ &lt;!ATTLIST PACKAGE   NAME    CDATA   #REQUIRED&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT LOCATION  (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT INSTDATE  (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT INSTROOT  (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT INSTPACKLIST (#PCDATA)&gt;</PRE>
+<PRE>
+ &lt;!ELEMENT INSTPPD   (#PCDATA)&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="sample ppmconfig file">SAMPLE PPMConfig FILE</A></H1>
+<P>The following is a sample PPMConfig file.  Note that this may <STRONG>not</STRONG> be a
+current description of this module and is for sample purposes only.</P>
+<PRE>
+ &lt;PPMCONFIG&gt;
+     &lt;PPMVER&gt;1,0,0,0&lt;/PPMVER&gt;
+     &lt;PLATFORM CPU=&quot;x86&quot; OSVALUE=&quot;MSWin32&quot; OSVERSION=&quot;4,0,0,0&quot; /&gt;
+     &lt;OPTIONS BUILDDIR=&quot;/tmp&quot; CLEAN=&quot;1&quot; CONFIRM=&quot;1&quot; FORCEINSTALL=&quot;1&quot;
+              IGNORECASE=&quot;0&quot; MORE=&quot;0&quot; ROOT=&quot;/usr/local&quot; TRACE=&quot;0&quot; TRACEFILE=&quot;&quot; DOWNLOADSTATUS=&quot;16384&quot; /&gt;
+     &lt;REPOSITORY LOCATION=&quot;<A HREF="http://www.ActiveState.com/packages&quot">http://www.ActiveState.com/packages&quot</A>;
+                 NAME=&quot;ActiveState Package Repository&quot; SUMMARYFILE=&quot;package.lst&quot; /&gt;
+     &lt;PPMPRECIOUS&gt;PPM;libnet;Archive-Tar;Compress-Zlib;libwww-perl&lt;/PPMPRECIOUS&gt;
+     &lt;PACKAGE NAME=&quot;AtExit&quot;&gt;
+         &lt;LOCATION&gt;g:/packages&lt;/LOCATION&gt;
+         &lt;INSTPACKLIST&gt;c:/perllib/lib/site/MSWin32-x86/auto/AtExit/.packlist&lt;/INSTPACKLIST&gt;
+         &lt;INSTROOT&gt;c:/perllib&lt;/INSTROOT&gt;
+         &lt;INSTDATE&gt;Sun Mar  8 02:56:31 1998&lt;/INSTDATE&gt;
+         &lt;INSTPPD&gt;
+             &lt;SOFTPKG NAME=&quot;AtExit&quot; VERSION=&quot;1,02,0,0&quot;&gt;
+                 &lt;TITLE&gt;AtExit&lt;/TITLE&gt;
+                 &lt;ABSTRACT&gt;Register a subroutine to be invoked at program -exit time.&lt;/ABSTRACT&gt;
+                 &lt;AUTHOR&gt;Brad Appleton (Brad_Appleton-GBDA001@email.mot.com)&lt;/AUTHOR&gt;
+                 &lt;IMPLEMENTATION&gt;
+                     &lt;CODEBASE HREF=&quot;x86/AtExit.tar.gz&quot; /&gt;
+                 &lt;/IMPLEMENTATION&gt;
+             &lt;/SOFTPKG&gt;
+         &lt;/INSTPPD&gt;
+     &lt;/PACKAGE&gt;
+ &lt;/PPMCONFIG&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="known bugs/issues">KNOWN BUGS/ISSUES</A></H1>
+<P>Elements which are required to be empty (e.g. REPOSITORY) are not enforced as
+such.</P>
+<P>Notations above about elements for which ``only one instance'' or ``multiple
+instances'' are valid are not enforced; this primarily a guideline for
+generating your own PPD files.</P>
+<P>Currently, this module creates new classes within it's own namespace for all of
+the PPD elements which can be contained within the INSTPPD element.  A suitable
+method for importing the entire PPM::XML::PPD:: namespace should be found 
+in order to make this cleaner.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Graham TerMarsch &lt;<A HREF="mailto:grahamt@ActiveState.com">grahamt@ActiveState.com</A>&gt;</P>
+<P>Murray Nesbitt &lt;<A HREF="mailto:murrayn@ActiveState.com">murrayn@ActiveState.com</A>&gt;</P>
+<P>Dick Hardt &lt;<A HREF="mailto:dick_hardt@ActiveState.com">dick_hardt@ActiveState.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>v0.1 - Initial release</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../../site/lib/PPM/XML/ValidatingElement.html">the PPM::XML::ValidatingElement manpage</A>,
+<A HREF="../../../../site/lib/XML/Parser.html">the XML::Parser manpage</A>,
+<A HREF="../../../../site/lib/PPM/XML/PPD.html">the PPM::XML::PPD manpage</A>
+.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;PPM::XML::PPMConfig - PPMConfig file format and XML parsing elements</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

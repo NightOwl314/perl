@@ -1,0 +1,890 @@
+<HTML>
+<HEAD>
+<TITLE>perlvms - VMS-specific documentation for Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlvms - VMS-specific documentation for Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#installation">Installation</A></LI>
+	<LI><A HREF="#organization of perl images">Organization of Perl Images</A></LI>
+	<UL>
+
+		<LI><A HREF="#core images">Core Images</A></LI>
+		<LI><A HREF="#perl extensions">Perl Extensions</A></LI>
+		<LI><A HREF="#installing static extensions">Installing static extensions</A></LI>
+		<LI><A HREF="#installing dynamic extensions">Installing dynamic extensions</A></LI>
+	</UL>
+
+	<LI><A HREF="#file specifications">File specifications</A></LI>
+	<UL>
+
+		<LI><A HREF="#syntax">Syntax</A></LI>
+		<LI><A HREF="#wildcard expansion">Wildcard expansion</A></LI>
+		<LI><A HREF="#pipes">Pipes</A></LI>
+	</UL>
+
+	<LI><A HREF="#perl5lib and perllib">PERL5LIB and PERLLIB</A></LI>
+	<LI><A HREF="#command line">Command line</A></LI>
+	<UL>
+
+		<LI><A HREF="#i/o redirection and backgrounding">I/O redirection and backgrounding</A></LI>
+		<LI><A HREF="#command line switches">Command line switches</A></LI>
+	</UL>
+
+	<LI><A HREF="#perl functions">Perl functions</A></LI>
+	<LI><A HREF="#perl variables">Perl variables</A></LI>
+	<LI><A HREF="#standard modules with vmsspecific differences">Standard modules with VMS-specific differences</A></LI>
+	<UL>
+
+		<LI><A HREF="#sdbm_file">SDBM_File</A></LI>
+	</UL>
+
+	<LI><A HREF="#revision date">Revision date</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlvms - VMS-specific documentation for Perl</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Gathered below are notes describing details of Perl 5's 
+behavior on VMS.  They are a supplement to the regular Perl 5 
+documentation, so we have focussed on the ways in which Perl 
+5 functions differently under VMS than it does under Unix, 
+and on the interactions between Perl and the rest of the 
+operating system.  We haven't tried to duplicate complete 
+descriptions of Perl features from the main Perl 
+documentation, which can be found in the <EM>[.pod]</EM> 
+subdirectory of the Perl distribution.</P>
+<P>We hope these notes will save you from confusion and lost 
+sleep when writing Perl scripts on VMS.  If you find we've 
+missed something you think should appear here, please don't 
+hesitate to drop a line to <A HREF="mailto:vmsperl@newman.upenn.edu.">vmsperl@newman.upenn.edu.</A></P>
+<P>
+<HR>
+<H1><A NAME="installation">Installation</A></H1>
+<P>Directions for building and installing Perl 5 can be found in 
+the file <EM>README.vms</EM> in the main source directory of the 
+Perl distribution..</P>
+<P>
+<HR>
+<H1><A NAME="organization of perl images">Organization of Perl Images</A></H1>
+<P>
+<H2><A NAME="core images">Core Images</A></H2>
+<P>During the installation process, three Perl images are produced.
+<EM>Miniperl.Exe</EM> is an executable image which contains all of
+the basic functionality of Perl, but cannot take advantage of
+Perl extensions.  It is used to generate several files needed
+to build the complete Perl and various extensions.  Once you've
+finished installing Perl, you can delete this image.</P>
+<P>Most of the complete Perl resides in the shareable image
+<EM>PerlShr.Exe</EM>, which provides a core to which the Perl executable
+image and all Perl extensions are linked.  You should place this
+image in <EM>Sys$Share</EM>, or define the logical name <EM>PerlShr</EM> to
+translate to the full file specification of this image.  It should
+be world readable.  (Remember that if a user has execute only access
+to <EM>PerlShr</EM>, VMS will treat it as if it were a privileged shareable
+image, and will therefore require all downstream shareable images to be
+INSTALLed, etc.)</P>
+<P>Finally, <EM>Perl.Exe</EM> is an executable image containing the main
+entry point for Perl, as well as some initialization code.  It
+should be placed in a public directory, and made world executable.
+In order to run Perl with command line arguments, you should
+define a foreign command to invoke this image.</P>
+<P>
+<H2><A NAME="perl extensions">Perl Extensions</A></H2>
+<P>Perl extensions are packages which provide both XS and Perl code
+to add new functionality to perl.  (XS is a meta-language which
+simplifies writing C code which interacts with Perl, see
+<A HREF="../../lib/Pod/perlxs.html">the perlxs manpage</A> for more details.)  The Perl code for an
+extension is treated like any other library module - it's
+made available in your script through the appropriate
+<A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> statement, and usually defines a Perl
+package containing the extension.</P>
+<P>The portion of the extension provided by the XS code may be
+connected to the rest of Perl in either of two ways.  In the
+<STRONG>static</STRONG> configuration, the object code for the extension is
+linked directly into <EM>PerlShr.Exe</EM>, and is initialized whenever
+Perl is invoked.  In the <STRONG>dynamic</STRONG> configuration, the extension's
+machine code is placed into a separate shareable image, which is
+mapped by Perl's DynaLoader when the extension is <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>d or
+<A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>d in your script.  This allows you to maintain the
+extension as a separate entity, at the cost of keeping track of the
+additional shareable image.  Most extensions can be set up as either
+static or dynamic.</P>
+<P>The source code for an extension usually resides in its own
+directory.  At least three files are generally provided:
+<EM>Extshortname</EM><EM>.xs</EM> (where <EM>Extshortname</EM> is the portion of
+the extension's name following the last <CODE>::</CODE>), containing
+the XS code, <EM>Extshortname</EM><EM>.pm</EM>, the Perl library module
+for the extension, and <EM>Makefile.PL</EM>, a Perl script which uses
+the <CODE>MakeMaker</CODE> library modules supplied with Perl to generate
+a <EM>Descrip.MMS</EM> file for the extension.</P>
+<P>
+<H2><A NAME="installing static extensions">Installing static extensions</A></H2>
+<P>Since static extensions are incorporated directly into
+<EM>PerlShr.Exe</EM>, you'll have to rebuild Perl to incorporate a
+new extension.  You should edit the main <EM>Descrip.MMS</EM> or <EM>Makefile</EM>
+you use to build Perl, adding the extension's name to the <CODE>ext</CODE>
+macro, and the extension's object file to the <CODE>extobj</CODE> macro.
+You'll also need to build the extension's object file, either
+by adding dependencies to the main <EM>Descrip.MMS</EM>, or using a
+separate <EM>Descrip.MMS</EM> for the extension.  Then, rebuild
+<EM>PerlShr.Exe</EM> to incorporate the new code.</P>
+<P>Finally, you'll need to copy the extension's Perl library
+module to the <EM>[.</EM><EM>Extname</EM><EM>]</EM> subdirectory under one
+of the directories in <A HREF="../../lib/Pod/perlvar.html#item_%40INC"><CODE>@INC</CODE></A>, where <EM>Extname</EM> is the name
+of the extension, with all <CODE>::</CODE> replaced by <CODE>.</CODE> (e.g.
+the library module for extension Foo::Bar would be copied
+to a <EM>[.Foo.Bar]</EM> subdirectory).</P>
+<P>
+<H2><A NAME="installing dynamic extensions">Installing dynamic extensions</A></H2>
+<P>In general, the distributed kit for a Perl extension includes
+a file named Makefile.PL, which is a Perl program which is used
+to create a <EM>Descrip.MMS</EM> file which can be used to build and
+install the files required by the extension.  The kit should be
+unpacked into a directory tree <STRONG>not</STRONG> under the main Perl source
+directory, and the procedure for building the extension is simply</P>
+<PRE>
+    $ perl Makefile.PL  ! Create Descrip.MMS
+    $ mmk               ! Build necessary files
+    $ mmk test          ! Run test code, if supplied
+    $ mmk install       ! Install into public Perl tree</PRE>
+<P><EM>N.B.</EM> The procedure by which extensions are built and
+tested creates several levels (at least 4) under the
+directory in which the extension's source files live.
+For this reason, you shouldn't nest the source directory
+too deeply in your directory structure, lest you exceed RMS'
+maximum of 8 levels of subdirectory in a filespec.  (You
+can use rooted logical names to get another 8 levels of
+nesting, if you can't place the files near the top of
+the physical directory structure.)</P>
+<P>VMS support for this process in the current release of Perl
+is sufficient to handle most extensions.  However, it does
+not yet recognize extra libraries required to build shareable
+images which are part of an extension, so these must be added
+to the linker options file for the extension by hand.  For
+instance, if the <EM>PGPLOT</EM> extension to Perl requires the
+<EM>PGPLOTSHR.EXE</EM> shareable image in order to properly link
+the Perl extension, then the line <CODE>PGPLOTSHR/Share</CODE> must
+be added to the linker options file <EM>PGPLOT.Opt</EM> produced
+during the build process for the Perl extension.</P>
+<P>By default, the shareable image for an extension is placed
+<EM>[.lib.site_perl.auto</EM><EM>Arch</EM>.<EM>Extname</EM><EM>]</EM> directory of the
+installed Perl directory tree (where <EM>Arch</EM> is <EM>VMS_VAX</EM> or
+<EM>VMS_AXP</EM>, and <EM>Extname</EM> is the name of the extension, with
+each <CODE>::</CODE> translated to <CODE>.</CODE>).  (See the MakeMaker documentation
+for more details on installation options for extensions.)
+However, it can be manually placed in any of several locations:
+   - the <EM>[.Lib.Auto.</EM><EM>Arch</EM><EM>$PVers</EM><EM>Extname</EM><EM>]</EM> subdirectory
+     of one of the directories in <A HREF="../../lib/Pod/perlvar.html#item_%40INC"><CODE>@INC</CODE></A> (where <EM>PVers</EM>
+     is the version of Perl you're using, as supplied in <A HREF="../../lib/Pod/perlvar.html#item_%24%5D"><CODE>$]</CODE></A>,
+     with '.' converted to '_'), or
+   - one of the directories in <A HREF="../../lib/Pod/perlvar.html#item_%40INC"><CODE>@INC</CODE></A>, or
+   - a directory which the extensions Perl library module
+     passes to the DynaLoader when asking it to map
+     the shareable image, or
+   - <EM>Sys$Share</EM> or <EM>Sys$Library</EM>.
+If the shareable image isn't in any of these places, you'll need
+to define a logical name <EM>Extshortname</EM>, where <EM>Extshortname</EM>
+is the portion of the extension's name after the last <CODE>::</CODE>, which
+translates to the full file specification of the shareable image.</P>
+<P>
+<HR>
+<H1><A NAME="file specifications">File specifications</A></H1>
+<P>
+<H2><A NAME="syntax">Syntax</A></H2>
+<P>We have tried to make Perl aware of both VMS-style and Unix-
+style file specifications wherever possible.  You may use 
+either style, or both, on the command line and in scripts, 
+but you may not combine the two styles within a single file 
+specification.  VMS Perl interprets Unix pathnames in much
+the same way as the CRTL (<EM>e.g.</EM> the first component of
+an absolute path is read as the device name for the
+VMS file specification).  There are a set of functions
+provided in the <CODE>VMS::Filespec</CODE> package for explicit
+interconversion between VMS and Unix syntax; its
+documentation provides more details.</P>
+<P>Filenames are, of course, still case-insensitive.  For
+consistency, most Perl routines return  filespecs using
+lower case letters only, regardless of the case used in
+the arguments passed to them.  (This is true  only when
+running under VMS; Perl respects the case-sensitivity
+of OSs like Unix.)</P>
+<P>We've tried to minimize the dependence of Perl library 
+modules on Unix syntax, but you may find that some of these, 
+as well as some scripts written for Unix systems, will 
+require that you use Unix syntax, since they will assume that 
+'/' is the directory separator, <EM>etc.</EM>  If you find instances 
+of this in the Perl distribution itself, please let us know, 
+so we can try to work around them.</P>
+<P>
+<H2><A NAME="wildcard expansion">Wildcard expansion</A></H2>
+<P>File specifications containing wildcards are allowed both on 
+the command line and within Perl globs (e.g. &lt;C&lt;*.c&gt;&gt;).  If
+the wildcard filespec uses VMS syntax, the resultant 
+filespecs will follow VMS syntax; if a Unix-style filespec is 
+passed in, Unix-style filespecs will be returned.</P>
+<P>In both cases, VMS wildcard expansion is performed. (csh-style
+wildcard expansion is available if you use <CODE>File::Glob::glob</CODE>.)
+If the wildcard filespec contains a device or directory 
+specification, then the resultant filespecs will also contain 
+a device and directory; otherwise, device and directory 
+information are removed.  VMS-style resultant filespecs will 
+contain a full device and directory, while Unix-style 
+resultant filespecs will contain only as much of a directory 
+path as was present in the input filespec.  For example, if 
+your default directory is Perl_Root:[000000], the expansion 
+of <CODE>[.t]*.*</CODE> will yield filespecs  like 
+``perl_root:[t]base.dir'', while the expansion of <CODE>t/*/*</CODE> will 
+yield filespecs like ``t/base.dir''.  (This is done to match 
+the behavior of glob expansion performed by Unix shells.)</P>
+<P>Similarly, the resultant filespec will contain the file version
+only if one was present in the input filespec.</P>
+<P>
+<H2><A NAME="pipes">Pipes</A></H2>
+<P>Input and output pipes to Perl filehandles are supported; the 
+``file name'' is passed to lib$spawn() for asynchronous 
+execution.  You should be careful to close any pipes you have 
+opened in a Perl script, lest you leave any ``orphaned'' 
+subprocesses around when Perl exits.</P>
+<P>You may also use backticks to invoke a DCL subprocess, whose 
+output is used as the return value of the expression.  The 
+string between the backticks is handled as if it were the
+argument to the <A HREF="#item_system"><CODE>system</CODE></A> operator (see below).  In this case,
+Perl will wait for the subprocess to complete before continuing.</P>
+<P>
+<HR>
+<H1><A NAME="perl5lib and perllib">PERL5LIB and PERLLIB</A></H1>
+<P>The PERL5LIB and PERLLIB logical names work as documented in <A HREF="../../lib/Pod/perl.html">the perl manpage</A>,
+except that the element separator is '|' instead of ':'.  The
+directory specifications may use either VMS or Unix syntax.</P>
+<P>
+<HR>
+<H1><A NAME="command line">Command line</A></H1>
+<P>
+<H2><A NAME="i/o redirection and backgrounding">I/O redirection and backgrounding</A></H2>
+<P>Perl for VMS supports redirection of input and output on the 
+command line, using a subset of Bourne shell syntax:</P>
+<PRE>
+    &lt;F&lt;file&gt; reads stdin from F&lt;file&gt;,
+    &gt;F&lt;file&gt; writes stdout to F&lt;file&gt;,
+    &gt;&gt;F&lt;file&gt; appends stdout to F&lt;file&gt;,
+    2&gt;F&lt;file&gt; writes stderr to F&lt;file&gt;, and
+    2&gt;&gt;F&lt;file&gt; appends stderr to F&lt;file&gt;.</PRE>
+<P>In addition, output may be piped to a subprocess, using the  
+character '|'.  Anything after this character on the command 
+line is passed to a subprocess for execution; the subprocess 
+takes the output of Perl as its input.</P>
+<P>Finally, if the command line ends with '&amp;', the entire 
+command is run in the background as an asynchronous 
+subprocess.</P>
+<P>
+<H2><A NAME="command line switches">Command line switches</A></H2>
+<P>The following command line switches behave differently under
+VMS than described in <A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A>.  Note also that in order
+to pass uppercase switches to Perl, you need to enclose
+them in double-quotes on the command line, since the CRTL
+downcases all unquoted strings.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Di">-i</A></STRONG><BR>
+<DD>
+If the <A HREF="#item_%2Di"><CODE>-i</CODE></A> switch is present but no extension for a backup
+copy is given, then inplace editing creates a new version of
+a file; the existing copy is not deleted.  (Note that if
+an extension is given, an existing file is renamed to the backup
+file, as is the case under other operating systems, so it does
+not remain as a previous version under the original filename.)
+<P></P>
+<DT><STRONG><A NAME="item_%2DS">-S</A></STRONG><BR>
+<DD>
+If the <A HREF="#item_%2DS"><CODE>-S</CODE></A> switch is present <EM>and</EM> the script name does
+not contain a directory, then Perl translates the logical
+name DCL$PATH as a searchlist, using each translation as
+a directory in which to look for the script.  In addition,
+if no file type is specified, Perl looks in each directory
+for a file matching the name specified, with a blank type,
+a type of <EM>.pl</EM>, and a type of <EM>.com</EM>, in that order.
+<P></P>
+<DT><STRONG><A NAME="item_%2Du">-u</A></STRONG><BR>
+<DD>
+The <A HREF="#item_%2Du"><CODE>-u</CODE></A> switch causes the VMS debugger to be invoked
+after the Perl program is compiled, but before it has
+run.  It does not create a core dump file.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="perl functions">Perl functions</A></H1>
+<P>As of the time this document was last revised, the following 
+Perl functions were implemented in the VMS port of Perl 
+(functions marked with * are discussed in more detail below):</P>
+<PRE>
+    file tests*, abs, alarm, atan, backticks*, binmode*, bless,
+    caller, chdir, chmod, chown, chomp, chop, chr,
+    close, closedir, cos, crypt*, defined, delete,
+    die, do, dump*, each, endpwent, eof, eval, exec*,
+    exists, exit, exp, fileno, fork*, getc, getlogin,
+    getpwent*, getpwnam*, getpwuid*, glob, gmtime*, goto,
+    grep, hex, import, index, int, join, keys, kill*,
+    last, lc, lcfirst, length, local, localtime, log, m//,
+    map, mkdir, my, next, no, oct, open, opendir, ord, pack,
+    pipe, pop, pos, print, printf, push, q//, qq//, qw//,
+    qx//*, quotemeta, rand, read, readdir, redo, ref, rename,
+    require, reset, return, reverse, rewinddir, rindex,
+    rmdir, s///, scalar, seek, seekdir, select(internal),
+    select (system call)*, setpwent, shift, sin, sleep,
+    sort, splice, split, sprintf, sqrt, srand, stat,
+    study, substr, sysread, system*, syswrite, tell,
+    telldir, tie, time, times*, tr///, uc, ucfirst, umask,
+    undef, unlink*, unpack, untie, unshift, use, utime*,
+    values, vec, wait, waitpid*, wantarray, warn, write, y///</PRE>
+<P>The following functions were not implemented in the VMS port, 
+and calling them produces a fatal error (usually) or 
+undefined behavior (rarely, we hope):</P>
+<PRE>
+    chroot, dbmclose, dbmopen, fcntl, flock,
+    getpgrp, getppid, getpriority, getgrent, getgrgid,
+    getgrnam, setgrent, endgrent, ioctl, link, lstat,
+    msgctl, msgget, msgsend, msgrcv, readlink, semctl,
+    semget, semop, setpgrp, setpriority, shmctl, shmget,
+    shmread, shmwrite, socketpair, symlink, syscall</PRE>
+<P>The following functions are available on Perls compiled with Dec C 5.2 or
+greater and running VMS 7.0 or greater</P>
+<PRE>
+    truncate</PRE>
+<P>The following functions may or may not be implemented, 
+depending on what type of socket support you've built into 
+your copy of Perl:</P>
+<PRE>
+    accept, bind, connect, getpeername,
+    gethostbyname, getnetbyname, getprotobyname,
+    getservbyname, gethostbyaddr, getnetbyaddr,
+    getprotobynumber, getservbyport, gethostent,
+    getnetent, getprotoent, getservent, sethostent,
+    setnetent, setprotoent, setservent, endhostent,
+    endnetent, endprotoent, endservent, getsockname,
+    getsockopt, listen, recv, select(system call)*,
+    send, setsockopt, shutdown, socket</PRE>
+<DL>
+<DT><STRONG><A NAME="item_File_tests">File tests</A></STRONG><BR>
+<DD>
+The tests <CODE>-b</CODE>, <CODE>-B</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dc"><CODE>-c</CODE></A>, <A HREF="../../lib/Pod/perlrun.html#item_%2DC"><CODE>-C</CODE></A>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dd"><CODE>-d</CODE></A>, <CODE>-e</CODE>, <CODE>-f</CODE>,
+<CODE>-o</CODE>, <CODE>-M</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Ds"><CODE>-s</CODE></A>, <A HREF="#item_%2DS"><CODE>-S</CODE></A>, <CODE>-t</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2DT"><CODE>-T</CODE></A>, and <CODE>-z</CODE> work as
+advertised.  The return values for <CODE>-r</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A>, and <CODE>-x</CODE>
+tell you whether you can actually access the file; this may
+not reflect the UIC-based file protections.  Since real and
+effective UIC don't differ under VMS, <CODE>-O</CODE>, <CODE>-R</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2DW"><CODE>-W</CODE></A>,
+and <A HREF="../../lib/Pod/perlrun.html#item_%2DX"><CODE>-X</CODE></A> are equivalent to <CODE>-o</CODE>, <CODE>-r</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A>, and <CODE>-x</CODE>.
+Similarly, several other tests, including <CODE>-A</CODE>, <CODE>-g</CODE>, <CODE>-k</CODE>,
+<CODE>-l</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dp"><CODE>-p</CODE></A>, and <A HREF="#item_%2Du"><CODE>-u</CODE></A>, aren't particularly meaningful under
+VMS, and the values returned by these tests reflect whatever
+your CRTL <A HREF="#item_stat"><CODE>stat()</CODE></A> routine does to the equivalent bits in the
+st_mode field.  Finally, <A HREF="../../lib/Pod/perlrun.html#item_%2Dd"><CODE>-d</CODE></A> returns true if passed a device
+specification without an explicit directory (e.g. <CODE>DUA1:</CODE>), as
+well as if passed a directory.
+<P>Note: Some sites have reported problems when using the file-access
+tests (<CODE>-r</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A>, and <CODE>-x</CODE>) on files accessed via DEC's DFS.
+Specifically, since DFS does not currently provide access to the
+extended file header of files on remote volumes, attempts to
+examine the ACL fail, and the file tests will return false,
+with <A HREF="#item_%24%21"><CODE>$!</CODE></A> indicating that the file does not exist.  You can
+use <A HREF="#item_stat"><CODE>stat</CODE></A> on these files, since that checks UIC-based protection
+only, and then manually check the appropriate bits, as defined by
+your C compiler's <EM>stat.h</EM>, in the mode value it returns, if you
+need an approximation of the file's protections.</P>
+<P></P>
+<DT><STRONG><A NAME="item_backticks">backticks</A></STRONG><BR>
+<DD>
+Backticks create a subprocess, and pass the enclosed string
+to it for execution as a DCL command.  Since the subprocess is
+created directly via <CODE>lib$spawn()</CODE>, any valid DCL command string
+may be specified.
+<P></P>
+<DT><STRONG><A NAME="item_binmode">binmode FILEHANDLE</A></STRONG><BR>
+<DD>
+The <A HREF="#item_binmode"><CODE>binmode</CODE></A> operator will attempt to insure that no translation
+of carriage control occurs on input from or output to this filehandle.
+Since this involves reopening the file and then restoring its
+file position indicator, if this function returns FALSE, the
+underlying filehandle may no longer point to an open file, or may
+point to a different position in the file than before <A HREF="#item_binmode"><CODE>binmode</CODE></A>
+was called.
+<P>Note that <A HREF="#item_binmode"><CODE>binmode</CODE></A> is generally not necessary when using normal
+filehandles; it is provided so that you can control I/O to existing
+record-structured files when necessary.  You can also use the
+<CODE>vmsfopen</CODE> function in the VMS::Stdio extension to gain finer
+control of I/O to files and devices with different record structures.</P>
+<P></P>
+<DT><STRONG><A NAME="item_crypt">crypt PLAINTEXT, USER</A></STRONG><BR>
+<DD>
+The <A HREF="#item_crypt"><CODE>crypt</CODE></A> operator uses the <CODE>sys$hash_password</CODE> system
+service to generate the hashed representation of PLAINTEXT.
+If USER is a valid username, the algorithm and salt values
+are taken from that user's UAF record.  If it is not, then
+the preferred algorithm and a salt of 0 are used.  The
+quadword encrypted value is returned as an 8-character string.
+<P>The value returned by <A HREF="#item_crypt"><CODE>crypt</CODE></A> may be compared against
+the encrypted password from the UAF returned by the <CODE>getpw*</CODE>
+functions, in order to authenticate users.  If you're
+going to do this, remember that the encrypted password in
+the UAF was generated using uppercase username and
+password strings; you'll have to upcase the arguments to
+<A HREF="#item_crypt"><CODE>crypt</CODE></A> to insure that you'll get the proper value:</P>
+<PRE>
+  sub validate_passwd {
+    my($user,$passwd) = @_;
+    my($pwdhash);
+    if ( !($pwdhash = (getpwnam($user))[1]) ||
+         $pwdhash ne crypt(&quot;\U$passwd&quot;,&quot;\U$name&quot;) ) {
+      intruder_alert($name);
+    }
+    return 1;
+  }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_dump">dump</A></STRONG><BR>
+<DD>
+Rather than causing Perl to abort and dump core, the <A HREF="#item_dump"><CODE>dump</CODE></A>
+operator invokes the VMS debugger.  If you continue to
+execute the Perl program under the debugger, control will
+be transferred to the label specified as the argument to
+<A HREF="#item_dump"><CODE>dump</CODE></A>, or, if no label was specified, back to the
+beginning of the program.  All other state of the program
+(<EM>e.g.</EM> values of variables, open file handles) are not
+affected by calling <A HREF="#item_dump"><CODE>dump</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_exec">exec LIST</A></STRONG><BR>
+<DD>
+The <A HREF="#item_exec"><CODE>exec</CODE></A> operator behaves in one of two different ways.  
+If called after a call to <A HREF="#item_fork"><CODE>fork</CODE></A>, it will invoke the CRTL 
+<CODE>execv()</CODE> routine, passing its arguments to the subprocess 
+created by <A HREF="#item_fork"><CODE>fork</CODE></A> for execution.  In this case, it is 
+subject to all limitations that affect <CODE>execv()</CODE>.  (In 
+particular, this usually means that the command executed in 
+the subprocess must be an image compiled from C source code, 
+and that your options for passing file descriptors and signal 
+handlers to the subprocess are limited.)
+<P>If the call to <A HREF="#item_exec"><CODE>exec</CODE></A> does not follow a call to <A HREF="#item_fork"><CODE>fork</CODE></A>, it 
+will cause Perl to exit, and to invoke the command given as 
+an argument to <A HREF="#item_exec"><CODE>exec</CODE></A> via <CODE>lib$do_command</CODE>.  If the argument 
+begins with '@' or '$' (other than as part of a filespec), then it 
+is executed as a DCL command.  Otherwise, the first token on 
+the command line is treated as the filespec of an image to 
+run, and an attempt is made to invoke it (using <EM>.Exe</EM> and 
+the process defaults to expand the filespec) and pass the 
+rest of <A HREF="#item_exec"><CODE>exec</CODE></A>'s argument to it as parameters.  If the token
+has no file type, and matches a file with null type, then an
+attempt is made to determine whether the file is an executable
+image which should be invoked using <CODE>MCR</CODE> or a text file which
+should be passed to DCL as a command procedure.</P>
+<P>You can use <A HREF="#item_exec"><CODE>exec</CODE></A> in both ways within the same script, as 
+long as you call <A HREF="#item_fork"><CODE>fork</CODE></A> and <A HREF="#item_exec"><CODE>exec</CODE></A> in pairs.  Perl
+keeps track of how many times <A HREF="#item_fork"><CODE>fork</CODE></A> and <A HREF="#item_exec"><CODE>exec</CODE></A> have been
+called, and will call the CRTL <CODE>execv()</CODE> routine if there have
+previously been more calls to <A HREF="#item_fork"><CODE>fork</CODE></A> than to <A HREF="#item_exec"><CODE>exec</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_fork">fork</A></STRONG><BR>
+<DD>
+The <A HREF="#item_fork"><CODE>fork</CODE></A> operator works in the same way as the CRTL 
+<CODE>vfork()</CODE> routine, which is quite different under VMS than 
+under Unix.  Specifically, while <A HREF="#item_fork"><CODE>fork</CODE></A> returns 0 after it 
+is called and the subprocess PID after <A HREF="#item_exec"><CODE>exec</CODE></A> is called, in 
+both cases the thread of execution is within the parent 
+process, so there is no opportunity to perform operations in 
+the subprocess before calling <A HREF="#item_exec"><CODE>exec</CODE></A>.
+<P>In general, the use of <A HREF="#item_fork"><CODE>fork</CODE></A> and <A HREF="#item_exec"><CODE>exec</CODE></A> to create 
+subprocess is not recommended under VMS; wherever possible, 
+use the <A HREF="#item_system"><CODE>system</CODE></A> operator or piped filehandles instead.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getpwent">getpwent</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_getpwnam">getpwnam</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_getpwuid">getpwuid</A></STRONG><BR>
+<DD>
+These operators obtain the information described in <A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A>,
+if you have the privileges necessary to retrieve the named user's
+UAF information via <CODE>sys$getuai</CODE>.  If not, then only the <CODE>$name</CODE>,
+<CODE>$uid</CODE>, and <CODE>$gid</CODE> items are returned.  The <CODE>$dir</CODE> item contains
+the login directory in VMS syntax, while the <CODE>$comment</CODE> item
+contains the login directory in Unix syntax. The <CODE>$gcos</CODE> item
+contains the owner field from the UAF record.  The <CODE>$quota</CODE>
+item is not used.
+<P></P>
+<DT><STRONG><A NAME="item_gmtime">gmtime</A></STRONG><BR>
+<DD>
+The <A HREF="#item_gmtime"><CODE>gmtime</CODE></A> operator will function properly if you have a
+working CRTL <A HREF="#item_gmtime"><CODE>gmtime()</CODE></A> routine, or if the logical name
+SYS$TIMEZONE_DIFFERENTIAL is defined as the number of seconds
+which must be added to UTC to yield local time.  (This logical
+name is defined automatically if you are running a version of
+VMS with built-in UTC support.)  If neither of these cases is
+true, a warning message is printed, and <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> is returned.
+<P></P>
+<DT><STRONG><A NAME="item_kill">kill</A></STRONG><BR>
+<DD>
+In most cases, <A HREF="#item_kill"><CODE>kill</CODE></A> is implemented via the CRTL's <A HREF="#item_kill"><CODE>kill()</CODE></A>
+function, so it will behave according to that function's
+documentation.  If you send a SIGKILL, however, the $DELPRC system
+service is called directly.  This insures that the target
+process is actually deleted, if at all possible.  (The CRTL's <A HREF="#item_kill"><CODE>kill()</CODE></A>
+function is presently implemented via $FORCEX, which is ignored by
+supervisor-mode images like DCL.)
+<P>Also, negative signal values don't do anything special under
+VMS; they're just converted to the corresponding positive value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_qx/">qx//</A></STRONG><BR>
+<DD>
+See the entry on <A HREF="#item_backticks"><CODE>backticks</CODE></A> above.
+<P></P>
+<DT><STRONG><A NAME="item_select">select (system call)</A></STRONG><BR>
+<DD>
+If Perl was not built with socket support, the system call
+version of <A HREF="#item_select"><CODE>select</CODE></A> is not available at all.  If socket
+support is present, then the system call version of
+<A HREF="#item_select"><CODE>select</CODE></A> functions only for file descriptors attached
+to sockets.  It will not provide information about regular
+files or pipes, since the CRTL <A HREF="#item_select"><CODE>select()</CODE></A> routine does not
+provide this functionality.
+<P></P>
+<DT><STRONG><A NAME="item_stat">stat EXPR</A></STRONG><BR>
+<DD>
+Since VMS keeps track of files according to a different scheme
+than Unix, it's not really possible to represent the file's ID
+in the <CODE>st_dev</CODE> and <CODE>st_ino</CODE> fields of a <CODE>struct stat</CODE>.  Perl
+tries its best, though, and the values it uses are pretty unlikely
+to be the same for two different files.  We can't guarantee this,
+though, so caveat scriptor.
+<P></P>
+<DT><STRONG><A NAME="item_system">system LIST</A></STRONG><BR>
+<DD>
+The <A HREF="#item_system"><CODE>system</CODE></A> operator creates a subprocess, and passes its 
+arguments to the subprocess for execution as a DCL command.  
+Since the subprocess is created directly via <CODE>lib$spawn()</CODE>, any 
+valid DCL command string may be specified.  If the string begins with
+'@', it is treated as a DCL command unconditionally.  Otherwise, if
+the first token contains a character used as a delimiter in file
+specification (e.g. <CODE>:</CODE> or <CODE>]</CODE>), an attempt is made to expand it
+using  a default type of <EM>.Exe</EM> and the process defaults, and if
+successful, the resulting file is invoked via <CODE>MCR</CODE>. This allows you
+to invoke an image directly simply by passing the file specification
+to <A HREF="#item_system"><CODE>system</CODE></A>, a common Unixish idiom.  If the token has no file type,
+and matches a file with null type, then an attempt is made to
+determine whether the file is an executable image which should be
+invoked using <CODE>MCR</CODE> or a text file which should be passed to DCL
+as a command procedure.
+<P>If LIST consists of the empty string, <A HREF="#item_system"><CODE>system</CODE></A> spawns an
+interactive DCL subprocess, in the same fashion as typing
+<STRONG>SPAWN</STRONG> at the DCL prompt.</P>
+<P>Perl waits for the subprocess to complete before continuing
+execution in the current process.  As described in <A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A>,
+the return value of <A HREF="#item_system"><CODE>system</CODE></A> is a fake ``status'' which follows
+POSIX semantics; see the description of <A HREF="#item_%24%3F"><CODE>$?</CODE></A> in this document
+for more detail.  The actual VMS exit status of the subprocess
+is available in <A HREF="#item_%24%5ES"><CODE>$^S</CODE></A> (as long as you haven't used another Perl
+function that resets <A HREF="#item_%24%3F"><CODE>$?</CODE></A> and <A HREF="#item_%24%5ES"><CODE>$^S</CODE></A> in the meantime).</P>
+<P></P>
+<DT><STRONG><A NAME="item_time">time</A></STRONG><BR>
+<DD>
+The value returned by <A HREF="#item_time"><CODE>time</CODE></A> is the offset in seconds from
+01-JAN-1970 00:00:00 (just like the CRTL's <A HREF="#item_times"><CODE>times()</CODE></A> routine), in order
+to make life easier for code coming in from the POSIX/Unix world.
+<P></P>
+<DT><STRONG><A NAME="item_times">times</A></STRONG><BR>
+<DD>
+The array returned by the <A HREF="#item_times"><CODE>times</CODE></A> operator is divided up 
+according to the same rules the CRTL <A HREF="#item_times"><CODE>times()</CODE></A> routine.  
+Therefore, the ``system time'' elements will always be 0, since 
+there is no difference between ``user time'' and ``system'' time 
+under VMS, and the time accumulated by a subprocess may or may 
+not appear separately in the ``child time'' field, depending on 
+whether <A HREF="#item_times">times</A> keeps track of subprocesses separately.  Note
+especially that the VAXCRTL (at least) keeps track only of
+subprocesses spawned using <A HREF="#item_fork">fork</A> and <A HREF="#item_exec">exec</A>; it will not
+accumulate the times of subprocesses spawned via pipes, <A HREF="#item_system">system</A>,
+or backticks.
+<P></P>
+<DT><STRONG><A NAME="item_unlink">unlink LIST</A></STRONG><BR>
+<DD>
+<A HREF="#item_unlink"><CODE>unlink</CODE></A> will delete the highest version of a file only; in
+order to delete all versions, you need to say
+<PRE>
+    1 while (unlink LIST);</PRE>
+<P>You may need to make this change to scripts written for a
+Unix system which expect that after a call to <A HREF="#item_unlink"><CODE>unlink</CODE></A>,
+no files with the names passed to <A HREF="#item_unlink"><CODE>unlink</CODE></A> will exist.
+(Note: This can be changed at compile time; if you
+<CODE>use Config</CODE> and <CODE>$Config{'d_unlink_all_versions'}</CODE> is
+<CODE>define</CODE>, then <A HREF="#item_unlink"><CODE>unlink</CODE></A> will delete all versions of a
+file on the first call.)</P>
+<P><A HREF="#item_unlink"><CODE>unlink</CODE></A> will delete a file if at all possible, even if it
+requires changing file protection (though it won't try to
+change the protection of the parent directory).  You can tell
+whether you've got explicit delete access to a file by using the
+<CODE>VMS::Filespec::candelete</CODE> operator.  For instance, in order
+to delete only files to which you have delete access, you could
+say something like</P>
+<PRE>
+    sub safe_unlink {
+        my($file,$num);
+        foreach $file (@_) {
+            next unless VMS::Filespec::candelete($file);
+            $num += unlink $file;
+        }
+        $num;
+    }</PRE>
+<P>(or you could just use <CODE>VMS::Stdio::remove</CODE>, if you've installed
+the VMS::Stdio extension distributed with Perl). If <A HREF="#item_unlink"><CODE>unlink</CODE></A> has to
+change the file protection to delete the file, and you interrupt it
+in midstream, the file may be left intact, but with a changed ACL
+allowing you delete access.</P>
+<P></P>
+<DT><STRONG><A NAME="item_utime">utime LIST</A></STRONG><BR>
+<DD>
+Since ODS-2, the VMS file structure for disk files, does not keep
+track of access times, this operator changes only the modification
+time of the file (VMS revision date).
+<P></P>
+<DT><STRONG><A NAME="item_waitpid">waitpid PID,FLAGS</A></STRONG><BR>
+<DD>
+If PID is a subprocess started by a piped <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A> (see <A HREF="../../lib/open.html">the open manpage</A>), 
+<A HREF="#item_waitpid"><CODE>waitpid</CODE></A> will wait for that subprocess, and return its final
+status value.  If PID is a subprocess created in some other way
+(e.g. SPAWNed before Perl was invoked), or is not a subprocess of
+the current process, <A HREF="#item_waitpid"><CODE>waitpid</CODE></A> will check once per second whether
+the process has completed, and when it has, will return 0.  (If PID
+specifies a process that isn't a subprocess of the current process,
+and you invoked Perl with the <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A> switch, a warning will be issued.)
+<P>The FLAGS argument is ignored in all cases.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="perl variables">Perl variables</A></H1>
+<P>The following VMS-specific information applies to the indicated
+``special'' Perl variables, in addition to the general information
+in <A HREF="../../lib/Pod/perlvar.html">the perlvar manpage</A>.  Where there is a conflict, this information
+takes precedence.</P>
+<DL>
+<DT><STRONG><A NAME="item_%ENV">%ENV</A></STRONG><BR>
+<DD>
+The operation of the <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> array depends on the translation
+of the logical name <EM>PERL_ENV_TABLES</EM>.  If defined, it should
+be a search list, each element of which specifies a location
+for <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> elements.  If you tell Perl to read or set the
+element <CODE>$ENV{</CODE><EM>name</EM><CODE>}</CODE>, then Perl uses the translations of
+<EM>PERL_ENV_TABLES</EM> as follows:
+<DL>
+<DT><STRONG><A NAME="item_CRTL_ENV">CRTL_ENV</A></STRONG><BR>
+<DD>
+This string tells Perl to consult the CRTL's internal <CODE>environ</CODE>
+array of key-value pairs, using <EM>name</EM> as the key.  In most cases,
+this contains only a few keys, but if Perl was invoked via the C
+<CODE>exec[lv]e()</CODE> function, as is the case for CGI processing by some
+HTTP servers, then the <CODE>environ</CODE> array may have been populated by
+the calling program.
+<P></P>
+<DT><STRONG><A NAME="item_CLISYM_%5BLOCAL%5D">CLISYM_[LOCAL]</A></STRONG><BR>
+<DD>
+A string beginning with <CODE>CLISYM_</CODE>tells Perl to consult the CLI's
+symbol tables, using <EM>name</EM> as the name of the symbol.  When reading
+an element of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A>, the local symbol table is scanned first, followed
+by the global symbol table..  The characters following <CODE>CLISYM_</CODE> are
+significant when an element of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> is set or deleted: if the
+complete string is <CODE>CLISYM_LOCAL</CODE>, the change is made in the local
+symbol table; otherwise the global symbol table is changed.
+<P></P>
+<DT><STRONG><A NAME="item_Any_other_string">Any other string</A></STRONG><BR>
+<DD>
+If an element of <EM>PERL_ENV_TABLES</EM> translates to any other string,
+that string is used as the name of a logical name table, which is
+consulted using <EM>name</EM> as the logical name.  The normal search
+order of access modes is used.
+<P></P></DL>
+<P><EM>PERL_ENV_TABLES</EM> is translated once when Perl starts up; any changes
+you make while Perl is running do not affect the behavior of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A>.
+If <EM>PERL_ENV_TABLES</EM> is not defined, then Perl defaults to consulting
+first the logical name tables specified by <EM>LNM$FILE_DEV</EM>, and then
+the CRTL <CODE>environ</CODE> array.</P>
+<P>In all operations on %ENV, the key string is treated as if it 
+were entirely uppercase, regardless of the case actually 
+specified in the Perl expression.</P>
+<P>When an element of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> is read, the locations to which
+<EM>PERL_ENV_TABLES</EM> points are checked in order, and the value
+obtained from the first successful lookup is returned.  If the
+name of the <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> element contains a semi-colon, it and
+any characters after it are removed.  These are ignored when
+the CRTL <CODE>environ</CODE> array or a CLI symbol table is consulted.
+However, the name is looked up in a logical name table, the
+suffix after the semi-colon is treated as the translation index
+to be used for the lookup.   This lets you look up successive values
+for search list logical names.  For instance, if you say</P>
+<PRE>
+   $  Define STORY  once,upon,a,time,there,was
+   $  perl -e &quot;for ($i = 0; $i &lt;= 6; $i++) &quot; -
+   _$ -e &quot;{ print $ENV{'story;'.$i},' '}&quot;</PRE>
+<P>Perl will print <CODE>ONCE UPON A TIME THERE WAS</CODE>, assuming, of course,
+that <EM>PERL_ENV_TABLES</EM> is set up so that the logical name <CODE>story</CODE>
+is found, rather than a CLI symbol or CRTL <CODE>environ</CODE> element with
+the same name.</P>
+<P>When an element of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> is set to a defined string, the
+corresponding definition is made in the location to which the
+first translation of <EM>PERL_ENV_TABLES</EM> points.  If this causes a
+logical name to be created, it is defined in supervisor mode.
+(The same is done if an existing logical name was defined in
+executive or kernel mode; an existing user or supervisor mode
+logical name is reset to the new value.)  If the value is an empty
+string, the logical name's translation is defined as a single NUL
+(ASCII 00) character, since a logical name cannot translate to a
+zero-length string.  (This restriction does not apply to CLI symbols
+or CRTL <CODE>environ</CODE> values; they are set to the empty string.)
+An element of the CRTL <CODE>environ</CODE> array can be set only if your
+copy of Perl knows about the CRTL's <CODE>setenv()</CODE> function.  (This is
+present only in some versions of the DECCRTL; check <CODE>$Config{d_setenv}</CODE>
+to see whether your copy of Perl was built with a CRTL that has this
+function.)</P>
+<P>When an element of <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> is set to <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>,
+the element is looked up as if it were being read, and if it is
+found, it is deleted.  (An item ``deleted'' from the CRTL <CODE>environ</CODE>
+array is set to the empty string; this can only be done if your
+copy of Perl knows about the CRTL <CODE>setenv()</CODE> function.)  Using
+<A HREF="../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> to remove an element from <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> has a similar effect,
+but after the element is deleted, another attempt is made to
+look up the element, so an inner-mode logical name or a name in
+another location will replace the logical name just deleted.
+In either case, only the first value found searching PERL_ENV_TABLES
+is altered.  It is not possible at present to define a search list
+logical name via %ENV.</P>
+<P>The element <CODE>$ENV{DEFAULT}</CODE> is special: when read, it returns
+Perl's current default device and directory, and when set, it
+resets them, regardless of the definition of <EM>PERL_ENV_TABLES</EM>.
+It cannot be cleared or deleted; attempts to do so are silently
+ignored.</P>
+<P>Note that if you want to pass on any elements of the
+C-local environ array to a subprocess which isn't
+started by fork/exec, or isn't running a C program, you
+can ``promote'' them to logical names in the current
+process, which will then be inherited by all subprocesses,
+by saying</P>
+<PRE>
+    foreach my $key (qw[C-local keys you want promoted]) {
+       my $temp = $ENV{$key}; # read from C-local array
+       $ENV{$key} = $temp;    # and define as logical name
+    }</PRE>
+<P>(You can't just say <CODE>$ENV{$key} = $ENV{$key}</CODE>, since the
+Perl optimizer is smart enough to elide the expression.)</P>
+<P>Don't try to clear <A HREF="#item_%ENV"><CODE>%ENV</CODE></A> by saying <A HREF="#item_%ENV"><CODE>%ENV = ();</CODE></A>, it will throw
+a fatal error.  This is equivalent to doing the following from DCL:</P>
+<PRE>
+    DELETE/LOGICAL *</PRE>
+<P>You can imagine how bad things would be if, for example, the SYS$MANAGER
+or SYS$SYSTEM logicals were deleted.</P>
+<P>At present, the first time you iterate over %ENV using
+<A HREF="../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_values"><CODE>values</CODE></A>,  you will incur a time penalty as all
+logical names are read, in order to fully populate %ENV.
+Subsequent iterations will not reread logical names, so they
+won't be as slow, but they also won't reflect any changes
+to logical name tables caused by other programs.</P>
+<P>You do need to be careful with the logicals representing process-permanent
+files, such as <CODE>SYS$INPUT</CODE> and <CODE>SYS$OUTPUT</CODE>.  The translations for these
+logicals are prepended with a two-byte binary value (0x1B 0x00) that needs to be
+stripped off if you want to use it. (In previous versions of Perl it wasn't
+possible to get the values of these logicals, as the null byte acted as an
+end-of-string marker)</P>
+<DT><STRONG><A NAME="item_%24%21">$!</A></STRONG><BR>
+<DD>
+The string value of <A HREF="#item_%24%21"><CODE>$!</CODE></A> is that returned by the CRTL's
+<CODE>strerror()</CODE> function, so it will include the VMS message for
+VMS-specific errors.  The numeric value of <A HREF="#item_%24%21"><CODE>$!</CODE></A> is the
+value of <CODE>errno</CODE>, except if errno is EVMSERR, in which
+case <A HREF="#item_%24%21"><CODE>$!</CODE></A> contains the value of vaxc$errno.  Setting <A HREF="#item_%24%21"><CODE>$!</CODE></A>
+always sets errno to the value specified.  If this value is
+EVMSERR, it also sets vaxc$errno to 4 (NONAME-F-NOMSG), so
+that the string value of <A HREF="#item_%24%21"><CODE>$!</CODE></A> won't reflect the VMS error
+message from before <A HREF="#item_%24%21"><CODE>$!</CODE></A> was set.
+<P></P>
+<DT><STRONG><A NAME="item_%24%5EE">$^E</A></STRONG><BR>
+<DD>
+This variable provides direct access to VMS status values
+in vaxc$errno, which are often more specific than the
+generic Unix-style error messages in <A HREF="#item_%24%21"><CODE>$!</CODE></A>.  Its numeric value
+is the value of vaxc$errno, and its string value is the
+corresponding VMS message string, as retrieved by sys$getmsg().
+Setting <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> sets vaxc$errno to the value specified.
+<P></P>
+<DT><STRONG><A NAME="item_%24%3F">$?</A></STRONG><BR>
+<DD>
+The ``status value'' returned in <A HREF="#item_%24%3F"><CODE>$?</CODE></A> is synthesized from the
+actual exit status of the subprocess in a way that approximates
+POSIX <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait(5)</CODE></A> semantics, in order to allow Perl programs to
+portably test for successful completion of subprocesses.  The
+low order 8 bits of <A HREF="#item_%24%3F"><CODE>$?</CODE></A> are always 0 under VMS, since the
+termination status of a process may or may not have been
+generated by an exception.  The next 8 bits are derived from
+the severity portion of the subprocess' exit status: if the
+severity was success or informational, these bits are all 0;
+otherwise, they contain the severity value shifted left one bit.
+As a result, <A HREF="#item_%24%3F"><CODE>$?</CODE></A> will always be zero if the subprocess' exit
+status indicated successful completion, and non-zero if a
+warning or error occurred.  The actual VMS exit status may
+be found in <A HREF="#item_%24%5ES"><CODE>$^S</CODE></A> (q.v.).
+<P></P>
+<DT><STRONG><A NAME="item_%24%5ES">$^S</A></STRONG><BR>
+<DD>
+Under VMS, this is the 32-bit VMS status value returned by the
+last subprocess to complete.  Unlike <A HREF="#item_%24%3F"><CODE>$?</CODE></A>, no manipulation
+is done to make this look like a POSIX <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait(5)</CODE></A> value, so it
+may be treated as a normal VMS status value.
+<P></P>
+<DT><STRONG><A NAME="item_%24%7C">$|</A></STRONG><BR>
+<DD>
+Setting <A HREF="#item_%24%7C"><CODE>$|</CODE></A> for an I/O stream causes data to be flushed
+all the way to disk on each write (<EM>i.e.</EM> not just to
+the underlying RMS buffers for a file).  In other words,
+it's equivalent to calling <CODE>fflush()</CODE> and <CODE>fsync()</CODE> from C.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="standard modules with vmsspecific differences">Standard modules with VMS-specific differences</A></H1>
+<P>
+<H2><A NAME="sdbm_file">SDBM_File</A></H2>
+<P>SDBM_File works properly on VMS. It has, however, one minor
+difference. The database directory file created has a <EM>.sdbm_dir</EM>
+extension rather than a <EM>.dir</EM> extension. <EM>.dir</EM> files are VMS filesystem
+directory files, and using them for other purposes could cause unacceptable
+problems.</P>
+<P>
+<HR>
+<H1><A NAME="revision date">Revision date</A></H1>
+<P>This document was last updated on 26-Feb-2000, for Perl 5, 
+patchlevel 6.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Charles Bailey  &lt;<A HREF="mailto:bailey@cor.newman.upenn.edu">bailey@cor.newman.upenn.edu</A>&gt;
+Dan Sugalski  &lt;<A HREF="mailto:dan@sidhe.org">dan@sidhe.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlvms - VMS-specific documentation for Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

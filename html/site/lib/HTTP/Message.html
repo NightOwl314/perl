@@ -1,0 +1,144 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Message - Class encapsulating HTTP messages</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Message - Class encapsulating HTTP messages</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Message - Class encapsulating HTTP messages</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ package HTTP::Request;  # or HTTP::Response
+ require HTTP::Message;
+ @ISA=qw(HTTP::Message);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A <CODE>HTTP::Message</CODE> object contains some headers and a content (body).
+The class is abstract, i.e. it only used as a base class for
+<CODE>HTTP::Request</CODE> and <CODE>HTTP::Response</CODE> and should never instantiated
+as itself.</P>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_%24mess_%3D_new_HTTP%3A%3AMessage%3B">$mess = new HTTP::Message;</A></STRONG><BR>
+<DD>
+This is the object constructor.  It should only be called internally
+by this library.  External code should construct <CODE>HTTP::Request</CODE> or
+<CODE>HTTP::Response</CODE> objects.
+<P></P>
+<DT><STRONG><A NAME="item_clone">$mess-&gt;<CODE>clone()</CODE></A></STRONG><BR>
+<DD>
+Returns a copy of the object.
+<P></P>
+<DT><STRONG><A NAME="item_protocol">$mess-&gt;<CODE>protocol([$proto])</CODE></A></STRONG><BR>
+<DD>
+Sets the HTTP protocol used for the message.  The <A HREF="#item_protocol"><CODE>protocol()</CODE></A> is a string
+like ``HTTP/1.0'' or ``HTTP/1.1''.
+<P></P>
+<DT><STRONG><A NAME="item_content">$mess-&gt;<CODE>content([$content])</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_content"><CODE>content()</CODE></A> method sets the content if an argument is given.  If no
+argument is given the content is not touched.  In either case the
+previous content is returned.
+<P></P>
+<DT><STRONG><A NAME="item_add_content">$mess-&gt;<CODE>add_content($data)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_add_content"><CODE>add_content()</CODE></A> methods appends more data to the end of the previous
+content.
+<P></P>
+<DT><STRONG><A NAME="item_content_ref">$mess-&gt;content_ref</A></STRONG><BR>
+<DD>
+The <A HREF="#item_content_ref"><CODE>content_ref()</CODE></A> method will return a reference to content string.
+It can be more efficient to access the content this way if the content
+is huge, and it can be used for direct manipulation of the content,
+for instance:
+<PRE>
+  ${$res-&gt;content_ref} =~ s/\bfoo\b/bar/g;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_headers">$mess-&gt;headers;</A></STRONG><BR>
+<DD>
+Return the embedded HTTP::Headers object.
+<P></P>
+<DT><STRONG><A NAME="item_headers_as_string">$mess-&gt;<CODE>headers_as_string([$endl])</CODE></A></STRONG><BR>
+<DD>
+Call the HTTP::Headers-&gt;<CODE>as_string()</CODE> method for the headers in the
+message.
+<P></P></DL>
+<P>All unknown <CODE>HTTP::Message</CODE> methods are delegated to the
+<CODE>HTTP::Headers</CODE> object that is part of every message.  This allows
+convenient access to these methods.  Refer to <A HREF="../../../site/lib/HTTP/Headers.html">the HTTP::Headers manpage</A> for
+details of these methods:</P>
+<PRE>
+  $mess-&gt;header($field =&gt; $val);
+  $mess-&gt;scan(\&amp;doit);
+  $mess-&gt;push_header($field =&gt; $val);
+  $mess-&gt;remove_header($field);</PRE>
+<PRE>
+  $mess-&gt;date;
+  $mess-&gt;expires;
+  $mess-&gt;if_modified_since;
+  $mess-&gt;if_unmodified_since;
+  $mess-&gt;last_modified;
+  $mess-&gt;content_type;
+  $mess-&gt;content_encoding;
+  $mess-&gt;content_length;
+  $mess-&gt;content_language
+  $mess-&gt;title;
+  $mess-&gt;user_agent;
+  $mess-&gt;server;
+  $mess-&gt;from;
+  $mess-&gt;referer;
+  $mess-&gt;www_authenticate;
+  $mess-&gt;authorization;
+  $mess-&gt;proxy_authorization;
+  $mess-&gt;authorization_basic;
+  $mess-&gt;proxy_authorization_basic;</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1997 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Message - Class encapsulating HTTP messages</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,1446 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::Internet - Access to WININET.DLL functions</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Internet - Access to WININET.DLL functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#introduction">INTRODUCTION</A></LI>
+	<LI><A HREF="#reference">REFERENCE</A></LI>
+	<UL>
+
+		<LI><A HREF="#general internet functions">General Internet Functions</A></LI>
+		<LI><A HREF="#ftp functions">FTP Functions</A></LI>
+		<LI><A HREF="#http functions">HTTP Functions</A></LI>
+	</UL>
+
+	<LI><A HREF="#appendix">APPENDIX</A></LI>
+	<UL>
+
+		<LI><A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A></LI>
+		<LI><A HREF="#functions table">Functions Table</A></LI>
+		<LI><A HREF="#constants">Constants</A></LI>
+	</UL>
+
+	<LI><A HREF="#version history">VERSION HISTORY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#disclaimer">DISCLAIMER</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Internet - Access to WININET.DLL functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="introduction">INTRODUCTION</A></H1>
+<P>This extension to Perl implements the Win32 Internet APIs (found in
+<EM>WININET.DLL</EM>). They give a complete support for HTTP, FTP and GOPHER
+connections.</P>
+<P>See the <A HREF="#version history">Version History</A> and the <A HREF="#functions table">Functions Table</A> for a list
+of the currently supported features. You should also get a copy of the
+<A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation.</P>
+<P>
+<HR>
+<H1><A NAME="reference">REFERENCE</A></H1>
+<P>To use this module, first add the following line at the beginning of
+your script:</P>
+<PRE>
+    use Win32::Internet;</PRE>
+<P>Then you have to open an Internet connection with this command:</P>
+<PRE>
+    $Connection = new Win32::Internet();</PRE>
+<P>This is required to use any of the function of this module.  It will
+create an Internet object in Perl on which you can act upon with the
+<A HREF="#general internet functions">General Internet Functions</A> explained later.</P>
+<P>The objects available are:</P>
+<UL>
+<LI>
+Internet connections (the main object, see <CODE>new</CODE>)
+<P></P>
+<LI>
+URLs (see <CODE>OpenURL</CODE>)
+<P></P>
+<LI>
+FTP sessions (see <CODE>FTP</CODE>)
+<P></P>
+<LI>
+HTTP sessions (see <CODE>HTTP</CODE>)
+<P></P>
+<LI>
+HTTP requests (see <CODE>OpenRequest</CODE>)
+<P></P></UL>
+<P>As in the good Perl tradition, there are in this extension different
+ways to do the same thing; there are, in fact, different levels of
+implementation of the Win32 Internet Functions.  Some routines use
+several Win32 API functions to perform a complex task in a single
+call; they are simpler to use, but of course less powerful.</P>
+<P>There are then other functions that implement nothing more and nothing
+less than the corresponding API function, so you can use all of their
+power, but with some additional programming steps.</P>
+<P>To make an example, there is a function called <CODE>FetchURL</CODE> that you
+can use to fetch the content of any HTTP, FTP or GOPHER URL with this
+simple commands:</P>
+<PRE>
+    $INET = new Win32::Internet();
+    $file = $INET-&gt;FetchURL(&quot;<A HREF="http://www.yahoo.com&quot">http://www.yahoo.com&quot</A>;);</PRE>
+<P>You can have the same result (and this is actually what is done by
+<CODE>FetchURL</CODE>) this way:</P>
+<PRE>
+    $INET = new Win32::Internet();
+    $URL = $INET-&gt;OpenURL(&quot;<A HREF="http://www.yahoo.com&quot">http://www.yahoo.com&quot</A>;);
+    $file = $URL-&gt;ReadFile();
+    $URL-&gt;Close();</PRE>
+<P>Or, you can open a complete HTTP session:</P>
+<PRE>
+    $INET = new Win32::Internet();
+    $HTTP = $INET-&gt;HTTP(&quot;www.yahoo.com&quot;, &quot;anonymous&quot;, &quot;dada@divinf.it&quot;);
+    ($statuscode, $headers, $file) = $HTTP-&gt;Request(&quot;/&quot;);
+    $HTTP-&gt;Close();</PRE>
+<P>Finally, you can choose to manage even the HTTP request:</P>
+<PRE>
+    $INET = new Win32::Internet();
+    $HTTP = $INET-&gt;HTTP(&quot;www.yahoo.com&quot;, &quot;anonymous&quot;, &quot;dada@divinf.it&quot;);
+    $HTTP-&gt;OpenRequest($REQ, &quot;/&quot;);
+    $REQ-&gt;AddHeader(&quot;If-Modified-Since: Saturday, 16-Nov-96 15:58:50 GMT&quot;);
+    $REQ-&gt;SendRequest();
+    $statuscode = $REQ-&gt;QueryInfo(&quot;&quot;,HTTP_QUERY_STATUS_CODE);
+    $lastmodified = $REQ-&gt;QueryInfo(&quot;Last-Modified&quot;);
+    $file = $REQ-&gt;ReadEntireFile();
+    $REQ-&gt;Close();
+    $HTTP-&gt;Close();</PRE>
+<P>To open and control a complete FTP session, type:</P>
+<PRE>
+    $Connection-&gt;FTP($Session, &quot;<A HREF="ftp://ftp.activeware.com&quot">ftp://ftp.activeware.com&quot</A>;, &quot;anonymous&quot;, &quot;dada\@divinf.it&quot;);</PRE>
+<P>This will create an FTP object in Perl to which you can apply the <A HREF="#ftp functions">FTP functions</A> provided by the package:</P>
+<PRE>
+    $Session-&gt;Cd(&quot;/ntperl/perl5.001m/CurrentBuild&quot;);
+    $Session-&gt;Ascii();
+    $Session-&gt;Get(&quot;110-i86.zip&quot;);
+    $Session-&gt;Close();</PRE>
+<P>For a more complete example, see the TEST.PL file that comes with the
+package.</P>
+<P>
+<H2><A NAME="general internet functions">General Internet Functions</A></H2>
+<P><STRONG>General Note</STRONG></P>
+<P>All methods assume that you have the line:</P>
+<PRE>
+    use Win32::Internet;</PRE>
+<P>somewhere before the method calls, and that you have an Internet
+object called $INET which was created using this call:</P>
+<PRE>
+    $INET = new Win32::Internet();</PRE>
+<P>See <CODE>new</CODE> for more information.</P>
+<P><STRONG>Methods</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_CanonicalizeURL_URL%2C_%5Bflags%5D">CanonicalizeURL URL, [flags]</A></STRONG><BR>
+<DD>
+Converts a URL to a canonical format, which includes converting unsafe
+characters to escape sequences.  Returns the canonicalized URL or
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  For the possible values of <EM>flags</EM>, refer to the
+<A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.  See also
+<CODE>CombineURL</CODE> and <CODE>OpenURL</CODE>.
+<P>Example:</P>
+<PRE>
+    $cURL = $INET-&gt;CanonicalizeURL($URL);
+    $URL = $INET-&gt;CanonicalizeURL($cURL, ICU_DECODE);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Close">Close</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Close_object">Close object</A></STRONG><BR>
+<DD>
+Closes an Internet connection.  This can be applied to any
+Win32::Internet object (Internet connections, URLs, FTP sessions,
+etc.).  Note that it is not ``strictly'' required to close the
+connections you create, since the Win32::Internet objects are
+automatically closed when the program ends (or when you elsehow
+destroy such an object).
+<P>Example:</P>
+<PRE>
+    $INET-&gt;Close();
+    $FTP-&gt;Close();
+    $INET-&gt;Close($FTP); # same as above...</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_CombineURL_baseURL%2C_relativeURL%2C_%5Bflags%5D">CombineURL baseURL, relativeURL, [flags]</A></STRONG><BR>
+<DD>
+Combines a base and relative URL into a single URL.  Returns the
+(canonicalized) combined URL or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  For the possible
+values of <EM>flags</EM>, refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.  See also <CODE>CombineURL</CODE> and <CODE>OpenURL</CODE>.
+<P>Example:</P>
+<PRE>
+    $URL = $INET-&gt;CombineURL(&quot;<A HREF="http://www.divinf.it/dada/perl/internet&quot">http://www.divinf.it/dada/perl/internet&quot</A>;, &quot;..&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ConnectBackoff_%5Bvalue%5D">ConnectBackoff [value]</A></STRONG><BR>
+<DD>
+Reads or sets the delay value, in milliseconds, to wait between
+connection retries.  If no <EM>value</EM> parameter is specified, the
+current value is returned; otherwise, the delay between retries is set
+to <EM>value</EM>.  See also <CODE>ConnectTimeout</CODE>, <CODE>ConnectRetries</CODE>,
+<CODE>QueryOption</CODE> and <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;ConnectBackoff(2000);
+    $backoff = $HTTP-&gt;ConnectBackoff();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ConnectRetries_%5Bvalue%5D">ConnectRetries [value]</A></STRONG><BR>
+<DD>
+Reads or sets the number of times a connection is retried before
+considering it failed.  If no <EM>value</EM> parameter is specified, the
+current value is returned; otherwise, the number of retries is set to
+<EM>value</EM>.  The default value for <CODE>ConnectRetries</CODE> is 5.  See also
+<CODE>ConnectBackoff</CODE>, <CODE>ConnectTimeout</CODE>, <CODE>QueryOption</CODE> and <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;ConnectRetries(20);
+    $retries = $HTTP-&gt;ConnectRetries();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ConnectTimeout_%5Bvalue%5D">ConnectTimeout [value]</A></STRONG><BR>
+<DD>
+Reads or sets the timeout value (in milliseconds) before a connection
+is considered failed.  If no <EM>value</EM> parameter is specified, the
+current value is returned; otherwise, the timeout is set to <EM>value</EM>.
+The default value for <CODE>ConnectTimeout</CODE> is infinite.  See also
+<CODE>ConnectBackoff</CODE>, <CODE>ConnectRetries</CODE>, <CODE>QueryOption</CODE> and <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;ConnectTimeout(10000);
+    $timeout = $HTTP-&gt;ConnectTimeout();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ControlReceiveTimeout_%5Bvalue%5D">ControlReceiveTimeout [value]</A></STRONG><BR>
+<DD>
+Reads or sets the timeout value (in milliseconds) to use for non-data
+(control) receive requests before they are canceled.  Currently, this
+value has meaning only for <CODE>FTP</CODE> sessions.  If no <EM>value</EM> parameter
+is specified, the current value is returned; otherwise, the timeout is
+set to <EM>value</EM>.  The default value for <CODE>ControlReceiveTimeout</CODE> is
+infinite.  See also <CODE>ControlSendTimeout</CODE>, <CODE>QueryOption</CODE> and
+<CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;ControlReceiveTimeout(10000);
+    $timeout = $HTTP-&gt;ControlReceiveTimeout();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ControlSendTimeout_%5Bvalue%5D">ControlSendTimeout [value]</A></STRONG><BR>
+<DD>
+Reads or sets the timeout value (in milliseconds) to use for non-data
+(control) send requests before they are canceled.  Currently, this
+value has meaning only for <CODE>FTP</CODE> sessions.  If no <EM>value</EM> parameter
+is specified, the current value is returned; otherwise, the timeout is
+set to <EM>value</EM>.  The default value for <CODE>ControlSendTimeout</CODE> is
+infinite.  See also <CODE>ControlReceiveTimeout</CODE>, <CODE>QueryOption</CODE> and
+<CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;ControlSendTimeout(10000);
+    $timeout = $HTTP-&gt;ControlSendTimeout();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_CrackURL_URL%2C_%5Bflags%5D">CrackURL URL, [flags]</A></STRONG><BR>
+<DD>
+Splits an URL into its component parts and returns them in an array.
+Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors, otherwise the array will contain the
+following values: <EM>scheme, host, port, username, password, path,
+extrainfo</EM>.
+<P>For example, the URL ``http://www.divinf.it/index.html#top'' can be
+splitted in:</P>
+<PRE>
+    http, www.divinf.it, 80, anonymous, dada@divinf.it, /index.html, #top</PRE>
+<P>If you don't specify a <EM>flags</EM> parameter, ICU_ESCAPE will be used by
+default; for the possible values of <EM>flags</EM> refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation.  See also <CODE>CreateURL</CODE>.</P>
+<P>Example:</P>
+<PRE>
+    @parts=$INET-&gt;CrackURL(&quot;<A HREF="http://www.activeware.com&quot">http://www.activeware.com&quot</A>;);
+    ($scheme, $host, $port, $user, $pass, $path, $extra) =
+         $INET-&gt;CrackURL(&quot;<A HREF="http://www.divinf.it:80/perl-win32/index.sht#feedback&quot">http://www.divinf.it:80/perl-win32/index.sht#feedback&quot</A>;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_CreateURL_scheme%2C_hostname%2C_port%2C_username%2">CreateURL scheme, hostname, port, username, password, path, extrainfo, [flags]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_CreateURL_hashref%2C_%5Bflags%5D">CreateURL hashref, [flags]</A></STRONG><BR>
+<DD>
+Creates a URL from its component parts.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors,
+otherwise the created URL.
+<P>If you pass <EM>hashref</EM> (a reference to an hash array), the following
+values are taken from the array:</P>
+<PRE>
+    %hash=(
+      &quot;scheme&quot;    =&gt; &quot;scheme&quot;,
+      &quot;hostname&quot;  =&gt; &quot;hostname&quot;,
+      &quot;port&quot;      =&gt; port,
+      &quot;username&quot;  =&gt; &quot;username&quot;,
+      &quot;password&quot;  =&gt; &quot;password&quot;,
+      &quot;path&quot;      =&gt; &quot;path&quot;,
+      &quot;extrainfo&quot; =&gt; &quot;extrainfo&quot;,
+    );</PRE>
+<P>If you don't specify a <EM>flags</EM> parameter, ICU_ESCAPE will be used by
+default; for the other possible values of <EM>flags</EM> refer to the
+<A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation.  See also
+<CODE>CrackURL</CODE>.</P>
+<P>Example:</P>
+<PRE>
+    $URL=$I-&gt;CreateURL(&quot;http&quot;, &quot;www.divinf.it&quot;, 80, &quot;&quot;, &quot;&quot;, &quot;/perl-win32/index.sht&quot;, &quot;#feedback&quot;);
+    $URL=$I-&gt;CreateURL(\%params);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_DataReceiveTimeout_%5Bvalue%5D">DataReceiveTimeout [value]</A></STRONG><BR>
+<DD>
+Reads or sets the timeout value (in milliseconds) to use for data
+receive requests before they are canceled.  If no <EM>value</EM> parameter
+is specified, the current value is returned; otherwise, the timeout is
+set to <EM>value</EM>.  The default value for DataReceiveTimeout is
+infinite.  See also <CODE>DataSendTimeout</CODE>, <CODE>QueryOption</CODE> and
+<CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;DataReceiveTimeout(10000);
+    $timeout = $HTTP-&gt;DataReceiveTimeout();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_DataSendTimeout_%5Bvalue%5D">DataSendTimeout [value]</A></STRONG><BR>
+<DD>
+Reads or sets the timeout value (in milliseconds) to use for data send
+requests before they are canceled.  If no <EM>value</EM> parameter is
+specified, the current value is returned; otherwise, the timeout is
+set to <EM>value</EM>.  The default value for DataSendTimeout is infinite.
+See also <CODE>DataReceiveTimeout</CODE>, <CODE>QueryOption</CODE> and <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;DataSendTimeout(10000);
+    $timeout = $HTTP-&gt;DataSendTimeout();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Error">Error</A></STRONG><BR>
+<DD>
+Returns the last recorded error in the form of an array or string
+(depending upon the context) containing the error number and an error
+description.  Can be applied on any Win32::Internet object (FTP
+sessions, etc.).  There are 3 types of error you can encounter; they
+are recognizable by the error number returned:
+<UL>
+<LI><STRONG><A NAME="item_%2D1">-1</A></STRONG><BR>
+
+A ``trivial'' error has occurred in the package.  For example, you tried
+to use a method on the wrong type of object.
+<P></P>
+<LI><STRONG><A NAME="item_1_%2E%2E_11999">1 .. 11999</A></STRONG><BR>
+
+A generic error has occurred and the Win32::GetLastError error message
+is returned.
+<P></P>
+<LI><STRONG><A NAME="item_12000_and_higher">12000 and higher</A></STRONG><BR>
+
+An Internet error has occurred; the extended Win32 Internet API error
+message is returned.
+<P></P></UL>
+<P>See also <A HREF="#item_GetResponse"><CODE>GetResponse</CODE></A>.</P>
+<P>Example:</P>
+<PRE>
+    die $INET-&gt;Error(), qq(\n);
+    ($ErrNum, $ErrText) = $INET-&gt;Error();</PRE>
+<DT><STRONG><A NAME="item_FetchURL_URL">FetchURL URL</A></STRONG><BR>
+<DD>
+Fetch the content of an HTTP, FTP or GOPHER URL.  Returns the content
+of the file read (or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if there was an error and nothing was
+read).  See also <CODE>OpenURL</CODE> and <CODE>ReadFile</CODE>.
+<P>Example:</P>
+<PRE>
+    $file = $INET-&gt;FetchURL(&quot;<A HREF="http://www.yahoo.com/&quot">http://www.yahoo.com/&quot</A>;);
+    $file = $INET-&gt;FetchURL(&quot;<A HREF="ftp://www.activeware.com/contrib/internet.zip&quot">ftp://www.activeware.com/contrib/internet.zip&quot</A>;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_FTP_ftpobject%2C_server%2C_username%2C_password%2C">FTP ftpobject, server, username, password, [port, pasv, context]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FTP_ftpobject%2C_hashref">FTP ftpobject, hashref</A></STRONG><BR>
+<DD>
+Opens an FTP connection to server logging in with the given
+<EM>username</EM> and <EM>password</EM>.
+<P>The parameters and their values are:</P>
+<UL>
+<LI><STRONG><A NAME="item_server">server</A></STRONG><BR>
+
+The server to connect to.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG><A NAME="item_username">username</A></STRONG><BR>
+
+The username used to login to the server.  Default: anonymous.
+<P></P>
+<LI><STRONG><A NAME="item_password">password</A></STRONG><BR>
+
+The password used to login to the server.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG><A NAME="item_port">port</A></STRONG><BR>
+
+The port of the FTP service on the server.  Default: 21.
+<P></P>
+<LI><STRONG><A NAME="item_pasv">pasv</A></STRONG><BR>
+
+If it is a value other than 0, use passive transfer mode.  Default is
+taken from the parent Internet connection object; you can set this
+value with the <CODE>Pasv</CODE> method.
+<P></P>
+<LI><STRONG><A NAME="item_context">context</A></STRONG><BR>
+
+A number to identify this operation if it is asynchronous.  See
+<A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A> and <CODE>GetStatusCallback</CODE> for more info on
+asynchronous operations.  Default: <EM>none</EM>.
+<P></P></UL>
+<P>If you pass <EM>hashref</EM> (a reference to an hash array), the following
+values are taken from the array:</P>
+<PRE>
+    %hash=(
+      &quot;server&quot;   =&gt; &quot;server&quot;,
+      &quot;username&quot; =&gt; &quot;username&quot;,
+      &quot;password&quot; =&gt; &quot;password&quot;,
+      &quot;port&quot;     =&gt; port,
+      &quot;pasv&quot;     =&gt; pasv,
+      &quot;context&quot;  =&gt; context,
+    );</PRE>
+<P>This method returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if the connection failed, a number
+otherwise.  You can then call any of the <A HREF="#ftp functions">FTP functions</A> as methods
+of the newly created <EM>ftpobject</EM>.</P>
+<P>Example:</P>
+<PRE>
+    $result = $INET-&gt;FTP($FTP, &quot;ftp.activeware.com&quot;, &quot;anonymous&quot;, &quot;dada\@divinf.it&quot;);
+    # and then for example...
+    $FTP-&gt;Cd(&quot;/ntperl/perl5.001m/CurrentBuild&quot;);</PRE>
+<PRE>
+    $params{&quot;server&quot;} = &quot;ftp.activeware.com&quot;;
+    $params{&quot;password&quot;} = &quot;dada\@divinf.it&quot;;
+    $params{&quot;pasv&quot;} = 0;
+    $result = $INET-&gt;FTP($FTP,\%params);</PRE>
+<DT><STRONG><A NAME="item_GetResponse">GetResponse</A></STRONG><BR>
+<DD>
+Returns the text sent by a remote server in response to the last
+function executed.  It applies on any Win32::Internet object,
+particularly of course on <A HREF="#ftp functions">FTP sessions</A>.  See also
+the <A HREF="#item_Error"><CODE>Error</CODE></A> function.
+<P>Example:</P>
+<PRE>
+    print $INET-&gt;GetResponse();
+    $INET-&gt;FTP($FTP, &quot;ftp.activeware.com&quot;, &quot;anonymous&quot;, &quot;dada\@divinf.it&quot;);
+    print $FTP-&gt;GetResponse();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GetStatusCallback_context">GetStatusCallback context</A></STRONG><BR>
+<DD>
+Returns information about the progress of the asynchronous operation
+identified by <EM>context</EM>; those informations consist of two values: a
+status code (one of the INTERNET_STATUS_* <A HREF="#constants">Constants</A>) and an
+additional value depending on the status code; for example, if the
+status code returned is INTERNET_STATUS_HANDLE_CREATED, the second
+value will hold the handle just created.  For more informations on
+those values, please refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation.  See also <A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A>.
+<P>Example:</P>
+<PRE>
+    ($status, $info) = $INET-&gt;GetStatusCallback(1);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_HTTP_httpobject%2C_server%2C_username%2C_password%">HTTP httpobject, server, username, password, [port, flags, context]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_HTTP_httpobject%2C_hashref">HTTP httpobject, hashref</A></STRONG><BR>
+<DD>
+Opens an HTTP connection to <EM>server</EM> logging in with the given
+<EM>username</EM> and <EM>password</EM>.
+<P>The parameters and their values are:</P>
+<UL>
+<LI><STRONG>server</STRONG><BR>
+
+The server to connect to.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG>username</STRONG><BR>
+
+The username used to login to the server.  Default: anonymous.
+<P></P>
+<LI><STRONG>password</STRONG><BR>
+
+The password used to login to the server.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG>port</STRONG><BR>
+
+The port of the HTTP service on the server.  Default: 80.
+<P></P>
+<LI><STRONG><A NAME="item_flags">flags</A></STRONG><BR>
+
+Additional flags affecting the behavior of the function.  Default:
+<EM>none</EM>.
+<P></P>
+<LI><STRONG>context</STRONG><BR>
+
+A number to identify this operation if it is asynchronous.  See
+<A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A> and <CODE>GetStatusCallback</CODE> for more info on
+asynchronous operations.  Default: <EM>none</EM>.
+<P></P></UL>
+<P>Refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation for
+more details on those parameters.</P>
+<P>If you pass <EM>hashref</EM> (a reference to an hash array), the following
+values are taken from the array:</P>
+<PRE>
+    %hash=(
+      &quot;server&quot;   =&gt; &quot;server&quot;,
+      &quot;username&quot; =&gt; &quot;username&quot;,
+      &quot;password&quot; =&gt; &quot;password&quot;,
+      &quot;port&quot;     =&gt; port,
+      &quot;flags&quot;    =&gt; flags,
+      &quot;context&quot;  =&gt; context,
+    );</PRE>
+<P>This method returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if the connection failed, a number
+otherwise.  You can then call any of the <A HREF="#http functions">HTTP functions</A> as
+methods of the newly created <EM>httpobject</EM>.</P>
+<P>Example:</P>
+<PRE>
+    $result = $INET-&gt;HTTP($HTTP,&quot;www.activeware.com&quot;,&quot;anonymous&quot;,&quot;dada\@divinf.it&quot;);
+    # and then for example...
+    ($statuscode, $headers, $file) = $HTTP-&gt;Request(&quot;/gifs/camel.gif&quot;);</PRE>
+<PRE>
+    $params{&quot;server&quot;} = &quot;www.activeware.com&quot;;
+    $params{&quot;password&quot;} = &quot;dada\@divinf.it&quot;;
+    $params{&quot;flags&quot;} = INTERNET_FLAG_RELOAD;
+    $result = $INET-&gt;HTTP($HTTP,\%params);</PRE>
+<DT><STRONG><A NAME="item_new_Win32%3A%3AInternet_%5Buseragent%2C_opentype%2">new Win32::Internet [useragent, opentype, proxy, proxybypass, flags]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_new_Win32%3A%3AInternet_%5Bhashref%5D">new Win32::Internet [hashref]</A></STRONG><BR>
+<DD>
+Creates a new Internet object and initializes the use of the Internet
+functions; this is required before any of the functions of this
+package can be used.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if the connection fails, a number
+otherwise.  The parameters and their values are:
+<UL>
+<LI><STRONG><A NAME="item_useragent">useragent</A></STRONG><BR>
+
+The user agent passed to HTTP requests.  See <CODE>OpenRequest</CODE>.  Default:
+Perl-Win32::Internet/<EM>version</EM>.
+<P></P>
+<LI><STRONG><A NAME="item_opentype">opentype</A></STRONG><BR>
+
+How to access to the Internet (eg. directly or using a proxy).
+Default: INTERNET_OPEN_TYPE_DIRECT.
+<P></P>
+<LI><STRONG><A NAME="item_proxy">proxy</A></STRONG><BR>
+
+Name of the proxy server (or servers) to use.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG><A NAME="item_proxybypass">proxybypass</A></STRONG><BR>
+
+Optional list of host names or IP addresses, or both, that are known
+locally.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG>flags</STRONG><BR>
+
+Additional flags affecting the behavior of the function.  Default:
+<EM>none</EM>.
+<P></P></UL>
+<P>Refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation for
+more details on those parameters.  If you pass <EM>hashref</EM> (a reference to
+an hash array), the following values are taken from the array:</P>
+<PRE>
+    %hash=(
+      &quot;useragent&quot;   =&gt; &quot;useragent&quot;,
+      &quot;opentype&quot;    =&gt; &quot;opentype&quot;,
+      &quot;proxy&quot;       =&gt; &quot;proxy&quot;,
+      &quot;proxybypass&quot; =&gt; &quot;proxybypass&quot;,
+      &quot;flags&quot;       =&gt; flags,
+    );</PRE>
+<P>Example:</P>
+<PRE>
+    $INET = new Win32::Internet();
+    die qq(Cannot connect to Internet...\n) if ! $INET;</PRE>
+<PRE>
+    $INET = new Win32::Internet(&quot;Mozilla/3.0&quot;, INTERNET_OPEN_TYPE_PROXY, &quot;www.microsoft.com&quot;, &quot;&quot;);</PRE>
+<PRE>
+    $params{&quot;flags&quot;} = INTERNET_FLAG_ASYNC;
+    $INET = new Win32::Internet(\%params);</PRE>
+<DT><STRONG><A NAME="item_OpenURL_urlobject%2C_URL">OpenURL urlobject, URL</A></STRONG><BR>
+<DD>
+Opens a connection to an HTTP, FTP or GOPHER Uniform Resource Location
+(URL).  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors or a number if the connection was
+succesful.  You can then retrieve the URL content by applying the
+methods <A HREF="#item_QueryDataAvailable"><CODE>QueryDataAvailable</CODE></A> and <CODE>ReadFile</CODE> on the newly created
+<EM>urlobject</EM>.  See also <CODE>FetchURL</CODE>.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;OpenURL($URL, &quot;<A HREF="http://www.yahoo.com/&quot">http://www.yahoo.com/&quot</A>;);
+    $bytes = $URL-&gt;QueryDataAvailable();
+    $file = $URL-&gt;ReadEntireFile();
+    $URL-&gt;Close();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Password_%5Bpassword%5D">Password [password]</A></STRONG><BR>
+<DD>
+Reads or sets the password used for an <CODE>FTP</CODE> or <CODE>HTTP</CODE> connection.
+If no <EM>password</EM> parameter is specified, the current value is
+returned; otherwise, the password is set to <EM>password</EM>.  See also
+<CODE>Username</CODE>, <CODE>QueryOption</CODE> and <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;Password(&quot;splurfgnagbxam&quot;);
+    $password = $HTTP-&gt;Password();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_QueryDataAvailable">QueryDataAvailable</A></STRONG><BR>
+<DD>
+Returns the number of bytes of data that are available to be read
+immediately by a subsequent call to <CODE>ReadFile</CODE> (or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on
+errors).  Can be applied to URL or HTTP request objects.  See
+<CODE>OpenURL</CODE> or <CODE>OpenRequest</CODE>.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;OpenURL($URL, &quot;<A HREF="http://www.yahoo.com/&quot">http://www.yahoo.com/&quot</A>;);
+    $bytes = $URL-&gt;QueryDataAvailable();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_QueryOption_option">QueryOption option</A></STRONG><BR>
+<DD>
+Queries an Internet option.  For the possible values of <EM>option</EM>,
+refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.  See
+also <CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $value = $INET-&gt;QueryOption(INTERNET_OPTION_CONNECT_TIMEOUT);
+    $value = $HTTP-&gt;QueryOption(INTERNET_OPTION_USERNAME);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ReadEntireFile">ReadEntireFile</A></STRONG><BR>
+<DD>
+Reads all the data available from an opened URL or HTTP request
+object.  Returns what have been read or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also
+<CODE>OpenURL</CODE>, <CODE>OpenRequest</CODE> and <CODE>ReadFile</CODE>.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;OpenURL($URL, &quot;<A HREF="http://www.yahoo.com/&quot">http://www.yahoo.com/&quot</A>;);
+    $file = $URL-&gt;ReadEntireFile();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ReadFile_bytes">ReadFile bytes</A></STRONG><BR>
+<DD>
+Reads <EM>bytes</EM> bytes of data from an opened URL or HTTP request
+object.  Returns what have been read or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.  See also
+<CODE>OpenURL</CODE>, <CODE>OpenRequest</CODE>, <A HREF="#item_QueryDataAvailable"><CODE>QueryDataAvailable</CODE></A> and
+<A HREF="#item_ReadEntireFile"><CODE>ReadEntireFile</CODE></A>.
+<P><STRONG>Note:</STRONG> be careful to keep <EM>bytes</EM> to an acceptable value (eg.  don't
+tell him to swallow megabytes at once...).  <A HREF="#item_ReadEntireFile"><CODE>ReadEntireFile</CODE></A> in fact
+uses <A HREF="#item_QueryDataAvailable"><CODE>QueryDataAvailable</CODE></A> and <CODE>ReadFile</CODE> in a loop to read no more
+than 16k at a time.</P>
+<P>Example:</P>
+<PRE>
+    $INET-&gt;OpenURL($URL, &quot;<A HREF="http://www.yahoo.com/&quot">http://www.yahoo.com/&quot</A>;);
+    $chunk = $URL-&gt;ReadFile(16000);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SetOption_option%2C_value">SetOption option, value</A></STRONG><BR>
+<DD>
+Sets an Internet option.  For the possible values of <EM>option</EM>, refer to
+the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.  See also
+<CODE>QueryOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;SetOption(INTERNET_OPTION_CONNECT_TIMEOUT,10000);
+    $HTTP-&gt;SetOption(INTERNET_OPTION_USERNAME,&quot;dada&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SetStatusCallback">SetStatusCallback</A></STRONG><BR>
+<DD>
+Initializes the callback routine used to return data about the
+progress of an asynchronous operation.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;SetStatusCallback();</PRE>
+<P>This is one of the step required to perform asynchronous operations;
+the complete procedure is:</P>
+<PRE>
+    # use the INTERNET_FLAG_ASYNC when initializing
+    $params{'flags'}=INTERNET_FLAG_ASYNC;
+    $INET = new Win32::Internet(\%params);</PRE>
+<PRE>
+    # initialize the callback routine
+    $INET-&gt;SetStatusCallback();</PRE>
+<PRE>
+    # specify the context parameter (the last 1 in this case)
+    $INET-&gt;HTTP($HTTP, &quot;www.yahoo.com&quot;, &quot;anonymous&quot;, &quot;dada\@divinf.it&quot;, 80, 0, 1);</PRE>
+<P>At this point, control returns immediately to Perl and $INET-&gt;<A HREF="#item_Error"><CODE>Error()</CODE></A>
+will return 997, which means an asynchronous I/O operation is
+pending.  Now, you can call</P>
+<PRE>
+    $HTTP-&gt;GetStatusCallback(1);</PRE>
+<P>in a loop to verify what's happening; see also <CODE>GetStatusCallback</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_TimeConvert_time">TimeConvert time</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TimeConvert_seconds%2C_minute%2C_hours%2C_day%2C_m">TimeConvert seconds, minute, hours, day, month, year,
+                  day_of_week, RFC</A></STRONG><BR>
+<DD>
+The first form takes a HTTP date/time string and returns the date/time
+converted in the following array: <EM>seconds, minute, hours, day,
+month, year, day_of_week</EM>.
+<P>The second form does the opposite (or at least it should, because
+actually seems to be malfunctioning): it takes the values and returns
+an HTTP date/time string, in the RFC format specified by the <EM>RFC</EM>
+parameter (OK, I didn't find yet any accepted value in the range
+0..2000, let me know if you have more luck with it).</P>
+<P>Example:</P>
+<PRE>
+    ($sec, $min, $hour, $day, $mday, $year, $wday) =
+       $INET-&gt;TimeConvert(&quot;Sun, 26 Jan 1997 20:01:52 GMT&quot;);</PRE>
+<PRE>
+    # the opposite DOESN'T WORK! which value should $RFC have???
+    $time = $INET-&gt;TimeConvert(52, 1, 20, 26, 1, 1997, 0, $RFC);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_UserAgent_%5Bname%5D">UserAgent [name]</A></STRONG><BR>
+<DD>
+Reads or sets the user agent used for HTTP requests.  If no <EM>name</EM>
+parameter is specified, the current value is returned; otherwise, the
+user agent is set to <EM>name</EM>.  See also <CODE>QueryOption</CODE> and
+<CODE>SetOption</CODE>.
+<P>Example:</P>
+<PRE>
+    $INET-&gt;UserAgent(&quot;Mozilla/3.0&quot;);
+    $useragent = $INET-&gt;UserAgent();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Username_%5Bname%5D">Username [name]</A></STRONG><BR>
+<DD>
+Reads or sets the username used for an <CODE>FTP</CODE> or <CODE>HTTP</CODE> connection.
+If no <EM>name</EM> parameter is specified, the current value is returned;
+otherwise, the username is set to <EM>name</EM>.  See also <CODE>Password</CODE>,
+<CODE>QueryOption</CODE> and SetOption.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;Username(&quot;dada&quot;);
+    $username = $HTTP-&gt;Username();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Version">Version</A></STRONG><BR>
+<DD>
+Returns the version numbers for the Win32::Internet package and the
+WININET.DLL version, as an array or string, depending on the context.
+The string returned will contain ``package_version/DLL_version'', while
+the array will contain: ``package_version'', ``DLL_version''.
+<P>Example:</P>
+<PRE>
+    $version = $INET-&gt;Version(); # should return &quot;0.06/4.70.1215&quot;
+    @version = $INET-&gt;Version(); # should return (&quot;0.06&quot;, &quot;4.70.1215&quot;)</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="ftp functions">FTP Functions</A></H2>
+<P><STRONG>General Note</STRONG></P>
+<P>All methods assume that you have the following lines:</P>
+<PRE>
+    use Win32::Internet;
+    $INET = new Win32::Internet();
+    $INET-&gt;FTP($FTP, &quot;hostname&quot;, &quot;username&quot;, &quot;password&quot;);</PRE>
+<P>somewhere before the method calls; in other words, we assume that you
+have an Internet object called $INET and an open FTP session called
+$FTP.</P>
+<P>See <CODE>new</CODE> and <CODE>FTP</CODE> for more information.</P>
+<P><STRONG>Methods</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Ascii">Ascii</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Asc">Asc</A></STRONG><BR>
+<DD>
+Sets the ASCII transfer mode for this FTP session.  It will be applied
+to the subsequent <CODE>Get</CODE> functions.  See also the <A HREF="#item_Binary"><CODE>Binary</CODE></A> and
+<CODE>Mode</CODE> function.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Ascii();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Binary">Binary</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Bin">Bin</A></STRONG><BR>
+<DD>
+Sets the binary transfer mode for this FTP session.  It will be
+applied to the subsequent <CODE>Get</CODE> functions.  See also the <A HREF="#item_Ascii"><CODE>Ascii</CODE></A> and
+<CODE>Mode</CODE> function.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Binary();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Cd_path">Cd path</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Cwd_path">Cwd path</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Chdir_path">Chdir path</A></STRONG><BR>
+<DD>
+Changes the current directory on the FTP remote host.  Returns <EM>path</EM>
+or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Cd(&quot;/pub&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Delete_file">Delete file</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Del_file">Del file</A></STRONG><BR>
+<DD>
+Deletes a file on the FTP remote host.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Delete(&quot;110-i86.zip&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Get_remote%2C_%5Blocal%2C_overwrite%2C_flags%2C_co">Get remote, [local, overwrite, flags, context]</A></STRONG><BR>
+<DD>
+Gets the <EM>remote</EM> FTP file and saves it locally in <EM>local</EM>.  If
+<EM>local</EM> is not specified, it will be the same name as <EM>remote</EM>.
+Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.  The parameters and their values are:
+<UL>
+<LI><STRONG><A NAME="item_remote">remote</A></STRONG><BR>
+
+The name of the remote file on the FTP server.  Default: <EM>none</EM>.
+<P></P>
+<LI><STRONG><A NAME="item_local">local</A></STRONG><BR>
+
+The name of the local file to create.  Default: remote.
+<P></P>
+<LI><STRONG><A NAME="item_overwrite">overwrite</A></STRONG><BR>
+
+If 0, overwrites <EM>local</EM> if it exists; with any other value, the
+function fails if the <EM>local</EM> file already exists.  Default: 0.
+<P></P>
+<LI><STRONG>flags</STRONG><BR>
+
+Additional flags affecting the behavior of the function.  Default:
+<EM>none</EM>.
+<P></P>
+<LI><STRONG>context</STRONG><BR>
+
+A number to identify this operation if it is asynchronous.  See
+<A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A> and <CODE>GetStatusCallback</CODE> for more info on
+asynchronous operations.  Default: <EM>none</EM>.
+<P></P></UL>
+<P>Refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation for
+more details on those parameters.</P>
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Get(&quot;110-i86.zip&quot;);
+    $FTP-&gt;Get(&quot;/pub/perl/languages/CPAN/00index.html&quot;, &quot;CPAN_index.html&quot;);</PRE>
+<DT><STRONG><A NAME="item_List_%5Bpattern%2C_listmode%5D">List [pattern, listmode]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Ls_%5Bpattern%2C_listmode%5D">Ls [pattern, listmode]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Dir_%5Bpattern%2C_listmode%5D">Dir [pattern, listmode]</A></STRONG><BR>
+<DD>
+Returns a list containing the files found in this directory,
+eventually matching the given <EM>pattern</EM> (which, if omitted, is
+considered ``*.*'').  The content of the returned list depends on the
+<EM>listmode</EM> parameter, which can have the following values:
+<UL>
+<LI><STRONG><A NAME="item_1">listmode=1 (or omitted)</A></STRONG><BR>
+
+the list contains the names of the files found.  Example:
+<PRE>
+    @files = $FTP-&gt;List();
+    @textfiles = $FTP-&gt;List(&quot;*.txt&quot;);
+    foreach $file (@textfiles) {
+      print &quot;Name: &quot;, $file, &quot;\n&quot;;
+    }</PRE>
+<P></P>
+<LI><STRONG><A NAME="item_listmode%3D2">listmode=2</A></STRONG><BR>
+
+the list contains 7 values for each file, which respectively are:
+<UL>
+<LI><STRONG><A NAME="item_the_file_name">the file name</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_DOS_short_file_name%2C_aka_8%2E3">the DOS short file name, aka 8.3</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_size">the size</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_attributes">the attributes</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_creation_time">the creation time</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_last_access_time">the last access time</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_the_last_modified_time">the last modified time</A></STRONG><BR>
+
+</UL>
+<P>Example:</P>
+<PRE>
+    @files = $FTP-&gt;List(&quot;*.*&quot;, 2);
+    for($i=0; $i&lt;=$#files; $i+=7) {
+      print &quot;Name: &quot;, @files[$i], &quot;\n&quot;;
+      print &quot;Size: &quot;, @files[$i+2], &quot;\n&quot;;
+      print &quot;Attr: &quot;, @files[$i+3], &quot;\n&quot;;
+    }</PRE>
+<LI><STRONG><A NAME="item_listmode%3D3">listmode=3</A></STRONG><BR>
+
+the list contains a reference to an hash array for each found file;
+each hash contains:
+<UL>
+<LI><STRONG><A NAME="item_name_%3D%3E_the_file_name">name =&gt; the file name</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_altname_%3D%3E_the_DOS_short_file_name%2C_aka_8%2E">altname =&gt; the DOS short file name, aka 8.3</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_size_%3D%3E_the_size">size =&gt; the size</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_attr_%3D%3E_the_attributes">attr =&gt; the attributes</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_ctime_%3D%3E_the_creation_time">ctime =&gt; the creation time</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_atime_%3D%3E_the_last_access_time">atime =&gt; the last access time</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_mtime_%3D%3E_the_last_modified_time">mtime =&gt; the last modified time</A></STRONG><BR>
+
+</UL>
+<P>Example:</P>
+<PRE>
+    @files = $FTP-&gt;List(&quot;*.*&quot;, 3);
+    foreach $file (@files) {
+      print $file-&gt;{'name'}, &quot; &quot;, $file-&gt;{'size'}, &quot; &quot;, $file-&gt;{'attr'}, &quot;\n&quot;;
+    }</PRE>
+<P><STRONG>Note:</STRONG> all times are reported as strings of the following format:
+<EM>second, hour, minute, day, month, year</EM>.</P>
+<P>Example:</P>
+<PRE>
+    $file-&gt;{'mtime'} == &quot;0,10,58,9,12,1996&quot; stands for 09 Dec 1996 at 10:58:00</PRE>
+</UL>
+<DT><STRONG><A NAME="item_Mkdir_name">Mkdir name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Md_name">Md name</A></STRONG><BR>
+<DD>
+Creates a directory on the FTP remote host.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Mkdir(&quot;NextBuild&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Mode_%5Bmode%5D">Mode [mode]</A></STRONG><BR>
+<DD>
+If called with no arguments, returns the current transfer mode for
+this FTP session (``asc'' for ASCII or ``bin'' for binary).  The <EM>mode</EM>
+argument can be ``asc'' or ``bin'', in which case the appropriate transfer
+mode is selected.  See also the Ascii and Binary functions.  Returns
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.
+<P>Example:</P>
+<PRE>
+    print &quot;Current mode is: &quot;, $FTP-&gt;Mode();
+    $FTP-&gt;Mode(&quot;asc&quot;); # ...  same as $FTP-&gt;Ascii();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Pasv_%5Bmode%5D">Pasv [mode]</A></STRONG><BR>
+<DD>
+If called with no arguments, returns 1 if the current FTP session has
+passive transfer mode enabled, 0 if not.
+<P>You can call it with a <EM>mode</EM> parameter (0/1) only as a method of a
+Internet object (see <CODE>new</CODE>), in which case it will set the default
+value for the next <CODE>FTP</CODE> objects you create (read: set it before,
+because you can't change this value once you opened the FTP session).</P>
+<P>Example:</P>
+<PRE>
+    print &quot;Pasv is: &quot;, $FTP-&gt;Pasv();</PRE>
+<PRE>
+    $INET-&gt;Pasv(1);
+    $INET-&gt;FTP($FTP,&quot;ftp.activeware.com&quot;, &quot;anonymous&quot;, &quot;dada\@divinf.it&quot;);
+    $FTP-&gt;Pasv(0); # this will be ignored...</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Put_local%2C_%5Bremote%2C_context%5D">Put local, [remote, context]</A></STRONG><BR>
+<DD>
+Upload the <EM>local</EM> file to the FTP server saving it under the name
+<EM>remote</EM>, which if if omitted is the same name as <EM>local</EM>.  Returns
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P><EM>context</EM> is a number to identify this operation if it is asynchronous.
+See <A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A> and <CODE>GetStatusCallback</CODE> for more info on
+asynchronous operations.</P>
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Put(&quot;internet.zip&quot;);
+    $FTP-&gt;Put(&quot;d:/users/dada/temp.zip&quot;, &quot;/temp/dada.zip&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Pwd">Pwd</A></STRONG><BR>
+<DD>
+Returns the current directory on the FTP server or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors.
+<P>Example:</P>
+<PRE>
+    $path = $FTP-&gt;Pwd();</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Rename_oldfile%2C_newfile">Rename oldfile, newfile</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Ren_oldfile%2C_newfile">Ren oldfile, newfile</A></STRONG><BR>
+<DD>
+Renames a file on the FTP remote host.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Rename(&quot;110-i86.zip&quot;, &quot;68i-011.zip&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Rmdir_name">Rmdir name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Rd_name">Rd name</A></STRONG><BR>
+<DD>
+Removes a directory on the FTP remote host.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on error.
+<P>Example:</P>
+<PRE>
+    $FTP-&gt;Rmdir(&quot;CurrentBuild&quot;);</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="http functions">HTTP Functions</A></H2>
+<P><STRONG>General Note</STRONG></P>
+<P>All methods assume that you have the following lines:</P>
+<PRE>
+    use Win32::Internet;
+    $INET = new Win32::Internet();
+    $INET-&gt;HTTP($HTTP, &quot;hostname&quot;, &quot;username&quot;, &quot;password&quot;);</PRE>
+<P>somewhere before the method calls; in other words, we assume that you
+have an Internet object called $INET and an open HTTP session called
+$HTTP.</P>
+<P>See <CODE>new</CODE> and <CODE>HTTP</CODE> for more information.</P>
+<P><STRONG>Methods</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_AddHeader_header%2C_%5Bflags%5D">AddHeader header, [flags]</A></STRONG><BR>
+<DD>
+Adds HTTP request headers to an HTTP request object created with
+<CODE>OpenRequest</CODE>.  For the possible values of <EM>flags</EM> refer to the
+<A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;OpenRequest($REQUEST,&quot;/index.html&quot;);
+    $REQUEST-&gt;AddHeader(&quot;If-Modified-Since:  Sunday, 17-Nov-96 11:40:03 GMT&quot;);
+    $REQUEST-&gt;AddHeader(&quot;Accept: text/html\r\n&quot;, HTTP_ADDREQ_FLAG_REPLACE);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_OpenRequest_requestobject%2C_%5Bpath%2C_method%2C_">OpenRequest requestobject, [path, method, version, referer, accept, flags, context]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_OpenRequest_requestobject%2C_hashref">OpenRequest requestobject, hashref</A></STRONG><BR>
+<DD>
+Opens an HTTP request.  Returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> on errors or a number if the
+connection was succesful.  You can then use one of the <CODE>AddHeader</CODE>,
+<CODE>SendRequest</CODE>, <CODE>QueryInfo</CODE>, <A HREF="#item_QueryDataAvailable"><CODE>QueryDataAvailable</CODE></A> and <CODE>ReadFile</CODE>
+methods on the newly created <EM>requestobject</EM>.  The parameters and
+their values are:
+<UL>
+<LI><STRONG><A NAME="item_path">path</A></STRONG><BR>
+
+The object to request.  This is generally a file name, an executable
+module, etc.  Default: /
+<P></P>
+<LI><STRONG><A NAME="item_method">method</A></STRONG><BR>
+
+The method to use; can actually be GET, POST, HEAD or PUT.  Default:
+GET
+<P></P>
+<LI><STRONG><A NAME="item_version">version</A></STRONG><BR>
+
+The HTTP version.  Default: HTTP/1.0
+<P></P>
+<LI><STRONG><A NAME="item_referer">referer</A></STRONG><BR>
+
+The URL of the document from which the URL in the request was
+obtained.  Default: <EM>none</EM>
+<P></P>
+<LI><STRONG><A NAME="item_accept">accept</A></STRONG><BR>
+
+The content types accepted.  They must be separated by a ``\0'' (ASCII
+zero).  Default: text/* image/gif image/jpeg
+<P></P>
+<LI><STRONG>flags</STRONG><BR>
+
+Additional flags affecting the behavior of the function.  Default:
+<EM>none</EM>
+<P></P>
+<LI><STRONG>context</STRONG><BR>
+
+A number to identify this operation if it is asynchronous.  See
+<A HREF="#item_SetStatusCallback"><CODE>SetStatusCallback</CODE></A> and <CODE>GetStatusCallback</CODE> for more info on
+asynchronous operations.  Default: <EM>none</EM>
+<P></P></UL>
+<P>Refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> documentation for
+more details on those parameters.  If you pass <EM>hashref</EM> (a reference to
+an hash array), the following values are taken from the array:</P>
+<PRE>
+    %hash=(
+      &quot;path&quot;        =&gt; &quot;path&quot;,
+      &quot;method&quot;      =&gt; &quot;method&quot;,
+      &quot;version&quot;     =&gt; &quot;version&quot;,
+      &quot;referer&quot;     =&gt; &quot;referer&quot;,
+      &quot;accept&quot;      =&gt; &quot;accept&quot;,
+      &quot;flags&quot;       =&gt; flags,
+      &quot;context&quot;     =&gt; context,
+    );</PRE>
+<P>See also <CODE>Request</CODE>.</P>
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;OpenRequest($REQUEST, &quot;/index.html&quot;);
+    $HTTP-&gt;OpenRequest($REQUEST, &quot;/index.html&quot;, &quot;GET&quot;, &quot;HTTP/0.9&quot;);</PRE>
+<PRE>
+    $params{&quot;path&quot;} = &quot;/index.html&quot;;
+    $params{&quot;flags&quot;} = &quot;
+    $HTTP-&gt;OpenRequest($REQUEST, \%params);</PRE>
+<DT><STRONG><A NAME="item_QueryInfo_header%2C_%5Bflags%5D">QueryInfo header, [flags]</A></STRONG><BR>
+<DD>
+Queries information about an HTTP request object created with
+<CODE>OpenRequest</CODE>.  You can specify an <EM>header</EM> (for example,
+``Content-type'') and/or one or more <EM>flags</EM>.  If you don't specify
+<EM>flags</EM>, HTTP_QUERY_CUSTOM will be used by default; this means that
+<EM>header</EM> should contain a valid HTTP header name.  For the possible
+values of <EM>flags</EM> refer to the <A HREF="#microsoft win32 internet functions">Microsoft Win32 Internet Functions</A> document.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;OpenRequest($REQUEST,&quot;/index.html&quot;);
+    $statuscode = $REQUEST-&gt;QueryInfo(&quot;&quot;, HTTP_QUERY_STATUS_CODE);
+    $headers = $REQUEST-&gt;QueryInfo(&quot;&quot;, HTTP_QUERY_RAW_HEADERS_CRLF); # will get all the headers
+    $length = $REQUEST-&gt;QueryInfo(&quot;Content-length&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Request_%5Bpath%2C_method%2C_version%2C_referer%2C">Request [path, method, version, referer, accept, flags]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Request_hashref">Request hashref</A></STRONG><BR>
+<DD>
+Performs an HTTP request and returns an array containing the status
+code, the headers and the content of the file.  It is a one-step
+procedure that makes an <CODE>OpenRequest</CODE>, a <CODE>SendRequest</CODE>, some
+<CODE>QueryInfo</CODE>, <CODE>ReadFile</CODE> and finally <A HREF="#item_Close"><CODE>Close</CODE></A>.  For a description of
+the parameters, see <CODE>OpenRequest</CODE>.
+<P>Example:</P>
+<PRE>
+    ($statuscode, $headers, $file) = $HTTP-&gt;Request(&quot;/index.html&quot;);
+    ($s, $h, $f) = $HTTP-&gt;Request(&quot;/index.html&quot;, &quot;GET&quot;, &quot;HTTP/1.0&quot;);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SendRequest_%5Bpostdata%5D">SendRequest [postdata]</A></STRONG><BR>
+<DD>
+Send an HTTP request to the destination server.  <EM>postdata</EM> are any
+optional data to send immediately after the request header; this is
+generally used for POST or PUT requests.  See also <CODE>OpenRequest</CODE>.
+<P>Example:</P>
+<PRE>
+    $HTTP-&gt;OpenRequest($REQUEST, &quot;/index.html&quot;);
+    $REQUEST-&gt;SendRequest();</PRE>
+<PRE>
+    # A POST request...
+    $HTTP-&gt;OpenRequest($REQUEST, &quot;/cgi-bin/somescript.pl&quot;, &quot;POST&quot;);</PRE>
+<PRE>
+    #This line is a must -&gt; (thanks Philip :)
+    $REQUEST-&gt;AddHeader(&quot;Content-Type: application/x-www-form-urlencoded&quot;);</PRE>
+<PRE>
+    $REQUEST-&gt;SendRequest(&quot;key1=value1&amp;key2=value2&amp;key3=value3&quot;);</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="appendix">APPENDIX</A></H1>
+<P>
+<H2><A NAME="microsoft win32 internet functions">Microsoft Win32 Internet Functions</A></H2>
+<P>Complete documentation for the Microsoft Win32 Internet Functions can
+be found, in both HTML and zipped Word format, at this address:</P>
+<PRE>
+    <A HREF="http://www.microsoft.com/intdev/sdk/docs/wininet/">http://www.microsoft.com/intdev/sdk/docs/wininet/</A></PRE>
+<P>
+<H2><A NAME="functions table">Functions Table</A></H2>
+<P>This table reports the correspondence between the functions offered by
+WININET.DLL and their implementation in the Win32::Internet
+extension. Functions showing a ``---'' are not currently
+implemented. Functions enclosed in parens ( ) aren't implemented
+straightforwardly, but in a higher-level routine, eg. together with
+other functions.</P>
+<PRE>
+    WININET.DLL                     Win32::Internet</PRE>
+<PRE>
+    InternetOpen                    new Win32::Internet
+    InternetConnect                 FTP / HTTP
+    InternetCloseHandle             Close
+    InternetQueryOption             QueryOption
+    InternetSetOption               SetOption
+    InternetSetOptionEx             ---
+    InternetSetStatusCallback       SetStatusCallback
+    InternetStatusCallback          GetStatusCallback
+    InternetConfirmZoneCrossing     ---
+    InternetTimeFromSystemTime      TimeConvert
+    InternetTimeToSystemTime        TimeConvert
+    InternetAttemptConnect          ---
+    InternetReadFile                ReadFile
+    InternetSetFilePointer          ---
+    InternetFindNextFile            (List)
+    InternetQueryDataAvailable      QueryDataAvailable
+    InternetGetLastResponseInfo     GetResponse
+    InternetWriteFile               ---
+    InternetCrackUrl                CrackURL
+    InternetCreateUrl               CreateURL
+    InternetCanonicalizeUrl         CanonicalizeURL
+    InternetCombineUrl              CombineURL
+    InternetOpenUrl                 OpenURL
+    FtpFindFirstFile                (List)
+    FtpGetFile                      Get
+    FtpPutFile                      Put
+    FtpDeleteFile                   Delete
+    FtpRenameFile                   Rename
+    FtpOpenFile                     ---
+    FtpCreateDirectory              Mkdir
+    FtpRemoveDirectory              Rmdir
+    FtpSetCurrentDirectory          Cd
+    FtpGetCurrentDirectory          Pwd
+    HttpOpenRequest                 OpenRequest
+    HttpAddRequestHeaders           AddHeader
+    HttpSendRequest                 SendRequest
+    HttpQueryInfo                   QueryInfo
+    InternetErrorDlg                ---</PRE>
+<P>Actually, I don't plan to add support for Gopher, Cookie and Cache
+functions. I will if there will be consistent requests to do so.</P>
+<P>There are a number of higher-level functions in the Win32::Internet
+that simplify some usual procedures, calling more that one WININET API
+function. This table reports those functions and the relative WININET
+functions they use.</P>
+<PRE>
+    Win32::Internet                 WININET.DLL</PRE>
+<PRE>
+    FetchURL                        InternetOpenUrl
+                                    InternetQueryDataAvailable
+                                    InternetReadFile
+                                    InternetCloseHandle</PRE>
+<PRE>
+    ReadEntireFile                  InternetQueryDataAvailable
+                                    InternetReadFile</PRE>
+<PRE>
+    Request                         HttpOpenRequest
+                                    HttpSendRequest
+                                    HttpQueryInfo
+                                    InternetQueryDataAvailable
+                                    InternetReadFile
+                                    InternetCloseHandle</PRE>
+<PRE>
+    List                            FtpFindFirstFile
+                                    InternetFindNextFile</PRE>
+<P>
+<H2><A NAME="constants">Constants</A></H2>
+<P>Those are the constants exported by the package in the main namespace
+(eg. you can use them in your scripts); for their meaning and proper
+use, refer to the Microsoft Win32 Internet Functions document.</P>
+<PRE>
+    HTTP_ADDREQ_FLAG_ADD
+    HTTP_ADDREQ_FLAG_REPLACE
+    HTTP_QUERY_ALLOW
+    HTTP_QUERY_CONTENT_DESCRIPTION
+    HTTP_QUERY_CONTENT_ID
+    HTTP_QUERY_CONTENT_LENGTH
+    HTTP_QUERY_CONTENT_TRANSFER_ENCODING
+    HTTP_QUERY_CONTENT_TYPE
+    HTTP_QUERY_COST
+    HTTP_QUERY_CUSTOM
+    HTTP_QUERY_DATE
+    HTTP_QUERY_DERIVED_FROM
+    HTTP_QUERY_EXPIRES
+    HTTP_QUERY_FLAG_REQUEST_HEADERS
+    HTTP_QUERY_FLAG_SYSTEMTIME
+    HTTP_QUERY_LANGUAGE
+    HTTP_QUERY_LAST_MODIFIED
+    HTTP_QUERY_MESSAGE_ID
+    HTTP_QUERY_MIME_VERSION
+    HTTP_QUERY_PRAGMA
+    HTTP_QUERY_PUBLIC
+    HTTP_QUERY_RAW_HEADERS
+    HTTP_QUERY_RAW_HEADERS_CRLF
+    HTTP_QUERY_REQUEST_METHOD
+    HTTP_QUERY_SERVER
+    HTTP_QUERY_STATUS_CODE
+    HTTP_QUERY_STATUS_TEXT
+    HTTP_QUERY_URI
+    HTTP_QUERY_USER_AGENT
+    HTTP_QUERY_VERSION
+    HTTP_QUERY_WWW_LINK
+    ICU_BROWSER_MODE
+    ICU_DECODE
+    ICU_ENCODE_SPACES_ONLY
+    ICU_ESCAPE
+    ICU_NO_ENCODE
+    ICU_NO_META
+    ICU_USERNAME
+    INTERNET_CONNECT_FLAG_PASSIVE
+    INTERNET_FLAG_ASYNC
+    INTERNET_FLAG_HYPERLINK
+    INTERNET_FLAG_KEEP_CONNECTION
+    INTERNET_FLAG_MAKE_PERSISTENT
+    INTERNET_FLAG_NO_AUTH
+    INTERNET_FLAG_NO_AUTO_REDIRECT
+    INTERNET_FLAG_NO_CACHE_WRITE
+    INTERNET_FLAG_NO_COOKIES
+    INTERNET_FLAG_READ_PREFETCH
+    INTERNET_FLAG_RELOAD
+    INTERNET_FLAG_RESYNCHRONIZE
+    INTERNET_FLAG_TRANSFER_ASCII
+    INTERNET_FLAG_TRANSFER_BINARY
+    INTERNET_INVALID_PORT_NUMBER
+    INTERNET_INVALID_STATUS_CALLBACK
+    INTERNET_OPEN_TYPE_DIRECT
+    INTERNET_OPEN_TYPE_PROXY
+    INTERNET_OPEN_TYPE_PROXY_PRECONFIG
+    INTERNET_OPTION_CONNECT_BACKOFF
+    INTERNET_OPTION_CONNECT_RETRIES
+    INTERNET_OPTION_CONNECT_TIMEOUT
+    INTERNET_OPTION_CONTROL_SEND_TIMEOUT
+    INTERNET_OPTION_CONTROL_RECEIVE_TIMEOUT
+    INTERNET_OPTION_DATA_SEND_TIMEOUT
+    INTERNET_OPTION_DATA_RECEIVE_TIMEOUT
+    INTERNET_OPTION_HANDLE_TYPE
+    INTERNET_OPTION_LISTEN_TIMEOUT
+    INTERNET_OPTION_PASSWORD
+    INTERNET_OPTION_READ_BUFFER_SIZE
+    INTERNET_OPTION_USER_AGENT
+    INTERNET_OPTION_USERNAME
+    INTERNET_OPTION_VERSION
+    INTERNET_OPTION_WRITE_BUFFER_SIZE
+    INTERNET_SERVICE_FTP
+    INTERNET_SERVICE_GOPHER
+    INTERNET_SERVICE_HTTP
+    INTERNET_STATUS_CLOSING_CONNECTION
+    INTERNET_STATUS_CONNECTED_TO_SERVER
+    INTERNET_STATUS_CONNECTING_TO_SERVER
+    INTERNET_STATUS_CONNECTION_CLOSED
+    INTERNET_STATUS_HANDLE_CLOSING
+    INTERNET_STATUS_HANDLE_CREATED
+    INTERNET_STATUS_NAME_RESOLVED
+    INTERNET_STATUS_RECEIVING_RESPONSE
+    INTERNET_STATUS_REDIRECT
+    INTERNET_STATUS_REQUEST_COMPLETE
+    INTERNET_STATUS_REQUEST_SENT
+    INTERNET_STATUS_RESOLVING_NAME
+    INTERNET_STATUS_RESPONSE_RECEIVED
+    INTERNET_STATUS_SENDING_REQUEST</PRE>
+<P>
+<HR>
+<H1><A NAME="version history">VERSION HISTORY</A></H1>
+<UL>
+<LI><STRONG><A NAME="item_081">0.081 (25 Sep 1999)</A></STRONG><BR>
+
+<UL>
+<LI>
+Documentation converted to pod format by Jan Dubois &lt;<A HREF="mailto:jand@activestate.com">jand@activestate.com</A>&gt;.
+<P></P>
+<LI>
+Minor changes from Perl 5.005xx compatibility.
+<P></P></UL>
+<LI><STRONG><A NAME="item_08">0.08 (14 Feb 1997)</A></STRONG><BR>
+
+<UL>
+<LI>
+fixed 2 more bugs in <CODE>Option(s)</CODE> related subs (thanks to Brian
+Helterline!).
+<P></P>
+<LI>
+<A HREF="#item_Error"><CODE>Error()</CODE></A> now gets error messages directly from WININET.DLL.
+<P></P>
+<LI>
+The PLL file now comes in 2 versions, one for Perl version 5.001
+(build 100) and one for Perl version 5.003 (build 300 and
+higher). Everybody should be happy now :)
+<P></P>
+<LI>
+added an installation program.
+<P></P></UL>
+<LI><STRONG><A NAME="item_07">0.07 (10 Feb 1997)</A></STRONG><BR>
+
+<UL>
+<LI>
+fixed a bug in <A HREF="#item_Version"><CODE>Version()</CODE></A> introduced with 0.06...
+<P></P>
+<LI>
+completely reworked PM file, fixed *lots* of minor bugs, and removed
+almost all the warnings with ``perl -w''.
+<P></P></UL>
+<LI><STRONG><A NAME="item_06">0.06 (26 Jan 1997)</A></STRONG><BR>
+
+<UL>
+<LI>
+fixed another hideous bug in ``new'' (the 'class' parameter was still
+missing).
+<P></P>
+<LI>
+added support for asynchronous operations (work still in embryo).
+<P></P>
+<LI>
+removed the ending \0 (ASCII zero) from the DLL version returned by
+``Version''.
+<P></P>
+<LI>
+added a lot of constants.
+<P></P>
+<LI>
+added <CODE>safefree()</CODE> after every <CODE>safemalloc()</CODE> in C... wonder why I didn't
+it before :)
+<P></P>
+<LI>
+added TimeConvert, which actually works one way only.
+<P></P></UL>
+<LI><STRONG><A NAME="item_05f">0.05f (29 Nov 1996)</A></STRONG><BR>
+
+<UL>
+<LI>
+fixed a bug in ``new'' (parameters passed were simply ignored).
+<P></P>
+<LI>
+fixed another bug: ``Chdir'' and ``Cwd'' were aliases of RMDIR instead of
+CD..
+<P></P></UL>
+<LI><STRONG><A NAME="item_05">0.05 (29 Nov 1996)</A></STRONG><BR>
+
+<UL>
+<LI>
+added ``CrackURL'' and ``CreateURL''.
+<P></P>
+<LI>
+corrected an error in TEST.PL (there was a GetUserAgent instead of
+UserAgent).
+<P></P></UL>
+<LI><STRONG><A NAME="item_04">0.04 (25 Nov 1996)</A></STRONG><BR>
+
+<UL>
+<LI>
+added ``Version'' to retrieve package and DLL versions.
+<P></P>
+<LI>
+added proxies and other options to ``new''.
+<P></P>
+<LI>
+changed ``OpenRequest'' and ``Request'' to read parameters from a hash.
+<P></P>
+<LI>
+added ``SetOption/QueryOption'' and a lot of relative functions
+(connect, username, password, useragent, etc.).
+<P></P>
+<LI>
+added ``CanonicalizeURL'' and ``CombineURL''.
+<P></P>
+<LI>
+``Error'' covers a wider spectrum of errors.
+<P></P></UL>
+<LI><STRONG><A NAME="item_02">0.02 (18 Nov 1996)</A></STRONG><BR>
+
+<UL>
+<LI>
+added support for HTTP sessions and requests.
+<P></P></UL>
+<LI><STRONG><A NAME="item_01">0.01 (11 Nov 1996)</A></STRONG><BR>
+
+<UL>
+<LI>
+fetching of HTTP, FTP and GOPHER URLs.
+<P></P>
+<LI>
+complete set of commands to manage an FTP session.
+<P></P></UL>
+</UL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Version 0.08 (14 Feb 1997) by Aldo Calpini &lt;<A HREF="mailto:a.calpini@romagiubileo.it">a.calpini@romagiubileo.it</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Win32::Internet is based on the Win32::Registry code written by Jesse
+Dougherty.</P>
+<P>Additional thanks to: Carl Tichler for his help in the initial
+development; Tore Haraldsen, Brian Helterline for the bugfixes; Dave
+Roth for his great source code examples.</P>
+<P>
+<HR>
+<H1><A NAME="disclaimer">DISCLAIMER</A></H1>
+<P>This program is FREE; you can redistribute, modify, disassemble, or
+even reverse engineer this software at your will. Keep in mind,
+however, that NOTHING IS GUARANTEED to work and everything you do is
+AT YOUR OWN RISK - I will not take responsability for any damage, loss
+of money and/or health that may arise from the use of this program!</P>
+<P>This is distributed under the terms of Larry Wall's Artistic License.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Internet - Access to WININET.DLL functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

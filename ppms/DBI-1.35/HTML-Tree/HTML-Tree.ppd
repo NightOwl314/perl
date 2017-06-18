@@ -1,0 +1,23 @@
+<SOFTPKG NAME="HTML-Tree" VERSION="3,07,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="sun4-solaris-thread-multi/HTML-Tree.tar.gz" />
+    <DEPENDENCY NAME="HTML-Tagset" VERSION="3,03,0,0" />
+    <ARCHITECTURE NAME="sun4-solaris-thread-multi" />
+    <OS NAME="solaris" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="i686-linux-thread-multi/HTML-Tree.tar.gz" />
+    <DEPENDENCY NAME="HTML-Tagset" VERSION="3,03,0,0" />
+    <ARCHITECTURE NAME="i686-linux-thread-multi" />
+    <OS NAME="linux" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="MSWin32-x86-multi-thread/HTML-Tree.tar.gz" />
+    <DEPENDENCY NAME="HTML-Tagset" VERSION="3,03,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>functions that construct a HTML syntax tree</ABSTRACT>
+  <AUTHOR>Sean M. Burke (sburke@cpan.org)</AUTHOR>
+  <TITLE>HTML-Tree</TITLE>
+</SOFTPKG>

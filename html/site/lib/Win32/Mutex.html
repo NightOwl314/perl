@@ -1,0 +1,115 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::Mutex - Use Win32 mutex objects from Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Mutex - Use Win32 mutex objects from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+		<LI><A HREF="#deprecated functions and methods">Deprecated Functions and Methods</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Mutex - Use Win32 mutex objects from Perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        require Win32::Mutex;</PRE>
+<PRE>
+        $mutex = Win32::Mutex-&gt;new($initial,$name);
+        $mutex-&gt;wait;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module allows access to the Win32 mutex objects.  The <A HREF="#item_wait"><CODE>wait</CODE></A>
+method and <CODE>wait_all</CODE> &amp; <CODE>wait_any</CODE> functions are inherited from the
+<A HREF="#win32::ipc">Win32::IPC</A> module.</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">$mutex = Win32::Mutex-&gt;new([$initial, [$name]])</A></STRONG><BR>
+<DD>
+Constructor for a new mutex object.  If <CODE>$initial</CODE> is true, requests
+immediate ownership of the mutex (default false).  If <CODE>$name</CODE> is
+omitted, creates an unnamed mutex object.
+<P>If <CODE>$name</CODE> signifies an existing mutex object, then <CODE>$initial</CODE> is
+ignored and the object is opened.</P>
+<P></P>
+<DT><STRONG><A NAME="item_open">$mutex = Win32::Mutex-&gt;<CODE>open($name)</CODE></A></STRONG><BR>
+<DD>
+Constructor for opening an existing mutex object.
+<P></P>
+<DT><STRONG><A NAME="item_release">$mutex-&gt;release</A></STRONG><BR>
+<DD>
+Release ownership of a <CODE>$mutex</CODE>.  You should have obtained ownership
+of the mutex through <A HREF="#item_new"><CODE>new</CODE></A> or one of the wait functions.  Returns
+true if successful.
+<P></P>
+<DT><STRONG><A NAME="item_wait">$mutex-&gt;<CODE>wait([$timeout])</CODE></A></STRONG><BR>
+<DD>
+Wait for ownership of <CODE>$mutex</CODE>.  See <A HREF="#win32::ipc">Win32::IPC</A>.
+<P></P></DL>
+<P>
+<H2><A NAME="deprecated functions and methods">Deprecated Functions and Methods</A></H2>
+<P><STRONG>Win32::Mutex</STRONG> still supports the ActiveWare syntax, but its use is
+deprecated.</P>
+<DL>
+<DT><STRONG><A NAME="item_Create"><CODE>Create($MutObj,$Initial,$Name)</CODE></A></STRONG><BR>
+<DD>
+Use <A HREF="#item_new"><CODE>$MutObj = Win32::Mutex-&gt;new($Initial,$Name)</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_Open"><CODE>Open($MutObj,$Name)</CODE></A></STRONG><BR>
+<DD>
+Use <A HREF="#item_open"><CODE>$MutObj = Win32::Mutex-&gt;open($Name)</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_Release">$MutObj-&gt;<CODE>Release()</CODE></A></STRONG><BR>
+<DD>
+Use <A HREF="#item_release"><CODE>$MutObj-&gt;release</CODE></A> instead.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Christopher J. Madsen &lt;<EM><A HREF="mailto:chris_madsen@geocities.com">chris_madsen@geocities.com</A></EM>&gt;</P>
+<P>Loosely based on the original module by ActiveWare Internet Corp.,
+<EM><A HREF="http://www.ActiveWare.com">http://www.ActiveWare.com</A></EM></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Mutex - Use Win32 mutex objects from Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

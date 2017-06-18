@@ -1,0 +1,92 @@
+
+<HTML>
+<HEAD>
+<TITLE>URI::WithBase - URI which remember their base</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::WithBase - URI which remember their base</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>URI::WithBase - URI which remember their base</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ $u1 = URI::WithBase-&gt;new($str, $base);
+ $u2 = $u1-&gt;abs;</PRE>
+<PRE>
+ $base = $u1-&gt;base;
+ $u1-&gt;base( $new_base )</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provide the <CODE>URI::WithBase</CODE> class.  Objects of this class
+are like <CODE>URI</CODE> objects, but can keep their base too.</P>
+<P>The methods provided in addition to or modified from those of <CODE>URI</CODE> are:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$uri = URI::WithBase-&gt;new($str, [$base])</A></STRONG><BR>
+<DD>
+The constructor takes a an optional base URI as the second argument.
+<P></P>
+<DT><STRONG><A NAME="item_base">$uri-&gt;base( [$new_base] )</A></STRONG><BR>
+<DD>
+This method can be used to get or set the value of the base attribute.
+<P></P>
+<DT><STRONG><A NAME="item_abs">$uri-&gt;abs( [$base_uri] )</A></STRONG><BR>
+<DD>
+The $base_uri argument is now made optional as the object carries it's
+base with it.
+<P></P>
+<DT><STRONG><A NAME="item_rel">$uri-&gt;rel( [$base_uri] )</A></STRONG><BR>
+<DD>
+The $base_uri argument is now made optional as the object carries it's
+base with it.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/URI.html">the URI manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1998-2000 Gisle Aas.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::WithBase - URI which remember their base</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

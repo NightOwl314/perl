@@ -1,0 +1,97 @@
+
+<HTML>
+<HEAD>
+<TITLE>Errno - System errno constants</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Errno - System errno constants</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#caveats">CAVEATS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Errno - System errno constants</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Errno qw(EINTR EIO :POSIX);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Errno</CODE> defines and conditionally exports all the error constants
+defined in your system <CODE>errno.h</CODE> include file. It has a single export
+tag, <CODE>:POSIX</CODE>, which will export all POSIX defined error numbers.</P>
+<P><CODE>Errno</CODE> also makes <CODE>%!</CODE> magic such that each element of <CODE>%!</CODE> has a
+non-zero value only if <A HREF="../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> is set to that value. For example:</P>
+<PRE>
+    use Errno;</PRE>
+<PRE>
+    unless (open(FH, &quot;/fangorn/spouse&quot;)) {
+        if ($!{ENOENT}) {
+            warn &quot;Get a wife!\n&quot;;
+        } else {
+            warn &quot;This path is barred: $!&quot;;
+        } 
+    }</PRE>
+<P>If a specified constant <CODE>EFOO</CODE> does not exist on the system, <CODE>$!{EFOO}</CODE>
+returns <CODE>&quot;&quot;</CODE>.  You may use <CODE>exists $!{EFOO}</CODE> to check whether the
+constant is available on the system.</P>
+<P>
+<HR>
+<H1><A NAME="caveats">CAVEATS</A></H1>
+<P>Importing a particular constant may not be very portable, because the
+import will fail on platforms that do not have that constant.  A more
+portable way to set <A HREF="../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> to a valid value is to use:</P>
+<PRE>
+    if (exists &amp;Errno::EFOO) {
+        $! = &amp;Errno::EFOO;
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-8 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Errno - System errno constants</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

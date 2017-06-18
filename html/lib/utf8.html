@@ -1,0 +1,97 @@
+
+<HTML>
+<HEAD>
+<TITLE>utf8 - Perl pragma to enable/disable UTF-8 in source code</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;utf8 - Perl pragma to enable/disable UTF-8 in source code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>utf8 - Perl pragma to enable/disable UTF-8 in source code</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use utf8;
+    no utf8;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>WARNING: The implementation of Unicode support in Perl is incomplete.
+See <A HREF="../lib/Pod/perlunicode.html">the perlunicode manpage</A> for the exact details.</P>
+<P>The <CODE>use utf8</CODE> pragma tells the Perl parser to allow UTF-8 in the
+program text in the current lexical scope.  The <CODE>no utf8</CODE> pragma
+tells Perl to switch back to treating the source text as literal
+bytes in the current lexical scope.</P>
+<P>This pragma is primarily a compatibility device.  Perl versions
+earlier than 5.6 allowed arbitrary bytes in source code, whereas
+in future we would like to standardize on the UTF-8 encoding for
+source text.  Until UTF-8 becomes the default format for source
+text, this pragma should be used to recognize UTF-8 in the source.
+When UTF-8 becomes the standard source format, this pragma will
+effectively become a no-op.  This pragma already is a no-op on
+EBCDIC platforms (where it is alright to code perl in EBCDIC 
+rather than UTF-8).</P>
+<P>Enabling the <CODE>utf8</CODE> pragma has the following effects:</P>
+<UL>
+<LI>
+Bytes in the source text that have their high-bit set will be treated
+as being part of a literal UTF-8 character.  This includes most literals
+such as identifiers, string constants, constant regular expression patterns
+and package names.
+<P></P>
+<LI>
+In the absence of inputs marked as UTF-8, regular expressions within the
+scope of this pragma will default to using character semantics instead
+of byte semantics.
+<PRE>
+    @bytes_or_chars = split //, $data;  # may split to bytes if data
+                                        # $data isn't UTF-8
+    {
+        use utf8;                       # force char semantics
+        @chars = split //, $data;       # splits characters
+    }</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../lib/Pod/perlunicode.html">the perlunicode manpage</A>, <A HREF="../lib/bytes.html">the bytes manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;utf8 - Perl pragma to enable/disable UTF-8 in source code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

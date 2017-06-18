@@ -1,0 +1,286 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::NetAdmin - manage network groups and users in perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::NetAdmin - manage network groups and users in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#note">NOTE</A></LI>
+	</UL>
+
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::NetAdmin - manage network groups and users in perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Win32::NetAdmin;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module offers control over the administration of groups and users over a
+network.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="note">NOTE</A></H2>
+<P>All of the functions return FALSE (0) if they fail, unless otherwise noted.
+<CODE>server</CODE> is optional for all the calls below. If not given the local machine is
+assumed.</P>
+<DL>
+<DT><STRONG><A NAME="item_GetDomainController">GetDomainController(server, domain, returnedName)</A></STRONG><BR>
+<DD>
+Returns the name of the domain controller for server.
+<P></P>
+<DT><STRONG><A NAME="item_GetAnyDomainController">GetAnyDomainController(server, domain, returnedName)</A></STRONG><BR>
+<DD>
+Returns the name of any domain controller for a domain that is directly trusted
+by the server.
+<P></P>
+<DT><STRONG><A NAME="item_UserCreate">UserCreate(server, userName, password, passwordAge, privilege, homeDir, comment, flags, scriptPath)</A></STRONG><BR>
+<DD>
+Creates a user on server with password, passwordAge, privilege, homeDir, comment,
+flags, and scriptPath.
+<P></P>
+<DT><STRONG><A NAME="item_UserDelete">UserDelete(server, user)</A></STRONG><BR>
+<DD>
+Deletes a user from server.
+<P></P>
+<DT><STRONG><A NAME="item_UserGetAttributes">UserGetAttributes(server, userName, password, passwordAge, privilege, homeDir, comment, flags, scriptPath)</A></STRONG><BR>
+<DD>
+Gets password, passwordAge, privilege, homeDir, comment, flags, and scriptPath
+for user.
+<P></P>
+<DT><STRONG><A NAME="item_UserSetAttributes">UserSetAttributes(server, userName, password, passwordAge, privilege, homeDir, comment, flags, scriptPath)</A></STRONG><BR>
+<DD>
+Sets password, passwordAge, privilege, homeDir, comment, flags, and scriptPath
+for user.
+<P></P>
+<DT><STRONG><A NAME="item_UserChangePassword">UserChangePassword(domainname, username, oldpassword, newpassword)</A></STRONG><BR>
+<DD>
+Changes a users password. Can be run under any account.
+<P></P>
+<DT><STRONG><A NAME="item_UsersExist">UsersExist(server, userName)</A></STRONG><BR>
+<DD>
+Checks if a user exists.
+<P></P>
+<DT><STRONG><A NAME="item_GetUsers">GetUsers(server, filter, userRef)</A></STRONG><BR>
+<DD>
+Fills userRef with user names if it is an array reference and with the user
+names and the full names if it is a hash reference.
+<P></P>
+<DT><STRONG><A NAME="item_GroupCreate">GroupCreate(server, group, comment)</A></STRONG><BR>
+<DD>
+Creates a group.
+<P></P>
+<DT><STRONG><A NAME="item_GroupDelete">GroupDelete(server, group)</A></STRONG><BR>
+<DD>
+Deletes a group.
+<P></P>
+<DT><STRONG><A NAME="item_GroupGetAttributes">GroupGetAttributes(server, groupName, comment)</A></STRONG><BR>
+<DD>
+Gets the comment.
+<P></P>
+<DT><STRONG><A NAME="item_GroupSetAttributes">GroupSetAttributes(server, groupName, comment)</A></STRONG><BR>
+<DD>
+Sets the comment.
+<P></P>
+<DT><STRONG><A NAME="item_GroupAddUsers">GroupAddUsers(server, groupName, users)</A></STRONG><BR>
+<DD>
+Adds a user to a group.
+<P></P>
+<DT><STRONG><A NAME="item_GroupDeleteUsers">GroupDeleteUsers(server, groupName, users)</A></STRONG><BR>
+<DD>
+Deletes a users from a group.
+<P></P>
+<DT><STRONG><A NAME="item_GroupIsMember">GroupIsMember(server, groupName, user)</A></STRONG><BR>
+<DD>
+Returns TRUE if user is a member of groupName.
+<P></P>
+<DT><STRONG><A NAME="item_GroupGetMembers">GroupGetMembers(server, groupName, userArrayRef)</A></STRONG><BR>
+<DD>
+Fills userArrayRef with the members of groupName.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupCreate">LocalGroupCreate(server, group, comment)</A></STRONG><BR>
+<DD>
+Creates a local group.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupDelete">LocalGroupDelete(server, group)</A></STRONG><BR>
+<DD>
+Deletes a local group.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupGetAttributes">LocalGroupGetAttributes(server, groupName, comment)</A></STRONG><BR>
+<DD>
+Gets the comment.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupSetAttributes">LocalGroupSetAttributes(server, groupName, comment)</A></STRONG><BR>
+<DD>
+Sets the comment.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupIsMember">LocalGroupIsMember(server, groupName, user)</A></STRONG><BR>
+<DD>
+Returns TRUE if user is a member of groupName.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupGetMembers">LocalGroupGetMembers(server, groupName, userArrayRef)</A></STRONG><BR>
+<DD>
+Fills userArrayRef with the members of groupName.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupGetMembersWithDomain">LocalGroupGetMembersWithDomain(server, groupName, userRef)</A></STRONG><BR>
+<DD>
+This function is similar LocalGroupGetMembers but accepts an array or
+a hash reference. Unlike LocalGroupGetMembers it returns each user name
+as <CODE>DOMAIN\USERNAME</CODE>. If a hash reference is given, the function
+returns to each user or group name the type (group, user, alias etc.).
+The possible types are as follows:
+<PRE>
+  $SidTypeUser = 1;
+  $SidTypeGroup = 2;
+  $SidTypeDomain = 3;
+  $SidTypeAlias = 4;
+  $SidTypeWellKnownGroup = 5;
+  $SidTypeDeletedAccount = 6;
+  $SidTypeInvalid = 7;
+  $SidTypeUnknown = 8;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupAddUsers">LocalGroupAddUsers(server, groupName, users)</A></STRONG><BR>
+<DD>
+Adds a user to a group.
+<P></P>
+<DT><STRONG><A NAME="item_LocalGroupDeleteUsers">LocalGroupDeleteUsers(server, groupName, users)</A></STRONG><BR>
+<DD>
+Deletes a users from a group.
+<P></P>
+<DT><STRONG><A NAME="item_GetServers">GetServers(server, domain, flags, serverRef)</A></STRONG><BR>
+<DD>
+Gets an array of server names or an hash with the server names and the
+comments as seen in the Network Neighborhood or the server manager.
+For flags, see SV_TYPE_* constants.
+<P></P>
+<DT><STRONG><A NAME="item_GetTransports">GetTransports(server, transportRef)</A></STRONG><BR>
+<DD>
+Enumerates the network transports of a computer. If transportRef is an array
+reference, it is filled with the transport names. If transportRef is a hash
+reference then a hash of hashes is filled with the data for the transports.
+<P></P>
+<DT><STRONG><A NAME="item_LoggedOnUsers">LoggedOnUsers(server, userRef)</A></STRONG><BR>
+<DD>
+Gets an array or hash with the users logged on at the specified computer. If
+userRef is a hash reference, the value is a semikolon separated string of
+username, logon domain and logon server.
+<P></P>
+<DT><STRONG><A NAME="item_GetAliasFromRID">GetAliasFromRID(server, RID, returnedName)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_GetUserGroupFromRID">GetUserGroupFromRID(server, RID, returnedName)</A></STRONG><BR>
+<DD>
+Retrieves the name of an alias (i.e local group) or a user group for a RID
+from the specified server. These functions can be used for example to get the
+account name for the administrator account if it is renamed or localized.
+<P>Possible values for <CODE>RID</CODE>:</P>
+<PRE>
+  DOMAIN_ALIAS_RID_ACCOUNT_OPS
+  DOMAIN_ALIAS_RID_ADMINS
+  DOMAIN_ALIAS_RID_BACKUP_OPS
+  DOMAIN_ALIAS_RID_GUESTS
+  DOMAIN_ALIAS_RID_POWER_USERS
+  DOMAIN_ALIAS_RID_PRINT_OPS
+  DOMAIN_ALIAS_RID_REPLICATOR
+  DOMAIN_ALIAS_RID_SYSTEM_OPS
+  DOMAIN_ALIAS_RID_USERS
+  DOMAIN_GROUP_RID_ADMINS
+  DOMAIN_GROUP_RID_GUESTS
+  DOMAIN_GROUP_RID_USERS
+  DOMAIN_USER_RID_ADMIN
+  DOMAIN_USER_RID_GUEST</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GetServerDisks">GetServerDisks(server, arrayRef)</A></STRONG><BR>
+<DD>
+Returns an array with the disk drives of the specified server. The array
+contains two-character strings (drive letter followed by a colon).
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<PRE>
+    # Simple script using Win32::NetAdmin to set the login script for
+    # all members of the NT group &quot;Domain Users&quot;.  Only works if you
+    # run it on the PDC. (From Robert Spier &lt;rspier@seas.upenn.edu&gt;)
+    #
+    # FILTER_TEMP_DUPLICATE_ACCOUNTS
+    #   Enumerates local user account data on a domain controller.
+    #
+    # FILTER_NORMAL_ACCOUNT
+    #   Enumerates global user account data on a computer.
+    #
+    # FILTER_INTERDOMAIN_TRUST_ACCOUNT
+    #   Enumerates domain trust account data on a domain controller.
+    #
+    # FILTER_WORKSTATION_TRUST_ACCOUNT
+    #   Enumerates workstation or member server account data on a domain
+    #   controller.
+    #
+    # FILTER_SERVER_TRUST_ACCOUNT
+    #   Enumerates domain controller account data on a domain controller.</PRE>
+<PRE>
+    use Win32::NetAdmin qw(GetUsers GroupIsMember
+                           UserGetAttributes UserSetAttributes);</PRE>
+<PRE>
+    my %hash;
+    GetUsers(&quot;&quot;, FILTER_NORMAL_ACCOUNT , \%hash)
+        or die &quot;GetUsers() failed: $^E&quot;;</PRE>
+<PRE>
+    foreach (keys %hash) {
+        my ($password, $passwordAge, $privilege,
+            $homeDir, $comment, $flags, $scriptPath);
+        if (GroupIsMember(&quot;&quot;, &quot;Domain Users&quot;, $_)) {
+            print &quot;Updating $_ ($hash{$_})\n&quot;;
+            UserGetAttributes(&quot;&quot;, $_, $password, $passwordAge, $privilege,
+                              $homeDir, $comment, $flags, $scriptPath)
+                or die &quot;UserGetAttributes() failed: $^E&quot;;
+            $scriptPath = &quot;dnx_login.bat&quot;; # this is the new login script
+            UserSetAttributes(&quot;&quot;, $_, $password, $passwordAge, $privilege,
+                              $homeDir, $comment, $flags, $scriptPath)
+                or die &quot;UserSetAttributes() failed: $^E&quot;;
+        }
+    }</PRE>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::NetAdmin - manage network groups and users in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

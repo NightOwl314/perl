@@ -1,0 +1,17 @@
+<SOFTPKG NAME="HTML-Parser" VERSION="3,13,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="i686-linux-thread-multi/HTML-Parser.tar.gz" />
+    <DEPENDENCY NAME="HTML-Tagset" VERSION="3,03,0,0" />
+    <ARCHITECTURE NAME="i686-linux-thread-multi" />
+    <OS NAME="linux" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <CODEBASE HREF="MSWin32-x86-multi-thread/HTML-Parser.tar.gz" />
+    <DEPENDENCY NAME="HTML-Tagset" VERSION="3,03,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>HTML parser class</ABSTRACT>
+  <TITLE>HTML-Parser</TITLE>
+  <AUTHOR>Gisle Aas (gisle@aas.no)</AUTHOR>
+</SOFTPKG>

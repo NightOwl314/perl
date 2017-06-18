@@ -1,0 +1,195 @@
+<HTML>
+
+<HEAD>
+<TITLE>PerlScript</TITLE>
+<META name="GENERATOR" charset="iso-8859-1" content="Microsoft FrontPage 4.0">
+<META name="ProgId" content="FrontPage.Editor.Document">
+<LINK rel="STYLESHEET" href="../../Active.css" type="text/css">
+</HEAD>
+
+<BODY>
+
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%">
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><STRONG>
+      <P class="block">&nbsp;PerlScript</P>
+      </STRONG></TD>
+  </TR>
+</TABLE>
+
+<UL>
+  <LI><A href="#what_is_perlscript">What is PerlScript?</A>
+  <LI><A href="#running_perlscript">What do I need to run PerlScript?</A>
+  <LI><A href="#how_do_i_install_perlscript">How do I install PerlScript?</A>
+  <LI><A href="#case_sensitive_event_names">Why aren't my event handlers called?</A>
+  <LI><A href="#windows_scripting_host">What is Windows Script Host?</A>
+  <LI><A href="#active_server_pages">Can I write Active Server Pages with PerlScript?</A>
+  <LI><A href="#active_server_pages_why">What can I do when PerlScript in ASP seems capsized in PWS?</A>
+  <LI><A href="#global_asa">What is Global.asa to ASP and PerlScript?</A>
+  <LI><A href="#client_side">Client-side PerlScript</A>
+  <LI><A href="#perlscript_configuration">How can I configure client-side PerlScript security?</A>
+  <LI><A href="#other_references">Other References</A>
+</UL>
+<A name="what_is_perlscript">
+<HR>
+<H1>What is PerlScript?</H1>
+<P>PerlScript is an ActiveX scripting engine that allows you to use Perl with any ActiveX scripting
+host. At this time, ActiveX scripting hosts include:</P>
+<UL>
+  <LI>Internet Information Server 3.0/4.0
+  <LI>Peer Web Services 3.0/4.0
+  <LI>Microsoft Internet Explorer 4.0x
+  <LI>Windows Scripting Host
+</UL>
+</A><A name="running_perlscript">
+<HR>
+<H1>What do I need to run PerlScript?</H1>
+<UL>
+  <LI><B>ActivePerl</B>
+  <LI>an ActiveX scripting host (see above)
+  <LI>Windows NT/95
+  <LI>Perl scripts!
+</UL>
+</A><A name="how_do_i_install_perlscript">
+<HR>
+<H1>How do I install PerlScript?</H1>
+<P>When you launch the <B>ActivePerl</B> installer, <B>PerlScript</B> is one of the components you
+can optionally install. You must install, or have previously installed, <B>ActivePerl</B> to use
+PerlScript.
+<P></A><A name="case_sensitive_event_names">
+<HR>
+<H1>Why aren't my event handlers called?</H1>
+<P>Case sensitive lookup of event names may be being performed. Event name lookup can be made case
+insensitive by adding key
+<UL>
+  HKEY_LOCAL_MACHINE\SOFTWARE\ActiveState\PerlSE\1.0<BR>
+  REG_DWORD: NoCaseCompare = 1 (default)
+</UL>
+<P></A><A name="windows_scripting_host">
+<HR>
+<H1>What is Windows Script Host?</H1>
+<P>Microsoft advertises <B>Windows Script Host</B>, or WSH for short, as being &quot;a
+language-independent scripting host for 32-bit Windows operating system platforms&quot;. WSH offers a lot to VBScript and JScript developers for whom console type programs have been traditionally difficult. For Perl Developers, however, the same functionality can be found with a Perl module or extension.
+<BR><BR>
+More information can be found in the Windows Script Host tutorial.
+<P></a><A name="active_server_pages">
+<HR>
+<H1>What do I need to write Active Server Pages with PerlScript?</H1>
+<P><B>Active Server Pages</B>, or ASP for short, is a server-side technology that
+enables you to embed script commands within HTML. <B>ActivePerl</B> and <B>PerlScript</B> are required on the server that is providing the webpages, but the two are not
+required on the client; however, would you be developing <b>Active Server Pages</b> on your
+local machine, you are, of course, both the client and the server. 
+<BR><BR>
+For a web server, Windows
+95 users will need the Personal Web Server (PWS), which is freely downloadable as a component included in the NT Option Pack available from
+</a> <a href="http://www.microsoft.com">Microsoft</a>. 
+
+Windows 98 users will need to either install it from
+the CD that comes with Windows 98 or download the NT Option pack. Windows NT/2000 users will 
+either get it installed out of the box under the name Internet Information Services or need to
+install it off from the CD. 
+<BR><BR>
+For more information about how to use the technology, see the Active Server Pages tutorial.
+
+<P><A name="active_server_pages_why">
+<HR>
+<H1>What can I do when PerlScript in ASP seems capsized in PWS?</H1>
+<P>
+There are three widely used solutions when PerlScript and ASP doesn't function the way it should in PWS. First, reboot the computer and see if it works; next, reinstall ActivePerl with PerlScript checked and see if it works; lastly, reinstall PWS if none of the above works. Oftentimes, when somebody has a problem with PWS, it is commonly asked if the person has set "scripts" permissions on the server so that a scripting language is enabled to run. PWS and IIS
+sets the majority, if not all, virtual directories to allow scripts by default, so do not worry yourself about that; instead, follow the guidelines laid out above. 
+
+
+<P></a><A name="global_asa">
+<HR>
+<H1>What is Global.asa to ASP and PerlScript?</H1>
+<P>
+Global.asa is a file that exists for each IIS application. On PWS, there is only one IIS application while later versions of the IIS web-server supports many more IIS applications. 
+Global.asa can be used to declare objects that are given either Session or Application scope within the web service. It must as a skeleton without code look as follows:
+<ul><code>
+&lt;script language=perlscript runat=server&gt;
+<BR>sub Application_OnStart {
+<BR>}
+<BR>
+<BR>sub Application_OnEnd {
+<BR>}
+<BR>
+<BR>sub Session_OnStart {
+<BR>}
+<BR>
+<BR>sub Session_OnEnd {
+<BR>}
+<BR>&lt;/script&gt;
+</code></ul>
+Then you can put code within the subroutines that creates variables, objects, and so forth. The subroutines, or events, will be called at their designated times: Session_OnStart when a new session is started, and its OnEnd event is run when the session is ended. The Application's start and end signifies the start and stop of the webserver.
+
+
+
+<P></A><A name="client_side">
+<HR>
+<H1>Client-side PerlScript</H1>
+<P>Client-Side PerlScript has Perl embedded within your HTML documents. All PerlScript code must be
+contained within <CODE>&lt;SCRIPT LANGUAGE=&quot;PerlScript&quot;&gt; &lt;/SCRIPT&gt;</CODE>
+<P>Client-side PerlScript has the added requirement that both ActivePerl and PerlScript be installed
+on each computer will will be loading PerlScript pages.
+<P>Client-side Perlscript should only be used if you can control the ocnfiguration of the computers
+on which it will be run. If your goal is build an application which will be used by a large number
+users, Server-side PerlScript is considerably more practical.
+<P>To display something to the browser, use the <CODE>write()</CODE> method of the document object.
+You can use the <CODE>write()</CODE> method with <CODE>$windows-&gt;document-&gt;write('any old
+text')</CODE>.
+<P>The sample below is another Hello World variation, but this time using client-side PerlScript:
+<UL>
+  <CODE>&lt;HTML&gt;<BR>
+  &lt;HEAD&gt;<BR>
+  &lt;TITLE&gt;PerlScript Hello World!&lt;/TITLE&gt;<BR>
+  &lt;/HEAD&gt;<BR>
+  &lt;BODY BGCOLOR=&quot;#FFFFFF&quot;&gt;<BR>
+  &lt;H1&gt;PerlScript Hello world!&lt;/H1&gt;<BR>
+  &lt;SCRIPT LANGUAGE=&quot;PerlScript&quot;&gt;<BR>
+  $window-&gt;document-&gt;write('Hello world!');<BR>
+  &lt;/SCRIPT&gt;<BR>
+  &lt;/BODY&gt;<BR>
+  &lt;/HTML&gt;<BR>
+  </CODE>
+</UL>
+<P></A><A name="perlscript_configuration">
+<HR>
+<H1>How can I configure client-side PerlScript security?</H1>
+<P>PerlScript in IE 4.0 and higher can be enabled/disabled by zones
+<UL>
+  HKEY_LOCAL_MACHINE\SOFTWARE\ActiveState\PerlSE\1.0<BR>
+  REG_DWORD: EnabledZones = 0x0010 (default)
+</UL>
+<P><STRONG>Values</STRONG>
+<UL>
+  <LI>Enable All 0x0001
+  <LI>Enable Local 0x0010
+  <LI>Enable Internet 0x0020
+  <LI>Enable Trusted 0x0040
+  <LI>Enable Restricted 0x0080 (for the perverse)
+</UL>
+IE3 is more limited; it is an all or nothing affair. For IE3 the only values recognized are
+<P><STRONG>Values</STRONG>
+<UL>
+  <LI>Disable All 0x0000
+  <LI>Enable All 0x0001
+</UL>
+
+
+<P></A><A name="other_references">
+<HR>
+<H1>Other References</H1>
+<P>Here's a short list of PerlScript FAQs available on the net: &nbsp;</A>
+<UL>
+  <LI><A href="http://www.fastnetltd.ndirect.co.uk/Perl/perl-win32-asp.html"><B>The Perl-Win32-ASP
+    FAQ</B></A>. Maintained by Matthew Sergeant.</LI>
+</UL>
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%">
+  <TR>
+    <TD class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><STRONG>
+      <P class="block">&nbsp;PerlScript</P>
+      </STRONG></TD>
+  </TR>
+</TABLE>
+
+</BODY>

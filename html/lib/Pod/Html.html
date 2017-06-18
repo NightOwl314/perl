@@ -1,0 +1,209 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::Html - module to convert pod files to HTML</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Html - module to convert pod files to HTML</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#environment">ENVIRONMENT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Html - module to convert pod files to HTML</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::Html;
+    pod2html([options]);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Converts files from pod format (see <A HREF="../../lib/Pod/perlpod.html">the perlpod manpage</A>) to HTML format.  It
+can automatically generate indexes and cross-references, and it keeps
+a cache of things it knows how to cross-reference.</P>
+<P>
+<HR>
+<H1><A NAME="arguments">ARGUMENTS</A></H1>
+<P>Pod::Html takes the following arguments:</P>
+<DL>
+<DT><STRONG><A NAME="item_backlink">backlink</A></STRONG><BR>
+<DD>
+<PRE>
+    --backlink=&quot;Back to Top&quot;</PRE>
+<P>Adds ``Back to Top'' links in front of every HEAD1 heading (except for
+the first).  By default, no backlink are being generated.</P>
+<DT><STRONG><A NAME="item_css">css</A></STRONG><BR>
+<DD>
+<PRE>
+    --css=stylesheet</PRE>
+<P>Specify the URL of a cascading style sheet.</P>
+<DT><STRONG><A NAME="item_flush">flush</A></STRONG><BR>
+<DD>
+<PRE>
+    --flush</PRE>
+<P>Flushes the item and directory caches.</P>
+<DT><STRONG><A NAME="item_header">header</A></STRONG><BR>
+<DD>
+<PRE>
+    --header
+    --noheader</PRE>
+<P>Creates header and footer blocks containing the text of the NAME
+section.  By default, no headers are being generated.</P>
+<DT><STRONG><A NAME="item_help">help</A></STRONG><BR>
+<DD>
+<PRE>
+    --help</PRE>
+<P>Displays the usage message.</P>
+<DT><STRONG><A NAME="item_htmldir">htmldir</A></STRONG><BR>
+<DD>
+<PRE>
+    --htmldir=name</PRE>
+<P>Sets the directory in which the resulting HTML file is placed.  This
+is used to generate relative links to other files. Not passing this
+causes all links to be absolute, since this is the value that tells
+Pod::Html the root of the documentation tree.</P>
+<DT><STRONG><A NAME="item_htmlroot">htmlroot</A></STRONG><BR>
+<DD>
+<PRE>
+    --htmlroot=name</PRE>
+<P>Sets the base URL for the HTML files.  When cross-references are made,
+the HTML root is prepended to the URL.</P>
+<DT><STRONG><A NAME="item_index">index</A></STRONG><BR>
+<DD>
+<PRE>
+    --index
+    --noindex</PRE>
+<P>Generate an index at the top of the HTML file.  This is the default
+behaviour.</P>
+<DT><STRONG><A NAME="item_infile">infile</A></STRONG><BR>
+<DD>
+<PRE>
+    --infile=name</PRE>
+<P>Specify the pod file to convert.  Input is taken from STDIN if no
+infile is specified.</P>
+<DT><STRONG><A NAME="item_libpods">libpods</A></STRONG><BR>
+<DD>
+<PRE>
+    --libpods=name:...:name</PRE>
+<P>List of page names (eg, ``perlfunc'') which contain linkable <CODE>=item</CODE>s.</P>
+<DT><STRONG><A NAME="item_netscape">netscape</A></STRONG><BR>
+<DD>
+<PRE>
+    --netscape
+    --nonetscape</PRE>
+<P>Use Netscape HTML directives when applicable.  By default, they will
+<STRONG>not</STRONG> be used.</P>
+<DT><STRONG><A NAME="item_outfile">outfile</A></STRONG><BR>
+<DD>
+<PRE>
+    --outfile=name</PRE>
+<P>Specify the HTML file to create.  Output goes to STDOUT if no outfile
+is specified.</P>
+<DT><STRONG><A NAME="item_podpath">podpath</A></STRONG><BR>
+<DD>
+<PRE>
+    --podpath=name:...:name</PRE>
+<P>Specify which subdirectories of the podroot contain pod files whose
+HTML converted forms can be linked-to in cross-references.</P>
+<DT><STRONG><A NAME="item_podroot">podroot</A></STRONG><BR>
+<DD>
+<PRE>
+    --podroot=name</PRE>
+<P>Specify the base directory for finding library pods.</P>
+<DT><STRONG><A NAME="item_quiet">quiet</A></STRONG><BR>
+<DD>
+<PRE>
+    --quiet
+    --noquiet</PRE>
+<P>Don't display <EM>mostly harmless</EM> warning messages.  These messages
+will be displayed by default.  But this is not the same as <A HREF="#item_verbose"><CODE>verbose</CODE></A>
+mode.</P>
+<DT><STRONG><A NAME="item_recurse">recurse</A></STRONG><BR>
+<DD>
+<PRE>
+    --recurse
+    --norecurse</PRE>
+<P>Recurse into subdirectories specified in podpath (default behaviour).</P>
+<DT><STRONG><A NAME="item_title">title</A></STRONG><BR>
+<DD>
+<PRE>
+    --title=title</PRE>
+<P>Specify the title of the resulting HTML file.</P>
+<DT><STRONG><A NAME="item_verbose">verbose</A></STRONG><BR>
+<DD>
+<PRE>
+    --verbose
+    --noverbose</PRE>
+<P>Display progress messages.  By default, they won't be displayed.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<PRE>
+    pod2html(&quot;pod2html&quot;,
+             &quot;--podpath=lib:ext:pod:vms&quot;, 
+             &quot;--podroot=/usr/src/perl&quot;,
+             &quot;--htmlroot=/perl/nmanual&quot;,
+             &quot;--libpods=<A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>:<A HREF="../../lib/Pod/perlguts.html">perlguts</A>:<A HREF="../../lib/Pod/perlvar.html">perlvar</A>:<A HREF="../../lib/Pod/perlrun.html">perlrun</A>:<A HREF="../../lib/Pod/perlop.html">perlop</A>&quot;,
+             &quot;--recurse&quot;,
+             &quot;--infile=foo.pod&quot;,
+             &quot;--outfile=/perl/nmanual/foo.html&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="environment">ENVIRONMENT</A></H1>
+<P>Uses $Config{pod2html} to setup default options.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen, &lt;<A HREF="mailto:tchrist@perl.com">tchrist@perl.com</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Pod/perlpod.html">the perlpod manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>This program is distributed under the Artistic License.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Html - module to convert pod files to HTML</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

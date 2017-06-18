@@ -1,0 +1,272 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Glob - Perl extension for BSD glob routine</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Glob - Perl extension for BSD glob routine</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#notes">NOTES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Glob - Perl extension for BSD glob routine</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use File::Glob ':glob';
+  @list = bsd_glob('*.[ch]');
+  $homedir = bsd_glob('~gnat', GLOB_TILDE | GLOB_ERR);
+  if (GLOB_ERROR) {
+    # an error occurred reading $homedir
+  }</PRE>
+<PRE>
+  ## override the core glob (CORE::glob() does this automatically
+  ## by default anyway, since v5.6.0)
+  use File::Glob ':globally';
+  my @sources = &lt;*.{c,h,y}&gt;</PRE>
+<PRE>
+  ## override the core glob, forcing case sensitivity
+  use File::Glob qw(:globally :case);
+  my @sources = &lt;*.{c,h,y}&gt;</PRE>
+<PRE>
+  ## override the core glob forcing case insensitivity
+  use File::Glob qw(:globally :nocase);
+  my @sources = &lt;*.{c,h,y}&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>File::Glob::bsd_glob() implements the FreeBSD <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob(3)</CODE></A> routine, which is
+a superset of the POSIX <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob()</CODE></A> (described in IEEE Std 1003.2 ``POSIX.2'').
+<CODE>bsd_glob()</CODE> takes a mandatory <CODE>pattern</CODE> argument, and an optional
+<CODE>flags</CODE> argument, and returns a list of filenames matching the
+pattern, with interpretation of the pattern modified by the <CODE>flags</CODE>
+variable.</P>
+<P>Since v5.6.0, Perl's CORE::glob() is implemented in terms of bsd_glob().
+Note that they don't share the same prototype--CORE::glob() only accepts
+a single argument.  Due to historical reasons, CORE::glob() will also
+split its argument on whitespace, treating it as multiple patterns,
+whereas <CODE>bsd_glob()</CODE> considers them as one pattern.</P>
+<P>The POSIX defined flags for <CODE>bsd_glob()</CODE> are:</P>
+<DL>
+<DT><STRONG><A NAME="item_GLOB_ERR"><CODE>GLOB_ERR</CODE></A></STRONG><BR>
+<DD>
+Force <CODE>bsd_glob()</CODE> to return an error when it encounters a directory it
+cannot open or read.  Ordinarily <CODE>bsd_glob()</CODE> continues to find matches.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_LIMIT"><CODE>GLOB_LIMIT</CODE></A></STRONG><BR>
+<DD>
+Make <CODE>bsd_glob()</CODE> return an error (GLOB_NOSPACE) when the pattern expands
+to a size bigger than the system constant <CODE>ARG_MAX</CODE> (usually found in
+limits.h).  If your system does not define this constant, <CODE>bsd_glob()</CODE> uses
+<CODE>sysconf(_SC_ARG_MAX)</CODE> or <CODE>_POSIX_ARG_MAX</CODE> where available (in that
+order).  You can inspect these values using the standard <CODE>POSIX</CODE>
+extension.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_MARK"><CODE>GLOB_MARK</CODE></A></STRONG><BR>
+<DD>
+Each pathname that is a directory that matches the pattern has a slash
+appended.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_NOCASE"><CODE>GLOB_NOCASE</CODE></A></STRONG><BR>
+<DD>
+By default, file names are assumed to be case sensitive; this flag
+makes <CODE>bsd_glob()</CODE> treat case differences as not significant.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_NOCHECK"><CODE>GLOB_NOCHECK</CODE></A></STRONG><BR>
+<DD>
+If the pattern does not match any pathname, then <CODE>bsd_glob()</CODE> returns a list
+consisting of only the pattern.  If <A HREF="#item_GLOB_QUOTE"><CODE>GLOB_QUOTE</CODE></A> is set, its effect
+is present in the pattern returned.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_NOSORT"><CODE>GLOB_NOSORT</CODE></A></STRONG><BR>
+<DD>
+By default, the pathnames are sorted in ascending ASCII order; this
+flag prevents that sorting (speeding up bsd_glob()).
+<P></P></DL>
+<P>The FreeBSD extensions to the POSIX standard are the following flags:</P>
+<DL>
+<DT><STRONG><A NAME="item_GLOB_BRACE"><CODE>GLOB_BRACE</CODE></A></STRONG><BR>
+<DD>
+Pre-process the string to expand <CODE>{pat,pat,...}</CODE> strings like csh(1).
+The pattern '{}' is left unexpanded for historical reasons (and <CODE>csh(1)</CODE>
+does the same thing to ease typing of <CODE>find(1)</CODE> patterns).
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_NOMAGIC"><CODE>GLOB_NOMAGIC</CODE></A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_GLOB_NOCHECK"><CODE>GLOB_NOCHECK</CODE></A> but it only returns the pattern if it does not
+contain any of the special characters ``*'', ``?'' or ``[''.  <CODE>NOMAGIC</CODE> is
+provided to simplify implementing the historic <CODE>csh(1)</CODE> globbing
+behaviour and should probably not be used anywhere else.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_QUOTE"><CODE>GLOB_QUOTE</CODE></A></STRONG><BR>
+<DD>
+Use the backslash ('\') character for quoting: every occurrence of a
+backslash followed by a character in the pattern is replaced by that
+character, avoiding any special interpretation of the character.
+(But see below for exceptions on DOSISH systems).
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_TILDE"><CODE>GLOB_TILDE</CODE></A></STRONG><BR>
+<DD>
+Expand patterns that start with '~' to user name home directories.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_CSH"><CODE>GLOB_CSH</CODE></A></STRONG><BR>
+<DD>
+For convenience, <A HREF="#item_GLOB_CSH"><CODE>GLOB_CSH</CODE></A> is a synonym for
+<CODE>GLOB_BRACE | GLOB_NOMAGIC | GLOB_QUOTE | GLOB_TILDE | GLOB_ALPHASORT</CODE>.
+<P></P></DL>
+<P>The POSIX provided <CODE>GLOB_APPEND</CODE>, <CODE>GLOB_DOOFFS</CODE>, and the FreeBSD
+extensions <CODE>GLOB_ALTDIRFUNC</CODE>, and <CODE>GLOB_MAGCHAR</CODE> flags have not been
+implemented in the Perl version because they involve more complex
+interaction with the underlying C structures.</P>
+<P>The following flag has been added in the Perl implementation for
+compatibility with common flavors of csh:</P>
+<DL>
+<DT><STRONG><A NAME="item_GLOB_ALPHASORT"><CODE>GLOB_ALPHASORT</CODE></A></STRONG><BR>
+<DD>
+If <A HREF="#item_GLOB_NOSORT"><CODE>GLOB_NOSORT</CODE></A> is not in effect, sort filenames is alphabetical
+order (case does not matter) rather than in ASCII order.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<P><CODE>bsd_glob()</CODE> returns a list of matching paths, possibly zero length.  If an
+error occurred, &amp;File::Glob::GLOB_ERROR will be non-zero and <A HREF="../../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> will be
+set.  &amp;File::Glob::GLOB_ERROR is guaranteed to be zero if no error occurred,
+or one of the following values otherwise:</P>
+<DL>
+<DT><STRONG><A NAME="item_GLOB_NOSPACE"><CODE>GLOB_NOSPACE</CODE></A></STRONG><BR>
+<DD>
+An attempt to allocate memory failed.
+<P></P>
+<DT><STRONG><A NAME="item_GLOB_ABEND"><CODE>GLOB_ABEND</CODE></A></STRONG><BR>
+<DD>
+The glob was stopped because an error was encountered.
+<P></P></DL>
+<P>In the case where <CODE>bsd_glob()</CODE> has found some matching paths, but is
+interrupted by an error, it will return a list of filenames <STRONG>and</STRONG>
+set &amp;File::Glob::ERROR.</P>
+<P>Note that <CODE>bsd_glob()</CODE> deviates from POSIX and FreeBSD <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob(3)</CODE></A> behaviour
+by not considering <CODE>ENOENT</CODE> and <CODE>ENOTDIR</CODE> as errors - <CODE>bsd_glob()</CODE> will
+continue processing despite those errors, unless the <A HREF="#item_GLOB_ERR"><CODE>GLOB_ERR</CODE></A> flag is
+set.</P>
+<P>Be aware that all filenames returned from File::Glob are tainted.</P>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<UL>
+<LI>
+If you want to use multiple patterns, e.g. <CODE>bsd_glob &quot;a* b*&quot;</CODE>, you should
+probably throw them in a set as in <CODE>bsd_glob &quot;{a*,b*}&quot;</CODE>.  This is because
+the argument to <CODE>bsd_glob()</CODE> isn't subjected to parsing by the C shell.
+Remember that you can use a backslash to escape things.
+<P></P>
+<LI>
+On DOSISH systems, backslash is a valid directory separator character.
+In this case, use of backslash as a quoting character (via GLOB_QUOTE)
+interferes with the use of backslash as a directory separator. The
+best (simplest, most portable) solution is to use forward slashes for
+directory separators, and backslashes for quoting. However, this does
+not match ``normal practice'' on these systems. As a concession to user
+expectation, therefore, backslashes (under GLOB_QUOTE) only quote the
+glob metacharacters '[', ']', '{', '}', '-', '~', and backslash itself.
+All other backslashes are passed through unchanged.
+<P></P>
+<LI>
+Win32 users should use the real slash.  If you really want to use
+backslashes, consider using Sarathy's File::DosGlob, which comes with
+the standard Perl distribution.
+<P></P>
+<LI>
+Mac OS (Classic) users should note a few differences. Since
+Mac OS is not Unix, when the glob code encounters a tilde glob (e.g.
+~user/foo) and the <A HREF="#item_GLOB_TILDE"><CODE>GLOB_TILDE</CODE></A> flag is used, it simply returns that
+pattern without doing any expansion.
+<P>Glob on Mac OS is case-insensitive by default (if you don't use any
+flags). If you specify any flags at all and still want glob
+to be case-insensitive, you must include <A HREF="#item_GLOB_NOCASE"><CODE>GLOB_NOCASE</CODE></A> in the flags.</P>
+<P>The path separator is ':' (aka colon), not '/' (aka slash). Mac OS users
+should be careful about specifying relative pathnames. While a full path
+always begins with a volume name, a relative pathname should always
+begin with a ':'.  If specifying a volume name only, a trailing ':' is
+required.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>The Perl interface was written by Nathan Torkington &lt;<A HREF="mailto:gnat@frii.com">gnat@frii.com</A>&gt;,
+and is released under the artistic license.  Further modifications were
+made by Greg Bacon &lt;<A HREF="mailto:gbacon@cs.uah.edu">gbacon@cs.uah.edu</A>&gt;, Gurusamy Sarathy
+&lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt;, and Thomas Wegner
+&lt;<A HREF="mailto:wegner_thomas@yahoo.com">wegner_thomas@yahoo.com</A>&gt;.  The C glob code has the
+following copyright:</P>
+<PRE>
+    Copyright (c) 1989, 1993 The Regents of the University of California.
+    All rights reserved.</PRE>
+<PRE>
+    This code is derived from software contributed to Berkeley by
+    Guido van Rossum.</PRE>
+<PRE>
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:</PRE>
+<PRE>
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the University nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.</PRE>
+<PRE>
+    THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</PRE>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Glob - Perl extension for BSD glob routine</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

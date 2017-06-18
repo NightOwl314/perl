@@ -1,0 +1,325 @@
+
+<HTML>
+<HEAD>
+<TITLE>lwpcook - libwww-perl cookbook</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;lwpcook - libwww-perl cookbook</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#get">GET</A></LI>
+	<LI><A HREF="#head">HEAD</A></LI>
+	<LI><A HREF="#post">POST</A></LI>
+	<LI><A HREF="#proxies">PROXIES</A></LI>
+	<LI><A HREF="#access to protected documents">ACCESS TO PROTECTED DOCUMENTS</A></LI>
+	<LI><A HREF="#cookies">COOKIES</A></LI>
+	<LI><A HREF="#https">HTTPS</A></LI>
+	<LI><A HREF="#mirroring">MIRRORING</A></LI>
+	<LI><A HREF="#large documents">LARGE DOCUMENTS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>lwpcook - libwww-perl cookbook</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This document contain some examples that show typical usage of the
+libwww-perl library.  You should consult the documentation for the
+individual modules for more detail.</P>
+<P>All examples should be runnable programs. You can, in most cases, test
+the code sections by piping the program text directly to perl.</P>
+<P>
+<HR>
+<H1><A NAME="get">GET</A></H1>
+<P>It is very easy to use this library to just fetch documents from the
+net.  The LWP::Simple module provides the <CODE>get()</CODE> function that return
+the document specified by its URL argument:</P>
+<PRE>
+  use LWP::Simple;
+  $doc = get '<A HREF="http://www.sn.no/libwww-perl/">http://www.sn.no/libwww-perl/</A>';</PRE>
+<P>or, as a perl one-liner using the <CODE>getprint()</CODE> function:</P>
+<PRE>
+  perl -MLWP::Simple -e 'getprint &quot;<A HREF="http://www.sn.no/libwww-perl/&quot">http://www.sn.no/libwww-perl/&quot</A>;'</PRE>
+<P>or, how about fetching the latest perl by running this command:</P>
+<PRE>
+  perl -MLWP::Simple -e '
+    getstore &quot;<A HREF="ftp://ftp.sunet.se/pub/lang/perl/CPAN/src/latest.tar.gz&quot">ftp://ftp.sunet.se/pub/lang/perl/CPAN/src/latest.tar.gz&quot</A>;,
+             &quot;perl.tar.gz&quot;'</PRE>
+<P>You will probably first want to find a CPAN site closer to you by
+running something like the following command:</P>
+<PRE>
+  perl -MLWP::Simple -e 'getprint &quot;<A HREF="http://www.perl.com/perl/CPAN/CPAN.html&quot">http://www.perl.com/perl/CPAN/CPAN.html&quot</A>;'</PRE>
+<P>Enough of this simple stuff!  The LWP object oriented interface gives
+you more control over the request sent to the server.  Using this
+interface you have full control over headers sent and how you want to
+handle the response returned.</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;
+  $ua-&gt;agent(&quot;$0/0.1 &quot; . $ua-&gt;agent);
+  # $ua-&gt;agent(&quot;Mozilla/8.0&quot;) # pretend we are very capable browser</PRE>
+<PRE>
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="http://www.linpro.no/lwp">http://www.linpro.no/lwp</A>');
+  $req-&gt;header('Accept' =&gt; 'text/html');</PRE>
+<PRE>
+  # send request
+  $res = $ua-&gt;request($req);</PRE>
+<PRE>
+  # check the outcome
+  if ($res-&gt;is_success) {
+     print $res-&gt;content;
+  } else {
+     print &quot;Error: &quot; . $res-&gt;status_line . &quot;\n&quot;;
+  }</PRE>
+<P>The lwp-request program (alias GET) that is distributed with the
+library can also be used to fetch documents from WWW servers.</P>
+<P>
+<HR>
+<H1><A NAME="head">HEAD</A></H1>
+<P>If you just want to check if a document is present (i.e. the URL is
+valid) try to run code that looks like this:</P>
+<PRE>
+  use LWP::Simple;</PRE>
+<PRE>
+  if (head($url)) {
+     # ok document exists
+  }</PRE>
+<P>The <CODE>head()</CODE> function really returns a list of meta-information about
+the document.  The first three values of the list returned are the
+document type, the size of the document, and the age of the document.</P>
+<P>More control over the request or access to all header values returned
+require that you use the object oriented interface described for GET
+above.  Just s/GET/HEAD/g.</P>
+<P>
+<HR>
+<H1><A NAME="post">POST</A></H1>
+<P>There is no simple procedural interface for posting data to a WWW server.  You
+must use the object oriented interface for this. The most common POST
+operation is to access a WWW form application:</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;</PRE>
+<PRE>
+  my $req = HTTP::Request-&gt;new(POST =&gt; '<A HREF="http://www.perl.com/cgi-bin/BugGlimpse">http://www.perl.com/cgi-bin/BugGlimpse</A>');
+  $req-&gt;content_type('application/x-www-form-urlencoded');
+  $req-&gt;content('match=www&amp;errors=0');</PRE>
+<PRE>
+  my $res = $ua-&gt;request($req);
+  print $res-&gt;as_string;</PRE>
+<P>Lazy people use the HTTP::Request::Common module to set up a suitable
+POST request message (it handles all the escaping issues) and has a
+suitable default for the content_type:</P>
+<PRE>
+  use HTTP::Request::Common qw(POST);
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;</PRE>
+<PRE>
+  my $req = POST '<A HREF="http://www.perl.com/cgi-bin/BugGlimpse">http://www.perl.com/cgi-bin/BugGlimpse</A>',
+                [ search =&gt; 'www', errors =&gt; 0 ];</PRE>
+<PRE>
+  print $ua-&gt;request($req)-&gt;as_string;</PRE>
+<P>The lwp-request program (alias POST) that is distributed with the
+library can also be used for posting data.</P>
+<P>
+<HR>
+<H1><A NAME="proxies">PROXIES</A></H1>
+<P>Some sites use proxies to go through fire wall machines, or just as
+cache in order to improve performance.  Proxies can also be used for
+accessing resources through protocols not supported directly (or
+supported badly :-) by the libwww-perl library.</P>
+<P>You should initialize your proxy setting before you start sending
+requests:</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;
+  $ua-&gt;env_proxy; # initialize from environment variables
+  # or
+  $ua-&gt;proxy(ftp  =&gt; '<A HREF="http://proxy.myorg.com">http://proxy.myorg.com</A>');
+  $ua-&gt;proxy(wais =&gt; '<A HREF="http://proxy.myorg.com">http://proxy.myorg.com</A>');
+  $ua-&gt;no_proxy(qw(no se fi));</PRE>
+<PRE>
+  my $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="wais://xxx.com/">wais://xxx.com/</A>');
+  print $ua-&gt;request($req)-&gt;as_string;</PRE>
+<P>The LWP::Simple interface will call <CODE>env_proxy()</CODE> for you automatically.
+Applications that use the $ua-&gt;<CODE>env_proxy()</CODE> method will normally not
+use the $ua-&gt;<CODE>proxy()</CODE> and $ua-&gt;<CODE>no_proxy()</CODE> methods.</P>
+<P>Some proxies also require that you send it a username/password in
+order to let requests through.  You should be able to add the
+required header, with something like this:</P>
+<PRE>
+ use LWP::UserAgent;</PRE>
+<PRE>
+ $ua = LWP::UserAgent-&gt;new;
+ $ua-&gt;proxy(['http', 'ftp'] =&gt; '<A HREF="http://proxy.myorg.com">http://proxy.myorg.com</A>');</PRE>
+<PRE>
+ $req = HTTP::Request-&gt;new('GET',&quot;<A HREF="http://www.perl.com&quot">http://www.perl.com&quot</A>;);
+ $req-&gt;proxy_authorization_basic(&quot;proxy_user&quot;, &quot;proxy_password&quot;);</PRE>
+<PRE>
+ $res = $ua-&gt;request($req);
+ print $res-&gt;content if $res-&gt;is_success;</PRE>
+<P>Replace <CODE>proxy.myorg.com</CODE>, <CODE>proxy_user</CODE> and
+<CODE>proxy_password</CODE> with something suitable for your site.</P>
+<P>
+<HR>
+<H1><A NAME="access to protected documents">ACCESS TO PROTECTED DOCUMENTS</A></H1>
+<P>Documents protected by basic authorization can easily be accessed
+like this:</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="http://www.linpro.no/secret/">http://www.linpro.no/secret/</A>');
+  $req-&gt;authorization_basic('aas', 'mypassword');
+  print $ua-&gt;request($req)-&gt;as_string;</PRE>
+<P>The other alternative is to provide a subclass of <EM>LWP::UserAgent</EM> that
+overrides the <CODE>get_basic_credentials()</CODE> method. Study the <EM>lwp-request</EM>
+program for an example of this.</P>
+<P>
+<HR>
+<H1><A NAME="cookies">COOKIES</A></H1>
+<P>Some sites like to play games with cookies.  By default LWP ignores
+cookies provided by the servers it visits.  LWP will collect cookies
+and respond to cookie requests if you set up a cookie jar.</P>
+<PRE>
+  use LWP::UserAgent;
+  use HTTP::Cookies;</PRE>
+<PRE>
+  $ua = LWP::UserAgent-&gt;new;
+  $ua-&gt;cookie_jar(HTTP::Cookies-&gt;new(file =&gt; &quot;lwpcookies.txt&quot;,
+                                     autosave =&gt; 1));</PRE>
+<PRE>
+  # and then send requests just as you used to do
+  $res = $ua-&gt;request(HTTP::Request-&gt;new(GET =&gt; &quot;<A HREF="http://www.yahoo.no&quot">http://www.yahoo.no&quot</A>;));
+  print $res-&gt;status_line, &quot;\n&quot;;</PRE>
+<P>As you visit sites that send you cookies to keep, then the file
+<EM>lwpcookies.txt``</EM> will grow.</P>
+<P>
+<HR>
+<H1><A NAME="https">HTTPS</A></H1>
+<P>URLs with https scheme are accessed in exactly the same way as with
+http scheme, provided that an SSL interface module for LWP has been
+properly installed (see the <EM>README.SSL</EM> file found in the
+libwww-perl distribution for more details).  If no SSL interface is
+installed for LWP to use, then you will get ``501 Protocol scheme
+'https' is not supported'' errors when accessing such URLs.</P>
+<P>Here's an example of fetching and printing a WWW page using SSL:</P>
+<PRE>
+  use LWP::UserAgent;</PRE>
+<PRE>
+  my $ua = LWP::UserAgent-&gt;new;
+  my $req = HTTP::Request-&gt;new(GET =&gt; 'https://www.helsinki.fi/');
+  my $res = $ua-&gt;request($req);
+  if ($res-&gt;is_success) {
+      print $res-&gt;as_string;
+  } else {
+      print &quot;Failed: &quot;, $res-&gt;status_line, &quot;\n&quot;;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="mirroring">MIRRORING</A></H1>
+<P>If you want to mirror documents from a WWW server, then try to run
+code similar to this at regular intervals:</P>
+<PRE>
+  use LWP::Simple;</PRE>
+<PRE>
+  %mirrors = (
+     '<A HREF="http://www.sn.no/">http://www.sn.no/</A>'             =&gt; 'sn.html',
+     '<A HREF="http://www.perl.com/">http://www.perl.com/</A>'          =&gt; 'perl.html',
+     '<A HREF="http://www.sn.no/libwww-perl/">http://www.sn.no/libwww-perl/</A>' =&gt; 'lwp.html',
+     '<A HREF="gopher://gopher.sn.no/">gopher://gopher.sn.no/</A>'        =&gt; 'gopher.html',
+  );</PRE>
+<PRE>
+  while (($url, $localfile) = each(%mirrors)) {
+     mirror($url, $localfile);
+  }</PRE>
+<P>Or, as a perl one-liner:</P>
+<PRE>
+  perl -MLWP::Simple -e 'mirror(&quot;<A HREF="http://www.perl.com/&quot">http://www.perl.com/&quot</A>;, &quot;perl.html&quot;)';</PRE>
+<P>The document will not be transfered unless it has been updated.</P>
+<P>
+<HR>
+<H1><A NAME="large documents">LARGE DOCUMENTS</A></H1>
+<P>If the document you want to fetch is too large to be kept in memory,
+then you have two alternatives.  You can instruct the library to write
+the document content to a file (second $ua-&gt;<CODE>request()</CODE> argument is a file
+name):</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;</PRE>
+<PRE>
+  my $req = HTTP::Request-&gt;new(GET =&gt;
+                '<A HREF="http://www.linpro.no/lwp/libwww-perl-5.46.tar.gz">http://www.linpro.no/lwp/libwww-perl-5.46.tar.gz</A>');
+  $res = $ua-&gt;request($req, &quot;libwww-perl.tar.gz&quot;);
+  if ($res-&gt;is_success) {
+     print &quot;ok\n&quot;;
+  }
+  else {
+     print $res-&gt;status_line, &quot;\n&quot;;
+  }</PRE>
+<P>Or you can process the document as it arrives (second $ua-&gt;<CODE>request()</CODE>
+argument is a code reference):</P>
+<PRE>
+  use LWP::UserAgent;
+  $ua = LWP::UserAgent-&gt;new;
+  $URL = '<A HREF="ftp://ftp.unit.no/pub/rfc/rfc-index.txt">ftp://ftp.unit.no/pub/rfc/rfc-index.txt</A>';</PRE>
+<PRE>
+  my $expected_length;
+  my $bytes_received = 0;
+  my $res = 
+     $ua-&gt;request(HTTP::Request-&gt;new(GET =&gt; $URL),
+               sub {
+                   my($chunk, $res) = @_;
+                   $bytes_received += length($chunk);
+                   unless (defined $expected_length) {
+                      $expected_length = $res-&gt;content_length || 0;
+                   }
+                   if ($expected_length) {
+                        printf STDERR &quot;%d%% - &quot;,
+                                  100 * $bytes_received / $expected_length;
+                   }
+                   print STDERR &quot;$bytes_received bytes received\n&quot;;</PRE>
+<PRE>
+                   # XXX Should really do something with the chunk itself
+                   # print $chunk;
+               });
+   print $res-&gt;status_line, &quot;\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1996-2001, Gisle Aas</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;lwpcook - libwww-perl cookbook</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

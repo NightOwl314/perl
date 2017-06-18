@@ -1,0 +1,97 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec::Functions - portably perform operations on file names</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Functions - portably perform operations on file names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#exports">Exports</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec::Functions - portably perform operations on file names</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use File::Spec::Functions;
+        $x = catfile('a','b');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module exports convenience functions for all of the class methods
+provided by File::Spec.</P>
+<P>For a reference of available functions, please consult <A HREF="../../../lib/File/Spec/Unix.html">the File::Spec::Unix manpage</A>,
+which contains the entire set, and which is inherited by the modules for
+other platforms. For further information, please see <A HREF="../../../lib/File/Spec/Mac.html">the File::Spec::Mac manpage</A>,
+<A HREF="../../../lib/File/Spec/OS2.html">the File::Spec::OS2 manpage</A>, <A HREF="../../../lib/File/Spec/Win32.html">the File::Spec::Win32 manpage</A>, or <A HREF="../../../lib/File/Spec/VMS.html">the File::Spec::VMS manpage</A>.</P>
+<P>
+<H2><A NAME="exports">Exports</A></H2>
+<P>The following functions are exported by default.</P>
+<PRE>
+        canonpath
+        catdir
+        catfile
+        curdir
+        rootdir
+        updir
+        no_upwards
+        file_name_is_absolute
+        path</PRE>
+<P>The following functions are exported only by request.</P>
+<PRE>
+        devnull
+        tmpdir
+        splitpath
+        splitdir
+        catpath
+        abs2rel
+        rel2abs</PRE>
+<P>All the functions may be imported using the <CODE>:ALL</CODE> tag.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>File::Spec, File::Spec::Unix, File::Spec::Mac, File::Spec::OS2,
+File::Spec::Win32, File::Spec::VMS, ExtUtils::MakeMaker</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Functions - portably perform operations on file names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

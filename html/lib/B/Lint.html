@@ -1,0 +1,154 @@
+
+<HTML>
+<HEAD>
+<TITLE>B::Lint - Perl lint</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Lint - Perl lint</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options and lint checks">OPTIONS AND LINT CHECKS</A></LI>
+	<LI><A HREF="#non lintcheck options">NON LINT-CHECK OPTIONS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>B::Lint - Perl lint</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>perl -MO=Lint[,OPTIONS] foo.pl</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The B::Lint module is equivalent to an extended version of the <STRONG>-w</STRONG>
+option of <STRONG>perl</STRONG>. It is named after the program <STRONG>lint</STRONG> which carries
+out a similar process for C programs.</P>
+<P>
+<HR>
+<H1><A NAME="options and lint checks">OPTIONS AND LINT CHECKS</A></H1>
+<P>Option words are separated by commas (not whitespace) and follow the
+usual conventions of compiler backend options. Following any options
+(indicated by a leading <STRONG>-</STRONG>) come lint check arguments. Each such
+argument (apart from the special <STRONG>all</STRONG> and <STRONG>none</STRONG> options) is a
+word representing one possible lint check (turning on that check) or
+is <STRONG>no-foo</STRONG> (turning off that check). Before processing the check
+arguments, a standard list of checks is turned on. Later options
+override earlier ones. Available options are:</P>
+<DL>
+<DT><STRONG><A NAME="item_context"><STRONG>context</STRONG></A></STRONG><BR>
+<DD>
+Produces a warning whenever an array is used in an implicit scalar
+context. For example, both of the lines
+<PRE>
+    $foo = length(@bar);
+    $foo = @bar;
+will elicit a warning. Using an explicit B&lt;scalar()&gt; silences the
+warning. For example,</PRE>
+<PRE>
+    $foo = scalar(@bar);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_implicit%2Dread_and_implicit%2Dwrite"><STRONG>implicit-read</STRONG> and <STRONG>implicit-write</STRONG></A></STRONG><BR>
+<DD>
+These options produce a warning whenever an operation implicitly
+reads or (respectively) writes to one of Perl's special variables.
+For example, <STRONG>implicit-read</STRONG> will warn about these:
+<PRE>
+    /foo/;</PRE>
+<P>and <STRONG>implicit-write</STRONG> will warn about these:</P>
+<PRE>
+    s/foo/bar/;</PRE>
+<P>Both <STRONG>implicit-read</STRONG> and <STRONG>implicit-write</STRONG> warn about this:</P>
+<PRE>
+    for (@a) { ... }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_dollar%2Dunderscore"><STRONG>dollar-underscore</STRONG></A></STRONG><BR>
+<DD>
+This option warns whenever $_ is used either explicitly anywhere or
+as the implicit argument of a <STRONG>print</STRONG> statement.
+<P></P>
+<DT><STRONG><A NAME="item_private%2Dnames"><STRONG>private-names</STRONG></A></STRONG><BR>
+<DD>
+This option warns on each use of any variable, subroutine or
+method name that lives in a non-current package but begins with
+an underscore (``_''). Warnings aren't issued for the special case
+of the single character name ``_'' by itself (e.g. $_ and @_).
+<P></P>
+<DT><STRONG><A NAME="item_undefined%2Dsubs"><STRONG>undefined-subs</STRONG></A></STRONG><BR>
+<DD>
+This option warns whenever an undefined subroutine is invoked.
+This option will only catch explicitly invoked subroutines such
+as <CODE>foo()</CODE> and not indirect invocations such as <CODE>&amp;$subref()</CODE>
+or <CODE>$obj-&gt;meth()</CODE>. Note that some programs or modules delay
+definition of subs until runtime by means of the AUTOLOAD
+mechanism.
+<P></P>
+<DT><STRONG><A NAME="item_regexp%2Dvariables"><STRONG>regexp-variables</STRONG></A></STRONG><BR>
+<DD>
+This option warns whenever one of the regexp variables $', $&amp; or
+$' is used. Any occurrence of any of these variables in your
+program can slow your whole program down. See <A HREF="../../lib/Pod/perlre.html">the perlre manpage</A> for
+details.
+<P></P>
+<DT><STRONG><A NAME="item_all"><STRONG>all</STRONG></A></STRONG><BR>
+<DD>
+Turn all warnings on.
+<P></P>
+<DT><STRONG><A NAME="item_none"><STRONG>none</STRONG></A></STRONG><BR>
+<DD>
+Turn all warnings off.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="non lintcheck options">NON LINT-CHECK OPTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Du_Package"><STRONG>-u Package</STRONG></A></STRONG><BR>
+<DD>
+Normally, Lint only checks the main code of the program together
+with all subs defined in package main. The <STRONG>-u</STRONG> option lets you
+include other package names whose subs are then checked by Lint.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This is only a very preliminary version.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Malcolm Beattie, <A HREF="mailto:mbeattie@sable.ox.ac.uk.">mbeattie@sable.ox.ac.uk.</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Lint - Perl lint</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

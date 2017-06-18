@@ -1,0 +1,158 @@
+
+<HTML>
+<HEAD>
+<TITLE>Test - provides a simple framework for writing test scripts</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Test - provides a simple framework for writing test scripts</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#test types">TEST TYPES</A></LI>
+	<LI><A HREF="#return value">RETURN VALUE</A></LI>
+	<LI><A HREF="#onfail">ONFAIL</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+  Test - provides a simple framework for writing test scripts</PRE>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use strict;
+  use Test;</PRE>
+<PRE>
+  # use a BEGIN block so we print our plan before MyModule is loaded
+  BEGIN { plan tests =&gt; 14, todo =&gt; [3,4] }</PRE>
+<PRE>
+  # load your module...
+  use MyModule;</PRE>
+<PRE>
+  ok(0); # failure
+  ok(1); # success</PRE>
+<PRE>
+  ok(0); # ok, expected failure (see todo list, above)
+  ok(1); # surprise success!</PRE>
+<PRE>
+  ok(0,1);             # failure: '0' ne '1'
+  ok('broke','fixed'); # failure: 'broke' ne 'fixed'
+  ok('fixed','fixed'); # success: 'fixed' eq 'fixed'
+  ok('fixed',qr/x/);   # success: 'fixed' =~ qr/x/</PRE>
+<PRE>
+  ok(sub { 1+1 }, 2);  # success: '2' eq '2'
+  ok(sub { 1+1 }, 3);  # failure: '2' ne '3'
+  ok(0, int(rand(2));  # (just kidding :-)</PRE>
+<PRE>
+  my @list = (0,0);
+  ok @list, 3, &quot;\@list=&quot;.join(',',@list);      #extra diagnostics
+  ok 'segmentation fault', '/(?i)success/';    #regex match</PRE>
+<PRE>
+  skip($feature_is_missing, ...);    #do platform specific test</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><A HREF="../lib/Test/Harness.html">Test::Harness</A> expects to see particular output when it
+executes tests.  This module aims to make writing proper test scripts just
+a little bit easier (and less error prone :-).</P>
+<P>
+<HR>
+<H1><A NAME="test types">TEST TYPES</A></H1>
+<UL>
+<LI><STRONG><A NAME="item_NORMAL_TESTS">NORMAL TESTS</A></STRONG><BR>
+
+These tests are expected to succeed.  If they don't something's
+screwed up!
+<P></P>
+<LI><STRONG><A NAME="item_SKIPPED_TESTS">SKIPPED TESTS</A></STRONG><BR>
+
+Skip is for tests that might or might not be possible to run depending
+on the availability of platform specific features.  The first argument
+should evaluate to true (think ``yes, please skip'') if the required
+feature is not available.  After the first argument, skip works
+exactly the same way as do normal tests.
+<P></P>
+<LI><STRONG><A NAME="item_TODO_TESTS">TODO TESTS</A></STRONG><BR>
+
+TODO tests are designed for maintaining an <STRONG>executable TODO list</STRONG>.
+These tests are expected NOT to succeed.  If a TODO test does succeed,
+the feature in question should not be on the TODO list, now should it?
+<P>Packages should NOT be released with succeeding TODO tests.  As soon
+as a TODO test starts working, it should be promoted to a normal test
+and the newly working feature should be documented in the release
+notes or change log.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="return value">RETURN VALUE</A></H1>
+<P>Both <CODE>ok</CODE> and <CODE>skip</CODE> return true if their test succeeds and false
+otherwise in a scalar context.</P>
+<P>
+<HR>
+<H1><A NAME="onfail">ONFAIL</A></H1>
+<PRE>
+  BEGIN { plan test =&gt; 4, onfail =&gt; sub { warn &quot;CALL 911!&quot; } }</PRE>
+<P>While test failures should be enough, extra diagnostics can be
+triggered at the end of a test run.  <CODE>onfail</CODE> is passed an array ref
+of hash refs that describe each test failure.  Each hash will contain
+at least the following fields: <A HREF="../lib/Pod/perlfunc.html#item_package"><CODE>package</CODE></A>, <CODE>repetition</CODE>, and
+<CODE>result</CODE>.  (The file, line, and test number are not included because
+their correspondence to a particular test is tenuous.)  If the test
+had an expected value or a diagnostic string, these will also be
+included.</P>
+<P>The <STRONG>optional</STRONG> <CODE>onfail</CODE> hook might be used simply to print out the
+version of your package and/or how to report problems.  It might also
+be used to generate extremely sophisticated diagnostics for a
+particularly bizarre test failure.  However it's not a panacea.  Core
+dumps or other unrecoverable errors prevent the <CODE>onfail</CODE> hook from
+running.  (It is run inside an <CODE>END</CODE> block.)  Besides, <CODE>onfail</CODE> is
+probably over-kill in most cases.  (Your test code should be simpler
+than the code it is testing, yes?)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../lib/Test/Harness.html">the Test::Harness manpage</A> and, perhaps, test coverage analysis tools.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Copyright (c) 1998-1999 Joshua Nathaniel Pritikin.  All rights reserved.</P>
+<P>This package is free software and is provided ``as is'' without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+<A HREF="http://www.perl.com/perl/misc/Artistic.html)">http://www.perl.com/perl/misc/Artistic.html)</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Test - provides a simple framework for writing test scripts</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

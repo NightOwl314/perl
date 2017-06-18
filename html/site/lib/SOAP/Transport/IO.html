@@ -1,0 +1,107 @@
+
+<HTML>
+<HEAD>
+<TITLE>SOAP::Transport::IO - Server side IO support for SOAP::Lite</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SOAP::Transport::IO - Server side IO support for SOAP::Lite</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SOAP::Transport::IO - Server side IO support for SOAP::Lite</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use SOAP::Transport::IO;</PRE>
+<PRE>
+  SOAP::Transport::IO::Server</PRE>
+<PRE>
+    # you may specify as parameters for new():
+    # -&gt; new( in =&gt; 'in_file_name' [, out =&gt; 'out_file_name'] )
+    # -&gt; new( in =&gt; IN_HANDLE      [, out =&gt; OUT_HANDLE] )
+    # -&gt; new( in =&gt; *IN_HANDLE     [, out =&gt; *OUT_HANDLE] )
+    # -&gt; new( in =&gt; \*IN_HANDLE    [, out =&gt; \*OUT_HANDLE] )
+</PRE>
+<PRE>
+
+    # -- OR --
+    # any combinations
+    # -&gt; new( in =&gt; *STDIN, out =&gt; 'out_file_name' )
+    # -&gt; new( in =&gt; 'in_file_name', =&gt; \*OUT_HANDLE )</PRE>
+<PRE>
+
+    # -- OR --
+    # use in() and/or out() methods
+    # -&gt; in( *STDIN ) -&gt; out( *STDOUT )</PRE>
+<PRE>
+
+    # -- OR --
+    # use default (when nothing specified):
+    #      in =&gt; *STDIN, out =&gt; *STDOUT</PRE>
+<PRE>
+
+    # don't forget, if you want to accept parameters from command line
+    # \*HANDLER will be understood literally, so this syntax won't work 
+    # and server will complain</PRE>
+<PRE>
+
+    -&gt; new(@ARGV)</PRE>
+<PRE>
+
+    # specify path to My/Examples.pm here
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+    -&gt; handle
+  ;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2000-2001 Paul Kulchenko. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Kulchenko (<A HREF="mailto:paulclinger@yahoo.com">paulclinger@yahoo.com</A>)</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SOAP::Transport::IO - Server side IO support for SOAP::Lite</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

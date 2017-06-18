@@ -1,0 +1,300 @@
+
+<HTML>
+<HEAD>
+<TITLE>ppm - PPM</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ppm - PPM</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#environment variables">ENVIRONMENT VARIABLES</A></LI>
+	<LI><A HREF="#files">FILES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ppm - PPM (Perl Package Management)</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use PPM;</PRE>
+<PRE>
+ PPM::InstallPackage(&quot;package&quot; =&gt; $package, &quot;location&quot; =&gt; $location, &quot;root&quot; =&gt; $root);
+ PPM::RemovePackage(&quot;package&quot; =&gt; $package, &quot;force&quot; =&gt; $force);
+ PPM::VerifyPackage(&quot;package&quot; =&gt; $package, &quot;location&quot; =&gt; $location, &quot;upgrade&quot; =&gt; $upgrade);
+ PPM::QueryInstalledPackages(&quot;searchRE&quot; =&gt; $searchRE, &quot;searchtag&quot; =&gt; $searchtag, &quot;ignorecase&quot; =&gt; $ignorecase);
+ PPM::InstalledPackageProperties();</PRE>
+<PRE>
+ PPM::ListOfRepositories();
+ PPM::RemoveRepository(&quot;repository&quot; =&gt; $repository, &quot;save&quot; =&gt; $save);
+ PPM::AddRepository(&quot;repository&quot; =&gt; $repository, &quot;location&quot; =&gt; $location, &quot;save&quot; =&gt; $save);
+ PPM::RepositoryPackages(&quot;location&quot; =&gt; $location);
+ PPM::RepositoryPackageProperties(&quot;package&quot; =&gt; $package, &quot;location&quot; =&gt; $location);
+ PPM::RepositorySummary(&quot;location&quot; =&gt; $location);</PRE>
+<PRE>
+ PPM::GetPPMOptions();
+ PPM::SetPPMOptions(&quot;options&quot; =&gt; %options, &quot;save&quot; =&gt; $save);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>PPM is a group of functions intended to simplify the tasks of locating,
+installing, upgrading and removing software 'packages'.  It can determine
+if the most recent version of a software package is installed on a system,
+and can install or upgrade that package from a local or remote host.</P>
+<P>PPM uses files containing a modified form of the Open Software Distribution
+(OSD) specification for information about software packages.
+These description files, which are written in Extensible Markup
+Language (XML) code, are referred to as 'PPD' files.  Information about
+OSD can be found at the W3C web site (at the time of this writing,
+<A HREF="http://www.w3.org/TR/NOTE-OSD.html).">http://www.w3.org/TR/NOTE-OSD.html).</A>  The modifications to OSD used by PPM
+are documented in PPM::ppd.</P>
+<P>PPD files for packages are generated from POD files using the pod2ppd
+command.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_InstallPackage">PPM::InstallPackage(``package'' =&gt; $package, ``location'' =&gt; $location, ``root'' =&gt; $root);</A></STRONG><BR>
+<DD>
+Installs the specified package onto the local system.  'package' may
+be a simple package name ('foo'), a pathname (P:\PACKAGES\FOO.PPD) or
+a URL (HTTP://www.ActiveState.com/packages/foo.ppd).  In the case of a
+simple package name, the function will look for the package's PPD file
+at 'location', if provided; otherwise, it will use information stored
+in the PPM data file (see 'Files' section below) to locate the PPD file
+for the requested package.  The package's files will be installed under
+the directory specified in 'root'; if not specified the default value
+of 'root' will be used.
+<P>The function uses the values stored in the PPM data file to determine the
+local operating system, operating system version and CPU type.  If the PPD
+for this package contains implementations for different platforms, these
+values will be used to determine which one is installed.</P>
+<P><A HREF="#item_InstallPackage"><CODE>InstallPackage()</CODE></A> updates the PPM data file with information about the package
+installation. It stores a copy of the PPD used for installation, as well
+as the location from which this PPD was obtained.  This location will
+become the default PPD location for this package.</P>
+<P>During an installation, the following actions are performed:</P>
+<PRE>
+    - the PPD file for the package is read
+    - a directory for this package is created in the directory specified in
+      &lt;BUILDDIR&gt; in the PPM data file.
+    - the file specified with the &lt;CODEBASE&gt; tag in the PPD file is
+      retrieved/copied into the directory created above.
+    - the package is unarchived in the directory created for this package
+    - individual files from the archive are installed in the appropriate
+      directories of the local Perl installation.
+    - <A HREF="../../lib/perllocal.html">perllocal</A>.pod is updated with the install information.
+    - if provided, the &lt;INSTALL&gt; script from the PPD is executed in the
+      directory created above.
+    - information about the installation is stored in the PPM data file.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_RemovePackage">PPM::RemovePackage(``package'' =&gt; $package, ``force'' =&gt; $force)</A></STRONG><BR>
+<DD>
+Removes the specified package from the system.  Reads the package's PPD
+(stored during installation) for removal details.  If 'force' is
+specified, even a package required by PPM will be removed (useful
+when installing an upgrade).
+<P></P>
+<DT><STRONG><A NAME="item_VerifyPackage">PPM::VerifyPackage(``package'' =&gt; $package, ``location'' =&gt; $location, ``upgrade'' =&gt; $upgrade)</A></STRONG><BR>
+<DD>
+Reads a PPD file for 'package', and compares the currently installed
+version of 'package' to the version available according to the PPD.
+The PPD file is expected to be on a local directory or remote site
+specified either in the PPM data file or in the 'location' argument.
+The 'location' argument may be a directory location or a URL.
+The 'upgrade' argument forces an upgrade if the installed package is
+not up-to-date.
+<P>The PPD file for each package will initially be searched for at
+'location', and if not found will then be searched for using the
+locations specified in the PPM data file.</P>
+<P></P>
+<DT><STRONG><A NAME="item_QueryInstalledPackages">PPM::QueryInstalledPackages(``searchRE'' =&gt; $searchRE, ``searchtag'' =&gt; $searchtag, ``ignorecase'' =&gt; $ignorecase);</A></STRONG><BR>
+<DD>
+Returns a hash containing information about all installed packages.
+By default, a list of all installed packages is returned.  If a regular
+expression 'searchRE' is specified, only packages matching it are
+returned.  If 'searchtag' is specified, the pattern match is applied
+to the appropriate tag (e.g., ABSTRACT).
+<P>The data comes from the PPM data file, which contains installation
+information about each installed package.</P>
+<P></P>
+<DT><STRONG><A NAME="item_InstalledPackageProperties">PPM::InstalledPackageProperties();</A></STRONG><BR>
+<DD>
+Returns a hash with package names as keys, and package properties as
+attributes.
+<P></P>
+<DT><STRONG><A NAME="item_RepositoryPackages">PPM::RepositoryPackages(``location'' =&gt; $location);</A></STRONG><BR>
+<DD>
+Returns a hash, with 'location' being the key, and arrays of all packages
+with package description (PPD) files available at 'location' as its
+elements.  'location' may be either a remote address or a directory path.
+If 'location' is not specified, the default location as specified in
+the PPM data file will be used.
+<P></P>
+<DT><STRONG><A NAME="item_ListOfRepositories">PPM::ListOfRepositories();</A></STRONG><BR>
+<DD>
+Returns a hash containing the name of the repository and its location.
+These repositories will be searched if an explicit location is not
+provided in any function needing to locate a PPD.
+<P></P>
+<DT><STRONG><A NAME="item_RemoveRepository">PPM::RemoveRepository(``repository'' =&gt; $repository, ``save'' =&gt; $save);</A></STRONG><BR>
+<DD>
+Removes the repository named 'repository' from the list of available
+repositories.  If 'save' is not specified, the change is for the current
+session only.
+<P></P>
+<DT><STRONG><A NAME="item_AddRepository">PPM::AddRepository(``repository'' =&gt; $repository, ``location'' =&gt; $location, ``save'' =&gt; $save);</A></STRONG><BR>
+<DD>
+Adds the repository named 'repository' to the list of available repositories.
+If 'save' is not specified, the change is for the current session only.
+<P></P>
+<DT><STRONG><A NAME="item_RepositoryPackageProperties">PPM::RepositoryPackageProperties(``package'' =&gt; $package, ``location'' =&gt; $location);</A></STRONG><BR>
+<DD>
+Reads the PPD file for 'package', from 'location' or the default repository,
+and returns a hash with keys being the various tags from the PPD (e.g.
+'ABSTRACT', 'AUTHOR', etc.).
+<P></P>
+<DT><STRONG><A NAME="item_RepositorySummary">PPM::RepositorySummary(``location'' =&gt; $location);</A></STRONG><BR>
+<DD>
+Attempts to retrieve the summary file associated with the specified repository,
+or from all repositories if 'location' is not specified.  The return value
+is a hash with the key being the repository, and the data being another
+hash of package name keys, and package detail data.
+<P></P>
+<DT><STRONG><A NAME="item_GetPPMOptions">PPM::GetPPMOptions();</A></STRONG><BR>
+<DD>
+Returns a hash containing values for all PPM internal options ('IGNORECASE',
+'CLEAN', 'CONFIRM', 'ROOT', 'BUILDDIR', 'DOWNLOADSTATUS').
+<P></P>
+<DT><STRONG><A NAME="item_SetPPMOptions">PPM::SetPPMOptions(``options'' =&gt; %options, ``save'' =&gt; $save);</A></STRONG><BR>
+<DD>
+Sets internal PPM options as specified in the 'options' hash, which is
+expected to be the hash previously returned by a call to GetPPMOptions().
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<DL>
+<DT><STRONG>PPM::AddRepository(``repository'' =&gt; 'ActiveState', ``location'' =&gt; ``http://www.ActiveState.com/packages'', ``save'' =&gt; 1);</STRONG><BR>
+<DD>
+Adds a repository to the list of available repositories, and saves it in
+the PPM options file.
+<P></P>
+<DT><STRONG>PPM::InstallPackage(``package'' =&gt; 'http://www.ActiveState.com/packages/foo.ppd');</STRONG><BR>
+<DD>
+Installs the software package 'foo' based on the information in the PPD
+obtained from the specified URL.
+<P></P>
+<DT><STRONG>PPM::VerifyPackage(``package'' =&gt; 'foo', ``upgrade'' =&gt; true)</STRONG><BR>
+<DD>
+Compares the currently installed version of the software package 'foo' to
+the one available according to the PPD obtained from the package-specific
+location provided in the PPM data file, and upgrades to a newer
+version if available.  If a location for this specific package is not
+given in PPM data file, a default location is searched.
+<P></P>
+<DT><STRONG>PPM::VerifyPackage(``package'' =&gt; 'foo', ``location'' =&gt; 'P:\PACKAGES', ``upgrade'' =&gt; true);</STRONG><BR>
+<DD>
+Compares the currently installed version of the software package 'foo'
+to the one available according to the PPD obtained from the specified
+directory, and upgrades to a newer version if available.
+<P></P>
+<DT><STRONG>PPM::VerifyPackage(``package'' =&gt; 'PerlDB');</STRONG><BR>
+<DD>
+Verifies that package 'PerlDB' is up to date, using package locations specified
+in the PPM data file.
+<P></P>
+<DT><STRONG>PPM::RepositoryPackages(``location'' =&gt; <A HREF="http://www.ActiveState.com/packages);">http://www.ActiveState.com/packages);</A></STRONG><BR>
+<DD>
+Returns a hash keyed on 'location', with its elements being an array of
+packages with PPD files available at the specified location.
+<P></P>
+<DT><STRONG>%opts = PPM::GetPPMOptions();</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24options%7B%27CONFIRM%27%7D_%3D_%270%27%3B">$options{'CONFIRM'} = '0';</A></STRONG><BR>
+<DD>
+<DT><STRONG>PPM::SetPPMOptions(``options'' =&gt; \%opts, ``save'' =&gt; 1);</STRONG><BR>
+<DD>
+Sets and saves the value of the option 'CONFIRM' to '0'.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="environment variables">ENVIRONMENT VARIABLES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_HTTP_proxy">HTTP_proxy</A></STRONG><BR>
+<DD>
+If the environment variable 'HTTP_proxy' is set, then it will
+be used as the address of a proxy for accessing the Internet.
+If the environment variables 'HTTP_proxy_user' and 'HTTP_proxy_pass'
+are set, they will be used as the login and password for the
+proxy server.  If a proxy requires a certain User-Agent value
+(e.g. ``Mozilla/5.0''), this can be set using the 'HTTP_proxy_agent'
+environment variable.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="files">FILES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_package%2Eppd">package.ppd</A></STRONG><BR>
+<DD>
+A description of a software package, in Perl Package Distribution (PPD)
+format.  More information on this file format can be found in <A HREF="../../site/lib/PPM/XML/PPD.html">the PPM::XML::PPD manpage</A>.
+PPM stores a copy of the PPD it uses to install or upgrade any software
+package.
+<P></P>
+<DT><STRONG><A NAME="item_ppm%2Exml_%2D_PPM_data_file%2E">ppm.xml - PPM data file.</A></STRONG><BR>
+<DD>
+The XML format file in which PPM stores configuration and package
+installation information.  This file is created when PPM is installed,
+and under normal circumstances should never require modification other
+than by PPM itself.  For more information on this file, refer to
+<A HREF="../../site/lib/PPM/XML/PPMConfig.html">the PPM::XML::PPMConfig manpage</A>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Murray Nesbitt, &lt;<EM><A HREF="mailto:murray@ActiveState.com">murray@ActiveState.com</A></EM>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../site/lib/PPM/XML/PPMConfig.html">the PPM::XML::PPMConfig manpage</A>
+.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ppm - PPM</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,145 @@
+
+<HTML>
+<HEAD>
+<TITLE>Text::ParseWords - parse text into an array of tokens or array of arrays</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Text::ParseWords - parse text into an array of tokens or array of arrays</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Text::ParseWords - parse text into an array of tokens or array of arrays</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Text::ParseWords;
+  @lists = &amp;nested_quotewords($delim, $keep, @lines);
+  @words = &amp;quotewords($delim, $keep, @lines);
+  @words = &amp;shellwords(@lines);
+  @words = &amp;parse_line($delim, $keep, $line);
+  @words = &amp;old_shellwords(@lines); # DEPRECATED!</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The &amp;nested_quotewords() and &amp;quotewords() functions accept a delimiter 
+(which can be a regular expression)
+and a list of lines and then breaks those lines up into a list of
+words ignoring delimiters that appear inside quotes.  &amp;quotewords()
+returns all of the tokens in a single long list, while &amp;nested_quotewords()
+returns a list of token lists corresponding to the elements of @lines.
+&amp;parse_line() does tokenizing on a single string.  The &amp;*quotewords()
+functions simply call &amp;parse_lines(), so if you're only splitting
+one line you can call &amp;parse_lines() directly and save a function
+call.</P>
+<P>The $keep argument is a boolean flag.  If true, then the tokens are
+split on the specified delimiter, but all other characters (quotes,
+backslashes, etc.) are kept in the tokens.  If $keep is false then the
+&amp;*quotewords() functions remove all quotes and backslashes that are
+not themselves backslash-escaped or inside of single quotes (i.e.,
+&amp;quotewords() tries to interpret these characters just like the Bourne
+shell).  NB: these semantics are significantly different from the
+original version of this module shipped with Perl 5.000 through 5.004.
+As an additional feature, $keep may be the keyword ``delimiters'' which
+causes the functions to preserve the delimiters in each string as
+tokens in the token lists, in addition to preserving quote and
+backslash characters.</P>
+<P>&amp;shellwords() is written as a special case of &amp;quotewords(), and it
+does token parsing with whitespace as a delimiter-- similar to most
+Unix shells.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The sample program:</P>
+<PRE>
+  use Text::ParseWords;
+  @words = &amp;quotewords('\s+', 0, q{this   is &quot;a test&quot; of\ quotewords \&quot;for you});
+  $i = 0;
+  foreach (@words) {
+      print &quot;$i: &lt;$_&gt;\n&quot;;
+      $i++;
+  }</PRE>
+<P>produces:</P>
+<PRE>
+  0: &lt;this&gt;
+  1: &lt;is&gt;
+  2: &lt;a test&gt;
+  3: &lt;of quotewords&gt;
+  4: &lt;&quot;for&gt;
+  5: &lt;you&gt;</PRE>
+<P>demonstrating:</P>
+<OL>
+<LI>
+a simple word
+<P></P>
+<LI>
+multiple spaces are skipped because of our $delim
+<P></P>
+<LI>
+use of quotes to include a space in a word
+<P></P>
+<LI>
+use of a backslash to include a space in a word
+<P></P>
+<LI>
+use of a backslash to remove the special meaning of a double-quote
+<P></P>
+<LI>
+another simple word (note the lack of effect of the
+backslashed double-quote)
+<P></P></OL>
+<P>Replacing <CODE>&amp;quotewords('\s+', 0, q{this   is...})</CODE>
+with <CODE>&amp;shellwords(q{this   is...})</CODE>
+is a simpler way to accomplish the same thing.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Maintainer is Hal Pomeranz &lt;<A HREF="mailto:pomeranz@netcom.com">pomeranz@netcom.com</A>&gt;, 1994-1997 (Original
+author unknown).  Much of the code for &amp;parse_line() (including the
+primary regexp) from Joerk Behrends &lt;<A HREF="mailto:jbehrends@multimediaproduzenten.de">jbehrends@multimediaproduzenten.de</A>&gt;.</P>
+<P>Examples section another documentation provided by John Heidemann 
+&lt;<A HREF="mailto:johnh@ISI.EDU">johnh@ISI.EDU</A>&gt;</P>
+<P>Bug reports, patches, and nagging provided by lots of folks-- thanks
+everybody!  Special thanks to Michael Schwern &lt;<A HREF="mailto:schwern@envirolink.org">schwern@envirolink.org</A>&gt;
+for assuring me that a &amp;nested_quotewords() would be useful, and to 
+Jeff Friedl &lt;<A HREF="mailto:jfriedl@yahoo-inc.com">jfriedl@yahoo-inc.com</A>&gt; for telling me not to worry about
+error-checking (sort of-- you had to be there).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Text::ParseWords - parse text into an array of tokens or array of arrays</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

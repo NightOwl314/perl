@@ -1,0 +1,96 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::Install - install files from here to there</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Install - install files from here to there</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::Install - install files from here to there</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><STRONG>use ExtUtils::Install;</STRONG></P>
+<P><STRONG>install($hashref,$verbose,$nonono);</STRONG></P>
+<P><STRONG>uninstall($packlistfile,$verbose,$nonono);</STRONG></P>
+<P><STRONG>pm_to_blib($hashref);</STRONG></P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Both <CODE>install()</CODE> and <CODE>uninstall()</CODE> are specific to the way
+ExtUtils::MakeMaker handles the installation and deinstallation of
+perl modules. They are not designed as general purpose tools.</P>
+<P><CODE>install()</CODE> takes three arguments. A reference to a hash, a verbose
+switch and a don't-really-do-it switch. The hash ref contains a
+mapping of directories: each key/value pair is a combination of
+directories to be copied. Key is a directory to copy from, value is a
+directory to copy to. The whole tree below the ``from'' directory will
+be copied preserving timestamps and permissions.</P>
+<P>There are two keys with a special meaning in the hash: ``read'' and
+``write''. After the copying is done, install will write the list of
+target files to the file named by <CODE>$hashref-&gt;{write}</CODE>. If there is
+another file named by <CODE>$hashref-&gt;{read}</CODE>, the contents of this file will
+be merged into the written file. The read and the written file may be
+identical, but on AFS it is quite likely that people are installing to a
+different directory than the one where the files later appear.</P>
+<P><CODE>install_default()</CODE> takes one or less arguments.  If no arguments are 
+specified, it takes $ARGV[0] as if it was specified as an argument.  
+The argument is the value of MakeMaker's <CODE>FULLEXT</CODE> key, like <EM>Tk/Canvas</EM>.  
+This function calls <CODE>install()</CODE> with the same arguments as the defaults 
+the MakeMaker would use.</P>
+<P>The argument-less form is convenient for install scripts like</P>
+<PRE>
+  perl -MExtUtils::Install -e install_default Tk/Canvas</PRE>
+<P>Assuming this command is executed in a directory with a populated <EM>blib</EM> 
+directory, it will proceed as if the <EM>blib</EM> was build by MakeMaker on 
+this machine.  This is useful for binary distributions.</P>
+<P><CODE>uninstall()</CODE> takes as first argument a file containing filenames to be
+unlinked. The second argument is a verbose switch, the third is a
+no-don't-really-do-it-now switch.</P>
+<P><CODE>pm_to_blib()</CODE> takes a hashref as the first argument and copies all keys
+of the hash to the corresponding values efficiently. Filenames with
+the extension pm are autosplit. Second argument is the autosplit
+directory.  If third argument is not empty, it is taken as a filter command
+to be ran on each .pm file, the output of the command being what is finally
+copied, and the source for auto-splitting.</P>
+<P>You can have an environment variable PERL_INSTALL_ROOT set which will
+be prepended as a directory to each installed file (and directory).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Install - install files from here to there</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

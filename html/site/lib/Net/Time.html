@@ -1,0 +1,96 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Time - time and daytime network client interface</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Time - time and daytime network client interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Time - time and daytime network client interface</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::Time qw(inet_time inet_daytime);
+</PRE>
+<PRE>
+
+    print inet_time();          # use default host from Net::Config
+    print inet_time('localhost');
+    print inet_time('localhost', 'tcp');</PRE>
+<PRE>
+
+    print inet_daytime();       # use default host from Net::Config
+    print inet_daytime('localhost');
+    print inet_daytime('localhost', 'tcp');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::Time</CODE> provides subroutines that obtain the time on a remote machine.</P>
+<DL>
+<DT><STRONG><A NAME="item_inet_time">inet_time ( [HOST [, PROTOCOL [, TIMEOUT]]])</A></STRONG><BR>
+<DD>
+Obtain the time on <CODE>HOST</CODE>, or some default host if <CODE>HOST</CODE> is not given
+or not defined, using the protocol as defined in RFC868. The optional
+argument <CODE>PROTOCOL</CODE> should define the protocol to use, either <CODE>tcp</CODE> or
+<CODE>udp</CODE>. The result will be a time value in the same units as returned
+by <A HREF="../../../lib/Pod/perlfunc.html#item_time"><CODE>time()</CODE></A> or <EM>undef</EM> upon failure.
+<P></P>
+<DT><STRONG><A NAME="item_inet_daytime">inet_daytime ( [HOST [, PROTOCOL [, TIMEOUT]]])</A></STRONG><BR>
+<DD>
+Obtain the time on <CODE>HOST</CODE>, or some default host if <CODE>HOST</CODE> is not given
+or not defined, using the protocol as defined in RFC867. The optional
+argument <CODE>PROTOCOL</CODE> should define the protocol to use, either <CODE>tcp</CODE> or
+<CODE>udp</CODE>. The result will be an ASCII string or <EM>undef</EM> upon failure.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Time - time and daytime network client interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

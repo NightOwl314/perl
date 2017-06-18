@@ -1,0 +1,141 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Pipe - supply object methods for pipes</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Pipe - supply object methods for pipes</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Pipe - supply object methods for pipes</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use IO::Pipe;</PRE>
+<PRE>
+        $pipe = new IO::Pipe;</PRE>
+<PRE>
+        if($pid = fork()) { # Parent
+            $pipe-&gt;reader();</PRE>
+<PRE>
+            while(&lt;$pipe&gt; {
+                ....
+            }</PRE>
+<PRE>
+        }
+        elsif(defined $pid) { # Child
+            $pipe-&gt;writer();</PRE>
+<PRE>
+            print $pipe ....
+        }</PRE>
+<PRE>
+        or</PRE>
+<PRE>
+        $pipe = new IO::Pipe;</PRE>
+<PRE>
+        $pipe-&gt;reader(qw(ls -l));</PRE>
+<PRE>
+        while(&lt;$pipe&gt;) {
+            ....
+        }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::Pipe</CODE> provides an interface to creating pipes between
+processes.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [READER, WRITER] )</A></STRONG><BR>
+<DD>
+Creates a <CODE>IO::Pipe</CODE>, which is a reference to a newly created symbol
+(see the <CODE>Symbol</CODE> package). <CODE>IO::Pipe::new</CODE> optionally takes two
+arguments, which should be objects blessed into <CODE>IO::Handle</CODE>, or a
+subclass thereof. These two objects will be used for the system call
+to <A HREF="../../lib/Pod/perlfunc.html#item_pipe"><CODE>pipe</CODE></A>. If no arguments are given then method <A HREF="#item_handles"><CODE>handles</CODE></A> is called
+on the new <CODE>IO::Pipe</CODE> object.
+<P>These two handles are held in the array part of the GLOB until either
+<A HREF="#item_reader"><CODE>reader</CODE></A> or <A HREF="#item_writer"><CODE>writer</CODE></A> is called.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_reader">reader ([ARGS])</A></STRONG><BR>
+<DD>
+The object is re-blessed into a sub-class of <CODE>IO::Handle</CODE>, and becomes a
+handle at the reading end of the pipe. If <CODE>ARGS</CODE> are given then <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork</CODE></A>
+is called and <CODE>ARGS</CODE> are passed to exec.
+<P></P>
+<DT><STRONG><A NAME="item_writer">writer ([ARGS])</A></STRONG><BR>
+<DD>
+The object is re-blessed into a sub-class of <CODE>IO::Handle</CODE>, and becomes a
+handle at the writing end of the pipe. If <CODE>ARGS</CODE> are given then <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork</CODE></A>
+is called and <CODE>ARGS</CODE> are passed to exec.
+<P></P>
+<DT><STRONG><A NAME="item_handles">handles ()</A></STRONG><BR>
+<DD>
+This method is called during construction by <CODE>IO::Pipe::new</CODE>
+on the newly created <CODE>IO::Pipe</CODE> object. It returns an array of two objects
+blessed into <CODE>IO::Pipe::End</CODE>, or a subclass thereof.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr. Currently maintained by the Perl Porters.  Please report all
+bugs to &lt;<A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1996-8 Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Pipe - supply object methods for pipes</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

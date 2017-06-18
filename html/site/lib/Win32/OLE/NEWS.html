@@ -1,0 +1,380 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::OLE::NEWS - What's new in Win32::OLE</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::NEWS - What's new in Win32::OLE</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#version 0.13">Version 0.13</A></LI>
+	<UL>
+
+		<LI><A HREF="#nothing() method in win32::ole::variant"><CODE>nothing()</CODE> method in Win32::OLE::Variant</A></LI>
+		<LI><A HREF="#new _newenum and _unique options">new _NewEnum and _Unique options</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 0.12">Version 0.12</A></LI>
+	<UL>
+
+		<LI><A HREF="#additional error handling functionality">Additional error handling functionality</A></LI>
+		<LI><A HREF="#builtin event loop">Builtin event loop</A></LI>
+		<LI><A HREF="#free unused ole libraries">Free unused OLE libraries</A></LI>
+		<LI><A HREF="#the win32::ole article from the perl journal #10">The ``Win32::OLE'' article from ``The Perl Journal #10''</A></LI>
+		<LI><A HREF="#variant>put() bug fixes">VARIANT-&gt;<CODE>Put()</CODE> bug fixes</A></LI>
+		<LI><A HREF="#error message fixes">Error message fixes</A></LI>
+		<LI><A HREF="#vt_date and vt_error return values handled differently">VT_DATE and VT_ERROR return values handled differently</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 0.11 (changes since 0.1008)">Version 0.11 (changes since 0.1008)</A></LI>
+	<UL>
+
+		<LI><A HREF="#new dhtml typelib browser">new DHTML typelib browser</A></LI>
+		<LI><A HREF="#vt_decimal support">VT_DECIMAL support</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 0.1008">Version 0.1008</A></LI>
+	<UL>
+
+		<LI><A HREF="#new letproperty() object method">new <CODE>LetProperty()</CODE> object method</A></LI>
+		<LI><A HREF="#new hresult() function">new <CODE>HRESULT()</CODE> function</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 0.1007 (changes since 0.1005)">Version 0.1007 (changes since 0.1005)</A></LI>
+	<UL>
+
+		<LI><A HREF="#ole event support">OLE Event support</A></LI>
+		<LI><A HREF="#getobject() and getactiveobject() now support optional destructor argument"><CODE>GetObject()</CODE> and <CODE>GetActiveObject()</CODE> now support optional DESTRUCTOR argument</A></LI>
+		<LI><A HREF="#remote object instantiation via dcom">Remote object instantiation via DCOM</A></LI>
+		<LI><A HREF="#enumerate all win32::ole objects">Enumerate all Win32::OLE objects</A></LI>
+		<LI><A HREF="#the variant>put() method now returns the variant object itself">The VARIANT-&gt;<CODE>Put()</CODE> method now returns the VARIANT object itself</A></LI>
+		<LI><A HREF="#the variant>put(arrayref) form allows assignment to a complete safearray">The VARIANT-&gt;<CODE>Put(ARRAYREF)</CODE> form allows assignment to a complete SAFEARRAY</A></LI>
+		<LI><A HREF="#new variant formatting methods">New Variant formatting methods</A></LI>
+		<LI><A HREF="#new win32::ole::nls methods: sendsettingchange() and setlocaleinfo()">new Win32::OLE::NLS methods: <CODE>SendSettingChange()</CODE> and <CODE>SetLocaleInfo()</CODE></A></LI>
+		<LI><A HREF="#win32::ole::const now correctly treats version numbers as hex">Win32::OLE::Const now correctly treats version numbers as hex</A></LI>
+		<LI><A HREF="#more robust global destruction of win32::ole objects">more robust global destruction of Win32::OLE objects</A></LI>
+	</UL>
+
+	<LI><A HREF="#version 0.1005 (changes since 0.1003)">Version 0.1005 (changes since 0.1003)</A></LI>
+	<UL>
+
+		<LI><A HREF="#optional destructor for getactiveobject() getobject() class methods">optional DESTRUCTOR for <CODE>GetActiveObject()</CODE> <CODE>GetObject()</CODE> class methods</A></LI>
+		<LI><A HREF="#new variant object method: $object>copy()">new Variant object method: $object-&gt;<CODE>Copy()</CODE></A></LI>
+		<LI><A HREF="#new win32::ole>option() class method">new Win32::OLE-&gt;<CODE>Option()</CODE> class method</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::OLE::NEWS - What's new in Win32::OLE</P>
+<P>This file contains a history of user visible changes to the
+Win32::OLE::* modules. Only new features and major bug fixes that
+might affect backwards compatibility are included.</P>
+<P>
+<HR>
+<H1><A NAME="version 0.13">Version 0.13</A></H1>
+<P>
+<H2><A NAME="nothing() method in win32::ole::variant"><CODE>nothing()</CODE> method in Win32::OLE::Variant</A></H2>
+<P>The <CODE>nothing()</CODE> function returns an empty VT_DISPATCH variant.  It can be
+used to clear an object reference stored in a property</P>
+<PRE>
+        use Win32::OLE::Variant qw(:DEFAULT nothing);
+        # ...
+        $object-&gt;{Property} = nothing;</PRE>
+<P>This has the same effect as the Visual Basic statement</P>
+<PRE>
+        Set object.Property = Nothing</PRE>
+<P>
+<H2><A NAME="new _newenum and _unique options">new _NewEnum and _Unique options</A></H2>
+<P>There are two new options available for the Win32::OLE-&gt;Option class
+method: <CODE>_NewEnum</CODE> provides the elements of a collection object
+directly as the value of a <CODE>_NewEnum</CODE> property.  The <CODE>_Unique</CODE>
+option guarantees that Win32::OLE will not create multiple proxy
+objects for the same underlying COM/OLE object.</P>
+<P>Both options are only really useful to tree traversal programs or
+during debugging.</P>
+<P>
+<HR>
+<H1><A NAME="version 0.12">Version 0.12</A></H1>
+<P>
+<H2><A NAME="additional error handling functionality">Additional error handling functionality</A></H2>
+<P>The Warn option can now be set to a CODE reference too.  For example,</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt; 3);</PRE>
+<P>could now be written as</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt; \&amp;Carp::croak);</PRE>
+<P>This can even be used to emulate the VisualBasic <CODE>On Error Goto
+Label</CODE> construct:</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt;  sub {goto CheckError});
+    # ... your normal OLE code here ...</PRE>
+<PRE>
+  CheckError:
+    # ... your error handling code here ...</PRE>
+<P>
+<H2><A NAME="builtin event loop">Builtin event loop</A></H2>
+<P>Processing OLE events required a polling loop before, e.g.</P>
+<PRE>
+    my $Quit;
+    #...
+    until ($Quit) {
+        Win32::OLE-&gt;SpinMessageLoop;
+        Win32::Sleep(100);
+    }
+    package BrowserEvents;
+    sub OnQuit { $Quit = 1 }</PRE>
+<P>This is inefficient and a bit odd.  This version of Win32::OLE now
+supports a standard messageloop:</P>
+<PRE>
+    Win32::OLE-&gt;MessageLoop();</PRE>
+<PRE>
+    package BrowserEvents;
+    sub OnQuit { Win32::OLE-&gt;QuitMessageLoop }</PRE>
+<P>
+<H2><A NAME="free unused ole libraries">Free unused OLE libraries</A></H2>
+<P>Previous versions of Win32::OLE would call the <CODE>CoFreeUnusedLibraries()</CODE>
+API whenever an OLE object was destroyed.  This made sure that OLE
+libraries would be unloaded as soon as they were no longer needed.
+Unfortunately, objects implemented in Visual Basic tend to crash
+during this call, as they pretend to be ready for unloading, when in
+fact, they aren't.</P>
+<P>The unloading of object libraries is really only important for long
+running processes that might instantiate a huge number of <STRONG>different</STRONG>
+objects over time.  Therefore this API is no longer called
+automatically.  The functionality is now available explicitly to those
+who want or need it by calling a Win32::OLE class method:</P>
+<PRE>
+    Win32::OLE-&gt;FreeUnusedLibraries();</PRE>
+<P>
+<H2><A NAME="the win32::ole article from the perl journal #10">The ``Win32::OLE'' article from ``The Perl Journal #10''</A></H2>
+<P>The article is Copyright 1998 by <EM>The Perl
+Journal</EM>. <A HREF="http://www.tpj.com">http://www.tpj.com</A></P>
+<P>It originally appeared in <EM>The Perl Journal</EM> # 10 and appears here
+courtesy of Jon Orwant and <EM>The Perl Journal</EM>.  The sample code from
+the article is in the <EM>eg/tpj.pl</EM> file.</P>
+<P>
+<H2><A NAME="variant>put() bug fixes">VARIANT-&gt;<CODE>Put()</CODE> bug fixes</A></H2>
+<P>The <CODE>Put()</CODE> method didn't work correctly for arrays of type VT_BSTR,
+VT_DISPATH or VT_UNKNOWN.  This has been fixed.</P>
+<P>
+<H2><A NAME="error message fixes">Error message fixes</A></H2>
+<P>Previous versions of Win32::OLE gave a wrong argument index for some
+OLE error messages (the number was too large by 1).  This should be
+fixed now.</P>
+<P>
+<H2><A NAME="vt_date and vt_error return values handled differently">VT_DATE and VT_ERROR return values handled differently</A></H2>
+<P>Method calls and property accesses returning a VT_DATE or VT_ERROR
+value would previously translate the value to string or integer
+format.  This has been changed to return a Win32::OLE::Variant object.
+The return values will behave as before if the Win32::OLE::Variant
+module is being used.  This module overloads the conversion of
+the objects to strings and numbers.</P>
+<P>
+<HR>
+<H1><A NAME="version 0.11 (changes since 0.1008)">Version 0.11 (changes since 0.1008)</A></H1>
+<P>
+<H2><A NAME="new dhtml typelib browser">new DHTML typelib browser</A></H2>
+<P>The Win32::OLE distribution now contains a type library browser.  It
+is written in PerlScript, generating dynamic HTML.  It requires
+Internet Explorer 4.0 or later.  You'll find it in
+<EM>browser/Browser.html</EM>.  It should be available in the ActivePerl
+HTML help under Win32::OLE::Browser.</P>
+<P>After selecting a library, type or member you can press F1 to call up
+the corresponding help file at the appropriate location.</P>
+<P>
+<H2><A NAME="vt_decimal support">VT_DECIMAL support</A></H2>
+<P>The Win32::OLE::Variant module now supports VT_DECIMAL variants too.
+They are not ``officially'' allowed in OLE Automation calls, but even
+Microsoft's ``ActiveX Data Objects'' sometimes returns VT_DECIMAL
+values.</P>
+<P>VT_DECIMAL variables are stored as 96-bit integers scaled by a
+variable power of 10.  The power of 10 scaling factor specifies the
+number of digits to the right of the decimal point, and ranges from 0
+to 28.  With a scale of 0 (no decimal places), the largest possible
+value is +/-79,228,162,514,264,337,593,543,950,335.  With a 28 decimal
+places, the largest value is +/-7.9228162514264337593543950335 and the
+smallest, non-zero value is +/-0.0000000000000000000000000001.</P>
+<P>
+<HR>
+<H1><A NAME="version 0.1008">Version 0.1008</A></H1>
+<P>
+<H2><A NAME="new letproperty() object method">new <CODE>LetProperty()</CODE> object method</A></H2>
+<P>In Win32::OLE property assignment using the hash syntax is equivalent
+to the Visual Basic <CODE>Set</CODE> syntax (<EM>by reference</EM> assignment):</P>
+<PRE>
+  $Object-&gt;{Property} = $OtherObject;</PRE>
+<P>corresponds to this Visual Basic statement:</P>
+<PRE>
+  Set Object.Property = OtherObject</PRE>
+<P>To get the <EM>by value</EM> treatment of the Visual Basic <CODE>Let</CODE> statement</P>
+<PRE>
+  Object.Property = OtherObject</PRE>
+<P>you have to use the <CODE>LetProperty()</CODE> object method in Perl:</P>
+<PRE>
+  $Object-&gt;LetProperty($Property, $OtherObject);</PRE>
+<P>
+<H2><A NAME="new hresult() function">new <CODE>HRESULT()</CODE> function</A></H2>
+<P>The <CODE>HRESULT()</CODE> function converts an unsigned number into a signed HRESULT
+error value as used by OLE internally. This is necessary because Perl
+treats all hexadecimal constants as unsigned. To check if the last OLE
+function returned ``Member not found'' (0x80020003) you can write:</P>
+<PRE>
+  if (Win32::OLE-&gt;LastError == HRESULT(0x80020003)) {
+      # your error recovery here
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="version 0.1007 (changes since 0.1005)">Version 0.1007 (changes since 0.1005)</A></H1>
+<P>
+<H2><A NAME="ole event support">OLE Event support</A></H2>
+<P>This version of Win32::OLE contains <STRONG>ALPHA</STRONG> level support for OLE events. The
+userinterface is still subject to change. There are ActiveX objects / controls
+that don't fire events under the current implementation.</P>
+<P>Events are enabled for a specific object with the Win32::OLE-&gt;<CODE>WithEvents()</CODE>
+class method:</P>
+<PRE>
+  Win32::OLE-&gt;WithEvents(OBJECT, HANDLER, INTERFACE)</PRE>
+<P>Please read further documentation in Win32::OLE.</P>
+<P>
+<H2><A NAME="getobject() and getactiveobject() now support optional destructor argument"><CODE>GetObject()</CODE> and <CODE>GetActiveObject()</CODE> now support optional DESTRUCTOR argument</A></H2>
+<P>It is now possible to specify a DESTRUCTOR argument to the <CODE>GetObject()</CODE> and
+<CODE>GetActiveObject()</CODE> class methods. They work identical to the <CODE>new()</CODE> DESTRUCTOR
+argument.</P>
+<P>
+<H2><A NAME="remote object instantiation via dcom">Remote object instantiation via DCOM</A></H2>
+<P>This has actually been in Win32::OLE since 0.0608, but somehow never got
+documented. You can provide an array reference in place of the usual PROGID
+parameter to Win32::OLE-&gt;new():</P>
+<PRE>
+  OBJ = Win32::OLE-&gt;new([MACHINE, PRODID]);</PRE>
+<P>The array must contain two elements: the name of the MACHINE and the PROGID.
+This will try to create the object on the remote MACHINE.</P>
+<P>
+<H2><A NAME="enumerate all win32::ole objects">Enumerate all Win32::OLE objects</A></H2>
+<P>This class method returns the number Win32::OLE objects currently in
+existance. It will call the optional CALLBACK function for each of
+these objects:</P>
+<PRE>
+  $Count = Win32::OLE-&gt;EnumAllObjects(sub {
+      my $Object = shift;
+      my $Class = Win32::OLE-&gt;QueryObjectType($Object);
+      printf &quot;# Object=%s Class=%s\n&quot;, $Object, $Class;
+  });</PRE>
+<P>The <CODE>EnumAllObjects()</CODE> method is primarily a debugging tool. It can be
+used e.g. in an END block to check if all external connections have
+been properly destroyed.</P>
+<P>
+<H2><A NAME="the variant>put() method now returns the variant object itself">The VARIANT-&gt;<CODE>Put()</CODE> method now returns the VARIANT object itself</A></H2>
+<P>This allows chaining of <CODE>Put()</CODE> method calls to set multiple values in an
+array variant:</P>
+<PRE>
+  $Array-&gt;Put(0,0,$First_value)-&gt;Put(0,1,$Another_value);</PRE>
+<P>
+<H2><A NAME="the variant>put(arrayref) form allows assignment to a complete safearray">The VARIANT-&gt;<CODE>Put(ARRAYREF)</CODE> form allows assignment to a complete SAFEARRAY</A></H2>
+<P>This allows automatic conversion from a list of lists to a SAFEARRAY.
+You can now write:</P>
+<PRE>
+  my $Array = Variant(VT_ARRAY|VT_R8, [1,2], 2);
+  $Array-&gt;Put([[1,2], [3,4]]);</PRE>
+<P>instead of the tedious:</P>
+<PRE>
+  $Array-&gt;Put(1,0,1);
+  $Array-&gt;Put(1,1,2);
+  $Array-&gt;Put(2,0,3);
+  $Array-&gt;Put(2,1,4);</PRE>
+<P>
+<H2><A NAME="new variant formatting methods">New Variant formatting methods</A></H2>
+<P>There are four new methods for formatting variant values: Currency(), Date(),
+<CODE>Number()</CODE> and Time(). For example:</P>
+<PRE>
+  my $v = Variant(VT_DATE, &quot;April 1 99&quot;);
+  print $v-&gt;Date(DATE_LONGDATE), &quot;\n&quot;;
+  print $v-&gt;Date(&quot;ddd',' MMM dd yy&quot;), &quot;\n&quot;;</PRE>
+<P>will print:</P>
+<PRE>
+  Thursday, April 01, 1999
+  Thu, Apr 01 99</PRE>
+<P>
+<H2><A NAME="new win32::ole::nls methods: sendsettingchange() and setlocaleinfo()">new Win32::OLE::NLS methods: <CODE>SendSettingChange()</CODE> and <CODE>SetLocaleInfo()</CODE></A></H2>
+<P><CODE>SendSettingChange()</CODE> sends a WM_SETTINGCHANGE message to all top level windows.</P>
+<P><CODE>SetLocaleInfo()</CODE> allows changing elements in the user override section of the
+locale database. Unfortunately these changes are not automatically available
+to further Variant formatting; you have to call <CODE>SendSettingChange()</CODE> first.</P>
+<P>
+<H2><A NAME="win32::ole::const now correctly treats version numbers as hex">Win32::OLE::Const now correctly treats version numbers as hex</A></H2>
+<P>The minor and major version numbers of type libraries have been treated as
+decimal. This was wrong. They are now correctly decoded as hex.</P>
+<P>
+<H2><A NAME="more robust global destruction of win32::ole objects">more robust global destruction of Win32::OLE objects</A></H2>
+<P>The final destruction of Win32::OLE objects has always been somewhat fragile.
+The reason for this is that Perl doesn't honour reference counts during global
+destruction but destroys objects in seemingly random order. This can lead
+to leaked database connections or unterminated external objects. The only
+solution was to make all objects lexical and hope that no object would be
+trapped in a closure. Alternatively all objects could be explicitly set to
+<A HREF="../../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>, which doesn't work very well with exception handling.</P>
+<P>With version 0.1007 of Win32::OLE this problem should be gone: The module
+keeps a list of active Win32::OLE objects. It uses an END block to destroy
+all objects at program termination <EM>before</EM> the Perl's global destruction
+starts. Objects still existing at program termination are now destroyed in
+reverse order of creation. The effect is similar to explicitly calling
+Win32::OLE-&gt;<CODE>Uninitialize()</CODE> just prior to termination.</P>
+<P>
+<HR>
+<H1><A NAME="version 0.1005 (changes since 0.1003)">Version 0.1005 (changes since 0.1003)</A></H1>
+<P>Win32::OLE 0.1005 has been release with ActivePerl build 509. It is also
+included in the <EM>Perl Resource Kit for Win32</EM> Update.</P>
+<P>
+<H2><A NAME="optional destructor for getactiveobject() getobject() class methods">optional DESTRUCTOR for <CODE>GetActiveObject()</CODE> <CODE>GetObject()</CODE> class methods</A></H2>
+<P>The <CODE>GetActiveObject()</CODE> and <CODE>GetObject()</CODE> class method now also support an
+optional DESTRUCTOR parameter just like Win32::OLE-&gt;new(). The DESTRUCTOR
+is executed when the last reference to this object goes away. It is
+generally considered <CODE>impolite</CODE> to stop applications that you did not
+start yourself.</P>
+<P>
+<H2><A NAME="new variant object method: $object>copy()">new Variant object method: $object-&gt;<CODE>Copy()</CODE></A></H2>
+<P>See <A HREF="../../../../site/lib/Win32/OLE/Variant.html#copy([dim])">Copy([DIM]) in the Win32::OLE::Variant manpage</A>.</P>
+<P>
+<H2><A NAME="new win32::ole>option() class method">new Win32::OLE-&gt;<CODE>Option()</CODE> class method</A></H2>
+<P>The <CODE>Option()</CODE> class method can be used to inspect and modify
+<A HREF="../../../../site/lib/Win32/OLE.html#module options">Module Options in the Win32::OLE manpage</A>. The single argument form retrieves
+the value of an option:</P>
+<PRE>
+  my $CP = Win32::OLE-&gt;Option('CP');</PRE>
+<P>A single call can be used to set multiple options simultaneously:</P>
+<PRE>
+  Win32::OLE-&gt;Option(CP =&gt; CP_ACP, Warn =&gt; 3);</PRE>
+<P>Currently the following options exist: CP, LCID and <CODE>Warn</CODE>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE::NEWS - What's new in Win32::OLE</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

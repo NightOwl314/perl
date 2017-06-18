@@ -1,0 +1,388 @@
+<HTML>
+<HEAD>
+<TITLE>perlreftut - Mark's very short tutorial about references</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlreftut - Mark's very short tutorial about references</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#who needs complicated data structures">Who Needs Complicated Data Structures?</A></LI>
+	<LI><A HREF="#the solution">The Solution</A></LI>
+	<LI><A HREF="#syntax">Syntax</A></LI>
+	<UL>
+
+		<LI><A HREF="#making references">Making References</A></LI>
+		<LI><A HREF="#using references">Using References</A></LI>
+	</UL>
+
+	<LI><A HREF="#an example">An Example</A></LI>
+	<LI><A HREF="#arrow rule">Arrow Rule</A></LI>
+	<LI><A HREF="#solution">Solution</A></LI>
+	<LI><A HREF="#the rest">The Rest</A></LI>
+	<LI><A HREF="#summary">Summary</A></LI>
+	<LI><A HREF="#credits">Credits</A></LI>
+	<UL>
+
+		<LI><A HREF="#distribution conditions">Distribution Conditions</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlreftut - Mark's very short tutorial about references</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>One of the most important new features in Perl 5 was the capability to
+manage complicated data structures like multidimensional arrays and
+nested hashes.  To enable these, Perl 5 introduced a feature called
+`references', and using references is the key to managing complicated,
+structured data in Perl.  Unfortunately, there's a lot of funny syntax
+to learn, and the main manual page can be hard to follow.  The manual
+is quite complete, and sometimes people find that a problem, because
+it can be hard to tell what is important and what isn't.</P>
+<P>Fortunately, you only need to know 10% of what's in the main page to get
+90% of the benefit.  This page will show you that 10%.</P>
+<P>
+<HR>
+<H1><A NAME="who needs complicated data structures">Who Needs Complicated Data Structures?</A></H1>
+<P>One problem that came up all the time in Perl 4 was how to represent a
+hash whose values were lists.  Perl 4 had hashes, of course, but the
+values had to be scalars; they couldn't be lists.</P>
+<P>Why would you want a hash of lists?  Let's take a simple example: You
+have a file of city and country names, like this:</P>
+<PRE>
+        Chicago, USA
+        Frankfurt, Germany
+        Berlin, Germany
+        Washington, USA
+        Helsinki, Finland
+        New York, USA</PRE>
+<P>and you want to produce an output like this, with each country mentioned
+once, and then an alphabetical list of the cities in that country:</P>
+<PRE>
+        Finland: Helsinki.
+        Germany: Berlin, Frankfurt.
+        USA:  Chicago, New York, Washington.</PRE>
+<P>The natural way to do this is to have a hash whose keys are country
+names.  Associated with each country name key is a list of the cities in
+that country.  Each time you read a line of input, split it into a country
+and a city, look up the list of cities already known to be in that
+country, and append the new city to the list.  When you're done reading
+the input, iterate over the hash as usual, sorting each list of cities
+before you print it out.</P>
+<P>If hash values can't be lists, you lose.  In Perl 4, hash values can't
+be lists; they can only be strings.  You lose.  You'd probably have to
+combine all the cities into a single string somehow, and then when
+time came to write the output, you'd have to break the string into a
+list, sort the list, and turn it back into a string.  This is messy
+and error-prone.  And it's frustrating, because Perl already has
+perfectly good lists that would solve the problem if only you could
+use them.</P>
+<P>
+<HR>
+<H1><A NAME="the solution">The Solution</A></H1>
+<P>By the time Perl 5 rolled around, we were already stuck with this
+design: Hash values must be scalars.  The solution to this is
+references.</P>
+<P>A reference is a scalar value that <EM>refers to</EM> an entire array or an
+entire hash (or to just about anything else).  Names are one kind of
+reference that you're already familiar with.  Think of the President:
+a messy, inconvenient bag of blood and bones.  But to talk about him,
+or to represent him in a computer program, all you need is the easy,
+convenient scalar string ``Bill Clinton''.</P>
+<P>References in Perl are like names for arrays and hashes.  They're
+Perl's private, internal names, so you can be sure they're
+unambiguous.  Unlike ``Bill Clinton'', a reference only refers to one
+thing, and you always know what it refers to.  If you have a reference
+to an array, you can recover the entire array from it.  If you have a
+reference to a hash, you can recover the entire hash.  But the
+reference is still an easy, compact scalar value.</P>
+<P>You can't have a hash whose values are arrays; hash values can only be
+scalars.  We're stuck with that.  But a single reference can refer to
+an entire array, and references are scalars, so you can have a hash of
+references to arrays, and it'll act a lot like a hash of arrays, and
+it'll be just as useful as a hash of arrays.</P>
+<P>We'll come back to this city-country problem later, after we've seen
+some syntax for managing references.</P>
+<P>
+<HR>
+<H1><A NAME="syntax">Syntax</A></H1>
+<P>There are just two ways to make a reference, and just two ways to use
+it once you have it.</P>
+<P>
+<H2><A NAME="making references">Making References</A></H2>
+<P><STRONG>Make Rule 1</STRONG></P>
+<P>If you put a <CODE>\</CODE> in front of a variable, you get a
+reference to that variable.</P>
+<PRE>
+    $aref = \@array;         # $aref now holds a reference to @array
+    $href = \%hash;          # $href now holds a reference to %hash</PRE>
+<P>Once the reference is stored in a variable like $aref or $href, you
+can copy it or store it just the same as any other scalar value:</P>
+<PRE>
+    $xy = $aref;             # $xy now holds a reference to @array
+    $p[3] = $href;           # $p[3] now holds a reference to %hash
+    $z = $p[3];              # $z now holds a reference to %hash</PRE>
+<P>These examples show how to make references to variables with names.
+Sometimes you want to make an array or a hash that doesn't have a
+name.  This is analogous to the way you like to be able to use the
+string <CODE>&quot;\n&quot;</CODE> or the number 80 without having to store it in a named
+variable first.</P>
+<P><STRONG>Make Rule 2</STRONG></P>
+<P><CODE>[ ITEMS ]</CODE> makes a new, anonymous array, and returns a reference to
+that array. <CODE>{ ITEMS }</CODE> makes a new, anonymous hash. and returns a
+reference to that hash.</P>
+<PRE>
+    $aref = [ 1, &quot;foo&quot;, undef, 13 ];  
+    # $aref now holds a reference to an array</PRE>
+<PRE>
+    $href = { APR =&gt; 4, AUG =&gt; 8 };   
+    # $href now holds a reference to a hash</PRE>
+<P>The references you get from rule 2 are the same kind of
+references that you get from rule 1:</P>
+<PRE>
+        # This:
+        $aref = [ 1, 2, 3 ];</PRE>
+<PRE>
+        # Does the same as this:
+        @array = (1, 2, 3);
+        $aref = \@array;</PRE>
+<P>The first line is an abbreviation for the following two lines, except
+that it doesn't create the superfluous array variable <CODE>@array</CODE>.</P>
+<P>
+<H2><A NAME="using references">Using References</A></H2>
+<P>What can you do with a reference once you have it?  It's a scalar
+value, and we've seen that you can store it as a scalar and get it back
+again just like any scalar.  There are just two more ways to use it:</P>
+<P><STRONG>Use Rule 1</STRONG></P>
+<P>If <CODE>$aref</CODE> contains a reference to an array, then you
+can put <CODE>{$aref}</CODE> anywhere you would normally put the name of an
+array.  For example, <CODE>@{$aref}</CODE> instead of <CODE>@array</CODE>.</P>
+<P>Here are some examples of that:</P>
+<P>Arrays:</P>
+<PRE>
+        @a              @{$aref}                An array
+        reverse @a      reverse @{$aref}        Reverse the array
+        $a[3]           ${$aref}[3]             An element of the array
+        $a[3] = 17;     ${$aref}[3] = 17        Assigning an element</PRE>
+<P>On each line are two expressions that do the same thing.  The
+left-hand versions operate on the array <CODE>@a</CODE>, and the right-hand
+versions operate on the array that is referred to by <CODE>$aref</CODE>, but
+once they find the array they're operating on, they do the same things
+to the arrays.</P>
+<P>Using a hash reference is <EM>exactly</EM> the same:</P>
+<PRE>
+        %h              %{$href}              A hash
+        keys %h         keys %{$href}         Get the keys from the hash
+        $h{'red'}       ${$href}{'red'}       An element of the hash
+        $h{'red'} = 17  ${$href}{'red'} = 17  Assigning an element</PRE>
+<P><STRONG>Use Rule 2</STRONG></P>
+<P><CODE>${$aref}[3]</CODE> is too hard to read, so you can write <CODE>$aref-&gt;[3]</CODE>
+instead.</P>
+<P><CODE>${$href}{red}</CODE> is too hard to read, so you can write
+<CODE>$href-&gt;{red}</CODE> instead.</P>
+<P>Most often, when you have an array or a hash, you want to get or set a
+single element from it.  <CODE>${$aref}[3]</CODE> and <CODE>${$href}{'red'}</CODE> have
+too much punctuation, and Perl lets you abbreviate.</P>
+<P>If <CODE>$aref</CODE> holds a reference to an array, then <CODE>$aref-&gt;[3]</CODE> is
+the fourth element of the array.  Don't confuse this with <CODE>$aref[3]</CODE>,
+which is the fourth element of a totally different array, one
+deceptively named <CODE>@aref</CODE>.  <CODE>$aref</CODE> and <CODE>@aref</CODE> are unrelated the
+same way that <CODE>$item</CODE> and <CODE>@item</CODE> are.</P>
+<P>Similarly, <CODE>$href-&gt;{'red'}</CODE> is part of the hash referred to by
+the scalar variable <CODE>$href</CODE>, perhaps even one with no name.
+<CODE>$href{'red'}</CODE> is part of the deceptively named <CODE>%href</CODE> hash.  It's
+easy to forget to leave out the <CODE>-&gt;</CODE>, and if you do, you'll get
+bizarre results when your program gets array and hash elements out of
+totally unexpected hashes and arrays that weren't the ones you wanted
+to use.</P>
+<P>
+<HR>
+<H1><A NAME="an example">An Example</A></H1>
+<P>Let's see a quick example of how all this is useful.</P>
+<P>First, remember that <CODE>[1, 2, 3]</CODE> makes an anonymous array containing
+<CODE>(1, 2, 3)</CODE>, and gives you a reference to that array.</P>
+<P>Now think about</P>
+<PRE>
+        @a = ( [1, 2, 3],
+               [4, 5, 6],
+               [7, 8, 9]
+             );</PRE>
+<P>@a is an array with three elements, and each one is a reference to
+another array.</P>
+<P><CODE>$a[1]</CODE> is one of these references.  It refers to an array, the array
+containing <CODE>(4, 5, 6)</CODE>, and because it is a reference to an array,
+<STRONG>USE RULE 2</STRONG> says that we can write <CODE>$a[1]-&gt;[2]</CODE> to get the
+third element from that array.  <CODE>$a[1]-&gt;[2]</CODE> is the 6.
+Similarly, <CODE>$a[0]-&gt;[1]</CODE> is the 2.  What we have here is like a
+two-dimensional array; you can write <CODE>$a[ROW]-&gt;[COLUMN]</CODE> to get
+or set the element in any row and any column of the array.</P>
+<P>The notation still looks a little cumbersome, so there's one more
+abbreviation:</P>
+<P>
+<HR>
+<H1><A NAME="arrow rule">Arrow Rule</A></H1>
+<P>In between two <STRONG>subscripts</STRONG>, the arrow is optional.</P>
+<P>Instead of <CODE>$a[1]-&gt;[2]</CODE>, we can write <CODE>$a[1][2]</CODE>; it means the
+same thing.  Instead of <CODE>$a[0]-&gt;[1]</CODE>, we can write <CODE>$a[0][1]</CODE>;
+it means the same thing.</P>
+<P>Now it really looks like two-dimensional arrays!</P>
+<P>You can see why the arrows are important.  Without them, we would have
+had to write <CODE>${$a[1]}[2]</CODE> instead of <CODE>$a[1][2]</CODE>.  For
+three-dimensional arrays, they let us write <CODE>$x[2][3][5]</CODE> instead of
+the unreadable <CODE>${${$x[2]}[3]}[5]</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="solution">Solution</A></H1>
+<P>Here's the answer to the problem I posed earlier, of reformatting a
+file of city and country names.</P>
+<PRE>
+    1   while (&lt;&gt;) {
+    2     chomp;
+    3     my ($city, $country) = split /, /;
+    4     push @{$table{$country}}, $city;
+    5   }
+    6
+    7   foreach $country (sort keys %table) {
+    8     print &quot;$country: &quot;;
+    9     my @cities = @{$table{$country}};
+   10     print join ', ', sort @cities;
+   11     print &quot;.\n&quot;;
+   12   }</PRE>
+<P>The program has two pieces:  Lines 1--5 read the input and build a
+data structure, and lines 7--12 analyze the data and print out the
+report.</P>
+<P>In the first part, line 4 is the important one.  We're going to have a
+hash, <CODE>%table</CODE>, whose keys are country names, and whose values are
+(references to) arrays of city names.  After acquiring a city and
+country name, the program looks up <CODE>$table{$country}</CODE>, which holds (a
+reference to) the list of cities seen in that country so far.  Line 4 is
+totally analogous to</P>
+<PRE>
+        push @array, $city;</PRE>
+<P>except that the name <CODE>array</CODE> has been replaced by the reference
+<CODE>{$table{$country}}</CODE>.  The <A HREF="../../lib/Pod/perlfunc.html#item_push"><CODE>push</CODE></A> adds a city name to the end of the
+referred-to array.</P>
+<P>In the second part, line 9 is the important one.  Again,
+<CODE>$table{$country}</CODE> is (a reference to) the list of cities in the country, so
+we can recover the original list, and copy it into the array <CODE>@cities</CODE>,
+by using <CODE>@{$table{$country}}</CODE>.  Line 9 is totally analogous to</P>
+<PRE>
+        @cities = @array;</PRE>
+<P>except that the name <CODE>array</CODE> has been replaced by the reference
+<CODE>{$table{$country}}</CODE>.  The <CODE>@</CODE> tells Perl to get the entire array.</P>
+<P>The rest of the program is just familiar uses of <A HREF="../../lib/Pod/perlfunc.html#item_chomp"><CODE>chomp</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_split"><CODE>split</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_sort"><CODE>sort</CODE></A>,
+<A HREF="../../lib/Pod/perlfunc.html#item_print"><CODE>print</CODE></A>, and doesn't involve references at all.</P>
+<P>There's one fine point I skipped.  Suppose the program has just read
+the first line in its input that happens to mention Greece.
+Control is at line 4, <CODE>$country</CODE> is <CODE>'Greece'</CODE>, and <CODE>$city</CODE> is
+<CODE>'Athens'</CODE>.  Since this is the first city in Greece,
+<CODE>$table{$country}</CODE> is undefined---in fact there isn't an <CODE>'Greece'</CODE> key
+in <CODE>%table</CODE> at all.  What does line 4 do here?</P>
+<PRE>
+ 4      push @{$table{$country}}, $city;</PRE>
+<P>This is Perl, so it does the exact right thing.  It sees that you want
+to push <CODE>Athens</CODE> onto an array that doesn't exist, so it helpfully
+makes a new, empty, anonymous array for you, installs it in the table,
+and then pushes <CODE>Athens</CODE> onto it.  This is called `autovivification'.</P>
+<P>
+<HR>
+<H1><A NAME="the rest">The Rest</A></H1>
+<P>I promised to give you 90% of the benefit with 10% of the details, and
+that means I left out 90% of the details.  Now that you have an
+overview of the important parts, it should be easier to read the
+<A HREF="../../lib/Pod/perlref.html">the perlref manpage</A> manual page, which discusses 100% of the details.</P>
+<P>Some of the highlights of <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A>:</P>
+<UL>
+<LI>
+You can make references to anything, including scalars, functions, and
+other references.
+<P></P>
+<LI>
+In <STRONG>USE RULE 1</STRONG>, you can omit the curly brackets whenever the thing
+inside them is an atomic scalar variable like <CODE>$aref</CODE>.  For example,
+<CODE>@$aref</CODE> is the same as <CODE>@{$aref}</CODE>, and <CODE>$$aref[1]</CODE> is the same as
+<CODE>${$aref}[1]</CODE>.  If you're just starting out, you may want to adopt
+the habit of always including the curly brackets.
+<P></P>
+<LI>
+To see if a variable contains a reference, use the `ref' function.
+It returns true if its argument is a reference.  Actually it's a
+little better than that:  It returns HASH for hash references and
+ARRAY for array references.
+<P></P>
+<LI>
+If you try to use a reference like a string, you get strings like
+<PRE>
+        ARRAY(0x80f5dec)   or    HASH(0x826afc0)</PRE>
+<P>If you ever see a string that looks like this, you'll know you
+printed out a reference by mistake.</P>
+<P>A side effect of this representation is that you can use <CODE>eq</CODE> to see
+if two references refer to the same thing.  (But you should usually use
+<CODE>==</CODE> instead because it's much faster.)</P>
+<P></P>
+<LI>
+You can use a string as if it were a reference.  If you use the string
+<CODE>&quot;foo&quot;</CODE> as an array reference, it's taken to be a reference to the
+array <CODE>@foo</CODE>.  This is called a <EM>soft reference</EM> or <EM>symbolic reference</EM>.
+<P></P></UL>
+<P>You might prefer to go on to <A HREF="../../lib/Pod/perllol.html">the perllol manpage</A> instead of <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A>; it
+discusses lists of lists and multidimensional arrays in detail.  After
+that, you should move on to <A HREF="../../lib/Pod/perldsc.html">the perldsc manpage</A>; it's a Data Structure Cookbook
+that shows recipes for using and printing out arrays of hashes, hashes
+of arrays, and other kinds of data.</P>
+<P>
+<HR>
+<H1><A NAME="summary">Summary</A></H1>
+<P>Everyone needs compound data structures, and in Perl the way you get
+them is with references.  There are four important rules for managing
+references: Two for making references and two for using them.  Once
+you know these rules you can do most of the important things you need
+to do with references.</P>
+<P>
+<HR>
+<H1><A NAME="credits">Credits</A></H1>
+<P>Author: Mark-Jason Dominus, Plover Systems (<CODE>mjd-perl-ref+@plover.com</CODE>)</P>
+<P>This article originally appeared in <EM>The Perl Journal</EM>
+(http://tpj.com) volume 3, #2.  Reprinted with permission.</P>
+<P>The original title was <EM>Understand References Today</EM>.</P>
+<P>
+<H2><A NAME="distribution conditions">Distribution Conditions</A></H2>
+<P>Copyright 1998 The Perl Journal.</P>
+<P>When included as part of the Standard Version of Perl, or as part of
+its complete documentation whether printed or otherwise, this work may
+be distributed only under the terms of Perl's Artistic License.  Any
+distribution of this file or derivatives thereof outside of that
+package require that special arrangements be made with copyright
+holder.</P>
+<P>Irrespective of its distribution, all code examples in these files are
+hereby placed into the public domain.  You are permitted and
+encouraged to use this code in your own programs for fun or for profit
+as you see fit.  A simple comment in the code giving credit would be
+courteous but is not required.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlreftut - Mark's very short tutorial about references</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

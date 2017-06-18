@@ -1,0 +1,132 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::hostent - by-name interface to Perl's built-in gethost* functions</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::hostent - by-name interface to Perl's built-in gethost* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::hostent - by-name interface to Perl's built-in gethost*() functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Net::hostnet;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module's default exports override the core <A HREF="../../lib/Pod/perlfunc.html#item_gethostbyname"><CODE>gethostbyname()</CODE></A> and
+<A HREF="../../lib/Pod/perlfunc.html#item_gethostbyaddr"><CODE>gethostbyaddr()</CODE></A> functions, replacing them with versions that return
+``Net::hostent'' objects.  This object has methods that return the similarly
+named structure field name from the C's hostent structure from <EM>netdb.h</EM>;
+namely name, aliases, addrtype, length, and addr_list.  The aliases and
+addr_list methods return array reference, the rest scalars.  The addr
+method is equivalent to the zeroth element in the addr_list array
+reference.</P>
+<P>You may also import all the structure fields directly into your namespace
+as regular variables using the :FIELDS import tag.  (Note that this still
+overrides your core functions.)  Access these fields as variables named
+with a preceding <CODE>h_</CODE>.  Thus, <CODE>$host_obj-&gt;name()</CODE> corresponds to
+$h_name if you import the fields.  Array references are available as
+regular array variables, so for example <CODE>@{ $host_obj-&gt;aliases()
+}</CODE> would be simply @h_aliases.</P>
+<P>The <CODE>gethost()</CODE> function is a simple front-end that forwards a numeric
+argument to <A HREF="../../lib/Pod/perlfunc.html#item_gethostbyaddr"><CODE>gethostbyaddr()</CODE></A> by way of Socket::inet_aton, and the rest
+to gethostbyname().</P>
+<P>To access this functionality without the core overrides,
+pass the <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> an empty import list, and then access
+function functions with their full qualified names.
+On the other hand, the built-ins are still available
+via the <CODE>CORE::</CODE> pseudo-package.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+ use Net::hostent;
+ use Socket;</PRE>
+<PRE>
+ @ARGV = ('netscape.com') unless @ARGV;</PRE>
+<PRE>
+ for $host ( @ARGV ) {</PRE>
+<PRE>
+    unless ($h = gethost($host)) {
+        warn &quot;$0: no such host: $host\n&quot;;
+        next;
+    }</PRE>
+<PRE>
+    printf &quot;\n%s is %s%s\n&quot;, 
+            $host, 
+            lc($h-&gt;name) eq lc($host) ? &quot;&quot; : &quot;*really* &quot;,
+            $h-&gt;name;</PRE>
+<PRE>
+    print &quot;\taliases are &quot;, join(&quot;, &quot;, @{$h-&gt;aliases}), &quot;\n&quot;
+                if @{$h-&gt;aliases};</PRE>
+<PRE>
+    if ( @{$h-&gt;addr_list} &gt; 1 ) { 
+        my $i;
+        for $addr ( @{$h-&gt;addr_list} ) {
+            printf &quot;\taddr #%d is [%s]\n&quot;, $i++, inet_ntoa($addr);
+        } 
+    } else {
+        printf &quot;\taddress is [%s]\n&quot;, inet_ntoa($h-&gt;addr);
+    }</PRE>
+<PRE>
+    if ($h = gethostbyaddr($h-&gt;addr)) {
+        if (lc($h-&gt;name) ne lc($host)) {
+            printf &quot;\tThat addr reverses to host %s!\n&quot;, $h-&gt;name;
+            $host = $h-&gt;name;
+            redo;
+        } 
+    }
+ }</PRE>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>While this class is currently implemented using the Class::Struct
+module to build a struct-like class, you shouldn't rely upon this.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::hostent - by-name interface to Perl's built-in gethost* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

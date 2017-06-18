@@ -1,0 +1,282 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Headers - Class encapsulating HTTP Message headers</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Headers - Class encapsulating HTTP Message headers</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#convenience methods">CONVENIENCE METHODS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Headers - Class encapsulating HTTP Message headers</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require HTTP::Headers;
+ $h = new HTTP::Headers;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>HTTP::Headers</CODE> class encapsulates HTTP-style message headers.
+The headers consist of attribute-value pairs, which may be repeated,
+and which are printed in a particular order.</P>
+<P>Instances of this class are usually created as member variables of the
+<CODE>HTTP::Request</CODE> and <CODE>HTTP::Response</CODE> classes, internal to the
+library.</P>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_%24h_%3D_new_HTTP%3A%3AHeaders">$h = new HTTP::Headers</A></STRONG><BR>
+<DD>
+Constructs a new <CODE>HTTP::Headers</CODE> object.  You might pass some initial
+attribute-value pairs as parameters to the constructor.  <EM>E.g.</EM>:
+<PRE>
+ $h = new HTTP::Headers
+     Date         =&gt; 'Thu, 03 Feb 1994 00:00:00 GMT',
+     Content_Type =&gt; 'text/html; version=3.2',
+     Content_Base =&gt; '<A HREF="http://www.sn.no/">http://www.sn.no/</A>';</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_header">$h-&gt;header($field [=&gt; $value],...)</A></STRONG><BR>
+<DD>
+Get or set the value of a header.  The header field name is not case
+sensitive.  To make the life easier for perl users who wants to avoid
+quoting before the =&gt; operator, you can use '_' as a synonym for '-'
+in header names (this behaviour can be suppressed by setting
+$HTTP::Headers::TRANSLATE_UNDERSCORE to a FALSE value).
+<P>The <A HREF="#item_header"><CODE>header()</CODE></A> method accepts multiple ($field =&gt; $value) pairs, so you
+can update several fields with a single invocation.</P>
+<P>The optional $value argument may be a scalar or a reference to a list
+of scalars. If the $value argument is undefined or not given, then the
+header is not modified.</P>
+<P>The old value of the last of the $field values is returned.
+Multi-valued fields will be concatenated with ``,'' as separator in
+scalar context.</P>
+<PRE>
+ $header-&gt;header(MIME_Version =&gt; '1.0',
+                 User_Agent   =&gt; 'My-Web-Client/0.01');
+ $header-&gt;header(Accept =&gt; &quot;text/html, text/plain, image/*&quot;);
+ $header-&gt;header(Accept =&gt; [qw(text/html text/plain image/*)]);
+ @accepts = $header-&gt;header('Accept');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_scan">$h-&gt;<CODE>scan(\&amp;doit)</CODE></A></STRONG><BR>
+<DD>
+Apply a subroutine to each header in turn.  The callback routine is
+called with two parameters; the name of the field and a single value.
+If the header has more than one value, then the routine is called once
+for each value.  The field name passed to the callback routine has
+case as suggested by HTTP Spec, and the headers will be visited in the
+recommended ``Good Practice'' order.
+<P></P>
+<DT><STRONG><A NAME="item_as_string">$h-&gt;<CODE>as_string([$endl])</CODE></A></STRONG><BR>
+<DD>
+Return the header fields as a formatted MIME header.  Since it
+internally uses the <A HREF="#item_scan"><CODE>scan()</CODE></A> method to build the string, the result
+will use case as suggested by HTTP Spec, and it will follow
+recommended ``Good Practice'' of ordering the header fieds.  Long header
+values are not folded.
+<P>The optional parameter specifies the line ending sequence to use.  The
+default is <CODE>&quot;\n&quot;</CODE>.  Embedded ``\n'' characters in the header will be
+substitued with this line ending sequence.</P>
+<P></P>
+<DT><STRONG><A NAME="item_push_header">$h-&gt;push_header($field, $val)</A></STRONG><BR>
+<DD>
+Add a new field value of the specified header.  The header field name
+is not case sensitive.  The field need not already have a
+value. Previous values for the same field are retained.  The argument
+may be a scalar or a reference to a list of scalars.
+<PRE>
+ $header-&gt;push_header(Accept =&gt; 'image/jpeg');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_remove_header">$h-&gt;<CODE>remove_header($field,...)</CODE></A></STRONG><BR>
+<DD>
+This function removes the headers with the specified names.
+<P></P>
+<DT><STRONG><A NAME="item_clone">$h-&gt;clone</A></STRONG><BR>
+<DD>
+Returns a copy of this HTTP::Headers object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="convenience methods">CONVENIENCE METHODS</A></H1>
+<P>The most frequently used headers can also be accessed through the
+following convenience methods.  These methods can both be used to read
+and to set the value of a header.  The header value is set if you pass
+an argument to the method.  The old header value is always returned.</P>
+<P>Methods that deal with dates/times always convert their value to system
+time (seconds since Jan 1, 1970) and they also expect this kind of
+value when the header value is set.</P>
+<DL>
+<DT><STRONG><A NAME="item_date">$h-&gt;date</A></STRONG><BR>
+<DD>
+This header represents the date and time at which the message was
+originated. <EM>E.g.</EM>:
+<PRE>
+  $h-&gt;date(time);  # set current date</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_expires">$h-&gt;expires</A></STRONG><BR>
+<DD>
+This header gives the date and time after which the entity should be
+considered stale.
+<P></P>
+<DT><STRONG><A NAME="item_if_modified_since">$h-&gt;if_modified_since</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_if_unmodified_since">$h-&gt;if_unmodified_since</A></STRONG><BR>
+<DD>
+This header is used to make a request conditional.  If the requested
+resource has (not) been modified since the time specified in this field,
+then the server will return a <CODE>&quot;304 Not Modified&quot;</CODE> response instead of
+the document itself.
+<P></P>
+<DT><STRONG><A NAME="item_last_modified">$h-&gt;last_modified</A></STRONG><BR>
+<DD>
+This header indicates the date and time at which the resource was last
+modified. <EM>E.g.</EM>:
+<PRE>
+  # check if document is more than 1 hour old
+  if ($h-&gt;last_modified &lt; time - 60*60) {
+        ...
+  }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_content_type">$h-&gt;content_type</A></STRONG><BR>
+<DD>
+The Content-Type header field indicates the media type of the message
+content. <EM>E.g.</EM>:
+<PRE>
+  $h-&gt;content_type('text/html');</PRE>
+<P>The value returned will be converted to lower case, and potential
+parameters will be chopped off and returned as a separate value if in
+an array context.  This makes it safe to do the following:</P>
+<PRE>
+  if ($h-&gt;content_type eq 'text/html') {
+     # we enter this place even if the real header value happens to
+     # be 'TEXT/HTML; version=3.0'
+     ...
+  }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_content_encoding">$h-&gt;content_encoding</A></STRONG><BR>
+<DD>
+The Content-Encoding header field is used as a modifier to the
+media type.  When present, its value indicates what additional
+encoding mechanism has been applied to the resource.
+<P></P>
+<DT><STRONG><A NAME="item_content_length">$h-&gt;content_length</A></STRONG><BR>
+<DD>
+A decimal number indicating the size in bytes of the message content.
+<P></P>
+<DT><STRONG><A NAME="item_content_language">$h-&gt;content_language</A></STRONG><BR>
+<DD>
+The natural <CODE>language(s)</CODE> of the intended audience for the message
+content.  The value is one or more language tags as defined by RFC
+1766.  Eg. ``no'' for Norwegian and ``en-US'' for US-English.
+<P></P>
+<DT><STRONG><A NAME="item_title">$h-&gt;title</A></STRONG><BR>
+<DD>
+The title of the document.  In libwww-perl this header will be
+initialized automatically from the &lt;TITLE&gt;...&lt;/TITLE&gt; element
+of HTML documents.  <EM>This header is no longer part of the HTTP
+standard.</EM>
+<P></P>
+<DT><STRONG><A NAME="item_user_agent">$h-&gt;user_agent</A></STRONG><BR>
+<DD>
+This header field is used in request messages and contains information
+about the user agent originating the request.  <EM>E.g.</EM>:
+<PRE>
+  $h-&gt;user_agent('Mozilla/1.2');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_server">$h-&gt;server</A></STRONG><BR>
+<DD>
+The server header field contains information about the software being
+used by the originating server program handling the request.
+<P></P>
+<DT><STRONG><A NAME="item_from">$h-&gt;from</A></STRONG><BR>
+<DD>
+This header should contain an Internet e-mail address for the human
+user who controls the requesting user agent.  The address should be
+machine-usable, as defined by RFC822.  E.g.:
+<PRE>
+  $h-&gt;from('Gisle Aas &lt;aas@sn.no&gt;');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_referer">$h-&gt;referer</A></STRONG><BR>
+<DD>
+Used to specify the address (URI) of the document from which the
+requested resouce address was obtained.
+<P></P>
+<DT><STRONG><A NAME="item_www_authenticate">$h-&gt;www_authenticate</A></STRONG><BR>
+<DD>
+This header must be included as part of a ``401 Unauthorized'' response.
+The field value consist of a challenge that indicates the
+authentication scheme and parameters applicable to the requested URI.
+<P></P>
+<DT><STRONG><A NAME="item_proxy_authenticate">$h-&gt;proxy_authenticate</A></STRONG><BR>
+<DD>
+This header must be included in a ``407 Proxy Authentication Required''
+response.
+<P></P>
+<DT><STRONG><A NAME="item_authorization">$h-&gt;authorization</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_proxy_authorization">$h-&gt;proxy_authorization</A></STRONG><BR>
+<DD>
+A user agent that wishes to authenticate itself with a server or a
+proxy, may do so by including these headers.
+<P></P>
+<DT><STRONG><A NAME="item_authorization_basic">$h-&gt;authorization_basic</A></STRONG><BR>
+<DD>
+This method is used to get or set an authorization header that use the
+``Basic Authentication Scheme''.  In array context it will return two
+values; the user name and the password.  In scalar context it will
+return <EM>``uname:password''</EM> as a single string value.
+<P>When used to set the header value, it expects two arguments.  <EM>E.g.</EM>:</P>
+<PRE>
+  $h-&gt;authorization_basic($uname, $password);</PRE>
+<P>The method will croak if the $uname contains a colon ':'.</P>
+<P></P>
+<DT><STRONG><A NAME="item_proxy_authorization_basic">$h-&gt;proxy_authorization_basic</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_authorization_basic"><CODE>authorization_basic()</CODE></A> but will set the ``Proxy-Authorization''
+header instead.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Headers - Class encapsulating HTTP Message headers</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tk::BrowseEntry - entry widget with popup choices.</title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Tk::BrowseEntry - entry widget with popup choices.</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tk::BrowseEntry - entry widget with popup choices.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Tk::BrowseEntry;</pre>
+<pre>
+    $b = $frame-&gt;BrowseEntry(-label =&gt; &quot;Label&quot;, -variable =&gt; \$var);
+    $b-&gt;insert(&quot;end&quot;, &quot;opt1&quot;);
+    $b-&gt;insert(&quot;end&quot;, &quot;opt2&quot;);
+    $b-&gt;insert(&quot;end&quot;, &quot;opt3&quot;);
+    ...
+    $b-&gt;pack;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>BrowseEntry is a poor man's ComboBox. It may be considered an
+enhanced version of LabEntry which provides a button to popup the
+choices of the possible values that the Entry may
+take. BrowseEntry supports all the options LabEntry supports
+except <strong>-textvariable</strong>. This is replaced by <strong>-variable</strong>. Other
+options that BrowseEntry supports.</p>
+<dl>
+<dt><strong><a name="item_%2dlistwidth"><strong>-listwidth</strong></a></strong><br />
+</dt>
+<dd>
+Specifies the width of the popup listbox.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dvariable"><strong>-variable</strong></a></strong><br />
+</dt>
+<dd>
+Specifies the variable in which the entered value is to be stored.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dbrowsecmd"><strong>-browsecmd</strong></a></strong><br />
+</dt>
+<dd>
+Specifies a function to call when a selection is made in the
+popped up listbox. It is passed the widget and the text of the
+entry selected. This function is called after the entry variable
+has been assigned the value.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dlistcmd"><strong>-listcmd</strong></a></strong><br />
+</dt>
+<dd>
+Specifies the function to call when the button next to the entry
+is pressed to popup the choices in the listbox. This is called before
+popping up the listbox, so can be used to populate the entries in
+the listbox.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2darrowimage"><strong>-arrowimage</strong></a></strong><br />
+</dt>
+<dd>
+Specifies the image to be used in the arrow button beside the entry
+widget. The default is an downward arrow image in the file cbxarrow.xbm
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dchoices"><strong>-choices</strong></a></strong><br />
+</dt>
+<dd>
+Specifies the list of choices to pop up.  This is a reference to an
+array of strings specifying the choices.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dstate"><strong>-state</strong></a></strong><br />
+</dt>
+<dd>
+Specifies one of three states for the widget: normal, readonly, or
+disabled.  If the widget is disabled then the value may not be changed
+and the arrow button won't activate.  If the widget is readonly, the
+entry may not be edited, but it may be changed by choosing a value
+from the popup listbox.  normal is the default.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_insert"><strong>insert(</strong><em>index</em>, <em>string</em><strong>)</strong></a></strong><br />
+</dt>
+<dd>
+Inserts the text of <em>string</em> at the specified <em>index</em>. This string
+then becomes available as one of the choices.
+</dd>
+<p></p>
+<dt><strong><a name="item_delete"><strong>delete(</strong><em>index1</em>, <em>index2</em><strong>)</strong></a></strong><br />
+</dt>
+<dd>
+Deletes items from <em>index1</em> to <em>index2</em>.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>BrowseEntry should really provide more of the ComboBox options.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p><strong>Rajappa Iyer</strong> <a href="mailto:rsi@earthling.net">rsi@earthling.net</a></p>
+<p><strong>Chris Dean</strong> <a href="mailto:ctdean@cogit.com">ctdean@cogit.com</a> made additions.</p>
+<p>This code was inspired by ComboBox.tcl in Tix4.0 by Ioi Lam and
+bears more than a passing resemblance to ComboBox code. This may
+be distributed under the same conditions as Perl.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Tk::BrowseEntry - entry widget with popup choices.</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

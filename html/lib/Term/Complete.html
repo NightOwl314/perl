@@ -1,0 +1,98 @@
+
+<HTML>
+<HEAD>
+<TITLE>Term::Complete - Perl word completion module</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::Complete - Perl word completion module</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Term::Complete - Perl word completion module</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    $input = Complete('prompt_string', \@completion_list);
+    $input = Complete('prompt_string', @completion_list);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This routine provides word completion on the list of words in
+the array (or array ref).</P>
+<P>The tty driver is put into raw mode using the system command
+<CODE>stty raw -echo</CODE> and restored using <CODE>stty -raw echo</CODE>.</P>
+<P>The following command characters are defined:</P>
+<DL>
+<DT><STRONG><A NAME="item_%3Ctab%3E">&lt;tab&gt;</A></STRONG><BR>
+<DD>
+Attempts word completion.
+Cannot be changed.
+<P></P>
+<DT><STRONG><A NAME="item_%5ED">^D</A></STRONG><BR>
+<DD>
+Prints completion list.
+Defined by <EM>$Term::Complete::complete</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_%5EU">^U</A></STRONG><BR>
+<DD>
+Erases the current input.
+Defined by <EM>$Term::Complete::kill</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_%3Cdel%3E%2C_%3Cbs%3E">&lt;del&gt;, &lt;bs&gt;</A></STRONG><BR>
+<DD>
+Erases one character.
+Defined by <EM>$Term::Complete::erase1</EM> and <EM>$Term::Complete::erase2</EM>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<P>Bell sounds when word completion fails.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The completion character &lt;tab&gt; cannot be changed.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Wayne Thompson</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::Complete - Perl word completion module</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

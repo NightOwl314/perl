@@ -1,0 +1,192 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Ping - check a remote host for reachability</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Ping - check a remote host for reachability</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#functions">Functions</A></LI>
+	</UL>
+
+	<LI><A HREF="#warning">WARNING</A></LI>
+	<LI><A HREF="#notes">NOTES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Ping - check a remote host for reachability</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::Ping;</PRE>
+<PRE>
+    $p = Net::Ping-&gt;new();
+    print &quot;$host is alive.\n&quot; if $p-&gt;ping($host);
+    $p-&gt;close();</PRE>
+<PRE>
+    $p = Net::Ping-&gt;new(&quot;icmp&quot;);
+    foreach $host (@host_array)
+    {
+        print &quot;$host is &quot;;
+        print &quot;NOT &quot; unless $p-&gt;ping($host, 2);
+        print &quot;reachable.\n&quot;;
+        sleep(1);
+    }
+    $p-&gt;close();</PRE>
+<PRE>
+    $p = Net::Ping-&gt;new(&quot;tcp&quot;, 2);
+    while ($stop_time &gt; time())
+    {
+        print &quot;$host not reachable &quot;, scalar(localtime()), &quot;\n&quot;
+            unless $p-&gt;ping($host);
+        sleep(300);
+    }
+    undef($p);</PRE>
+<PRE>
+    # For backward compatibility
+    print &quot;$host is alive.\n&quot; if pingecho($host);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module contains methods to test the reachability of remote
+hosts on a network.  A ping object is first created with optional
+parameters, a variable number of hosts may be pinged multiple
+times and then the connection is closed.</P>
+<P>You may choose one of three different protocols to use for the
+ping. The ``udp'' protocol is the default. Note that a live remote host
+may still fail to be pingable by one or more of these protocols. For
+example, www.microsoft.com is generally alive but not pingable.</P>
+<P>With the ``tcp'' protocol the <A HREF="#item_ping"><CODE>ping()</CODE></A> method attempts to establish a
+connection to the remote host's echo port.  If the connection is
+successfully established, the remote host is considered reachable.  No
+data is actually echoed.  This protocol does not require any special
+privileges but has higher overhead than the other two protocols.</P>
+<P>Specifying the ``udp'' protocol causes the <A HREF="#item_ping"><CODE>ping()</CODE></A> method to send a udp
+packet to the remote host's echo port.  If the echoed packet is
+received from the remote host and the received packet contains the
+same data as the packet that was sent, the remote host is considered
+reachable.  This protocol does not require any special privileges.</P>
+<P>It should be borne in mind that, for both tcp and udp ping, a host
+will be reported as unreachable if it is not running the
+appropriate echo service.  For Unix-like systems see <EM>inetd(8)</EM> for
+more information.</P>
+<P>If the ``icmp'' protocol is specified, the <A HREF="#item_ping"><CODE>ping()</CODE></A> method sends an icmp
+echo message to the remote host, which is what the UNIX ping program
+does.  If the echoed message is received from the remote host and
+the echoed information is correct, the remote host is considered
+reachable.  Specifying the ``icmp'' protocol requires that the program
+be run as root or that the program be setuid to root.</P>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">Net::Ping-&gt;new([$proto [, $def_timeout [, $bytes]]]);</A></STRONG><BR>
+<DD>
+Create a new ping object.  All of the parameters are optional.  $proto
+specifies the protocol to use when doing a ping.  The current choices
+are ``tcp'', ``udp'' or ``icmp''.  The default is ``udp''.
+<P>If a default timeout ($def_timeout) in seconds is provided, it is used
+when a timeout is not given to the <A HREF="#item_ping"><CODE>ping()</CODE></A> method (below).  The timeout
+must be greater than 0 and the default, if not specified, is 5 seconds.</P>
+<P>If the number of data bytes ($bytes) is given, that many data bytes
+are included in the ping packet sent to the remote host. The number of
+data bytes is ignored if the protocol is ``tcp''.  The minimum (and
+default) number of data bytes is 1 if the protocol is ``udp'' and 0
+otherwise.  The maximum number of data bytes that can be specified is
+1024.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ping">$p-&gt;ping($host [, $timeout]);</A></STRONG><BR>
+<DD>
+Ping the remote host and wait for a response.  $host can be either the
+hostname or the IP number of the remote host.  The optional timeout
+must be greater than 0 seconds and defaults to whatever was specified
+when the ping object was created.  If the hostname cannot be found or
+there is a problem with the IP number, undef is returned.  Otherwise,
+1 is returned if the host is reachable and 0 if it is not.  For all
+practical purposes, undef and 0 and can be treated as the same case.
+<P></P>
+<DT><STRONG><A NAME="item_close">$p-&gt;close();</A></STRONG><BR>
+<DD>
+Close the network connection for this ping object.  The network
+connection is also closed by ``undef $p''.  The network connection is
+automatically closed if the ping object goes out of scope (e.g. $p is
+local to a subroutine and you leave the subroutine).
+<P></P>
+<DT><STRONG><A NAME="item_pingecho">pingecho($host [, $timeout]);</A></STRONG><BR>
+<DD>
+To provide backward compatibility with the previous version of
+Net::Ping, a <A HREF="#item_pingecho"><CODE>pingecho()</CODE></A> subroutine is available with the same
+functionality as before.  <A HREF="#item_pingecho"><CODE>pingecho()</CODE></A> uses the tcp protocol.  The
+return values and parameters are the same as described for the <A HREF="#item_ping"><CODE>ping()</CODE></A>
+method.  This subroutine is obsolete and may be removed in a future
+version of Net::Ping.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="warning">WARNING</A></H1>
+<P><A HREF="#item_pingecho"><CODE>pingecho()</CODE></A> or a ping object with the tcp protocol use <A HREF="../../lib/Pod/perlfunc.html#item_alarm"><CODE>alarm()</CODE></A> to
+implement the timeout.  So, don't use <A HREF="../../lib/Pod/perlfunc.html#item_alarm"><CODE>alarm()</CODE></A> in your program while
+you are using <A HREF="#item_pingecho"><CODE>pingecho()</CODE></A> or a ping object with the tcp protocol.  The
+udp and icmp protocols do not use <A HREF="../../lib/Pod/perlfunc.html#item_alarm"><CODE>alarm()</CODE></A> to implement the timeout.</P>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<P>There will be less network overhead (and some efficiency in your
+program) if you specify either the udp or the icmp protocol.  The tcp
+protocol will generate 2.5 times or more traffic for each ping than
+either udp or icmp.  If many hosts are pinged frequently, you may wish
+to implement a small wait (e.g. 25ms or more) between each ping to
+avoid flooding your network with packets.</P>
+<P>The icmp protocol requires that the program be run as root or that it
+be setuid to root.  The tcp and udp protocols do not require special
+privileges, but not all network devices implement the echo protocol
+for tcp or udp.</P>
+<P>Local hosts should normally respond to pings within milliseconds.
+However, on a very congested network it may take up to 3 seconds or
+longer to receive an echo packet from the remote host.  If the timeout
+is set too low under these conditions, it will appear that the remote
+host is not reachable (which is almost the truth).</P>
+<P>Reachability doesn't necessarily mean that the remote host is actually
+functioning beyond its ability to echo packets.</P>
+<P>Because of a lack of anything better, this module uses its own
+routines to pack and unpack ICMP packets.  It would be better for a
+separate module to be written which understands all of the different
+kinds of ICMP packets.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Ping - check a remote host for reachability</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

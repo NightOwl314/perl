@@ -1,0 +1,127 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec::Win32 - methods for Win32 file specs</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Win32 - methods for Win32 file specs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec::Win32 - methods for Win32 file specs</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require File::Spec::Win32; # Done internally by File::Spec if needed</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>See File::Spec::Unix for a documentation of the methods provided
+there. This package overrides the implementation of these methods, not
+the semantics.</P>
+<DL>
+<DT><STRONG><A NAME="item_devnull">devnull</A></STRONG><BR>
+<DD>
+Returns a string representation of the null device.
+<P></P>
+<DT><STRONG><A NAME="item_tmpdir">tmpdir</A></STRONG><BR>
+<DD>
+Returns a string representation of the first existing directory
+from the following list:
+<PRE>
+    $ENV{TMPDIR}
+    $ENV{TEMP}
+    $ENV{TMP}
+    C:/temp
+    /tmp
+    /</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_catfile">catfile</A></STRONG><BR>
+<DD>
+Concatenate one or more directory names and a filename to form a
+complete path ending with a filename
+<P></P>
+<DT><STRONG><A NAME="item_canonpath">canonpath</A></STRONG><BR>
+<DD>
+No physical check on the filesystem, but a logical cleanup of a
+path. On UNIX eliminated successive slashes and successive ``/.''.
+<P></P>
+<DT><STRONG><A NAME="item_splitpath">splitpath</A></STRONG><BR>
+<DD>
+<PRE>
+    ($volume,$directories,$file) = File::Spec-&gt;splitpath( $path );
+    ($volume,$directories,$file) = File::Spec-&gt;splitpath( $path, $no_file );</PRE>
+<P>Splits a path in to volume, directory, and filename portions. Assumes that 
+the last file is a path unless the path ends in '\\', '\\.', '\\..'
+or $no_file is true.  On Win32 this means that $no_file true makes this return 
+( $volume, $path, undef ).</P>
+<P>Separators accepted are \ and /.</P>
+<P>Volumes can be drive letters or UNC sharenames (\\server\share).</P>
+<P>The results can be passed to <A HREF="#catpath">catpath</A> to get back a path equivalent to
+(usually identical to) the original path.</P>
+<DT><STRONG><A NAME="item_splitdir">splitdir</A></STRONG><BR>
+<DD>
+The opposite of <A HREF="#catdir()">catdir()</A>.
+<PRE>
+    @dirs = File::Spec-&gt;splitdir( $directories );</PRE>
+<P>$directories must be only the directory portion of the path on systems 
+that have the concept of a volume or that have path syntax that differentiates
+files from directories.</P>
+<P>Unlike just splitting the directories on the separator, leading empty and 
+trailing directory entries can be returned, because these are significant
+on some OSs. So,</P>
+<PRE>
+    File::Spec-&gt;splitdir( &quot;/a/b/c&quot; );</PRE>
+<P>Yields:</P>
+<PRE>
+    ( '', 'a', 'b', '', 'c', '' )</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_catpath">catpath</A></STRONG><BR>
+<DD>
+Takes volume, directory and file portions and returns an entire path. Under
+Unix, $volume is ignored, and this is just like catfile(). On other OSs,
+the $volume become significant.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/File/Spec.html">the File::Spec manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Win32 - methods for Win32 file specs</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

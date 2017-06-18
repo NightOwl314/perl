@@ -1,0 +1,152 @@
+
+<HTML>
+<HEAD>
+<TITLE>AutoSplit - split a package for autoloading</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;AutoSplit - split a package for autoloading</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#multiple packages">Multiple packages</A></LI>
+	</UL>
+
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>AutoSplit - split a package for autoloading</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ autosplit($file, $dir, $keep, $check, $modtime);</PRE>
+<PRE>
+ autosplit_lib_modules(@modules);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This function will split up your program into files that the AutoLoader
+module can handle. It is used by both the standard perl libraries and by
+the MakeMaker utility, to automatically configure libraries for autoloading.</P>
+<P>The <CODE>autosplit</CODE> interface splits the specified file into a hierarchy 
+rooted at the directory <CODE>$dir</CODE>. It creates directories as needed to reflect
+class hierarchy, and creates the file <EM>autosplit.ix</EM>. This file acts as
+both forward declaration of all package routines, and as timestamp for the
+last update of the hierarchy.</P>
+<P>The remaining three arguments to <CODE>autosplit</CODE> govern other options to
+the autosplitter.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24keep">$keep</A></STRONG><BR>
+<DD>
+If the third argument, <EM>$keep</EM>, is false, then any
+pre-existing <CODE>*.al</CODE> files in the autoload directory are removed if
+they are no longer part of the module (obsoleted functions).
+$keep defaults to 0.
+<P></P>
+<DT><STRONG><A NAME="item_%24check">$check</A></STRONG><BR>
+<DD>
+The
+fourth argument, <EM>$check</EM>, instructs <CODE>autosplit</CODE> to check the module
+currently being split to ensure that it does include a <A HREF="../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>
+specification for the AutoLoader module, and skips the module if
+AutoLoader is not detected.
+$check defaults to 1.
+<P></P>
+<DT><STRONG><A NAME="item_%24modtime">$modtime</A></STRONG><BR>
+<DD>
+Lastly, the <EM>$modtime</EM> argument specifies
+that <CODE>autosplit</CODE> is to check the modification time of the module
+against that of the <CODE>autosplit.ix</CODE> file, and only split the module if
+it is newer.
+$modtime defaults to 1.
+<P></P></DL>
+<P>Typical use of AutoSplit in the perl MakeMaker utility is via the command-line
+with:</P>
+<PRE>
+ perl -e 'use AutoSplit; autosplit($ARGV[0], $ARGV[1], 0, 1, 1)'</PRE>
+<P>Defined as a Make macro, it is invoked with file and directory arguments;
+<CODE>autosplit</CODE> will split the specified file into the specified directory and
+delete obsolete <CODE>.al</CODE> files, after checking first that the module does use
+the AutoLoader, and ensuring that the module is not already currently split
+in its current form (the modtime test).</P>
+<P>The <CODE>autosplit_lib_modules</CODE> form is used in the building of perl. It takes
+as input a list of files (modules) that are assumed to reside in a directory
+<STRONG>lib</STRONG> relative to the current directory. Each file is sent to the 
+autosplitter one at a time, to be split into the directory <STRONG>lib/auto</STRONG>.</P>
+<P>In both usages of the autosplitter, only subroutines defined following the
+perl <EM>__END__</EM> token are split out into separate files. Some
+routines may be placed prior to this marker to force their immediate loading
+and parsing.</P>
+<P>
+<H2><A NAME="multiple packages">Multiple packages</A></H2>
+<P>As of version 1.01 of the AutoSplit module it is possible to have
+multiple packages within a single file. Both of the following cases
+are supported:</P>
+<PRE>
+   package NAME;
+   __END__
+   sub AAA { ... }
+   package NAME::option1;
+   sub BBB { ... }
+   package NAME::option2;
+   sub BBB { ... }</PRE>
+<PRE>
+   package NAME;
+   __END__
+   sub AAA { ... }
+   sub NAME::option1::BBB { ... }
+   sub NAME::option2::BBB { ... }</PRE>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<P><CODE>AutoSplit</CODE> will inform the user if it is necessary to create the
+top-level directory specified in the invocation. It is preferred that
+the script or installation process that invokes <CODE>AutoSplit</CODE> have
+created the full directory path ahead of time. This warning may
+indicate that the module is being split into an incorrect path.</P>
+<P><CODE>AutoSplit</CODE> will warn the user of all subroutines whose name causes
+potential file naming conflicts on machines with drastically limited
+(8 characters or less) file name length. Since the subroutine name is
+used as the file name, these warnings can aid in portability to such
+systems.</P>
+<P>Warnings are issued and the file skipped if <CODE>AutoSplit</CODE> cannot locate
+either the <EM>__END__</EM> marker or a ``package Name;''-style specification.</P>
+<P><CODE>AutoSplit</CODE> will also emit general diagnostics for inability to
+create directories or files.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;AutoSplit - split a package for autoloading</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,172 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::Packlist - manage .packlist files</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Packlist - manage .packlist files</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::Packlist - manage .packlist files</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+   use ExtUtils::Packlist;
+   my ($pl) = ExtUtils::Packlist-&gt;new('.packlist');
+   $pl-&gt;read('/an/old/.packlist');
+   my @missing_files = $pl-&gt;validate();
+   $pl-&gt;write('/a/new/.packlist');</PRE>
+<PRE>
+   $pl-&gt;{'/some/file/name'}++;
+      or
+   $pl-&gt;{'/some/other/file/name'} = { type =&gt; 'file',
+                                      from =&gt; '/some/file' };</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>ExtUtils::Packlist provides a standard way to manage .packlist files.
+Functions are provided to read and write .packlist files.  The original
+.packlist format is a simple list of absolute pathnames, one per line.  In
+addition, this package supports an extended format, where as well as a filename
+each line may contain a list of attributes in the form of a space separated
+list of key=value pairs.  This is used by the installperl script to
+differentiate between files and links, for example.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>The hash reference returned by the <A HREF="#item_new"><CODE>new()</CODE></A> function can be used to examine and
+modify the contents of the .packlist.  Items may be added/deleted from the
+.packlist by modifying the hash.  If the value associated with a hash key is a
+scalar, the entry written to the .packlist by any subsequent <A HREF="#item_write"><CODE>write()</CODE></A> will be a
+simple filename.  If the value is a hash, the entry written will be the
+filename followed by the key=value pairs from the hash.  Reading back the
+.packlist will recreate the original entries.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+This takes an optional parameter, the name of a .packlist.  If the file exists,
+it will be opened and the contents of the file will be read.  The <A HREF="#item_new"><CODE>new()</CODE></A> method
+returns a reference to a hash.  This hash holds an entry for each line in the
+.packlist.  In the case of old-style .packlists, the value associated with each
+key is undef.  In the case of new-style .packlists, the value associated with
+each key is a hash containing the key=value pairs following the filename in the
+.packlist.
+<P></P>
+<DT><STRONG><A NAME="item_read"><CODE>read()</CODE></A></STRONG><BR>
+<DD>
+This takes an optional parameter, the name of the .packlist to be read.  If
+no file is specified, the .packlist specified to <A HREF="#item_new"><CODE>new()</CODE></A> will be read.  If the
+.packlist does not exist, Carp::croak will be called.
+<P></P>
+<DT><STRONG><A NAME="item_write"><CODE>write()</CODE></A></STRONG><BR>
+<DD>
+This takes an optional parameter, the name of the .packlist to be written.  If
+no file is specified, the .packlist specified to <A HREF="#item_new"><CODE>new()</CODE></A> will be overwritten.
+<P></P>
+<DT><STRONG><A NAME="item_validate"><CODE>validate()</CODE></A></STRONG><BR>
+<DD>
+This checks that every file listed in the .packlist actually exists.  If an
+argument which evaluates to true is given, any missing files will be removed
+from the internal hash.  The return value is a list of the missing files, which
+will be empty if they all exist.
+<P></P>
+<DT><STRONG><A NAME="item_packlist_file"><CODE>packlist_file()</CODE></A></STRONG><BR>
+<DD>
+This returns the name of the associated .packlist file
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<P>Here's <CODE>modrm</CODE>, a little utility to cleanly remove an installed module.</P>
+<PRE>
+    #!/usr/local/bin/perl -w</PRE>
+<PRE>
+    use strict;
+    use IO::Dir;
+    use ExtUtils::Packlist;
+    use ExtUtils::Installed;</PRE>
+<PRE>
+    sub emptydir($) {
+        my ($dir) = @_;
+        my $dh = IO::Dir-&gt;new($dir) || return(0);
+        my @count = $dh-&gt;read();
+        $dh-&gt;close();
+        return(@count == 2 ? 1 : 0);
+    }</PRE>
+<PRE>
+    # Find all the installed packages
+    print(&quot;Finding all installed modules...\n&quot;);
+    my $installed = ExtUtils::Installed-&gt;new();</PRE>
+<PRE>
+    foreach my $module (grep(!/^Perl$/, $installed-&gt;modules())) {
+       my $version = $installed-&gt;version($module) || &quot;???&quot;;
+       print(&quot;Found module $module Version $version\n&quot;);
+       print(&quot;Do you want to delete $module? [n] &quot;);
+       my $r = &lt;STDIN&gt;; chomp($r);
+       if ($r &amp;&amp; $r =~ /^y/i) {
+          # Remove all the files
+          foreach my $file (sort($installed-&gt;files($module))) {
+             print(&quot;rm $file\n&quot;);
+             unlink($file);
+          }
+          my $pf = $installed-&gt;packlist($module)-&gt;packlist_file();
+          print(&quot;rm $pf\n&quot;);
+          unlink($pf);
+          foreach my $dir (sort($installed-&gt;directory_tree($module))) {
+             if (emptydir($dir)) {
+                print(&quot;rmdir $dir\n&quot;);
+                rmdir($dir);
+             }
+          }
+       }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Alan Burlison &lt;<A HREF="mailto:Alan.Burlison@uk.sun.com">Alan.Burlison@uk.sun.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Packlist - manage .packlist files</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

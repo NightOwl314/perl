@@ -1,0 +1,108 @@
+
+<HTML>
+<HEAD>
+<TITLE>re - Perl pragma to alter regular expression behaviour</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;re - Perl pragma to alter regular expression behaviour</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>re - Perl pragma to alter regular expression behaviour</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use re 'taint';
+    ($x) = ($^X =~ /^(.*)$/s);     # $x is tainted here</PRE>
+<PRE>
+    $pat = '(?{ $foo = 1 })';
+    use re 'eval';
+    /foo${pat}bar/;                # won't fail (when not under -T switch)</PRE>
+<PRE>
+    {
+        no re 'taint';             # the default
+        ($x) = ($^X =~ /^(.*)$/s); # $x is not tainted here</PRE>
+<PRE>
+        no re 'eval';              # the default
+        /foo${pat}bar/;            # disallowed (with or without -T switch)
+    }</PRE>
+<PRE>
+    use re 'debug';                # NOT lexically scoped (as others are)
+    /^(.*)$/s;                     # output debugging info during
+                                   #     compile and run time</PRE>
+<PRE>
+    use re 'debugcolor';           # same as 'debug', but with colored output
+    ...</PRE>
+<P>(We use $^X in these examples because it's tainted by default.)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>When <CODE>use re 'taint'</CODE> is in effect, and a tainted string is the target
+of a regex, the regex memories (or values returned by the m// operator
+in list context) are tainted.  This feature is useful when regex operations
+on tainted data aren't meant to extract safe substrings, but to perform
+other transformations.</P>
+<P>When <CODE>use re 'eval'</CODE> is in effect, a regex is allowed to contain
+<CODE>(?{ ... })</CODE> zero-width assertions even if regular expression contains
+variable interpolation.  That is normally disallowed, since it is a 
+potential security risk.  Note that this pragma is ignored when the regular
+expression is obtained from tainted data, i.e.  evaluation is always
+disallowed with tainted regular expresssions.  See <A HREF="../lib/Pod/perlre.html#({ code })">(?{ code }) in the perlre manpage</A>.</P>
+<P>For the purpose of this pragma, interpolation of precompiled regular 
+expressions (i.e., the result of <A HREF="../lib/Pod/perlfunc.html#item_qr/"><CODE>qr//</CODE></A>) is <EM>not</EM> considered variable
+interpolation.  Thus:</P>
+<PRE>
+    /foo${pat}bar/</PRE>
+<P><EM>is</EM> allowed if $pat is a precompiled regular expression, even 
+if $pat contains <CODE>(?{ ... })</CODE> assertions.</P>
+<P>When <CODE>use re 'debug'</CODE> is in effect, perl emits debugging messages when 
+compiling and using regular expressions.  The output is the same as that
+obtained by running a <CODE>-DDEBUGGING</CODE>-enabled perl interpreter with the
+<STRONG>-Dr</STRONG> switch. It may be quite voluminous depending on the complexity
+of the match.  Using <CODE>debugcolor</CODE> instead of <CODE>debug</CODE> enables a
+form of output that can be used to get a colorful display on terminals
+that understand termcap color sequences.  Set <CODE>$ENV{PERL_RE_TC}</CODE> to a
+comma-separated list of <CODE>termcap</CODE> properties to use for highlighting
+strings on/off, pre-point part on/off.  
+See <A HREF="../lib/Pod/perldebug.html#debugging regular expressions">Debugging regular expressions in the perldebug manpage</A> for additional info.</P>
+<P>The directive <CODE>use re 'debug'</CODE> is <EM>not lexically scoped</EM>, as the
+other directives are.  It has both compile-time and run-time effects.</P>
+<P>See <A HREF="../lib/Pod/perlmodlib.html#pragmatic modules">Pragmatic Modules in the perlmodlib manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;re - Perl pragma to alter regular expression behaviour</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

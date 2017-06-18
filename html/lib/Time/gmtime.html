@@ -1,0 +1,97 @@
+
+<HTML>
+<HEAD>
+<TITLE>Time::gmtime - by-name interface to Perl's built-in gmtime function</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Time::gmtime - by-name interface to Perl's built-in gmtime function</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Time::gmtime - by-name interface to Perl's built-in <A HREF="../../lib/Pod/perlfunc.html#item_gmtime"><CODE>gmtime()</CODE></A> function</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Time::gmtime;
+ $gm = gmtime();
+ printf &quot;The day in Greenwich is %s\n&quot;, 
+    (qw(Sun Mon Tue Wed Thu Fri Sat Sun))[ gm-&gt;wday() ];</PRE>
+<PRE>
+ use Time::gmtime w(:FIELDS;
+ printf &quot;The day in Greenwich is %s\n&quot;, 
+    (qw(Sun Mon Tue Wed Thu Fri Sat Sun))[ gm_wday() ];</PRE>
+<PRE>
+ $now = gmctime();</PRE>
+<PRE>
+ use Time::gmtime;
+ use File::stat;
+ $date_string = gmctime(stat($file)-&gt;mtime);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module's default exports override the core <A HREF="../../lib/Pod/perlfunc.html#item_gmtime"><CODE>gmtime()</CODE></A> function,
+replacing it with a version that returns ``Time::tm'' objects.
+This object has methods that return the similarly named structure field
+name from the C's tm structure from <EM>time.h</EM>; namely sec, min, hour,
+mday, mon, year, wday, yday, and isdst.</P>
+<P>You may also import all the structure fields directly into your namespace
+as regular variables using the :FIELDS import tag.  (Note that this
+still overrides your core functions.)  Access these fields as variables
+named with a preceding <CODE>tm_</CODE> in front their method names.  Thus,
+<CODE>$tm_obj-&gt;mday()</CODE> corresponds to $tm_mday if you import the fields.</P>
+<P>The <CODE>gmctime()</CODE> function provides a way of getting at the 
+scalar sense of the original CORE::gmtime() function.</P>
+<P>To access this functionality without the core overrides,
+pass the <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> an empty import list, and then access
+function functions with their full qualified names.
+On the other hand, the built-ins are still available
+via the <CODE>CORE::</CODE> pseudo-package.</P>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>While this class is currently implemented using the Class::Struct
+module to build a struct-like class, you shouldn't rely upon this.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Time::gmtime - by-name interface to Perl's built-in gmtime function</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

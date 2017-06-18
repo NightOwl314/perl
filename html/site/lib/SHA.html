@@ -1,0 +1,87 @@
+
+<HTML>
+<HEAD>
+<TITLE>SHA - Perl interface to the NIST Secure Hash Algorithm</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SHA - Perl interface to the NIST Secure Hash Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SHA - Perl interface to the NIST Secure Hash Algorithm</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use SHA;</PRE>
+<PRE>
+    $version = &amp;SHA::sha_version;</PRE>
+<PRE>
+    $context = new SHA;
+    $context-&gt;reset();</PRE>
+<PRE>
+    $context-&gt;add(LIST);
+    $context-&gt;addfile(HANDLE);</PRE>
+<PRE>
+    $digest = $context-&gt;digest();
+    $string = $context-&gt;hexdigest();</PRE>
+<PRE>
+    $digest = $context-&gt;hash($string);
+    $string = $context-&gt;hexhash($string);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>SHA</CODE> module is <STRONG>depreciated</STRONG>.  Use <CODE>Digest::SHA1</CODE> instead.</P>
+<P>The current <CODE>SHA</CODE> module is just a wrapper around the <CODE>Digest::SHA1</CODE>
+module.  It is provided so that legacy code that rely on the old
+interface still work.  This wrapper does not support the old (and
+buggy) SHA-0 algorithm.</P>
+<P>In addition to the methods provided by <CODE>Digest::SHA1</CODE> this module
+provide the class methods SHA-&gt;<CODE>hash()</CODE> and SHA-&gt;<CODE>hexhash()</CODE> that
+basically do the same as the <CODE>sha1()</CODE> and <CODE>sha1_hex()</CODE> functions provided
+<CODE>Digest::SHA1</CODE>.</P>
+<P>The SHA-&gt;hex* methods will insert spaces between groups of 8 hex
+characters, while the Digest::SHA1 version of the same methods will not
+do this.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../site/lib/Digest/SHA1.html">the Digest::SHA1 manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SHA - Perl interface to the NIST Secure Hash Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

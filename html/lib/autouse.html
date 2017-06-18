@@ -1,0 +1,110 @@
+
+<HTML>
+<HEAD>
+<TITLE>autouse - postpone load of modules until a function is used</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;autouse - postpone load of modules until a function is used</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#warning">WARNING</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>autouse - postpone load of modules until a function is used</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use autouse 'Carp' =&gt; qw(carp croak);
+  carp &quot;this carp was predeclared and autoused &quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>If the module <CODE>Module</CODE> is already loaded, then the declaration</P>
+<PRE>
+  use autouse 'Module' =&gt; qw(func1 func2($;$) Module::func3);</PRE>
+<P>is equivalent to</P>
+<PRE>
+  use Module qw(func1 func2);</PRE>
+<P>if <CODE>Module</CODE> defines <CODE>func2()</CODE> with prototype <CODE>($;$)</CODE>, and <CODE>func1()</CODE> and
+<CODE>func3()</CODE> have no prototypes.  (At least if <CODE>Module</CODE> uses <CODE>Exporter</CODE>'s
+<A HREF="../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A>, otherwise it is a fatal error.)</P>
+<P>If the module <CODE>Module</CODE> is not loaded yet, then the above declaration
+declares functions <CODE>func1()</CODE> and <CODE>func2()</CODE> in the current package, and
+declares a function Module::func3().  When these functions are called,
+they load the package <CODE>Module</CODE> if needed, and substitute themselves
+with the correct definitions.</P>
+<P>
+<HR>
+<H1><A NAME="warning">WARNING</A></H1>
+<P>Using <CODE>autouse</CODE> will move important steps of your program's execution
+from compile time to runtime.  This can</P>
+<UL>
+<LI>
+Break the execution of your program if the module you <CODE>autouse</CODE>d has
+some initialization which it expects to be done early.
+<P></P>
+<LI>
+hide bugs in your code since important checks (like correctness of
+prototypes) is moved from compile time to runtime.  In particular, if
+the prototype you specified on <CODE>autouse</CODE> line is wrong, you will not
+find it out until the corresponding function is executed.  This will be
+very unfortunate for functions which are not always called (note that
+for such functions <CODE>autouse</CODE>ing gives biggest win, for a workaround
+see below).
+<P></P></UL>
+<P>To alleviate the second problem (partially) it is advised to write
+your scripts like this:</P>
+<PRE>
+  use Module;
+  use autouse Module =&gt; qw(carp($) croak(&amp;$));
+  carp &quot;this carp was predeclared and autoused &quot;;</PRE>
+<P>The first line ensures that the errors in your argument specification
+are found early.  When you ship your application you should comment
+out the first line, since it makes the second one useless.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ilya Zakharevich (<A HREF="mailto:ilya@math.ohio-state.edu">ilya@math.ohio-state.edu</A>)</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;autouse - postpone load of modules until a function is used</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

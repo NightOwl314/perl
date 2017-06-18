@@ -1,0 +1,898 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::FAQ -- The Frequently Asked Questions for the Perl5 Database Interface</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::FAQ -- The Frequently Asked Questions for the Perl5 Database Interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#basic information & information sources">Basic Information &amp; Information Sources</A></LI>
+	<UL>
+
+		<LI><A HREF="#1.1 what is dbi, dbperl, oraperl and *perl">1.1 What is DBI, DBperl, Oraperl and *perl?</A></LI>
+		<LI><A HREF="#1.2. where can i get it from">1.2. Where can I get it from?</A></LI>
+		<LI><A HREF="#1.3. where can i get more information">1.3. Where can I get more information?</A></LI>
+	</UL>
+
+	<LI><A HREF="#compilation problems">Compilation Problems</A></LI>
+	<UL>
+
+		<LI><A HREF="#2.1. compilation problems or it fails the test!">2.1. Compilation problems or ``It fails the test!''</A></LI>
+	</UL>
+
+	<LI><A HREF="#platform and driver issues">Platform and Driver Issues</A></LI>
+	<UL>
+
+		<LI><A HREF="#3.1 what's the difference between odbc and dbi">3.1 What's the difference between ODBC and DBI?</A></LI>
+		<LI><A HREF="#3.2 what's the difference between win32::odbc and dbd::odbc">3.2 What's the difference between Win32::ODBC and DBD::ODBC?</A></LI>
+		<LI><A HREF="#3.3 is dbi supported under windows 95 / nt platforms">3.3 Is DBI supported under Windows 95 / NT platforms?</A></LI>
+		<LI><A HREF="#3.4 can i access microsoft access or sqlserver databases with dbi">3.4 Can I access Microsoft Access or SQL-Server databases with DBI?</A></LI>
+		<LI><A HREF="#3.5 is the a dbd for <insert favourite database here>">3.5 Is the a DBD for &lt;<EM>insert favourite database here</EM>&gt;?</A></LI>
+		<LI><A HREF="#3.6 what's dbm and why should i use dbi instead">3.6 What's DBM? And why should I use DBI instead?</A></LI>
+		<LI><A HREF="#3.7 what database do you recommend me using">3.7 What database do you recommend me using?</A></LI>
+		<LI><A HREF="#3.8 is <insert feature here> supported in dbi">3.8 Is &lt;<EM>insert feature here</EM>&gt; supported in DBI?</A></LI>
+	</UL>
+
+	<LI><A HREF="#programming questions">Programming Questions</A></LI>
+	<UL>
+
+		<LI><A HREF="#4.1 is dbi any use for cgi programming">4.1 Is DBI any use for CGI programming?</A></LI>
+		<LI><A HREF="#4.2 how do i get faster connection times with dbd::oracle and cgi">4.2 How do I get faster connection times with DBD::Oracle and CGI?</A></LI>
+		<LI><A HREF="#4.3 how do i get persistent connections with dbi and cgi">4.3 How do I get persistent connections with DBI and CGI?</A></LI>
+		<LI><A HREF="#4.4 ``when i run a perl script from the command line, it works, but, when i run it under the httpd, it fails!'' why">4.4 ``When I run a perl script from the command line, it works, but, when I run it under the <CODE>httpd</CODE>, it fails!'' Why?</A></LI>
+		<LI><A HREF="#4.5 how do i get the number of rows returned from a select statement">4.5 How do I get the number of rows returned from a <CODE>SELECT</CODE> statement?</A></LI>
+	</UL>
+
+	<LI><A HREF="#miscellaneous questions">Miscellaneous Questions</A></LI>
+	<UL>
+
+		<LI><A HREF="#5.1 can i do multithreading with dbi">5.1 Can I do multi-threading with DBI?</A></LI>
+		<LI><A HREF="#5.2 how do i handle blob data with dbi">5.2 How do I handle BLOB data with DBI?</A></LI>
+		<LI><A HREF="#5.3 how can i invoke stored procedures with dbi">5.3 How can I invoke stored procedures with DBI?</A></LI>
+		<LI><A HREF="#5.4 how can i get return values from stored procedures with dbi">5.4 How can I get return values from stored procedures with DBI?</A></LI>
+		<LI><A HREF="#5.5 how can i create or drop a database with dbi">5.5 How can I create or drop a database with DBI?</A></LI>
+		<LI><A HREF="#5.6 how can i commit or rollback a statement with dbi">5.6 How can I <CODE>commit</CODE> or <CODE>rollback</CODE> a statement with DBI?</A></LI>
+		<LI><A HREF="#5.7 how are null values handled by dbi">5.7 How are <CODE>NULL</CODE> values handled by DBI?</A></LI>
+		<LI><A HREF="#5.8 what are these func() methods all about">5.8 What are these <CODE>func()</CODE> methods all about?</A></LI>
+		<LI><A HREF="#5.9 is dbi year 2000 compliant">5.9 Is DBI Year 2000 Compliant?</A></LI>
+	</UL>
+
+	<LI><A HREF="#support and training">Support and Training</A></LI>
+	<UL>
+
+		<LI><A HREF="#commercial support">Commercial Support</A></LI>
+		<LI><A HREF="#training">Training</A></LI>
+	</UL>
+
+	<LI><A HREF="#other references">Other References</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>DBI::FAQ -- The Frequently Asked Questions for the Perl5 Database Interface</P>
+<BODY BGCOLOR="#ffffff" TEXT="#000000" LINK="#3a15ff" ALINK="#ff0000" VLINK="#ff282d">
+<!--#include virtual="/technology/perl/DBI/templatetop.html" -->
+<CENTER>
+<FONT SIZE="+2">
+DBI Frequently Asked Questions v.0.38
+</FONT>
+<BR>
+<FONT SIZE="-1">
+<I>Last updated: February 8th, 2000</I>
+</FONT>
+</CENTER>
+<P><P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    perldoc DBI::FAQ</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>This document is currently at version <EM>0.38</EM>, as of <EM>February 8th, 2000</EM>.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This document serves to answer the most frequently asked questions on both
+the DBI Mailing Lists and personally to members of the DBI development team.</P>
+<P>
+<HR>
+<H1><A NAME="basic information & information sources">Basic Information &amp; Information Sources</A></H1>
+<P>
+<H2><A NAME="1.1 what is dbi, dbperl, oraperl and *perl">1.1 What is DBI, DBperl, Oraperl and *perl?</A></H2>
+<P>To quote Tim Bunce, the architect and author of DBI:</P>
+<PRE>
+    ``DBI is a database access Application Programming Interface (API)
+      for the Perl Language. The DBI API Specification defines a set
+      of functions, variables and conventions that provide a consistent
+      database interface independant of the actual database being used.''</PRE>
+<P>In simple language, the DBI interface allows users to access multiple database
+types transparently. So, if you connecting to an Oracle, Informix, mSQL, Sybase
+or whatever database, you don't need to know the underlying mechanics of the
+3GL layer. The API defined by DBI will work on <EM>all</EM> these database types.</P>
+<P>A similar benefit is gained by the ability to connect to two <EM>different</EM>
+databases of different vendor within the one perl script, <EM>ie</EM>, I want
+to read data from an Oracle database and insert it back into an Informix
+database all within one program. The DBI layer allows you to do this simply
+and powerfully.</P>
+Here's a diagram that demonstrates the principle:
+<P>
+<CENTER>
+<IMG SRC="img/dbiarch.gif" WIDTH=451 HEIGHT=321 ALT="[ DBI Architecture ]">
+</CENTER>
+<P><P><EM>DBperl</EM> is the old name for the interface specification. It's usually
+now used to denote perl<EM>4</EM> modules on database interfacing, such as,
+<EM>oraperl</EM>, <EM>isqlperl</EM>, <EM>ingperl</EM> and so on. These interfaces
+didn't have a standard API and are generally <EM>not</EM> supported.</P>
+<P>Here's a list of DBperl modules, their corresponding DBI counterparts and
+support information. <EM>Please note</EM>, the author's listed here generally
+<EM>do not</EM> maintain the DBI module for the same database. These email
+addresses are unverified and should only be used for queries concerning the
+perl4 modules listed below. DBI driver queries should be directed to the
+<EM>dbi-users</EM> mailing list.</P>
+<PRE>
+    Module Name Database Required   Author          DBI
+    ----------- -----------------   ------          ---
+    Sybperl     Sybase              Michael Peppler DBD::Sybase
+                                    &lt;mpeppler@itf.ch&gt;
+    Oraperl     Oracle 6 &amp; 7        Kevin Stock     DBD::Oracle
+                                    &lt;dbi-users@perl.org&gt;
+    Ingperl     Ingres              Tim Bunce &amp;     DBD::Ingres
+                                    Ted Lemon
+                                    &lt;dbi-users@perl.org&gt;
+    Interperl   Interbase           Buzz Moschetti  DBD::Interbase
+                                    &lt;buzz@bear.com&gt;
+    Uniperl     Unify 5.0           Rick Wargo      None
+                                    &lt;rickers@coe.drexel.edu&gt;
+    Pgperl      Postgres            Igor Metz       DBD::Pg
+                                    &lt;metz@iam.unibe.ch&gt;
+    Btreeperl   NDBM                John Conover    SDBM?
+                                    &lt;john@johncon.com&gt;
+    Ctreeperl   C-Tree              John Conover    None
+                                    &lt;john@johncon.com&gt;
+    Cisamperl   Informix C-ISAM     Mathias Koerber None
+                                    &lt;mathias@unicorn.swi.com.sg&gt;
+    Duaperl     X.500 Directory     Eric Douglas    None
+                User Agent</PRE>
+<P>However, some DBI modules have DBperl emulation layers, so, <EM>DBD::Oracle</EM>
+comes with an Oraperl emulation layer, which allows you to run legacy oraperl
+scripts without modification. The emulation layer translates the oraperl API
+calls into DBI calls and executes them through the DBI switch.</P>
+<P>Here's a table of emulation layer information:</P>
+<PRE>
+    Module                  Emulation Layer     Status
+    ------          ---------------     ------
+    DBD::Oracle     Oraperl             Complete
+    DBD::Informix   Isqlperl            Under development
+    DBD::Ingres     Ingperl             Complete?
+    DBD::Sybase     Sybperl             Working? ( Needs verification )
+    DBD::mSQL       Msqlperl            Experimentally released with
+                                        DBD::mSQL-0.61</PRE>
+<P>The <EM>Msqlperl</EM> emulation is a special case. <EM>Msqlperl</EM> is a perl5 driver
+for <EM>mSQL</EM> databases, but does not conform to the DBI Specification. It's
+use is being deprecated in favour of <EM>DBD::mSQL</EM>. <EM>Msqlperl</EM> may be downloaded
+from CPAN <EM>via</EM>:</P>
+<PRE>
+    <A HREF="http://www.perl.com/cgi-bin/cpan_mod?module=Msqlperl">http://www.perl.com/cgi-bin/cpan_mod?module=Msqlperl</A></PRE>
+<P>
+<H2><A NAME="1.2. where can i get it from">1.2. Where can I get it from?</A></H2>
+<P>The Comprehensive Perl Archive Network
+resources should be used for retrieving up-to-date versions of the DBI
+and drivers. CPAN may be accessed <EM>via</EM> Tom Christiansen's splendid
+<EM>CPAN multiplexer</EM> program located at:</P>
+<PRE>
+    <A HREF="http://www.perl.com/CPAN/">http://www.perl.com/CPAN/</A></PRE>
+<P>For more specific version information and exact URLs of drivers, please see
+the DBI drivers list and the DBI module pages which can be found on:</P>
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P>This list is automatically generated on a nightly basis from CPAN and should
+be up-to-date.</P>
+<P>
+<H2><A NAME="1.3. where can i get more information">1.3. Where can I get more information?</A></H2>
+<P>There are a few information sources on DBI.</P>
+<DL>
+<DT><STRONG><A NAME="item_%22Programming_the_Perl_DBI%22"><EM>``Programming the Perl DBI''</EM></A></STRONG><BR>
+<DD>
+``Programming the Perl DBI'' is the <EM>official</EM> book on the DBI written by
+Alligator Descartes and Tim Bunce and published by O'Reilly &amp; Associates.
+The book was released on February 9th, 2000.
+<P>The table of contents is:</P>
+<PRE>
+    Preface
+    1. Introduction
+        From Mainframes to Workstations
+        Perl
+        DBI in the Real World
+        A Historical Interlude and Standing Stones
+    2. Basic Non-DBI Databases
+        Storage Managers and Layers
+        Query Languages and Data Functions
+        Standing Stones and the Sample Database
+        Flat-File Databases
+        Putting Complex Data into Flat Files
+        Concurrent Database Access and Locking
+        DBM Files and the Berkeley Database Manager
+        The MLDBM Module
+        Summary
+    3. SQL and Relational Databases
+        The Relational Database Methodology
+        Datatypes and NULL Values
+        Querying Data
+        Modifying Data Within Tables
+        Creating and Destroying Tables
+    4. Programming with the DBI
+        DBI Architecture
+        Handles
+        Data Source Names
+        Connection and Disconnection
+        Error Handling
+        Utility Methods and Functions
+    5. Interacting with the Database
+        Issuing Simple Queries
+        Executing Non-SELECT Statements
+        Binding Parameters to Statements
+        Binding Output Columns
+        do() Versus prepare()
+        Atomic and Batch Fetching
+    6. Advanced DBI
+        Handle Attributes and Metadata
+        Handling LONG/LOB Data
+        Transactions, Locking, and Isolation
+    7. ODBC and the DBI
+        ODBC -- Embraced and Extended
+        DBI -- Thrashed and Mutated
+        The Nuts and Bolts of ODBC
+        ODBC from Perl
+        The Marriage of DBI and ODBC
+        Questions and Choices
+        Moving Between Win32::ODBC and the DBI
+        And What About ADO?
+    8. DBI Shell and Database Proxying
+        dbish -- The DBI Shell
+        Database Proxying
+    A. DBI Specification
+    B. Driver and Database Characteristics
+    C. ASLaN Sacred Site Charter
+    Index</PRE>
+<P>The book should be available from all good bookshops and can be ordered online
+either &lt;I&gt;via&lt;/I&gt; O'Reilly &amp; Associates</P>
+<PRE>
+    <A HREF="http://www.oreilly.com/catalog/perldbi">http://www.oreilly.com/catalog/perldbi</A></PRE>
+<P>or Amazon</P>
+<PRE>
+    <A HREF="http://www.amazon.com/exec/obidos/ASIN/1565926994/dbi">http://www.amazon.com/exec/obidos/ASIN/1565926994/dbi</A></PRE>
+<P></P>
+<DT><STRONG><A NAME="item_POD_documentation"><EM>POD documentation</EM></A></STRONG><BR>
+<DD>
+<EM>POD</EM>s are chunks of documentation usually embedded within perl programs
+that document the code ``<EM>in place</EM>'', providing a useful resource for
+programmers and users of modules. POD for DBI and drivers is beginning to
+become more commonplace, and documentation for these modules can be read
+with the <CODE>perldoc</CODE> program included with Perl.
+<DL>
+<DT><STRONG><A NAME="item_The_DBI_Specification">The DBI Specification</A></STRONG><BR>
+<DD>
+The POD for the DBI Specification can be read with the:
+<PRE>
+    perldoc DBI</PRE>
+<P>command. The Specification also forms Appendix A of ``Programming the Perl
+DBI''.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Oraperl">Oraperl</A></STRONG><BR>
+<DD>
+Users of the Oraperl emulation layer bundled with <EM>DBD::Oracle</EM>, may read
+up on how to program with the Oraperl interface by typing:
+<PRE>
+    perldoc Oraperl</PRE>
+<P>This will produce an updated copy of the original oraperl man page written by
+Kevin Stock for perl4. The oraperl API is fully listed and described there.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Drivers">Drivers</A></STRONG><BR>
+<DD>
+Users of the DBD modules may read about some of the private functions
+and quirks of that driver by typing:
+<PRE>
+    perldoc &lt;driver&gt;</PRE>
+<P>For example, the <EM>DBD::mSQL</EM> driver is bundled with driver-specific
+documentation that can be accessed by typing</P>
+<PRE>
+    perldoc DBD::mSQL</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Frequently_Asked_Questions">Frequently Asked Questions</A></STRONG><BR>
+<DD>
+This document, the <EM>Frequently Asked Questions</EM> is also available as POD
+documentation! You can read this on your own system by typing:
+<PRE>
+    perldoc DBI::FAQ</PRE>
+<P>This may be more convenient to persons not permanently, or conveniently,
+connected to the Internet. The <EM>DBI::FAQ</EM> module should be downloaded and
+installed for the more up-to-date version.</P>
+<P>The version of <EM>DBI::FAQ</EM> shipped with the <CODE>DBI</CODE> module may be slightly out
+of date.</P>
+<P></P>
+<DT><STRONG><A NAME="item_POD_in_general">POD in general</A></STRONG><BR>
+<DD>
+Information on writing POD, and on the philosophy of POD in general, can be
+read by typing:
+<PRE>
+    perldoc perlpod</PRE>
+<P>Users with the Tk module installed may be interested to learn there is a
+Tk-based POD reader available called <CODE>tkpod</CODE>, which formats POD in a convenient
+and readable way. This is available <EM>via</EM> CPAN as the module called
+<EM>Tk::POD</EM> and is highly recommended.</P>
+<P></P></DL>
+<DT><STRONG><A NAME="item_Driver_and_Database_Characteristics"><EM>Driver and Database Characteristics</EM></A></STRONG><BR>
+<DD>
+The driver summaries that were produced for Appendix B of ``Programming the
+Perl DBI'' are available online at:
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P>in the driver information table. These summaries contain standardised
+information on each driver and database which should aid you in selecting
+a database to use. It will also inform you quickly of any issues within
+drivers or whether a driver is not fully compliant with the DBI Specification.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Rambles%2C_Tidbits_and_Observations"><EM>Rambles, Tidbits and Observations</EM></A></STRONG><BR>
+<DD>
+<PRE>
+    <A HREF="http://dbi.perl.org/tidbits">http://dbi.perl.org/tidbits</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI/tidbits">http://www.symbolstone.org/technology/perl/DBI/tidbits</A></PRE>
+<P>There are a series of occasional rambles from various people on the
+DBI mailing lists who, in an attempt to clear up a simple point, end up
+drafting fairly comprehensive documents. These are quite often varying in
+quality, but do provide some insights into the workings of the interfaces.</P>
+<DT><STRONG><A NAME="item_Articles"><EM>Articles</EM></A></STRONG><BR>
+<DD>
+A list of articles discussing the DBI can be found on the DBI WWW page at:
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P>These articles are of varying quality and age, from the original Perl Journal
+article written by Alligator and Tim, to more recent debacles published online
+from about.com.</P>
+<P></P>
+<DT><STRONG><A NAME="item_README_files"><EM>README files</EM></A></STRONG><BR>
+<DD>
+The <EM>README</EM> files included with each driver occasionally contains
+some useful information ( no, really! ) that may be pertinent to the user.
+Please read them. It makes our worthless existences more bearable. These
+can all be read from the main DBI WWW page at:
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Mailing_Lists"><EM>Mailing Lists</EM></A></STRONG><BR>
+<DD>
+There are three mailing lists for DBI:
+<PRE>
+    dbi-announce@perl.org     -- for announcements, very low traffic
+    dbi-users@perl.org        -- general user support
+    dbi-dev@perl.org          -- for driver developers (no user support)</PRE>
+<P>For information on how to subscribe, set digest mode etc, and unsubscribe,
+send an email message (the content will be ignored) to:</P>
+<PRE>
+    dbi-announce-help@perl.org
+    dbi-users-help@perl.org
+    dbi-dev-help@perl.org</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Mailing_List_Archives"><EM>Mailing List Archives</EM></A></STRONG><BR>
+<DD>
+<DL>
+<DT><STRONG><A NAME="item_US_Mailing_List_Archives"><EM>US Mailing List Archives</EM></A></STRONG><BR>
+<DD>
+<PRE>
+    <A HREF="http://outside.organic.com/mail-archives/dbi-users/">http://outside.organic.com/mail-archives/dbi-users/</A></PRE>
+<P>Searchable hypermail archives of the three mailing lists, and some of the
+much older traffic have been set up for users to browse.</P>
+<DT><STRONG><A NAME="item_European_Mailing_List_Archives"><EM>European Mailing List Archives</EM></A></STRONG><BR>
+<DD>
+<PRE>
+    <A HREF="http://www.rosat.mpe-garching.mpg.de/mailing-lists/PerlDB-Interest">http://www.rosat.mpe-garching.mpg.de/mailing-lists/PerlDB-Interest</A></PRE>
+<P>As per the US archive above.</P>
+</DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="compilation problems">Compilation Problems</A></H1>
+<P>
+<H2><A NAME="2.1. compilation problems or it fails the test!">2.1. Compilation problems or ``It fails the test!''</A></H2>
+<P>First off, consult the README for that driver in case there is useful
+information about the problem. It may be a known problem for your given
+architecture and operating system or database. You can check the README
+files for each driver in advance online at:</P>
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P>If it's a known problem, you'll probably have to wait till it gets fixed. If
+you're <EM>really</EM> needing it fixed, try the following:</P>
+<DL>
+<DT><STRONG><A NAME="item_Attempt_to_fix_it_yourself"><EM>Attempt to fix it yourself</EM></A></STRONG><BR>
+<DD>
+This technique is generally <EM>not</EM> recommended to the faint-hearted.
+If you do think you have managed to fix it, then, send a patch file
+( context diff ) to the author with an explanation of:
+<UL>
+<LI>
+What the problem was, and test cases, if possible.
+<P></P>
+<LI>
+What you needed to do to fix it. Please make sure you mention everything.
+<P></P>
+<LI>
+Platform information, database version, perl version, module version and
+DBI version.
+<P></P></UL>
+<DT><STRONG><A NAME="item_Email_the_author_Do_NOT_whinge%21"><EM>Email the author</EM> Do <EM>NOT</EM> whinge!</A></STRONG><BR>
+<DD>
+Please email the address listed in the WWW pages for whichever driver you
+are having problems with. Do <EM>not</EM> directly email the author at a
+known address unless it corresponds with the one listed.
+<P>We tend to have real jobs to do, and we do read the mailing lists for
+problems. Besides, we may not have access to &lt;<EM>insert your
+favourite brain-damaged platform here</EM>&gt; and couldn't be of any
+assistance anyway! Apologies for sounding harsh, but that's the way of it!</P>
+<P>However, you might catch one of these creative genii at 3am when we're
+doing this sort of stuff anyway, and get a patch within 5 minutes. The
+atmosphere in the DBI circle is that we <EM>do</EM> appreciate the users'
+problems, since we work in similar environments.</P>
+<P>If you are planning to email the author, please furnish as much information
+as possible, <EM>ie</EM>:</P>
+<UL>
+<LI>
+<EM>ALL</EM> the information asked for in the README file in
+the problematic module. And we mean <EM>ALL</EM> of it. We don't
+put lines like that in documentation for the good of our health, or
+to meet obscure README file standards of length.
+<P></P>
+<LI>
+If you have a core dump, try the <EM>Devel::CoreStack</EM> module for
+generating a stack trace from the core dump. Send us that too.
+<EM>Devel::CoreStack</EM> can be found on CPAN at:
+<PRE>
+    <A HREF="http://www.perl.com/cgi-bin/cpan_mod?module=Devel::CoreStack">http://www.perl.com/cgi-bin/cpan_mod?module=Devel::CoreStack</A></PRE>
+<P></P>
+<LI>
+Module versions, perl version, test cases, operating system versions
+and <EM>any other pertinent information</EM>.
+<P></P></UL>
+<P>Remember, the more information you send us, the quicker we can track
+problems down. If you send us no useful information, expect nothing back.</P>
+<P>Finally, please be aware that some authors, including Tim Bunce, specifically
+request that you do <EM>not</EM> mail them directly. Please respect their wishes and
+use the email addresses listed in the appropriate module <CODE>README</CODE> file.</P>
+<DT><STRONG><A NAME="item_Email_the_dbi%2Dusers_Mailing_List"><EM>Email the dbi-users Mailing List</EM></A></STRONG><BR>
+<DD>
+It's usually a fairly intelligent idea to <EM>cc</EM> the mailing list
+anyway with problems. The authors all read the lists, so you lose nothing
+by mailing there.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="platform and driver issues">Platform and Driver Issues</A></H1>
+<P>
+<H2><A NAME="3.1 what's the difference between odbc and dbi">3.1 What's the difference between ODBC and DBI?</A></H2>
+<P>In terms of architecture - not much: Both define programming
+interfaces. Both allow multiple drivers to be loaded to do the
+actual work.</P>
+<P>In terms of ease of use - much: The DBI is a 'high level' interface
+that, like Perl itself, strives to make the simple things easy while
+still making the hard things possible. The ODBC is a 'low level'
+interface. All nuts-bolts-knobs-and-dials.</P>
+<P>Now there's an ODBC driver for the DBI (DBD::ODBC) the ``What's the
+difference'' question is more usefully rephrased as:</P>
+<P>Chapter 7 of ``Programming the Perl DBI'' covers this topic in far more
+detail and should be consulted.</P>
+<P>
+<H2><A NAME="3.2 what's the difference between win32::odbc and dbd::odbc">3.2 What's the difference between Win32::ODBC and DBD::ODBC?</A></H2>
+<P>The DBI, and thus DBD::ODBC, has a different philosophy from the
+Win32::ODBC module:</P>
+<P>The Win32::ODBC module is a 'thin' layer over the low-level ODBC API.
+The DBI defines a simpler 'higher level' interface.</P>
+<P>The Win32::ODBC module gives you access to more of the ODBC API.
+The DBI and DBD::ODBC give you access to only the essentials.
+(But, unlike Win32::ODBC, the DBI and DBD::ODBC do support parameter
+binding and multiple prepared statements which reduces the load on
+the database server and can dramatically increase performance.)</P>
+<P>The Win32::ODBC module only works on Win32 systems.
+The DBI and DBD::ODBC are very portable and work on Win32 and Unix.</P>
+<P>The DBI and DBD::ODBC modules are supplied as a standard part of the
+Perl 5.004 binary distribution for Win32 (they don't work with the
+older, non-standard, ActiveState port).</P>
+<P>Scripts written with the DBI and DBD::ODBC are faster than Win32::ODBC
+on Win32 and are trivially portable to other supported database types.</P>
+<P>The DBI offers optional automatic printing or die()ing on errors which
+makes applications simpler and more robust.</P>
+<P>The current DBD::ODBC driver version 0.16 is new and not yet fully stable.
+A new release is due soon [relative to the date of the next TPJ issue :-]
+and will be much improved and offer more ODBC functionality.</P>
+<P>To summarise: The Win32::ODBC module is your best choice if you need
+access to more of the ODBC API than the DBI gives you. Otherwise, the
+DBI and DBD::ODBC combination may be your best bet.</P>
+<P>Chapter 7 of ``Programming the Perl DBI'' covers this topic in far more
+detail and should be consulted.</P>
+<P>
+<H2><A NAME="3.3 is dbi supported under windows 95 / nt platforms">3.3 Is DBI supported under Windows 95 / NT platforms?</A></H2>
+<P>Finally, yes! Jeff Urlwin has been working diligently on building
+<EM>DBI</EM> and <EM>DBD::ODBC</EM> under these platforms, and, with the
+advent of a stabler perl and a port of <EM>MakeMaker</EM>, the project has
+come on by great leaps and bounds.</P>
+<P>The <EM>DBI</EM> and <EM>DBD::Oracle</EM> Win32 ports are now a standard part of DBI,
+so, downloading <EM>DBI</EM> of version higher than <EM>0.81</EM> should work fine as
+should using the most recent <EM>DBD::Oracle</EM> version.</P>
+<P>
+<H2><A NAME="3.4 can i access microsoft access or sqlserver databases with dbi">3.4 Can I access Microsoft Access or SQL-Server databases with DBI?</A></H2>
+<P>Yes, use the <EM>DBD::ODBC</EM> driver.</P>
+<P>
+<H2><A NAME="3.5 is the a dbd for <insert favourite database here>">3.5 Is the a DBD for &lt;<EM>insert favourite database here</EM>&gt;?</A></H2>
+<P>Is is listed on the DBI drivers page?</P>
+<PRE>
+    <A HREF="http://dbi.perl.org/">http://dbi.perl.org/</A>
+    <A HREF="http://www.symbolstone.org/technology/perl/DBI">http://www.symbolstone.org/technology/perl/DBI</A></PRE>
+<P>If not, no. A complete absence of a given database driver from that
+page means that no-one has announced any intention to work on it, not that
+such a driver is impossible to write.</P>
+<P>A corollary of the above statement implies that if you see an announcement
+for a driver <EM>not</EM> on the above page, there's a good chance it's not
+actually a <EM>DBI</EM> driver, and may not conform to the specifications. Therefore,
+questions concerning problems with that code should <EM>not</EM> really be addressed
+to the DBI Mailing Lists.</P>
+<P>
+<H2><A NAME="3.6 what's dbm and why should i use dbi instead">3.6 What's DBM? And why should I use DBI instead?</A></H2>
+<P>Extracted from ``<EM>DBI - The Database Interface for Perl 5</EM>'':</P>
+<PRE>
+    ``UNIX was originally blessed with simple file-based ``databases'', namely
+    the dbm system. dbm lets you store data in files, and retrieve
+    that data quickly. However, it also has serious drawbacks.</PRE>
+<PRE>
+        File Locking</PRE>
+<PRE>
+        The dbm systems did not allow particularly robust file locking
+        capabilities, nor any capability for correcting problems arising through
+        simultaneous writes [ to the database ].</PRE>
+<PRE>
+        Arbitrary Data Structures</PRE>
+<PRE>
+        The dbm systems only allows a single fixed data structure:
+        key-value pairs. That value could be a complex object, such as a
+        [ C ] struct, but the key had to be unique. This was a large
+        limitation on the usefulness of dbm systems.</PRE>
+<PRE>
+    However, dbm systems still provide a useful function for users with
+    simple datasets and limited resources, since they are fast, robust and
+    extremely well-tested. Perl modules to access dbm systems have now
+    been integrated into the core Perl distribution via the
+    AnyDBM_File module.''</PRE>
+<P>To sum up, DBM is a perfectly satisfactory solution for essentially read-only
+databases, or small and simple datasets. However, for more
+scaleable dataset handling, not to mention robust transactional locking,
+users are recommended to use a more powerful database engine <EM>via</EM> <EM>DBI</EM>.</P>
+<P>Chapter 2 of ``Programming the Perl DBI'' discusses DBM files in detail.</P>
+<P>
+<H2><A NAME="3.7 what database do you recommend me using">3.7 What database do you recommend me using?</A></H2>
+<P>This is a particularly thorny area in which an objective answer is difficult
+to come by, since each dataset, proposed usage and system configuration
+differs from person to person.</P>
+<P>From the current author's point of view, if the dataset is relatively
+small, being tables of less than 1 million rows, and less than 1000 tables
+in a given database, then <EM>mSQL</EM> is a perfectly acceptable solution
+to your problem. This database is extremely cheap, is wonderfully robust
+and has excellent support. More information is available on the Hughes
+Technology WWW site at:</P>
+<PRE>
+    <A HREF="http://www.hughes.com.au">http://www.hughes.com.au</A></PRE>
+<P>You may also wish to look at MySQL which is a more powerful database engine
+that has a similar feel to mSQL.</P>
+<PRE>
+    <A HREF="http://www.tcx.se">http://www.tcx.se</A></PRE>
+<P>If the dataset is larger than 1 million row tables or 1000 tables, or if you
+have either more money, or larger machines, I would recommend <EM>Oracle RDBMS</EM>.
+Oracle's WWW site is an excellent source of more information.</P>
+<PRE>
+    <A HREF="http://www.oracle.com">http://www.oracle.com</A></PRE>
+<P><EM>Informix</EM> is another high-end RDBMS that is worth considering. There are
+several differences between Oracle and Informix which are too complex for
+this document to detail. Information on Informix can be found on their
+WWW site at:</P>
+<PRE>
+    <A HREF="http://www.informix.com">http://www.informix.com</A></PRE>
+<P>In the case of WWW fronted applications, <EM>mSQL</EM> may be a better option
+due to slow connection times between a CGI script and the Oracle RDBMS and
+also the amount of resource each Oracle connection will consume. <EM>mSQL</EM>
+is lighter resource-wise and faster.</P>
+<P>These views are not necessarily representative of anyone else's opinions,
+and do not reflect any corporate sponsorship or views. They are provided
+<EM>as-is</EM>.</P>
+<P>
+<H2><A NAME="3.8 is <insert feature here> supported in dbi">3.8 Is &lt;<EM>insert feature here</EM>&gt; supported in DBI?</A></H2>
+<P>Given that we're making the assumption that the feature you have requested
+is a non-standard database-specific feature, then the answer will be <EM>no</EM>.</P>
+<P>DBI reflects a <EM>generic</EM> API that will work for most databases, and has
+no database-specific functionality.</P>
+<P>However, driver authors may, if they so desire, include hooks to database-specific
+functionality through the <CODE>func()</CODE> method defined in the DBI API.
+Script developers should note that use of functionality provided <EM>via</EM>
+the <CODE>func()</CODE> methods is very unlikely to be portable across databases.</P>
+<P>
+<HR>
+<H1><A NAME="programming questions">Programming Questions</A></H1>
+<P>
+<H2><A NAME="4.1 is dbi any use for cgi programming">4.1 Is DBI any use for CGI programming?</A></H2>
+<P>In a word, yes! DBI is hugely useful for CGI programming! In fact, I would
+tentatively say that CGI programming is one of two top uses for DBI.</P>
+<P>DBI confers the ability to CGI programmers to power WWW-fronted databases
+to their users, which provides users with vast quantities of ordered
+data to play with. DBI also provides the possibility that, if a site is
+receiving far too much traffic than their database server can cope with, they
+can upgrade the database server behind the scenes with no alterations to
+the CGI scripts.</P>
+<P>
+<H2><A NAME="4.2 how do i get faster connection times with dbd::oracle and cgi">4.2 How do I get faster connection times with DBD::Oracle and CGI?</A></H2>
+<PRE>
+    Contributed by John D. Groenveld</PRE>
+<P>The Apache <CODE>httpd</CODE> maintains a pool of <CODE>httpd</CODE> children to service client
+requests.</P>
+<P>Using the Apache <EM>mod_perl</EM> module by <EM>Doug MacEachern</EM>, the perl
+interpreter is embedded with the <CODE>httpd</CODE> children. The CGI, DBI, and your
+other favorite modules can be loaded at the startup of each child. These
+modules will not be reloaded unless changed on disk.</P>
+<P>For more information on Apache, see the Apache Project's WWW site:</P>
+<PRE>
+    <A HREF="http://www.apache.org">http://www.apache.org</A></PRE>
+<P>The <EM>mod_perl</EM> module can be downloaded from CPAN <EM>via</EM>:</P>
+<PRE>
+    <A HREF="http://www.perl.com/cgi-bin/cpan_mod?module=Apache">http://www.perl.com/cgi-bin/cpan_mod?module=Apache</A></PRE>
+<P>
+<H2><A NAME="4.3 how do i get persistent connections with dbi and cgi">4.3 How do I get persistent connections with DBI and CGI?</A></H2>
+<PRE>
+    Contributed by John D. Groenveld</PRE>
+<P>Using Edmund Mergl's <EM>Apache::DBI</EM> module, database logins are stored in a
+hash with each of these <CODE>httpd</CODE> child. If your application is based on a
+single database user, this connection can be started with each child.
+Currently, database connections cannot be shared between <CODE>httpd</CODE> children.</P>
+<P><EM>Apache::DBI</EM> can be downloaded from CPAN <EM>via</EM>:</P>
+<PRE>
+    <A HREF="http://www.perl.com/cgi-bin/cpan_mod?module=Apache::DBI">http://www.perl.com/cgi-bin/cpan_mod?module=Apache::DBI</A></PRE>
+<P>
+<H2><A NAME="4.4 ``when i run a perl script from the command line, it works, but, when i run it under the httpd, it fails!'' why">4.4 ``When I run a perl script from the command line, it works, but, when I run it under the <CODE>httpd</CODE>, it fails!'' Why?</A></H2>
+<P>Basically, a good chance this is occurring is due to the fact that the user
+that you ran it from the command line as has a correctly configured set of
+environment variables, in the case of <EM>DBD::Oracle</EM>, variables like
+<CODE>ORACLE_HOME</CODE>, <CODE>ORACLE_SID</CODE> or <CODE>TWO_TASK</CODE>.</P>
+<P>The <CODE>httpd</CODE> process usually runs under the user id of <CODE>nobody</CODE>,
+which implies there is no configured environment. Any scripts attempting to
+execute in this situation will correctly fail.</P>
+<P>One way to solve this problem is to set the environment for your database in a
+<CODE>BEGIN { }</CODE> block at the top of your script. Another technique is to configure
+your WWW server to pass-through certain environment variables to your CGI
+scripts.</P>
+<P>Similarly, you should check your <CODE>httpd</CODE> error logfile for any clues,
+as well as the ``Idiot's Guide To Solving Perl / CGI Problems'' and
+``Perl CGI Programming FAQ'' for further information. It is
+unlikely the problem is DBI-related.</P>
+<P>The ``Idiot's Guide To Solving Perl / CGI Problems'' can be located at:</P>
+<PRE>
+    <A HREF="http://www.perl.com/perl/faq/index.html">http://www.perl.com/perl/faq/index.html</A></PRE>
+<P>as can the ``Perl CGI Programming FAQ''. Read <EM>BOTH</EM> these documents
+carefully!</P>
+<P>
+<H2><A NAME="4.5 how do i get the number of rows returned from a select statement">4.5 How do I get the number of rows returned from a <CODE>SELECT</CODE> statement?</A></H2>
+<P>Count them. Read the DBI docs for the <CODE>rows()</CODE> method.</P>
+<P>
+<HR>
+<H1><A NAME="miscellaneous questions">Miscellaneous Questions</A></H1>
+<P>
+<H2><A NAME="5.1 can i do multithreading with dbi">5.1 Can I do multi-threading with DBI?</A></H2>
+<P>Perl version 5.005 and later can be built to support multi-threading.
+The DBI, as of version 1.02, does not yet support multi-threading
+so it would be unsafe to let more than one thread enter the DBI at
+the same time.</P>
+<P>It is expected that some future version of the DBI will at least be
+thread-safe (but not thread-hot) by automatically blocking threads
+intering the DBI while it's already in use.</P>
+<P>For some OCI example code for Oracle that has multi-threaded <CODE>SELECT</CODE>
+statements, see:</P>
+<PRE>
+    <A HREF="http://www.symbolstone.org/technology/oracle/oci/orathreads.tar.gz">http://www.symbolstone.org/technology/oracle/oci/orathreads.tar.gz</A></PRE>
+<P>
+<H2><A NAME="5.2 how do i handle blob data with dbi">5.2 How do I handle BLOB data with DBI?</A></H2>
+<P>Handling BLOB data with the DBI is very straight-forward. BLOB columns are
+specified in a SELECT statement as per normal columns. However, you also
+need to specify a maximum BLOB size that the &lt;I&gt;database handle&lt;/I&gt; can
+fetch using the <CODE>LongReadLen</CODE> attribute.</P>
+<P>For example:</P>
+<PRE>
+    ### $dbh is a connected database handle
+    $sth = $dbh-&gt;prepare( &quot;SELECT blob_column FROM blobby_table&quot; );
+    $sth-&gt;execute;</PRE>
+<P>would fail.</P>
+<PRE>
+    ### $dbh is a connected database handle
+    ### Set the maximum BLOB size...
+    $dbh-&gt;{LongReadLen} = 16384;        ### 16Kb...Not much of a BLOB!</PRE>
+<PRE>
+    $sth = $dbh-&gt;prepare( &quot;...&quot; );</PRE>
+<P>would succeed &lt;I&gt;provided no column values were larger than the specified
+value&lt;/I&gt;.</P>
+<P>If the BLOB data is longer than the value of <CODE>LongReadLen</CODE>, then an
+error will occur. However, the DBI provides an additional piece of
+functionality that will automatically truncate the fetched BLOB to the
+size of <CODE>LongReadLen</CODE> if it is longer. This does not cause an error to
+occur, but may make your fetched BLOB data useless.</P>
+<P>This behaviour is regulated by the <CODE>LongTruncOk</CODE> attribute which is
+defaultly set to a false value ( thus making overlong BLOB fetches fail ).</P>
+<PRE>
+    ### Set BLOB handling such that it's 16Kb and can be truncated
+    $dbh-&gt;{LongReadLen} = 16384;
+    $dbh-&gt;{LongTruncOk} = 1;</PRE>
+<P>Truncation of BLOB data may not be a big deal in cases where the BLOB
+contains run-length encoded data, but data containing checksums at the end,
+for example, a ZIP file, would be rendered useless.</P>
+<P>
+<H2><A NAME="5.3 how can i invoke stored procedures with dbi">5.3 How can I invoke stored procedures with DBI?</A></H2>
+<P>The DBI does not define a database-independent way of calling stored procedures.</P>
+<P>However, most database that support them also provide a way to call
+them from SQL statements - and the DBI certainly supports that.</P>
+<P>So, assuming that you have created a stored procedure within the target
+database, <EM>eg</EM>, an Oracle database, you can use <CODE>$dbh</CODE>-&gt;<CODE>do()</CODE> to
+immediately execute the procedure. For example,</P>
+<PRE>
+    $dbh-&gt;do( &quot;BEGIN someProcedure; END;&quot; );   # Oracle-specific</PRE>
+<P>You should also be able to <CODE>prepare</CODE> and <CODE>execute</CODE>, which is
+the recommended way if you'll be calling the procedure often.</P>
+<P>
+<H2><A NAME="5.4 how can i get return values from stored procedures with dbi">5.4 How can I get return values from stored procedures with DBI?</A></H2>
+<PRE>
+    Contributed by Jeff Urlwin</PRE>
+<PRE>
+    $sth = $dbh-&gt;prepare( &quot;BEGIN foo(:1, :2, :3); END;&quot; );
+    $sth-&gt;bind_param(1, $a);
+    $sth-&gt;bind_param_inout(2, \$path, 2000);
+    $sth-&gt;bind_param_inout(3, \$success, 2000);
+    $sth-&gt;execute;</PRE>
+<P>Remember to perform error checking, though! ( Or use the <CODE>RaiseError</CODE>
+attribute ).</P>
+<P>
+<H2><A NAME="5.5 how can i create or drop a database with dbi">5.5 How can I create or drop a database with DBI?</A></H2>
+<P>Database creation and deletion are concepts that are entirely too abstract
+to be adequately supported by DBI. For example, Oracle does not support the
+concept of dropping a database at all! Also, in Oracle, the database
+<EM>server</EM> essentially <EM>is</EM> the database, whereas in mSQL, the
+server process runs happily without any databases created in it. The
+problem is too disparate to attack in a worthwhile way.</P>
+<P>Some drivers, therefore, support database creation and deletion through
+the private <CODE>func()</CODE> methods. You should check the documentation for
+the drivers you are using to see if they support this mechanism.</P>
+<P>
+<H2><A NAME="5.6 how can i commit or rollback a statement with dbi">5.6 How can I <CODE>commit</CODE> or <CODE>rollback</CODE> a statement with DBI?</A></H2>
+<P>See the <CODE>commit()</CODE> and <CODE>rollback()</CODE> methods in the DBI Specification.</P>
+<P>Chapter 6 of ``Programming the Perl DBI'' discusses transaction handling within
+the context of DBI in more detail.</P>
+<P>
+<H2><A NAME="5.7 how are null values handled by dbi">5.7 How are <CODE>NULL</CODE> values handled by DBI?</A></H2>
+<P><CODE>NULL</CODE> values in DBI are specified to be treated as the value <CODE>undef</CODE>.
+<CODE>NULL</CODE>s can be inserted into databases as <CODE>NULL</CODE>, for example:</P>
+<PRE>
+    $rv = $dbh-&gt;do( &quot;INSERT INTO table VALUES( NULL )&quot; );</PRE>
+<P>but when queried back, the <CODE>NULL</CODE>s should be tested against <CODE>undef</CODE>.
+This is standard across all drivers.</P>
+<P>
+<H2><A NAME="5.8 what are these func() methods all about">5.8 What are these <CODE>func()</CODE> methods all about?</A></H2>
+<P>The <CODE>func()</CODE> method is defined within DBI as being an entry point
+for database-specific functionality, <EM>eg</EM>, the ability to create or
+drop databases. Invoking these driver-specific methods is simple, for example,
+to invoke a <CODE>createDatabase</CODE> method that has one argument, we would
+write:</P>
+<PRE>
+    $rv =$dbh-&gt;func( 'argument', 'createDatabase' );</PRE>
+<P>Software developers should note that the <CODE>func()</CODE> methods are
+non-portable between databases.</P>
+<P>
+<H2><A NAME="5.9 is dbi year 2000 compliant">5.9 Is DBI Year 2000 Compliant?</A></H2>
+<P>DBI has no knowledge of understanding of what dates are. Therefore, DBI
+itself does not have a Year 2000 problem. Individual drivers may use date
+handling code internally and therefore be potentially susceptible to the
+Year 2000 problem, but this is unlikely.</P>
+<P>You may also wish to read the ``Does Perl have a Year 2000 problem?'' section
+of the Perl FAQ at:</P>
+<PRE>
+    <A HREF="http://www.perl.com/CPAN/doc/FAQs/FAQ/PerlFAQ.html">http://www.perl.com/CPAN/doc/FAQs/FAQ/PerlFAQ.html</A></PRE>
+<P>
+<HR>
+<H1><A NAME="support and training">Support and Training</A></H1>
+<P>The Perl5 Database Interface is <EM>FREE</EM> software. IT COMES WITHOUT WARRANTY
+OF ANY KIND. See the DBI README for more details.</P>
+<P>However, some organizations are providing either technical support or
+training programs on DBI. The present author has no knowledge as
+to the quality of these services. The links are included for reference
+purposes only and should not be regarded as recommendations in any way.
+<EM>Caveat emptor</EM>.</P>
+<P>
+<H2><A NAME="commercial support">Commercial Support</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_The_Perl_Clinic">The Perl Clinic</A></STRONG><BR>
+<DD>
+The Perl Clinic provides commercial support for <EM>Perl</EM> and Perl
+related problems, including the <EM>DBI</EM> and its drivers.  Support is
+provided by the company with whom Tim Bunce, author of <EM>DBI</EM> and
+<EM>DBD::Oracle</EM>, works and ActiveState. For more information on their
+services, please see:
+<PRE>
+    <A HREF="http://www.perlclinic.com">http://www.perlclinic.com</A></PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="training">Training</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Westlake_Solutions">Westlake Solutions</A></STRONG><BR>
+<DD>
+A hands-on class for experienced Perl CGI developers that teaches
+how to write database-connected CGI scripts using Perl and DBI.pm.  This
+course, along with four other courses on CGI scripting with Perl, is
+taught in Washington, DC; Arlington, Virginia; and on-site worldwide upon
+request.
+<P>See:</P>
+<PRE>
+    <A HREF="http://www.westlake.com/training">http://www.westlake.com/training</A></PRE>
+<P>for more details.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="other references">Other References</A></H1>
+<P>In this section, we present some miscellaneous WWW links that may be of
+some interest to DBI users. These are not verified and may result in
+unknown sites or missing documents.</P>
+<PRE>
+    <A HREF="http://www-ccs.cs.umass.edu/db.html">http://www-ccs.cs.umass.edu/db.html</A>
+    <A HREF="http://www.odmg.org/odmg93/updates_dbarry.html">http://www.odmg.org/odmg93/updates_dbarry.html</A>
+    <A HREF="http://www.jcc.com/sql_stnd.html">http://www.jcc.com/sql_stnd.html</A></PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Alligator Descartes &lt;<EM><A HREF="http://www.symbolstone.org/descarte/contact.html">http://www.symbolstone.org/descarte/contact.html</A></EM>&gt;.
+Portions are Copyright their original stated authors.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>This document is Copyright (c)1994-2000 Alligator Descartes, with portions
+Copyright (c)1994-2000 their original authors. This module is released under
+the 'Artistic' license which you can find in the perl distribution.</P>
+<P>This document is Copyright (c)1997-2000 Alligator Descartes. All rights reserved.
+Permission to distribute this document, in full or in part, via email,
+Usenet, ftp archives or http is granted providing that no charges are involved,
+reasonable attempt is made to use the most current version and all credits
+and copyright notices are retained ( the <EM>AUTHOR</EM> and <EM>COPYRIGHT</EM> sections ).
+Requests for other distribution rights, including incorporation into
+commercial products, such as books, magazine articles or CD-ROMs should be
+made to Alligator Descartes &lt;<EM><A HREF="http://www.symbolstone.org/descarte/contact.html">http://www.symbolstone.org/descarte/contact.html</A></EM>&gt;.</P>
+<!--#include virtual="/technology/perl/DBI/templatebottom.html" -->
+</BODY>
+</HTML><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::FAQ -- The Frequently Asked Questions for the Perl5 Database Interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

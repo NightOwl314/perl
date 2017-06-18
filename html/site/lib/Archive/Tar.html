@@ -1,0 +1,186 @@
+
+<HTML>
+<HEAD>
+<TITLE>Tar - module for manipulation of tar archives.</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tar - module for manipulation of tar archives.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#changes">CHANGES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tar - module for manipulation of tar archives.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Archive::Tar;</PRE>
+<PRE>
+  $tar = Archive::Tar-&gt;new();
+  $tar-&gt;read(&quot;origin.tar.gz&quot;,1);
+  $tar-&gt;add_files(&quot;file/foo.c&quot;, &quot;file/bar.c&quot;);
+  $tar-&gt;add_data(&quot;file/baz.c&quot;,&quot;This is the file contents&quot;);
+  $tar-&gt;write(&quot;files.tar&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a module for the handling of tar archives.</P>
+<P>At the moment these methods are implemented:</P>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Returns a new Tar object. If given a filename as an argument, it will
+try to load that as a tar file. If given a true value as a second
+argument, will assume that the tar file is compressed, and will
+attempt to read it using <A HREF="../../../site/lib/Compress/Zlib.html">the Compress::Zlib manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_add_files"><CODE>add_files(@filenamelist)</CODE></A></STRONG><BR>
+<DD>
+Takes a list of filenames and adds them to the in-memory archive. 
+I suspect that this function will produce bogus tar archives when 
+used under MacOS, but I'm not sure and I have no Mac to test it on.
+<P></P>
+<DT><STRONG><A NAME="item_add_data"><CODE>add_data($filename,$data,$opthashref)</CODE></A></STRONG><BR>
+<DD>
+Takes a filename, a scalar full of data and optionally a reference to
+a hash with specific options. Will add a file to the in-memory
+archive, with name <CODE>$filename</CODE> and content <CODE>$data</CODE>. Specific options
+can be set using <CODE>$opthashref</CODE>, which will be documented later.
+<P></P>
+<DT><STRONG><A NAME="item_remove"><CODE>remove(@filenamelist)</CODE></A></STRONG><BR>
+<DD>
+Removes any entries with names matching any of the given filenames
+from the in-memory archive. String comparisons are done with <CODE>eq</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_read"><CODE>read('file.tar',$compressed)</CODE></A></STRONG><BR>
+<DD>
+Try to read the given tarfile into memory. If the second argument is a
+true value, the tarfile is assumed to be compressed. Will <EM>replace</EM>
+any previous content in <CODE>$tar</CODE>!
+<P></P>
+<DT><STRONG><A NAME="item_write"><CODE>write('file.tar',$compressed)</CODE></A></STRONG><BR>
+<DD>
+Will write the in-memory archive to disk. If no filename is given,
+returns the entire formatted archive as a string, which should be
+useful if you'd like to stuff the archive into a socket or a pipe to
+gzip or something. If the second argument is true, the module will try
+to write the file compressed.
+<P></P>
+<DT><STRONG><A NAME="item_data"><CODE>data()</CODE></A></STRONG><BR>
+<DD>
+Returns the in-memory archive. This is a list of references to hashes,
+the internals of which is not currently documented.
+<P></P>
+<DT><STRONG><A NAME="item_extract"><CODE>extract(@filenames)</CODE></A></STRONG><BR>
+<DD>
+Write files whose names are equivalent to any of the names in
+<CODE>@filenames</CODE> to disk, creating subdirectories as neccesary. This
+might not work too well under VMS and MacOS.
+<P></P>
+<DT><STRONG><A NAME="item_list_files"><CODE>list_files()</CODE></A></STRONG><BR>
+<DD>
+Returns a list with the names of all files in the in-memory archive.
+<P></P>
+<DT><STRONG><A NAME="item_get_content"><CODE>get_content($file)</CODE></A></STRONG><BR>
+<DD>
+Return the content of the named file.
+<P></P>
+<DT><STRONG><A NAME="item_replace_content"><CODE>replace_content($file,$content)</CODE></A></STRONG><BR>
+<DD>
+Make the string $content be the content for the file named $file.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="changes">CHANGES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Version_0%2E071">Version 0.071</A></STRONG><BR>
+<DD>
+Minor release.
+<P>Arrange to <A HREF="../../../lib/Pod/perlfunc.html#item_chmod"><CODE>chmod()</CODE></A> at the very end in case it makes the file readonly.
+Win32 is actually picky about that.</P>
+<P>SunOS 4.x tar makes tarfiles that contain directory entries
+that don't have typeflag set properly.  We use the trailing
+slash to recognize directories in such tarfiles.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E07">Version 0.07</A></STRONG><BR>
+<DD>
+Fixed (hopefully) broken portability to MacOS, reported by Paul J.
+Schinder at Goddard Space Flight Center.
+<P>Fixed two bugs with symlink handling, reported in excellent detail by
+an admin at teleport.com called Chris.</P>
+<P>Primive tar program (called ptar) included with distribution. Useage
+should be pretty obvious if you've used a normal tar program.</P>
+<P>Added methods get_content and replace_content.</P>
+<P>Added support for paths longer than 100 characters, according to
+POSIX. This is compatible with just about everything except GNU tar.
+Way to go, GNU tar (use a better tar, or GNU cpio).</P>
+<P>NOTE: When adding files to an archive, files with basenames longer
+      than 100 characters will be silently ignored. If the prefix part
+      of a path is longer than 155 characters, only the last 155
+      characters will be stored.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E06">Version 0.06</A></STRONG><BR>
+<DD>
+Added <A HREF="#item_list_files"><CODE>list_files()</CODE></A> method, as requested by Michael Wiedman.
+<P>Fixed a couple of dysfunctions when run under Windows NT. Michael
+Wiedmann reported the bugs.</P>
+<P>Changed the documentation to reflect reality a bit better.</P>
+<P>Fixed bug in format_tar_entry. Bug reported by Michael Schilli.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E05">Version 0.05</A></STRONG><BR>
+<DD>
+Quoted lots of barewords to make <CODE>use strict;</CODE> stop complaining under
+perl version 5.003.
+<P>Ties to <A HREF="../../../site/lib/Compress/Zlib.html">the Compress::Zlib manpage</A> put in. Will warn if it isn't available.</P>
+<P>$tar-&gt;<A HREF="#item_write"><CODE>write()</CODE></A> with no argument now returns the formatted archive.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E04">Version 0.04</A></STRONG><BR>
+<DD>
+Made changes to write_tar so that Solaris tar likes the resulting
+archives better.
+<P>Protected the calls to <A HREF="../../../lib/Pod/perlfunc.html#item_readlink"><CODE>readlink()</CODE></A> and symlink(). AFAIK this module
+should now run just fine on Windows NT.</P>
+<P>Add method to write a single entry to disk (extract)</P>
+<P>Added method to add entries entirely from scratch (add_data)</P>
+<P>Changed name of <CODE>add()</CODE> to <CODE>add_file()</CODE></P>
+<P>All calls to <CODE>croak()</CODE> removed and replaced with returning undef and
+setting Tar::error.</P>
+<P>Better handling of tarfiles with garbage at the end.</P>
+</DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tar - module for manipulation of tar archives.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

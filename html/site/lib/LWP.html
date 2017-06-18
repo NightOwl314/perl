@@ -1,0 +1,529 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP - Library for WWW access in Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP - Library for WWW access in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#http style communication">HTTP STYLE COMMUNICATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the request object">The Request Object</A></LI>
+		<LI><A HREF="#the response object">The Response Object</A></LI>
+		<LI><A HREF="#the user agent">The User Agent</A></LI>
+		<LI><A HREF="#an example">An Example</A></LI>
+	</UL>
+
+	<LI><A HREF="#network support">NETWORK SUPPORT</A></LI>
+	<UL>
+
+		<LI><A HREF="#http requests">HTTP Requests</A></LI>
+		<LI><A HREF="#https requests">HTTPS Requests</A></LI>
+		<LI><A HREF="#ftp requests">FTP Requests</A></LI>
+		<LI><A HREF="#news requests">News Requests</A></LI>
+		<LI><A HREF="#gopher request">Gopher Request</A></LI>
+		<LI><A HREF="#file request">File Request</A></LI>
+		<LI><A HREF="#mailto request">Mailto Request</A></LI>
+	</UL>
+
+	<LI><A HREF="#overview of classes and packages">OVERVIEW OF CLASSES AND PACKAGES</A></LI>
+	<LI><A HREF="#more documentation">MORE DOCUMENTATION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#acknowledgements">ACKNOWLEDGEMENTS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#availability">AVAILABILITY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP - Library for WWW access in Perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use LWP;
+  print &quot;This is libwww-perl-$LWP::VERSION\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Libwww-perl is a collection of Perl modules which provides a simple
+and consistent application programming interface (API) to the World-Wide Web.  The
+main focus of the library is to provide classes and functions that
+allow you to write WWW clients, thus libwww-perl is a WWW
+client library. The library also contain modules that are of more
+general use.</P>
+<P>Most modules in this library are object oriented.  The user
+agent, requests sent and responses received from the WWW server are
+all represented by objects.  This makes a simple and powerful
+interface to these services.  The interface should be easy to extend
+and customize for your needs.</P>
+<P>The main features of the library are:</P>
+<UL>
+<LI>
+Contains various reusable components (modules) that can be
+used separately or together.
+<P></P>
+<LI>
+Provides an object oriented model of HTTP-style communication.  Within
+this framework we currently support access to http, https, gopher, ftp, news,
+file, and mailto resources.
+<P></P>
+<LI>
+Provides a full object oriented interface or
+a very simple procedural interface.
+<P></P>
+<LI>
+Supports the basic and digest authorization schemes.
+<P></P>
+<LI>
+Supports transparent redirect handling.
+<P></P>
+<LI>
+Supports access through proxy servers.
+<P></P>
+<LI>
+Provides parser for <EM>robots.txt</EM> files and a framework for constructing robots.
+<P></P>
+<LI>
+Cooperates with Tk.  A simple Tk-based GUI browser
+called 'tkweb' is distributed with the Tk extension for perl.
+<P></P>
+<LI>
+Implements HTTP content negotiation algorithm that can
+be used both in protocol modules and in server scripts (like CGI
+scripts).
+<P></P>
+<LI>
+Supports HTTP cookies.
+<P></P>
+<LI>
+A simple command line client application called <CODE>lwp-request</CODE>.
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="http style communication">HTTP STYLE COMMUNICATION</A></H1>
+<P>The libwww-perl library is based on HTTP style communication. This
+section tries to describe what that means.</P>
+<P>Let us start with this quote from the HTTP specification document
+&lt;URL:http://www.w3.org/pub/WWW/Protocols/&gt;:</P>
+<DL>
+<DT><DD>
+The HTTP protocol is based on a request/response paradigm. A client
+establishes a connection with a server and sends a request to the
+server in the form of a request method, URI, and protocol version,
+followed by a MIME-like message containing request modifiers, client
+information, and possible body content. The server responds with a
+status line, including the message's protocol version and a success or
+error code, followed by a MIME-like message containing server
+information, entity meta-information, and possible body content.
+<P></P></DL>
+<P>What this means to libwww-perl is that communication always take place
+through these steps: First a <EM>request</EM> object is created and
+configured. This object is then passed to a server and we get a
+<EM>response</EM> object in return that we can examine. A request is always
+independent of any previous requests, i.e. the service is stateless.
+The same simple model is used for any kind of service we want to
+access.</P>
+<P>For example, if we want to fetch a document from a remote file server,
+then we send it a request that contains a name for that document and
+the response will contain the document itself.  If we access a search
+engine, then the content of the request will contain the query
+parameters and the response will contain the query result.  If we want
+to send a mail message to somebody then we send a request object which
+contains our message to the mail server and the response object will
+contain an acknowledgment that tells us that the message has been
+accepted and will be forwarded to the recipient(s).</P>
+<P>It is as simple as that!</P>
+<P>
+<H2><A NAME="the request object">The Request Object</A></H2>
+<P>The libwww-perl request object has the class name <CODE>HTTP::Request</CODE>.
+The fact that the class name uses <CODE>HTTP::</CODE> as a
+prefix only implies that we use the HTTP model of communication.  It
+does not limit the kind of services we can try to pass this <EM>request</EM>
+to.  For instance, we will send <CODE>HTTP::Request</CODE>s both to ftp and
+gopher servers, as well as to the local file system.</P>
+<P>The main attributes of the request objects are:</P>
+<UL>
+<LI>
+The <STRONG>method</STRONG> is a short string that tells what kind of
+request this is.  The most used methods are <STRONG>GET</STRONG>, <STRONG>PUT</STRONG>,
+<STRONG>POST</STRONG> and <STRONG>HEAD</STRONG>.
+<P></P>
+<LI>
+The <STRONG>url</STRONG> is a string denoting the protocol, server and
+the name of the ``document'' we want to access.  The <STRONG>url</STRONG> might
+also encode various other parameters.
+<P></P>
+<LI>
+The <STRONG>headers</STRONG> contain additional information about the
+request and can also used to describe the content.  The headers
+are a set of keyword/value pairs.
+<P></P>
+<LI>
+The <STRONG>content</STRONG> is an arbitrary amount of data.
+<P></P></UL>
+<P>
+<H2><A NAME="the response object">The Response Object</A></H2>
+<P>The libwww-perl response object has the class name <CODE>HTTP::Response</CODE>.
+The main attributes of objects of this class are:</P>
+<UL>
+<LI>
+The <STRONG>code</STRONG> is a numerical value that indicates the overall
+outcome of the request.
+<P></P>
+<LI>
+The <STRONG>message</STRONG> is a short, human readable string that
+corresponds to the <EM>code</EM>.
+<P></P>
+<LI>
+The <STRONG>headers</STRONG> contain additional information about the
+response and describe the content.
+<P></P>
+<LI>
+The <STRONG>content</STRONG> is an arbitrary amount of data.
+<P></P></UL>
+<P>Since we don't want to handle all possible <EM>code</EM> values directly in
+our programs, a libwww-perl response object has methods that can be
+used to query what kind of response this is.  The most commonly used
+response classification methods are:</P>
+<DL>
+<DT><STRONG><A NAME="item_is_success"><CODE>is_success()</CODE></A></STRONG><BR>
+<DD>
+The request was was successfully received, understood or accepted.
+<P></P>
+<DT><STRONG><A NAME="item_is_error"><CODE>is_error()</CODE></A></STRONG><BR>
+<DD>
+The request failed.  The server or the resource might not be
+available, access to the resource might be denied or other things might
+have failed for some reason.
+<P></P></DL>
+<P>
+<H2><A NAME="the user agent">The User Agent</A></H2>
+<P>Let us assume that we have created a <EM>request</EM> object. What do we
+actually do with it in order to receive a <EM>response</EM>?</P>
+<P>The answer is that you pass it to a <EM>user agent</EM> object and this
+object takes care of all the things that need to be done
+(like low-level communication and error handling) and returns
+a <EM>response</EM> object. The user agent represents your
+application on the network and provides you with an interface that
+can accept <EM>requests</EM> and return <EM>responses</EM>.</P>
+<P>The user agent is an interface layer between
+your application code and the network.  Through this interface you are
+able to access the various servers on the network.</P>
+<P>The libwww-perl class name for the user agent is
+<CODE>LWP::UserAgent</CODE>.  Every libwww-perl application that wants to
+communicate should create at least one object of this class. The main
+method provided by this object is request(). This method takes an
+<CODE>HTTP::Request</CODE> object as argument and (eventually) returns a
+<CODE>HTTP::Response</CODE> object.</P>
+<P>The user agent has many other attributes that let you
+configure how it will interact with the network and with your
+application.</P>
+<UL>
+<LI>
+The <STRONG>timeout</STRONG> specifies how much time we give remote servers to
+respond before the library disconnects and creates an
+internal <EM>timeout</EM> response.
+<P></P>
+<LI>
+The <STRONG>agent</STRONG> specifies the name that your application should use when it
+presents itself on the network.
+<P></P>
+<LI>
+The <STRONG>from</STRONG> attribute can be set to the e-mail address of the person
+responsible for running the application.  If this is set, then the
+address will be sent to the servers with every request.
+<P></P>
+<LI>
+The <STRONG>parse_head</STRONG> specifies whether we should initialize response
+headers from the &lt;head&gt; section of HTML documents.
+<P></P>
+<LI>
+The <STRONG>proxy</STRONG> and <STRONG>no_proxy</STRONG> attributes specify if and when to go through
+a proxy server. &lt;URL:http://www.w3.org/pub/WWW/Proxies/&gt;
+<P></P>
+<LI>
+The <STRONG>credentials</STRONG> provide a way to set up user names and
+passwords needed to access certain services.
+<P></P></UL>
+<P>Many applications want even more control over how they interact
+with the network and they get this by sub-classing
+<CODE>LWP::UserAgent</CODE>.  The library includes a
+sub-class, <CODE>LWP::RobotUA</CODE>, for robot applications.</P>
+<P>
+<H2><A NAME="an example">An Example</A></H2>
+<P>This example shows how the user agent, a request and a response are
+represented in actual perl code:</P>
+<PRE>
+  # Create a user agent object
+  use LWP::UserAgent;
+  $ua = new LWP::UserAgent;
+  $ua-&gt;agent(&quot;AgentName/0.1 &quot; . $ua-&gt;agent);</PRE>
+<PRE>
+  # Create a request
+  my $req = new HTTP::Request POST =&gt; '<A HREF="http://www.perl.com/cgi-bin/BugGlimpse">http://www.perl.com/cgi-bin/BugGlimpse</A>';
+  $req-&gt;content_type('application/x-www-form-urlencoded');
+  $req-&gt;content('match=www&amp;errors=0');</PRE>
+<PRE>
+  # Pass request to the user agent and get a response back
+  my $res = $ua-&gt;request($req);</PRE>
+<PRE>
+  # Check the outcome of the response
+  if ($res-&gt;is_success) {
+      print $res-&gt;content;
+  } else {
+      print &quot;Bad luck this time\n&quot;;
+  }</PRE>
+<P>The $ua is created once when the application starts up.  New request
+objects should normally created for each request sent.</P>
+<P>
+<HR>
+<H1><A NAME="network support">NETWORK SUPPORT</A></H1>
+<P>This section discusses the various protocol schemes and
+the HTTP style methods that headers may be used for each.</P>
+<P>For all requests, a ``User-Agent'' header is added and initialized from
+the $ua-&gt;agent attribute before the request is handed to the network
+layer.  In the same way, a ``From'' header is initialized from the
+$ua-&gt;from attribute.</P>
+<P>For all responses, the library adds a header called ``Client-Date''.
+This header holds the time when the response was received by
+your application.  The format and semantics of the header are the
+same as the server created ``Date'' header.  You may also encounter other
+``Client-XXX'' headers.  They are all generated by the library
+internally and are not received from the servers.</P>
+<P>
+<H2><A NAME="http requests">HTTP Requests</A></H2>
+<P>HTTP requests are just handed off to an HTTP server and it
+decides what happens.  Few servers implement methods beside the usual
+``GET'', ``HEAD'', ``POST'' and ``PUT'', but CGI-scripts may implement
+any method they like.</P>
+<P>If the server is not available then the library will generate an
+internal error response.</P>
+<P>The library automatically adds a ``Host'' and a ``Content-Length'' header
+to the HTTP request before it is sent over the network.</P>
+<P>For GET request you might want to add the ``If-Modified-Since'' header
+to make the request conditional.</P>
+<P>For POST request you should add the ``Content-Type'' header.  When you
+try to emulate HTML &lt;FORM&gt; handling you should usually let the value
+of the ``Content-Type'' header be ``application/x-www-form-urlencoded''.
+See <A HREF="../../site/lib/lwpcook.html">the lwpcook manpage</A> for examples of this.</P>
+<P>The libwww-perl HTTP implementation currently support the HTTP/1.0
+protocol.  HTTP/0.9 servers are also handled correctly.</P>
+<P>The library allows you to access proxy server through HTTP.  This
+means that you can set up the library to forward all types of request
+through the HTTP protocol module.  See <A HREF="../../site/lib/LWP/UserAgent.html">the LWP::UserAgent manpage</A> for
+documentation of this.</P>
+<P>
+<H2><A NAME="https requests">HTTPS Requests</A></H2>
+<P>HTTPS requests are HTTP requests over an encrypted network connection
+using the SSL protocol developed by Netscape.  Everything about HTTP
+requests above also apply to HTTPS requests.  In addition the library
+will add the headers ``Client-SSL-Cipher'', ``Client-SSL-Cert-Subject'' and
+``Client-SSL-Cert-Issuer'' to the response.  These headers denote the
+encryption method used and the name of the server owner.</P>
+<P>The request can contain the header ``If-SSL-Cert-Subject'' in order to
+make the request conditional on the content of the server certificate.
+If the certificate subject does not match, no request is sent to the
+server and an internally generated error response is returned.  The
+value of the ``If-SSL-Cert-Subject'' header is interpreted as a Perl
+regular expression.</P>
+<P>
+<H2><A NAME="ftp requests">FTP Requests</A></H2>
+<P>The library currently supports GET, HEAD and PUT requests.  GET
+retrieves a file or a directory listing from an FTP server.  PUT
+stores a file on a ftp server.</P>
+<P>You can specify a ftp account for servers that want this in addition
+to user name and password.  This is specified by including an ``Account''
+header in the request.</P>
+<P>User name/password can be specified using basic authorization or be
+encoded in the URL.  Failed logins return an UNAUTHORIZED response with
+``WWW-Authenticate: Basic'' and can be treated like basic authorization
+for HTTP.</P>
+<P>The library supports ftp ASCII transfer mode by specifying the ``type=a''
+parameter in the URL.</P>
+<P>Directory listings are by default returned unprocessed (as returned
+from the ftp server) with the content media type reported to be
+``text/ftp-dir-listing''. The <CODE>File::Listing</CODE> module provides methods
+for parsing of these directory listing.</P>
+<P>The ftp module is also able to convert directory listings to HTML and
+this can be requested via the standard HTTP content negotiation
+mechanisms (add an ``Accept: text/html'' header in the request if you
+want this).</P>
+<P>For normal file retrievals, the ``Content-Type'' is guessed based on the
+file name suffix. See <A HREF="../../site/lib/LWP/MediaTypes.html">the LWP::MediaTypes manpage</A>.</P>
+<P>The ``If-Modified-Since'' request header works for servers that implement
+the MDTM command.  It will probably not work for directory listings though.</P>
+<P>Example:</P>
+<PRE>
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="ftp://me:passwd@ftp.some.where.com/">ftp://me:passwd@ftp.some.where.com/</A>');
+  $req-&gt;header(Accept =&gt; &quot;text/html, */*;q=0.1&quot;);</PRE>
+<P>
+<H2><A NAME="news requests">News Requests</A></H2>
+<P>Access to the USENET News system is implemented through the NNTP
+protocol.  The name of the news server is obtained from the
+NNTP_SERVER environment variable and defaults to ``news''.  It is not
+possible to specify the hostname of the NNTP server in news: URLs.</P>
+<P>The library supports GET and HEAD to retrieve news articles through the
+NNTP protocol.  You can also post articles to newsgroups by using
+(surprise!) the POST method.</P>
+<P>GET on newsgroups is not implemented yet.</P>
+<P>Examples:</P>
+<PRE>
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="news:abc1234@a.sn.no">news:abc1234@a.sn.no</A>');</PRE>
+<PRE>
+  $req = HTTP::Request-&gt;new(POST =&gt; '<A HREF="news:comp.lang.perl.test">news:comp.lang.perl.test</A>');
+  $req-&gt;header(Subject =&gt; 'This is a test',
+               From    =&gt; 'me@some.where.org');
+  $req-&gt;content(&lt;&lt;EOT);
+  This is the content of the message that we are sending to
+  the world.
+  EOT</PRE>
+<P>
+<H2><A NAME="gopher request">Gopher Request</A></H2>
+<P>The library supports the GET and HEAD methods for gopher requests.  All
+request header values are ignored.  HEAD cheats and returns a
+response without even talking to server.</P>
+<P>Gopher menus are always converted to HTML.</P>
+<P>The response ``Content-Type'' is generated from the document type
+encoded (as the first letter) in the request URL path itself.</P>
+<P>Example:</P>
+<PRE>
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="gopher://gopher.sn.no/">gopher://gopher.sn.no/</A>');</PRE>
+<P>
+<H2><A NAME="file request">File Request</A></H2>
+<P>The library supports GET and HEAD methods for file requests.  The
+``If-Modified-Since'' header is supported.  All other headers are
+ignored.  The <EM>host</EM> component of the file URL must be empty or set
+to ``localhost''.  Any other <EM>host</EM> value will be treated as an error.</P>
+<P>Directories are always converted to an HTML document.  For normal
+files, the ``Content-Type'' and ``Content-Encoding'' in the response are
+guessed based on the file suffix.</P>
+<P>Example:</P>
+<PRE>
+  $req = HTTP::Request-&gt;new(GET =&gt; '<A HREF="file:/etc/passwd">file:/etc/passwd</A>');</PRE>
+<P>
+<H2><A NAME="mailto request">Mailto Request</A></H2>
+<P>You can send (aka ``POST'') mail messages using the library.  All
+headers specified for the request are passed on to the mail system.
+The ``To'' header is initialized from the mail address in the URL.</P>
+<P>Example:</P>
+<PRE>
+  $req = HTTP::Request-&gt;new(POST =&gt; '<A HREF="mailto:libwww@perl.ord">mailto:libwww@perl.ord</A>');
+  $req-&gt;header(Subject =&gt; &quot;subscribe&quot;);
+  $req-&gt;content(&quot;Please subscribe me to the libwww-perl mailing list!\n&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="overview of classes and packages">OVERVIEW OF CLASSES AND PACKAGES</A></H1>
+<P>This table should give you a quick overview of the classes provided by the
+library. Indentation shows class inheritance.</P>
+<PRE>
+ LWP::MemberMixin   -- Access to member variables of Perl5 classes
+   LWP::UserAgent   -- WWW user agent class
+     LWP::RobotUA   -- When developing a robot applications
+   LWP::Protocol          -- Interface to various protocol schemes
+     LWP::Protocol::http  -- <A HREF="http://">http://</A> access
+     LWP::Protocol::file  -- <A HREF="file://">file://</A> access
+     LWP::Protocol::ftp   -- <A HREF="ftp://">ftp://</A> access
+     ...</PRE>
+<PRE>
+ LWP::Authen::Basic -- Handle 401 and 407 responses
+ LWP::Authen::Digest</PRE>
+<PRE>
+ HTTP::Headers      -- MIME/RFC822 style header (used by HTTP::Message)
+ HTTP::Message      -- HTTP style message
+   HTTP::Request    -- HTTP request
+   HTTP::Response   -- HTTP response
+ HTTP::Daemon       -- A HTTP server class</PRE>
+<PRE>
+ WWW::RobotRules    -- Parse robots.txt files
+   WWW::RobotRules::AnyDBM_File -- Persistent RobotRules</PRE>
+<P>The following modules provide various functions and definitions.</P>
+<PRE>
+ LWP                -- This file.  Library version number and documentation.
+ LWP::MediaTypes    -- MIME types configuration (text/html etc.)
+ LWP::Debug         -- Debug logging module
+ LWP::Simple        -- Simplified procedural interface for common functions
+ HTTP::Status       -- HTTP status code (200 OK etc)
+ HTTP::Date         -- Date parsing module for HTTP date formats
+ HTTP::Negotiate    -- HTTP content negotiation calculation
+ File::Listing      -- Parse directory listings</PRE>
+<P>
+<HR>
+<H1><A NAME="more documentation">MORE DOCUMENTATION</A></H1>
+<P>All modules contain detailed information on the interfaces they
+provide.  The <EM>lwpcook</EM> manpage is the libwww-perl cookbook that contain
+examples of typical usage of the library.  You might want to take a
+look at how the scripts <CODE>lwp-request</CODE>, <CODE>lwp-rget</CODE> and <CODE>lwp-mirror</CODE>
+are implemented.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The library can not handle multiple simultaneous requests yet.  Also,
+check out what's left in the TODO file.</P>
+<P>
+<HR>
+<H1><A NAME="acknowledgements">ACKNOWLEDGEMENTS</A></H1>
+<P>This package owes a lot in motivation, design, and code, to the
+libwww-perl library for Perl 4, maintained by Roy Fielding
+&lt;<A HREF="mailto:fielding@ics.uci.edu>">fielding@ics.uci.edu></A>.</P>
+<P>That package used work from Alberto Accomazzi, James Casey, Brooks
+Cutter, Martijn Koster, Oscar Nierstrasz, Mel Melchner, Gertjan van
+Oosten, Jared Rhine, Jack Shirazi, Gene Spafford, Marc VanHeyningen,
+Steven E. Brenner, Marion Hakanson, Waldemar Kebsch, Tony Sanders, and
+Larry Wall; see the libwww-perl-0.40 library for details.</P>
+<P>The primary architect for this Perl 5 library is Martijn Koster and
+Gisle Aas, with lots of help from Graham Barr, Tim Bunce, Andreas
+Koenig, Jared Rhine, and Jack Shirazi.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<PRE>
+  Copyright 1995-2001, Gisle Aas
+  Copyright 1995, Martijn Koster</PRE>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="availability">AVAILABILITY</A></H1>
+<P>The latest version of this library is likely to be available from CPAN
+as well as:</P>
+<PRE>
+ <A HREF="http://www.linpro.no/lwp/">http://www.linpro.no/lwp/</A></PRE>
+<P>The best place to discuss this code is on the &lt;<A HREF="mailto:libwww@perl.org">libwww@perl.org</A>&gt;
+mailing list.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP - Library for WWW access in Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

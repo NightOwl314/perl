@@ -1,0 +1,552 @@
+<HTML>
+<HEAD>
+<TITLE>perlfilter - Source Filters</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfilter - Source Filters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#concepts">CONCEPTS</A></LI>
+	<LI><A HREF="#using filters">USING FILTERS</A></LI>
+	<LI><A HREF="#writing a source filter">WRITING A SOURCE FILTER</A></LI>
+	<LI><A HREF="#writing a source filter in c">WRITING A SOURCE FILTER IN C</A></LI>
+	<LI><A HREF="#creating a source filter as a separate executable">CREATING A SOURCE FILTER AS A SEPARATE EXECUTABLE</A></LI>
+	<LI><A HREF="#writing a source filter in perl">WRITING A SOURCE FILTER IN PERL</A></LI>
+	<LI><A HREF="#using context: the debug filter">USING CONTEXT: THE DEBUG FILTER</A></LI>
+	<LI><A HREF="#conclusion">CONCLUSION</A></LI>
+	<LI><A HREF="#requirements">REQUIREMENTS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyrights">Copyrights</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlfilter - Source Filters</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This article is about a little-known feature of Perl called
+<EM>source filters</EM>. Source filters alter the program text of a module
+before Perl sees it, much as a C preprocessor alters the source text of
+a C program before the compiler sees it. This article tells you more
+about what source filters are, how they work, and how to write your
+own.</P>
+<P>The original purpose of source filters was to let you encrypt your
+program source to prevent casual piracy. This isn't all they can do, as
+you'll soon learn. But first, the basics.</P>
+<P>
+<HR>
+<H1><A NAME="concepts">CONCEPTS</A></H1>
+<P>Before the Perl interpreter can execute a Perl script, it must first
+read it from a file into memory for parsing and compilation. If that
+script itself includes other scripts with a <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>
+statement, then each of those scripts will have to be read from their
+respective files as well.</P>
+<P>Now think of each logical connection between the Perl parser and an
+individual file as a <EM>source stream</EM>. A source stream is created when
+the Perl parser opens a file, it continues to exist as the source code
+is read into memory, and it is destroyed when Perl is finished parsing
+the file. If the parser encounters a <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> statement in
+a source stream, a new and distinct stream is created just for that
+file.</P>
+<P>The diagram below represents a single source stream, with the flow of
+source from a Perl script file on the left into the Perl parser on the
+right. This is how Perl normally operates.</P>
+<PRE>
+    file -------&gt; parser</PRE>
+<P>There are two important points to remember:</P>
+<OL>
+<LI>
+Although there can be any number of source streams in existence at any
+given time, only one will be active.
+<P></P>
+<LI>
+Every source stream is associated with only one file.
+<P></P></OL>
+<P>A source filter is a special kind of Perl module that intercepts and
+modifies a source stream before it reaches the parser. A source filter
+changes our diagram like this:</P>
+<PRE>
+    file ----&gt; filter ----&gt; parser</PRE>
+<P>If that doesn't make much sense, consider the analogy of a command
+pipeline. Say you have a shell script stored in the compressed file
+<EM>trial.gz</EM>. The simple pipeline command below runs the script without
+needing to create a temporary file to hold the uncompressed file.</P>
+<PRE>
+    gunzip -c trial.gz | sh</PRE>
+<P>In this case, the data flow from the pipeline can be represented as follows:</P>
+<PRE>
+    trial.gz ----&gt; gunzip ----&gt; sh</PRE>
+<P>With source filters, you can store the text of your script compressed and use a source filter to uncompress it for Perl's parser:</P>
+<PRE>
+     compressed           gunzip
+    Perl program ---&gt; source filter ---&gt; parser</PRE>
+<P>
+<HR>
+<H1><A NAME="using filters">USING FILTERS</A></H1>
+<P>So how do you use a source filter in a Perl script? Above, I said that
+a source filter is just a special kind of module. Like all Perl
+modules, a source filter is invoked with a use statement.</P>
+<P>Say you want to pass your Perl source through the C preprocessor before
+execution. You could use the existing <A HREF="../../lib/Pod/perlrun.html#item_%2DP"><CODE>-P</CODE></A> command line option to do
+this, but as it happens, the source filters distribution comes with a C
+preprocessor filter module called Filter::cpp. Let's use that instead.</P>
+<P>Below is an example program, <CODE>cpp_test</CODE>, which makes use of this filter.
+Line numbers have been added to allow specific lines to be referenced
+easily.</P>
+<PRE>
+    1: use Filter::cpp ;
+    2: #define TRUE 1
+    3: $a = TRUE ;
+    4: print &quot;a = $a\n&quot; ;</PRE>
+<P>When you execute this script, Perl creates a source stream for the
+file. Before the parser processes any of the lines from the file, the
+source stream looks like this:</P>
+<PRE>
+    cpp_test ---------&gt; parser</PRE>
+<P>Line 1, <CODE>use Filter::cpp</CODE>, includes and installs the <CODE>cpp</CODE> filter
+module. All source filters work this way. The use statement is compiled
+and executed at compile time, before any more of the file is read, and
+it attaches the cpp filter to the source stream behind the scenes. Now
+the data flow looks like this:</P>
+<PRE>
+    cpp_test ----&gt; cpp filter ----&gt; parser</PRE>
+<P>As the parser reads the second and subsequent lines from the source
+stream, it feeds those lines through the <CODE>cpp</CODE> source filter before
+processing them. The <CODE>cpp</CODE> filter simply passes each line through the
+real C preprocessor. The output from the C preprocessor is then
+inserted back into the source stream by the filter.</P>
+<PRE>
+                  .-&gt; cpp --.
+                  |         |
+                  |         |
+                  |       &lt;-'
+   cpp_test ----&gt; cpp filter ----&gt; parser</PRE>
+<P>The parser then sees the following code:</P>
+<PRE>
+    use Filter::cpp ;
+    $a = 1 ;
+    print &quot;a = $a\n&quot; ;</PRE>
+<P>Let's consider what happens when the filtered code includes another
+module with use:</P>
+<PRE>
+    1: use Filter::cpp ;
+    2: #define TRUE 1
+    3: use Fred ;
+    4: $a = TRUE ;
+    5: print &quot;a = $a\n&quot; ;</PRE>
+<P>The <CODE>cpp</CODE> filter does not apply to the text of the Fred module, only
+to the text of the file that used it (<CODE>cpp_test</CODE>). Although the use
+statement on line 3 will pass through the cpp filter, the module that
+gets included (<CODE>Fred</CODE>) will not. The source streams look like this
+after line 3 has been parsed and before line 4 is parsed:</P>
+<PRE>
+    cpp_test ---&gt; cpp filter ---&gt; parser (INACTIVE)</PRE>
+<PRE>
+    Fred.pm ----&gt; parser</PRE>
+<P>As you can see, a new stream has been created for reading the source
+from <CODE>Fred.pm</CODE>. This stream will remain active until all of <CODE>Fred.pm</CODE>
+has been parsed. The source stream for <CODE>cpp_test</CODE> will still exist,
+but is inactive. Once the parser has finished reading Fred.pm, the
+source stream associated with it will be destroyed. The source stream
+for <CODE>cpp_test</CODE> then becomes active again and the parser reads line 4
+and subsequent lines from <CODE>cpp_test</CODE>.</P>
+<P>You can use more than one source filter on a single file. Similarly,
+you can reuse the same filter in as many files as you like.</P>
+<P>For example, if you have a uuencoded and compressed source file, it is
+possible to stack a uudecode filter and an uncompression filter like
+this:</P>
+<PRE>
+    use Filter::uudecode ; use Filter::uncompress ;
+    M'XL(&quot;.H&lt;US4''V9I;F%L')Q;&gt;7/;1I;_&gt;_I3=&amp;E=%:F*I&quot;T?22Q/
+    M6]9*&lt;IQCO*XFT&quot;0[PL%%'Y+IG?WN^ZYN-$'J.[.JE$,20/?K=_[&gt;
+    ...</PRE>
+<P>Once the first line has been processed, the flow will look like this:</P>
+<PRE>
+    file ---&gt; uudecode ---&gt; uncompress ---&gt; parser
+               filter         filter</PRE>
+<P>Data flows through filters in the same order they appear in the source
+file. The uudecode filter appeared before the uncompress filter, so the
+source file will be uudecoded before it's uncompressed.</P>
+<P>
+<HR>
+<H1><A NAME="writing a source filter">WRITING A SOURCE FILTER</A></H1>
+<P>There are three ways to write your own source filter. You can write it
+in C, use an external program as a filter, or write the filter in Perl.
+I won't cover the first two in any great detail, so I'll get them out
+of the way first. Writing the filter in Perl is most convenient, so
+I'll devote the most space to it.</P>
+<P>
+<HR>
+<H1><A NAME="writing a source filter in c">WRITING A SOURCE FILTER IN C</A></H1>
+<P>The first of the three available techniques is to write the filter
+completely in C. The external module you create interfaces directly
+with the source filter hooks provided by Perl.</P>
+<P>The advantage of this technique is that you have complete control over
+the implementation of your filter. The big disadvantage is the
+increased complexity required to write the filter - not only do you
+need to understand the source filter hooks, but you also need a
+reasonable knowledge of Perl guts. One of the few times it is worth
+going to this trouble is when writing a source scrambler. The
+<CODE>decrypt</CODE> filter (which unscrambles the source before Perl parses it)
+included with the source filter distribution is an example of a C
+source filter (see Decryption Filters, below).</P>
+<DL>
+<DT><STRONG><A NAME="item_Decryption_Filters"><STRONG>Decryption Filters</STRONG></A></STRONG><BR>
+<DD>
+All decryption filters work on the principle of ``security through
+obscurity.'' Regardless of how well you write a decryption filter and
+how strong your encryption algorithm, anyone determined enough can
+retrieve the original source code. The reason is quite simple - once
+the decryption filter has decrypted the source back to its original
+form, fragments of it will be stored in the computer's memory as Perl
+parses it. The source might only be in memory for a short period of
+time, but anyone possessing a debugger, skill, and lots of patience can
+eventually reconstruct your program.
+<P>That said, there are a number of steps that can be taken to make life
+difficult for the potential cracker. The most important: Write your
+decryption filter in C and statically link the decryption module into
+the Perl binary. For further tips to make life difficult for the
+potential cracker, see the file <EM>decrypt.pm</EM> in the source filters
+module.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="creating a source filter as a separate executable">CREATING A SOURCE FILTER AS A SEPARATE EXECUTABLE</A></H1>
+<P>An alternative to writing the filter in C is to create a separate
+executable in the language of your choice. The separate executable
+reads from standard input, does whatever processing is necessary, and
+writes the filtered data to standard output. <CODE>Filter:cpp</CODE> is an
+example of a source filter implemented as a separate executable - the
+executable is the C preprocessor bundled with your C compiler.</P>
+<P>The source filter distribution includes two modules that simplify this
+task: <CODE>Filter::exec</CODE> and <CODE>Filter::sh</CODE>. Both allow you to run any
+external executable. Both use a coprocess to control the flow of data
+into and out of the external executable. (For details on coprocesses,
+see Stephens, W.R. ``Advanced Programming in the UNIX Environment.''
+Addison-Wesley, ISBN 0-210-56317-7, pages 441-445.) The difference
+between them is that <CODE>Filter::exec</CODE> spawns the external command
+directly, while <CODE>Filter::sh</CODE> spawns a shell to execute the external
+command. (Unix uses the Bourne shell; NT uses the cmd shell.) Spawning
+a shell allows you to make use of the shell metacharacters and
+redirection facilities.</P>
+<P>Here is an example script that uses <CODE>Filter::sh</CODE>:</P>
+<PRE>
+    use Filter::sh 'tr XYZ PQR' ;
+    $a = 1 ;
+    print &quot;XYZ a = $a\n&quot; ;</PRE>
+<P>The output you'll get when the script is executed:</P>
+<PRE>
+    PQR a = 1</PRE>
+<P>Writing a source filter as a separate executable works fine, but a
+small performance penalty is incurred. For example, if you execute the
+small example above, a separate subprocess will be created to run the
+Unix <CODE>tr</CODE> command. Each use of the filter requires its own subprocess.
+If creating subprocesses is expensive on your system, you might want to
+consider one of the other options for creating source filters.</P>
+<P>
+<HR>
+<H1><A NAME="writing a source filter in perl">WRITING A SOURCE FILTER IN PERL</A></H1>
+<P>The easiest and most portable option available for creating your own
+source filter is to write it completely in Perl. To distinguish this
+from the previous two techniques, I'll call it a Perl source filter.</P>
+<P>To help understand how to write a Perl source filter we need an example
+to study. Here is a complete source filter that performs rot13
+decoding. (Rot13 is a very simple encryption scheme used in Usenet
+postings to hide the contents of offensive posts. It moves every letter
+forward thirteen places, so that A becomes N, B becomes O, and Z
+becomes M.)</P>
+<PRE>
+   package Rot13 ;</PRE>
+<PRE>
+   use Filter::Util::Call ;</PRE>
+<PRE>
+   sub import {
+      my ($type) = @_ ;
+      my ($ref) = [] ;
+      filter_add(bless $ref) ;
+   }</PRE>
+<PRE>
+   sub filter {
+      my ($self) = @_ ;
+      my ($status) ;</PRE>
+<PRE>
+      tr/n-za-mN-ZA-M/a-zA-Z/
+         if ($status = filter_read()) &gt; 0 ;
+      $status ;
+   }</PRE>
+<PRE>
+   1;</PRE>
+<P>All Perl source filters are implemented as Perl classes and have the
+same basic structure as the example above.</P>
+<P>First, we include the <CODE>Filter::Util::Call</CODE> module, which exports a
+number of functions into your filter's namespace. The filter shown
+above uses two of these functions, <CODE>filter_add()</CODE> and
+<CODE>filter_read()</CODE>.</P>
+<P>Next, we create the filter object and associate it with the source
+stream by defining the <A HREF="../../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A> function. If you know Perl well
+enough, you know that <A HREF="../../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A> is called automatically every time a
+module is included with a use statement. This makes <A HREF="../../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A> the ideal
+place to both create and install a filter object.</P>
+<P>In the example filter, the object (<CODE>$ref</CODE>) is blessed just like any
+other Perl object. Our example uses an anonymous array, but this isn't
+a requirement. Because this example doesn't need to store any context
+information, we could have used a scalar or hash reference just as
+well. The next section demonstrates context data.</P>
+<P>The association between the filter object and the source stream is made
+with the <CODE>filter_add()</CODE> function. This takes a filter object as a
+parameter (<CODE>$ref</CODE> in this case) and installs it in the source stream.</P>
+<P>Finally, there is the code that actually does the filtering. For this
+type of Perl source filter, all the filtering is done in a method
+called <CODE>filter()</CODE>. (It is also possible to write a Perl source filter
+using a closure. See the <CODE>Filter::Util::Call</CODE> manual page for more
+details.) It's called every time the Perl parser needs another line of
+source to process. The <CODE>filter()</CODE> method, in turn, reads lines from
+the source stream using the <CODE>filter_read()</CODE> function.</P>
+<P>If a line was available from the source stream, <CODE>filter_read()</CODE>
+returns a status value greater than zero and appends the line to <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A>.
+A status value of zero indicates end-of-file, less than zero means an
+error. The filter function itself is expected to return its status in
+the same way, and put the filtered line it wants written to the source
+stream in <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A>. The use of <A HREF="../../lib/Pod/perlvar.html#item_%24_"><CODE>$_</CODE></A> accounts for the brevity of most Perl
+source filters.</P>
+<P>In order to make use of the rot13 filter we need some way of encoding
+the source file in rot13 format. The script below, <CODE>mkrot13</CODE>, does
+just that.</P>
+<PRE>
+    die &quot;usage mkrot13 filename\n&quot; unless @ARGV ;
+    my $in = $ARGV[0] ;
+    my $out = &quot;$in.tmp&quot; ;
+    open(IN, &quot;&lt;$in&quot;) or die &quot;Cannot open file $in: $!\n&quot;;
+    open(OUT, &quot;&gt;$out&quot;) or die &quot;Cannot open file $out: $!\n&quot;;</PRE>
+<PRE>
+    print OUT &quot;use Rot13;\n&quot; ;
+    while (&lt;IN&gt;) {
+       tr/a-zA-Z/n-za-mN-ZA-M/ ;
+       print OUT ;
+    }</PRE>
+<PRE>
+    close IN;
+    close OUT;
+    unlink $in;
+    rename $out, $in;</PRE>
+<P>If we encrypt this with <CODE>mkrot13</CODE>:</P>
+<PRE>
+    print &quot; hello fred \n&quot; ;</PRE>
+<P>the result will be this:</P>
+<PRE>
+    use Rot13;
+    cevag &quot;uryyb serq\a&quot; ;</PRE>
+<P>Running it produces this output:</P>
+<PRE>
+    hello fred</PRE>
+<P>
+<HR>
+<H1><A NAME="using context: the debug filter">USING CONTEXT: THE DEBUG FILTER</A></H1>
+<P>The rot13 example was a trivial example. Here's another demonstration
+that shows off a few more features.</P>
+<P>Say you wanted to include a lot of debugging code in your Perl script
+during development, but you didn't want it available in the released
+product. Source filters offer a solution. In order to keep the example
+simple, let's say you wanted the debugging output to be controlled by
+an environment variable, <CODE>DEBUG</CODE>. Debugging code is enabled if the
+variable exists, otherwise it is disabled.</P>
+<P>Two special marker lines will bracket debugging code, like this:</P>
+<PRE>
+    ## DEBUG_BEGIN
+    if ($year &gt; 1999) {
+       warn &quot;Debug: millennium bug in year $year\n&quot; ;
+    }
+    ## DEBUG_END</PRE>
+<P>When the <CODE>DEBUG</CODE> environment variable exists, the filter ensures that
+Perl parses only the code between the <CODE>DEBUG_BEGIN</CODE> and <CODE>DEBUG_END</CODE>
+markers. That means that when <CODE>DEBUG</CODE> does exist, the code above
+should be passed through the filter unchanged. The marker lines can
+also be passed through as-is, because the Perl parser will see them as
+comment lines. When <CODE>DEBUG</CODE> isn't set, we need a way to disable the
+debug code. A simple way to achieve that is to convert the lines
+between the two markers into comments:</P>
+<PRE>
+    ## DEBUG_BEGIN
+    #if ($year &gt; 1999) {
+    #     warn &quot;Debug: millennium bug in year $year\n&quot; ;
+    #}
+    ## DEBUG_END</PRE>
+<P>Here is the complete Debug filter:</P>
+<PRE>
+    package Debug;</PRE>
+<PRE>
+    use strict;
+    use warnings;
+    use Filter::Util::Call ;</PRE>
+<PRE>
+    use constant TRUE =&gt; 1 ;
+    use constant FALSE =&gt; 0 ;</PRE>
+<PRE>
+    sub import {
+       my ($type) = @_ ;
+       my (%context) = (
+         Enabled =&gt; defined $ENV{DEBUG},
+         InTraceBlock =&gt; FALSE,
+         Filename =&gt; (caller)[1],
+         LineNo =&gt; 0,
+         LastBegin =&gt; 0,
+       ) ;
+       filter_add(bless \%context) ;
+    }</PRE>
+<PRE>
+    sub Die {
+       my ($self) = shift ;
+       my ($message) = shift ;
+       my ($line_no) = shift || $self-&gt;{LastBegin} ;
+       die &quot;$message at $self-&gt;{Filename} line $line_no.\n&quot;
+    }</PRE>
+<PRE>
+    sub filter {
+       my ($self) = @_ ;
+       my ($status) ;
+       $status = filter_read() ;
+       ++ $self-&gt;{LineNo} ;</PRE>
+<PRE>
+       # deal with EOF/error first
+       if ($status &lt;= 0) {
+           $self-&gt;Die(&quot;DEBUG_BEGIN has no DEBUG_END&quot;)
+               if $self-&gt;{InTraceBlock} ;
+           return $status ;
+       }</PRE>
+<PRE>
+       if ($self-&gt;{InTraceBlock}) {
+          if (/^\s*##\s*DEBUG_BEGIN/ ) {
+              $self-&gt;Die(&quot;Nested DEBUG_BEGIN&quot;, $self-&gt;{LineNo})
+          } elsif (/^\s*##\s*DEBUG_END/) {
+              $self-&gt;{InTraceBlock} = FALSE ;
+          }</PRE>
+<PRE>
+          # comment out the debug lines when the filter is disabled
+          s/^/#/ if ! $self-&gt;{Enabled} ;
+       } elsif ( /^\s*##\s*DEBUG_BEGIN/ ) {
+          $self-&gt;{InTraceBlock} = TRUE ;
+          $self-&gt;{LastBegin} = $self-&gt;{LineNo} ;
+       } elsif ( /^\s*##\s*DEBUG_END/ ) {
+          $self-&gt;Die(&quot;DEBUG_END has no DEBUG_BEGIN&quot;, $self-&gt;{LineNo});
+       }
+       return $status ;
+    }</PRE>
+<PRE>
+    1 ;</PRE>
+<P>The big difference between this filter and the previous example is the
+use of context data in the filter object. The filter object is based on
+a hash reference, and is used to keep various pieces of context
+information between calls to the filter function. All but two of the
+hash fields are used for error reporting. The first of those two,
+Enabled, is used by the filter to determine whether the debugging code
+should be given to the Perl parser. The second, InTraceBlock, is true
+when the filter has encountered a <CODE>DEBUG_BEGIN</CODE> line, but has not yet
+encountered the following <CODE>DEBUG_END</CODE> line.</P>
+<P>If you ignore all the error checking that most of the code does, the
+essence of the filter is as follows:</P>
+<PRE>
+    sub filter {
+       my ($self) = @_ ;
+       my ($status) ;
+       $status = filter_read() ;</PRE>
+<PRE>
+       # deal with EOF/error first
+       return $status if $status &lt;= 0 ;
+       if ($self-&gt;{InTraceBlock}) {
+          if (/^\s*##\s*DEBUG_END/) {
+             $self-&gt;{InTraceBlock} = FALSE
+          }</PRE>
+<PRE>
+          # comment out debug lines when the filter is disabled
+          s/^/#/ if ! $self-&gt;{Enabled} ;
+       } elsif ( /^\s*##\s*DEBUG_BEGIN/ ) {
+          $self-&gt;{InTraceBlock} = TRUE ;
+       }
+       return $status ;
+    }</PRE>
+<P>Be warned: just as the C-preprocessor doesn't know C, the Debug filter
+doesn't know Perl. It can be fooled quite easily:</P>
+<PRE>
+    print &lt;&lt;EOM;
+    ##DEBUG_BEGIN
+    EOM</PRE>
+<P>Such things aside, you can see that a lot can be achieved with a modest
+amount of code.</P>
+<P>
+<HR>
+<H1><A NAME="conclusion">CONCLUSION</A></H1>
+<P>You now have better understanding of what a source filter is, and you
+might even have a possible use for them. If you feel like playing with
+source filters but need a bit of inspiration, here are some extra
+features you could add to the Debug filter.</P>
+<P>First, an easy one. Rather than having debugging code that is
+all-or-nothing, it would be much more useful to be able to control
+which specific blocks of debugging code get included. Try extending the
+syntax for debug blocks to allow each to be identified. The contents of
+the <CODE>DEBUG</CODE> environment variable can then be used to control which
+blocks get included.</P>
+<P>Once you can identify individual blocks, try allowing them to be
+nested. That isn't difficult either.</P>
+<P>Here is a interesting idea that doesn't involve the Debug filter.
+Currently Perl subroutines have fairly limited support for formal
+parameter lists. You can specify the number of parameters and their
+type, but you still have to manually take them out of the <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> array
+yourself. Write a source filter that allows you to have a named
+parameter list. Such a filter would turn this:</P>
+<PRE>
+    sub MySub ($first, $second, @rest) { ... }</PRE>
+<P>into this:</P>
+<PRE>
+    sub MySub($$@) {
+       my ($first) = shift ;
+       my ($second) = shift ;
+       my (@rest) = @_ ;
+       ...
+    }</PRE>
+<P>Finally, if you feel like a real challenge, have a go at writing a
+full-blown Perl macro preprocessor as a source filter. Borrow the
+useful features from the C preprocessor and any other macro processors
+you know. The tricky bit will be choosing how much knowledge of Perl's
+syntax you want your filter to have.</P>
+<P>
+<HR>
+<H1><A NAME="requirements">REQUIREMENTS</A></H1>
+<P>The Source Filters distribution is available on CPAN, in</P>
+<PRE>
+    CPAN/modules/by-module/Filter</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Marquess &lt;<A HREF="mailto:Paul.Marquess@btinternet.com">Paul.Marquess@btinternet.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyrights">Copyrights</A></H1>
+<P>This article originally appeared in The Perl Journal #11, and is
+copyright 1998 The Perl Journal. It appears courtesy of Jon Orwant and
+The Perl Journal.  This document may be distributed under the same terms
+as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfilter - Source Filters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

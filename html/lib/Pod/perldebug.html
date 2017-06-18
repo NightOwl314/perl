@@ -1,0 +1,924 @@
+<HTML>
+<HEAD>
+<TITLE>perldebug - Perl debugging</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perldebug - Perl debugging</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#the perl debugger">The Perl Debugger</A></LI>
+	<UL>
+
+		<LI><A HREF="#debugger commands">Debugger Commands</A></LI>
+		<LI><A HREF="#configurable options">Configurable Options</A></LI>
+		<LI><A HREF="#debugger input/output">Debugger input/output</A></LI>
+		<LI><A HREF="#debugging compiletime statements">Debugging compile-time statements</A></LI>
+		<LI><A HREF="#debugger customization">Debugger Customization</A></LI>
+		<LI><A HREF="#readline support">Readline Support</A></LI>
+		<LI><A HREF="#editor support for debugging">Editor Support for Debugging</A></LI>
+		<LI><A HREF="#the perl profiler">The Perl Profiler</A></LI>
+	</UL>
+
+	<LI><A HREF="#debugging regular expressions">Debugging regular expressions</A></LI>
+	<LI><A HREF="#debugging memory usage">Debugging memory usage</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perldebug - Perl debugging</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>First of all, have you tried using the <STRONG>-w</STRONG> switch?</P>
+<P>
+<HR>
+<H1><A NAME="the perl debugger">The Perl Debugger</A></H1>
+<P>If you invoke Perl with the <STRONG>-d</STRONG> switch, your script runs under the
+Perl source debugger.  This works like an interactive Perl
+environment, prompting for debugger commands that let you examine
+source code, set breakpoints, get stack backtraces, change the values of
+variables, etc.  This is so convenient that you often fire up
+the debugger all by itself just to test out Perl constructs
+interactively to see what they do.  For example:</P>
+<PRE>
+    $ perl -d -e 42</PRE>
+<P>In Perl, the debugger is not a separate program the way it usually is in the
+typical compiled environment.  Instead, the <STRONG>-d</STRONG> flag tells the compiler
+to insert source information into the parse trees it's about to hand off
+to the interpreter.  That means your code must first compile correctly
+for the debugger to work on it.  Then when the interpreter starts up, it
+preloads a special Perl library file containing the debugger.</P>
+<P>The program will halt <EM>right before</EM> the first run-time executable
+statement (but see below regarding compile-time statements) and ask you
+to enter a debugger command.  Contrary to popular expectations, whenever
+the debugger halts and shows you a line of code, it always displays the
+line it's <EM>about</EM> to execute, rather than the one it has just executed.</P>
+<P>Any command not recognized by the debugger is directly executed
+(<A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>'d) as Perl code in the current package.  (The debugger
+uses the DB package for keeping its own state information.)</P>
+<P>For any text entered at the debugger prompt, leading and trailing whitespace
+is first stripped before further processing.  If a debugger command
+coincides with some function in your own program, merely precede the
+function with something that doesn't look like a debugger command, such
+as a leading <CODE>;</CODE> or perhaps a <CODE>+</CODE>, or by wrapping it with parentheses
+or braces.</P>
+<P>
+<H2><A NAME="debugger commands">Debugger Commands</A></H2>
+<P>The debugger understands the following commands:</P>
+<DL>
+<DT><STRONG><A NAME="item_h_%5Bcommand%5D">h [command]</A></STRONG><BR>
+<DD>
+Prints out a help message.
+<P>If you supply another debugger command as an argument to the <CODE>h</CODE> command,
+it prints out the description for just that command.  The special
+argument of <CODE>h h</CODE> produces a more compact help listing, designed to fit
+together on one screen.</P>
+<P>If the output of the <CODE>h</CODE> command (or any command, for that matter) scrolls
+past your screen, precede the command with a leading pipe symbol so
+that it's run through your pager, as in</P>
+<PRE>
+    DB&gt; |h</PRE>
+<P>You may change the pager which is used via <CODE>O pager=...</CODE> command.</P>
+<P></P>
+<DT><STRONG><A NAME="item_p_expr">p expr</A></STRONG><BR>
+<DD>
+Same as <CODE>print {$DB::OUT} expr</CODE> in the current package.  In particular,
+because this is just Perl's own <A HREF="../../lib/Pod/perlfunc.html#item_print"><CODE>print</CODE></A> function, this means that nested
+data structures and objects are not dumped, unlike with the <A HREF="../../lib/Pod/perlguts.html#item_x"><CODE>x</CODE></A> command.
+<P>The <CODE>DB::OUT</CODE> filehandle is opened to <EM>/dev/tty</EM>, regardless of
+where STDOUT may be redirected to.</P>
+<P></P>
+<DT><STRONG><A NAME="item_x_expr">x expr</A></STRONG><BR>
+<DD>
+Evaluates its expression in list context and dumps out the result
+in a pretty-printed fashion.  Nested data structures are printed out
+recursively, unlike the real <A HREF="../../lib/Pod/perlfunc.html#item_print"><CODE>print</CODE></A> function in Perl.
+See <A HREF="../../lib/Dumpvalue.html">the Dumpvalue manpage</A> if you'd like to do this yourself.
+<P>The output format is governed by multiple options described under
+<A HREF="#configurable options">Configurable Options</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_V_%5Bpkg_%5Bvars%5D%5D">V [pkg [vars]]</A></STRONG><BR>
+<DD>
+Display all (or some) variables in package (defaulting to <CODE>main</CODE>) 
+using a data pretty-printer (hashes show their keys and values so
+you see what's what, control characters are made printable, etc.).
+Make sure you don't put the type specifier (like <CODE>$</CODE>) there, just
+the symbol names, like this:
+<PRE>
+    V DB filename line</PRE>
+<P>Use <CODE>~pattern</CODE> and <CODE>!pattern</CODE> for positive and negative regexes.</P>
+<P>This is similar to calling the <A HREF="../../lib/Pod/perlguts.html#item_x"><CODE>x</CODE></A> command on each applicable var.</P>
+<P></P>
+<DT><STRONG><A NAME="item_X_%5Bvars%5D">X [vars]</A></STRONG><BR>
+<DD>
+Same as <CODE>V currentpackage [vars]</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_T">T</A></STRONG><BR>
+<DD>
+Produce a stack backtrace.  See below for details on its output.
+<P></P>
+<DT><STRONG><A NAME="item_s_%5Bexpr%5D">s [expr]</A></STRONG><BR>
+<DD>
+Single step.  Executes until the beginning of another
+statement, descending into subroutine calls.  If an expression is
+supplied that includes function calls, it too will be single-stepped.
+<P></P>
+<DT><STRONG><A NAME="item_n_%5Bexpr%5D">n [expr]</A></STRONG><BR>
+<DD>
+Next.  Executes over subroutine calls, until the beginning
+of the next statement.  If an expression is supplied that includes
+function calls, those functions will be executed with stops before
+each statement.
+<P></P>
+<DT><STRONG><A NAME="item_r">r</A></STRONG><BR>
+<DD>
+Continue until the return from the current subroutine.
+Dump the return value if the <A HREF="#item_PrintRet"><CODE>PrintRet</CODE></A> option is set (default).
+<P></P>
+<DT><STRONG><A NAME="item_%3CCR%3E">&lt;CR&gt;</A></STRONG><BR>
+<DD>
+Repeat last <A HREF="../../lib/Pod/perlguts.html#item_n"><CODE>n</CODE></A> or <A HREF="../../lib/Pod/perlguts.html#item_s"><CODE>s</CODE></A> command.
+<P></P>
+<DT><STRONG><A NAME="item_c_%5Bline%7Csub%5D">c [line|sub]</A></STRONG><BR>
+<DD>
+Continue, optionally inserting a one-time-only breakpoint
+at the specified line or subroutine.
+<P></P>
+<DT><STRONG><A NAME="item_l">l</A></STRONG><BR>
+<DD>
+List next window of lines.
+<P></P>
+<DT><STRONG><A NAME="item_l_min%2Bincr">l min+incr</A></STRONG><BR>
+<DD>
+List <CODE>incr+1</CODE> lines starting at <CODE>min</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_l_min%2Dmax">l min-max</A></STRONG><BR>
+<DD>
+List lines <CODE>min</CODE> through <CODE>max</CODE>.  <CODE>l -</CODE> is synonymous to <A HREF="#item_%2D"><CODE>-</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_l_line">l line</A></STRONG><BR>
+<DD>
+List a single line.
+<P></P>
+<DT><STRONG><A NAME="item_l_subname">l subname</A></STRONG><BR>
+<DD>
+List first window of lines from subroutine.  <EM>subname</EM> may
+be a variable that contains a code reference.
+<P></P>
+<DT><STRONG><A NAME="item_%2D">-</A></STRONG><BR>
+<DD>
+List previous window of lines.
+<P></P>
+<DT><STRONG><A NAME="item_w_%5Bline%5D">w [line]</A></STRONG><BR>
+<DD>
+List window (a few lines) around the current line.
+<P></P>
+<DT><STRONG><A NAME="item_%2E">.</A></STRONG><BR>
+<DD>
+Return the internal debugger pointer to the line last
+executed, and print out that line.
+<P></P>
+<DT><STRONG><A NAME="item_f_filename">f filename</A></STRONG><BR>
+<DD>
+Switch to viewing a different file or <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A> statement.  If <EM>filename</EM>
+is not a full pathname found in the values of %INC, it is considered 
+a regex.
+<P><A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>ed strings (when accessible) are considered to be filenames:
+<A HREF="../../lib/Pod/perlguts.html#item_f"><CODE>f (eval 7)</CODE></A> and <CODE>f eval 7\b</CODE> access the body of the 7th <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>ed string
+(in the order of execution).  The bodies of the currently executed <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>
+and of <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>ed strings that define subroutines are saved and thus
+accessible.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Fpattern%2F">/pattern/</A></STRONG><BR>
+<DD>
+Search forwards for pattern (a Perl regex); final / is optional.
+<P></P>
+<DT><STRONG><A NAME="item_%3Fpattern%3F">?pattern?</A></STRONG><BR>
+<DD>
+Search backwards for pattern; final ? is optional.
+<P></P>
+<DT><STRONG><A NAME="item_L">L</A></STRONG><BR>
+<DD>
+List all breakpoints and actions.
+<P></P>
+<DT><STRONG><A NAME="item_S_%5B%5B%21%5Dregex%5D">S [[!]regex]</A></STRONG><BR>
+<DD>
+List subroutine names [not] matching the regex.
+<P></P>
+<DT><STRONG><A NAME="item_t">t</A></STRONG><BR>
+<DD>
+Toggle trace mode (see also the <A HREF="#item_AutoTrace"><CODE>AutoTrace</CODE></A> option).
+<P></P>
+<DT><STRONG><A NAME="item_t_expr">t expr</A></STRONG><BR>
+<DD>
+Trace through execution of <CODE>expr</CODE>.
+See <A HREF="../../lib/Pod/perldebguts.html#frame listing output examples">Frame Listing Output Examples in the perldebguts manpage</A> for examples.
+<P></P>
+<DT><STRONG><A NAME="item_b_%5Bline%5D_%5Bcondition%5D">b [line] [condition]</A></STRONG><BR>
+<DD>
+Set a breakpoint before the given line.  If <EM>line</EM> is omitted, set a
+breakpoint on the line about to be executed.  If a condition
+is specified, it's evaluated each time the statement is reached: a
+breakpoint is taken only if the condition is true.  Breakpoints may
+only be set on lines that begin an executable statement.  Conditions
+don't use <CODE>if</CODE>:
+<PRE>
+    b 237 $x &gt; 30
+    b 237 ++$count237 &lt; 11
+    b 33 /pattern/i</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_b_subname_%5Bcondition%5D">b subname [condition]</A></STRONG><BR>
+<DD>
+Set a breakpoint before the first line of the named subroutine.  <EM>subname</EM> may
+be a variable containing a code reference (in this case <EM>condition</EM>
+is not supported).
+<P></P>
+<DT><STRONG><A NAME="item_b_postpone_subname_%5Bcondition%5D">b postpone subname [condition]</A></STRONG><BR>
+<DD>
+Set a breakpoint at first line of subroutine after it is compiled.
+<P></P>
+<DT><STRONG><A NAME="item_b_load_filename">b load filename</A></STRONG><BR>
+<DD>
+Set a breakpoint before the first executed line of the <EM>filename</EM>,
+which should be a full pathname found amongst the %INC values.
+<P></P>
+<DT><STRONG><A NAME="item_b_compile_subname">b compile subname</A></STRONG><BR>
+<DD>
+Sets a breakpoint before the first statement executed after the specified
+subroutine is compiled.
+<P></P>
+<DT><STRONG><A NAME="item_d_%5Bline%5D">d [line]</A></STRONG><BR>
+<DD>
+Delete a breakpoint from the specified <EM>line</EM>.  If <EM>line</EM> is omitted, deletes
+the breakpoint from the line about to be executed.
+<P></P>
+<DT><STRONG><A NAME="item_D">D</A></STRONG><BR>
+<DD>
+Delete all installed breakpoints.
+<P></P>
+<DT><STRONG><A NAME="item_a_%5Bline%5D_command">a [line] command</A></STRONG><BR>
+<DD>
+Set an action to be done before the line is executed.  If <EM>line</EM> is
+omitted, set an action on the line about to be executed.
+The sequence of steps taken by the debugger is
+<PRE>
+  1. check for a breakpoint at this line
+  2. print the line if necessary (tracing)
+  3. do any actions associated with that line
+  4. prompt user if at a breakpoint or in single-step
+  5. evaluate line</PRE>
+<P>For example, this will print out $foo every time line
+53 is passed:</P>
+<PRE>
+    a 53 print &quot;DB FOUND $foo\n&quot;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_a_%5Bline%5D">a [line]</A></STRONG><BR>
+<DD>
+Delete an action from the specified line.  If <EM>line</EM> is omitted, delete
+the action on the line that is about to be executed.
+<P></P>
+<DT><STRONG><A NAME="item_A">A</A></STRONG><BR>
+<DD>
+Delete all installed actions.
+<P></P>
+<DT><STRONG><A NAME="item_W_expr">W expr</A></STRONG><BR>
+<DD>
+Add a global watch-expression.  We hope you know what one of these
+is, because they're supposed to be obvious.  <STRONG>WARNING</STRONG>: It is far
+too easy to destroy your watch expressions by accidentally omitting
+the <EM>expr</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_W">W</A></STRONG><BR>
+<DD>
+Delete all watch-expressions.
+<P></P>
+<DT><STRONG><A NAME="item_O_booloption_%2E%2E%2E">O booloption ...</A></STRONG><BR>
+<DD>
+Set each listed Boolean option to the value <CODE>1</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_O_anyoption%3F_%2E%2E%2E">O anyoption? ...</A></STRONG><BR>
+<DD>
+Print out the value of one or more options.
+<P></P>
+<DT><STRONG><A NAME="item_O_option%3Dvalue_%2E%2E%2E">O option=value ...</A></STRONG><BR>
+<DD>
+Set the value of one or more options.  If the value has internal
+whitespace, it should be quoted.  For example, you could set <CODE>O
+pager=&quot;less -MQeicsNfr&quot;</CODE> to call <STRONG>less</STRONG> with those specific options.
+You may use either single or double quotes, but if you do, you must
+escape any embedded instances of same sort of quote you began with,
+as well as any escaping any escapes that immediately precede that
+quote but which are not meant to escape the quote itself.  In other
+words, you follow single-quoting rules irrespective of the quote;
+eg: <CODE>O option='this isn\'t bad'</CODE> or <CODE>O option=&quot;She said, \&quot;Isn't
+it?\&quot;&quot;</CODE>.
+<P>For historical reasons, the <CODE>=value</CODE> is optional, but defaults to
+1 only where it is safe to do so--that is, mostly for Boolean
+options.  It is always better to assign a specific value using <CODE>=</CODE>.
+The <CODE>option</CODE> can be abbreviated, but for clarity probably should
+not be.  Several options can be set together.  See <A HREF="#configurable options">Configurable Options</A> 
+for a list of these.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%3C_%3F">&lt; ?</A></STRONG><BR>
+<DD>
+List out all pre-prompt Perl command actions.
+<P></P>
+<DT><STRONG><A NAME="item_%3C_%5B_command_%5D">&lt; [ command ]</A></STRONG><BR>
+<DD>
+Set an action (Perl command) to happen before every debugger prompt.
+A multi-line command may be entered by backslashing the newlines.  
+<STRONG>WARNING</STRONG> If <A HREF="#item_command"><CODE>command</CODE></A> is missing, all actions are wiped out!
+<P></P>
+<DT><STRONG><A NAME="item_%3C%3C_command">&lt;&lt; command</A></STRONG><BR>
+<DD>
+Add an action (Perl command) to happen before every debugger prompt.
+A multi-line command may be entered by backwhacking the newlines.
+<P></P>
+<DT><STRONG><A NAME="item_%3E_%3F">&gt; ?</A></STRONG><BR>
+<DD>
+List out post-prompt Perl command actions.
+<P></P>
+<DT><STRONG><A NAME="item_%3E_command">&gt; command</A></STRONG><BR>
+<DD>
+Set an action (Perl command) to happen after the prompt when you've
+just given a command to return to executing the script.  A multi-line
+command may be entered by backslashing the newlines (we bet you
+couldn't've guessed this by now).  <STRONG>WARNING</STRONG> If <A HREF="#item_command"><CODE>command</CODE></A> is
+missing, all actions are wiped out!
+<P></P>
+<DT><STRONG><A NAME="item_%3E%3E_command">&gt;&gt; command</A></STRONG><BR>
+<DD>
+Adds an action (Perl command) to happen after the prompt when you've
+just given a command to return to executing the script.  A multi-line
+command may be entered by backslashing the newlines.
+<P></P>
+<DT><STRONG><A NAME="item_%7B_%3F">{ ?</A></STRONG><BR>
+<DD>
+List out pre-prompt debugger commands.
+<P></P>
+<DT><STRONG><A NAME="item_%7B_%5B_command_%5D">{ [ command ]</A></STRONG><BR>
+<DD>
+Set an action (debugger command) to happen before every debugger prompt.
+A multi-line command may be entered in the customary fashion.  
+<STRONG>WARNING</STRONG> If <A HREF="#item_command"><CODE>command</CODE></A> is missing, all actions are wiped out!
+<P>Because this command is in some senses new, a warning is issued if
+you appear to have accidentally entered a block instead.  If that's
+what you mean to do, write it as with <CODE>;{ ... }</CODE> or even 
+<A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do { ... }</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%7B%7B_command">{{ command</A></STRONG><BR>
+<DD>
+Add an action (debugger command) to happen before every debugger prompt.
+A multi-line command may be entered, if you can guess how: see above.
+<P></P>
+<DT><STRONG><A NAME="item_%21_number">! number</A></STRONG><BR>
+<DD>
+Redo a previous command (defaults to the previous command).
+<P></P>
+<DT><STRONG><A NAME="item_%21_%2Dnumber">! -number</A></STRONG><BR>
+<DD>
+Redo number'th previous command.
+<P></P>
+<DT><STRONG><A NAME="item_%21_pattern">! pattern</A></STRONG><BR>
+<DD>
+Redo last command that started with pattern.
+See <CODE>O recallCommand</CODE>, too.
+<P></P>
+<DT><STRONG><A NAME="item_%21%21_cmd">!! cmd</A></STRONG><BR>
+<DD>
+Run cmd in a subprocess (reads from DB::IN, writes to DB::OUT) See
+<CODE>O shellBang</CODE>, also.  Note that the user's current shell (well,
+their <CODE>$ENV{SHELL}</CODE> variable) will be used, which can interfere
+with proper interpretation of exit status or signal and coredump
+information.
+<P></P>
+<DT><STRONG><A NAME="item_H_%2Dnumber">H -number</A></STRONG><BR>
+<DD>
+Display last n commands.  Only commands longer than one character are
+listed.  If <EM>number</EM> is omitted, list them all.
+<P></P>
+<DT><STRONG><A NAME="item_q_or_%5ED">q or ^D</A></STRONG><BR>
+<DD>
+Quit.  (``quit'' doesn't work for this, unless you've made an alias)
+This is the only supported way to exit the debugger, though typing
+<A HREF="../../lib/Pod/perlfunc.html#item_exit"><CODE>exit</CODE></A> twice might work.
+<P>Set the <A HREF="#item_inhibit_exit"><CODE>inhibit_exit</CODE></A> option to 0 if you want to be able to step
+off the end the script.  You may also need to set $finished to 0 
+if you want to step through global destruction.</P>
+<P></P>
+<DT><STRONG><A NAME="item_R">R</A></STRONG><BR>
+<DD>
+Restart the debugger by <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A>ing a new session.  We try to maintain
+your history across this, but internal settings and command-line options
+may be lost.
+<P>The following setting are currently preserved: history, breakpoints,
+actions, debugger options, and the Perl command-line
+options <STRONG>-w</STRONG>, <STRONG>-I</STRONG>, and <STRONG>-e</STRONG>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%7Cdbcmd">|dbcmd</A></STRONG><BR>
+<DD>
+Run the debugger command, piping DB::OUT into your current pager.
+<P></P>
+<DT><STRONG><A NAME="item_%7C%7Cdbcmd">||dbcmd</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_%7Cdbcmd"><CODE>|dbcmd</CODE></A> but DB::OUT is temporarily <A HREF="../../lib/Pod/perlfunc.html#item_select"><CODE>select</CODE></A>ed as well.
+<P></P>
+<DT><STRONG><A NAME="item_%3D_%5Balias_value%5D">= [alias value]</A></STRONG><BR>
+<DD>
+Define a command alias, like
+<PRE>
+    = quit q</PRE>
+<P>or list current aliases.</P>
+<P></P>
+<DT><STRONG><A NAME="item_command">command</A></STRONG><BR>
+<DD>
+Execute command as a Perl statement.  A trailing semicolon will be
+supplied.  If the Perl statement would otherwise be confused for a
+Perl debugger, use a leading semicolon, too.
+<P></P>
+<DT><STRONG><A NAME="item_m_expr">m expr</A></STRONG><BR>
+<DD>
+List which methods may be called on the result of the evaluated
+expression.  The expression may evaluated to a reference to a 
+blessed object, or to a package name.
+<P></P>
+<DT><STRONG><A NAME="item_man_%5Bmanpage%5D">man [manpage]</A></STRONG><BR>
+<DD>
+Despite its name, this calls your system's default documentation
+viewer on the given page, or on the viewer itself if <EM>manpage</EM> is
+omitted.  If that viewer is <STRONG>man</STRONG>, the current <CODE>Config</CODE> information
+is used to invoke <STRONG>man</STRONG> using the proper MANPATH or <STRONG>-M</STRONG>
+<EM>manpath</EM> option.  Failed lookups of the form <CODE>XXX</CODE> that match
+known manpages of the form <EM>perlXXX</EM> will be retried.  This lets
+you type <CODE>man debug</CODE> or <CODE>man op</CODE> from the debugger.
+<P>On systems traditionally bereft of a usable <STRONG>man</STRONG> command, the
+debugger invokes <STRONG>perldoc</STRONG>.  Occasionally this determination is
+incorrect due to recalcitrant vendors or rather more felicitously,
+to enterprising users.  If you fall into either category, just
+manually set the $DB::doccmd variable to whatever viewer to view
+the Perl documentation on your system.  This may be set in an rc
+file, or through direct assignment.  We're still waiting for a
+working example of something along the lines of:</P>
+<PRE>
+    $DB::doccmd = 'netscape -remote <A HREF="http://something.here/">http://something.here/</A>';</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="configurable options">Configurable Options</A></H2>
+<P>The debugger has numerous options settable using the <CODE>O</CODE> command,
+either interactively or from the environment or an rc file.
+(./.perldb or ~/.perldb under Unix.)</P>
+<DL>
+<DT><STRONG><A NAME="item_recallCommand%2C_ShellBang"><CODE>recallCommand</CODE>, <CODE>ShellBang</CODE></A></STRONG><BR>
+<DD>
+The characters used to recall command or spawn shell.  By
+default, both are set to <CODE>!</CODE>, which is unfortunate.
+<P></P>
+<DT><STRONG><A NAME="item_pager"><CODE>pager</CODE></A></STRONG><BR>
+<DD>
+Program to use for output of pager-piped commands (those beginning
+with a <CODE>|</CODE> character.)  By default, <CODE>$ENV{PAGER}</CODE> will be used.
+Because the debugger uses your current terminal characteristics
+for bold and underlining, if the chosen pager does not pass escape
+sequences through unchanged, the output of some debugger commands
+will not be readable when sent through the pager.
+<P></P>
+<DT><STRONG><A NAME="item_tkRunning"><CODE>tkRunning</CODE></A></STRONG><BR>
+<DD>
+Run Tk while prompting (with ReadLine).
+<P></P>
+<DT><STRONG><A NAME="item_signalLevel%2C_warnLevel%2C_dieLevel"><CODE>signalLevel</CODE>, <CODE>warnLevel</CODE>, <CODE>dieLevel</CODE></A></STRONG><BR>
+<DD>
+Level of verbosity.  By default, the debugger leaves your exceptions
+and warnings alone, because altering them can break correctly running
+programs.  It will attempt to print a message when uncaught INT, BUS, or
+SEGV signals arrive.  (But see the mention of signals in <EM>BUGS</EM> below.)
+<P>To disable this default safe mode, set these values to something higher
+than 0.  At a level of 1, you get backtraces upon receiving any kind
+of warning (this is often annoying) or exception (this is
+often valuable).  Unfortunately, the debugger cannot discern fatal
+exceptions from non-fatal ones.  If <CODE>dieLevel</CODE> is even 1, then your
+non-fatal exceptions are also traced and unceremoniously altered if they
+came from <CODE>eval'd</CODE> strings or from any kind of <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A> within modules
+you're attempting to load.  If <CODE>dieLevel</CODE> is 2, the debugger doesn't
+care where they came from:  It usurps your exception handler and prints
+out a trace, then modifies all exceptions with its own embellishments.
+This may perhaps be useful for some tracing purposes, but tends to hopelessly
+destroy any program that takes its exception handling seriously.</P>
+<P></P>
+<DT><STRONG><A NAME="item_AutoTrace"><CODE>AutoTrace</CODE></A></STRONG><BR>
+<DD>
+Trace mode (similar to <A HREF="#item_t"><CODE>t</CODE></A> command, but can be put into
+<CODE>PERLDB_OPTS</CODE>).
+<P></P>
+<DT><STRONG><A NAME="item_LineInfo"><CODE>LineInfo</CODE></A></STRONG><BR>
+<DD>
+File or pipe to print line number info to.  If it is a pipe (say,
+<CODE>|visual_perl_db</CODE>), then a short message is used.  This is the
+mechanism used to interact with a slave editor or visual debugger,
+such as the special <CODE>vi</CODE> or <CODE>emacs</CODE> hooks, or the <CODE>ddd</CODE> graphical
+debugger.
+<P></P>
+<DT><STRONG><A NAME="item_inhibit_exit"><CODE>inhibit_exit</CODE></A></STRONG><BR>
+<DD>
+If 0, allows <EM>stepping off</EM> the end of the script.
+<P></P>
+<DT><STRONG><A NAME="item_PrintRet"><CODE>PrintRet</CODE></A></STRONG><BR>
+<DD>
+Print return value after <A HREF="#item_r"><CODE>r</CODE></A> command if set (default).
+<P></P>
+<DT><STRONG><A NAME="item_ornaments"><CODE>ornaments</CODE></A></STRONG><BR>
+<DD>
+Affects screen appearance of the command line (see <A HREF="../../lib/Term/ReadLine.html">the Term::ReadLine manpage</A>).
+There is currently no way to disable these, which can render
+some output illegible on some displays, or with some pagers.
+This is considered a bug.
+<P></P>
+<DT><STRONG><A NAME="item_frame"><CODE>frame</CODE></A></STRONG><BR>
+<DD>
+Affects the printing of messages upon entry and exit from subroutines.  If
+<A HREF="#item_frame"><CODE>frame &amp; 2</CODE></A> is false, messages are printed on entry only. (Printing
+on exit might be useful if interspersed with other messages.)
+<P>If <A HREF="#item_frame"><CODE>frame &amp; 4</CODE></A>, arguments to functions are printed, plus context
+and caller info.  If <A HREF="#item_frame"><CODE>frame &amp; 8</CODE></A>, overloaded <CODE>stringify</CODE> and
+<A HREF="../../lib/Pod/perlfunc.html#item_tie"><CODE>tie</CODE></A>d <CODE>FETCH</CODE> is enabled on the printed arguments.  If <A HREF="#item_frame"><CODE>frame
+&amp; 16</CODE></A>, the return value from the subroutine is printed.</P>
+<P>The length at which the argument list is truncated is governed by the
+next option:</P>
+<P></P>
+<DT><STRONG><A NAME="item_maxTraceLen"><CODE>maxTraceLen</CODE></A></STRONG><BR>
+<DD>
+Length to truncate the argument list when the <A HREF="#item_frame"><CODE>frame</CODE></A> option's
+bit 4 is set.
+<P></P></DL>
+<P>The following options affect what happens with <CODE>V</CODE>, <CODE>X</CODE>, and <A HREF="../../lib/Pod/perlguts.html#item_x"><CODE>x</CODE></A>
+commands:</P>
+<DL>
+<DT><STRONG><A NAME="item_arrayDepth%2C_hashDepth"><CODE>arrayDepth</CODE>, <CODE>hashDepth</CODE></A></STRONG><BR>
+<DD>
+Print only first N elements ('' for all).
+<P></P>
+<DT><STRONG><A NAME="item_compactDump%2C_veryCompact"><CODE>compactDump</CODE>, <CODE>veryCompact</CODE></A></STRONG><BR>
+<DD>
+Change the style of array and hash output.  If <CODE>compactDump</CODE>, short array
+may be printed on one line.
+<P></P>
+<DT><STRONG><A NAME="item_globPrint"><CODE>globPrint</CODE></A></STRONG><BR>
+<DD>
+Whether to print contents of globs.
+<P></P>
+<DT><STRONG><A NAME="item_DumpDBFiles"><CODE>DumpDBFiles</CODE></A></STRONG><BR>
+<DD>
+Dump arrays holding debugged files.
+<P></P>
+<DT><STRONG><A NAME="item_DumpPackages"><CODE>DumpPackages</CODE></A></STRONG><BR>
+<DD>
+Dump symbol tables of packages.
+<P></P>
+<DT><STRONG><A NAME="item_DumpReused"><CODE>DumpReused</CODE></A></STRONG><BR>
+<DD>
+Dump contents of ``reused'' addresses.
+<P></P>
+<DT><STRONG><A NAME="item_quote%2C_HighBit%2C_undefPrint"><CODE>quote</CODE>, <CODE>HighBit</CODE>, <CODE>undefPrint</CODE></A></STRONG><BR>
+<DD>
+Change the style of string dump.  The default value for <CODE>quote</CODE>
+is <CODE>auto</CODE>; one can enable double-quotish or single-quotish format
+by setting it to <CODE>&quot;</CODE> or <CODE>'</CODE>, respectively.  By default, characters
+with their high bit set are printed verbatim.
+<P></P>
+<DT><STRONG><A NAME="item_UsageOnly"><CODE>UsageOnly</CODE></A></STRONG><BR>
+<DD>
+Rudimentary per-package memory usage dump.  Calculates total
+size of strings found in variables in the package.  This does not
+include lexicals in a module's file scope, or lost in closures.
+<P></P></DL>
+<P>After the rc file is read, the debugger reads the <CODE>$ENV{PERLDB_OPTS}</CODE>
+environment variable and parses this as the remainder of a `O ...'
+line as one might enter at the debugger prompt.  You may place the
+initialization options <A HREF="#item_TTY"><CODE>TTY</CODE></A>, <A HREF="#item_noTTY"><CODE>noTTY</CODE></A>, <A HREF="#item_ReadLine"><CODE>ReadLine</CODE></A>, and <A HREF="#item_NonStop"><CODE>NonStop</CODE></A>
+there.</P>
+<P>If your rc file contains:</P>
+<PRE>
+  parse_options(&quot;NonStop=1 LineInfo=db.out AutoTrace&quot;);</PRE>
+<P>then your script will run without human intervention, putting trace
+information into the file <EM>db.out</EM>.  (If you interrupt it, you'd
+better reset <A HREF="#item_LineInfo"><CODE>LineInfo</CODE></A> to <EM>/dev/tty</EM> if you expect to see anything.)</P>
+<DL>
+<DT><STRONG><A NAME="item_TTY"><CODE>TTY</CODE></A></STRONG><BR>
+<DD>
+The TTY to use for debugging I/O.
+<P></P>
+<DT><STRONG><A NAME="item_noTTY"><CODE>noTTY</CODE></A></STRONG><BR>
+<DD>
+If set, the debugger goes into <A HREF="#item_NonStop"><CODE>NonStop</CODE></A> mode and will not connect to a TTY.  If
+interrupted (or if control goes to the debugger via explicit setting of
+$DB::signal or $DB::single from the Perl script), it connects to a TTY
+specified in the <A HREF="#item_TTY"><CODE>TTY</CODE></A> option at startup, or to a tty found at
+runtime using the <CODE>Term::Rendezvous</CODE> module of your choice.
+<P>This module should implement a method named <CODE>new</CODE> that returns an object
+with two methods: <CODE>IN</CODE> and <CODE>OUT</CODE>.  These should return filehandles to use
+for debugging input and output correspondingly.  The <CODE>new</CODE> method should
+inspect an argument containing the value of <CODE>$ENV{PERLDB_NOTTY}</CODE> at
+startup, or <CODE>&quot;/tmp/perldbtty$$&quot;</CODE> otherwise.  This file is not 
+inspected for proper ownership, so security hazards are theoretically
+possible.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ReadLine"><CODE>ReadLine</CODE></A></STRONG><BR>
+<DD>
+If false, readline support in the debugger is disabled in order
+to debug applications that themselves use ReadLine.
+<P></P>
+<DT><STRONG><A NAME="item_NonStop"><CODE>NonStop</CODE></A></STRONG><BR>
+<DD>
+If set, the debugger goes into non-interactive mode until interrupted, or
+programmatically by setting $DB::signal or $DB::single.
+<P></P></DL>
+<P>Here's an example of using the <CODE>$ENV{PERLDB_OPTS}</CODE> variable:</P>
+<PRE>
+    $ PERLDB_OPTS=&quot;NonStop frame=2&quot; perl -d myprogram</PRE>
+<P>That will run the script <STRONG>myprogram</STRONG> without human intervention,
+printing out the call tree with entry and exit points.  Note that
+<CODE>NonStop=1 frame=2</CODE> is equivalent to <CODE>N f=2</CODE>, and that originally,
+options could be uniquely abbreviated by the first letter (modulo
+the <CODE>Dump*</CODE> options).  It is nevertheless recommended that you
+always spell them out in full for legibility and future compatibility.</P>
+<P>Other examples include</P>
+<PRE>
+    $ PERLDB_OPTS=&quot;NonStop frame=2&quot; perl -d myprogram</PRE>
+<P>which runs script non-interactively, printing info on each entry
+into a subroutine and each executed line into the file named <EM>listing</EM>.
+(If you interrupt it, you would better reset <A HREF="#item_LineInfo"><CODE>LineInfo</CODE></A> to something
+``interactive''!)</P>
+<P>Other examples include (using standard shell syntax to show environment
+variable settings):</P>
+<PRE>
+  $ ( PERLDB_OPTS=&quot;NonStop frame=1 AutoTrace LineInfo=tperl.out&quot;
+      perl -d myprogram )</PRE>
+<P>which may be useful for debugging a program that uses <CODE>Term::ReadLine</CODE>
+itself.  Do not forget to detach your shell from the TTY in the window that
+corresponds to <EM>/dev/ttyXX</EM>, say, by issuing a command like</P>
+<PRE>
+  $ sleep 1000000</PRE>
+<P>See <A HREF="../../lib/Pod/perldebguts.html#debugger internals">Debugger Internals in the perldebguts manpage</A> for details.</P>
+<P>
+<H2><A NAME="debugger input/output">Debugger input/output</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Prompt">Prompt</A></STRONG><BR>
+<DD>
+The debugger prompt is something like
+<PRE>
+    DB&lt;8&gt;</PRE>
+<P>or even</P>
+<PRE>
+    DB&lt;&lt;17&gt;&gt;</PRE>
+<P>where that number is the command number, and which you'd use to
+access with the built-in <STRONG>csh</STRONG>-like history mechanism.  For example,
+<CODE>!17</CODE> would repeat command number 17.  The depth of the angle
+brackets indicates the nesting depth of the debugger.  You could
+get more than one set of brackets, for example, if you'd already
+at a breakpoint and then printed the result of a function call that
+itself has a breakpoint, or you step into an expression via <CODE>s/n/t
+expression</CODE> command.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Multiline_commands">Multiline commands</A></STRONG><BR>
+<DD>
+If you want to enter a multi-line command, such as a subroutine
+definition with several statements or a format, escape the newline
+that would normally end the debugger command with a backslash.
+Here's an example:
+<PRE>
+      DB&lt;1&gt; for (1..4) {         \
+      cont:     print &quot;ok\n&quot;;   \
+      cont: }
+      ok
+      ok
+      ok
+      ok</PRE>
+<P>Note that this business of escaping a newline is specific to interactive
+commands typed into the debugger.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Stack_backtrace">Stack backtrace</A></STRONG><BR>
+<DD>
+Here's an example of what a stack backtrace via <A HREF="#item_T"><CODE>T</CODE></A> command might
+look like:
+<PRE>
+    $ = main::infested called from file `Ambulation.pm' line 10
+    @ = Ambulation::legs(1, 2, 3, 4) called from file `camel_flea' line 7
+    $ = main::pests('bactrian', 4) called from file `camel_flea' line 4</PRE>
+<P>The left-hand character up there indicates the context in which the
+function was called, with <CODE>$</CODE> and <CODE>@</CODE> meaning scalar or list
+contexts respectively, and <A HREF="#item_%2E"><CODE>.</CODE></A> meaning void context (which is
+actually a sort of scalar context).  The display above says
+that you were in the function <CODE>main::infested</CODE> when you ran the
+stack dump, and that it was called in scalar context from line
+10 of the file <EM>Ambulation.pm</EM>, but without any arguments at all,
+meaning it was called as <CODE>&amp;infested</CODE>.  The next stack frame shows
+that the function <CODE>Ambulation::legs</CODE> was called in list context
+from the <EM>camel_flea</EM> file with four arguments.  The last stack
+frame shows that <CODE>main::pests</CODE> was called in scalar context,
+also from <EM>camel_flea</EM>, but from line 4.</P>
+<P>If you execute the <A HREF="#item_T"><CODE>T</CODE></A> command from inside an active <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>
+statement, the backtrace will contain both a <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> frame and
+an <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>) frame.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Line_Listing_Format">Line Listing Format</A></STRONG><BR>
+<DD>
+This shows the sorts of output the <A HREF="#item_l"><CODE>l</CODE></A> command can produce:
+<PRE>
+    DB&lt;&lt;13&gt;&gt; l
+  101:                @i{@i} = ();
+  102:b               @isa{@i,$pack} = ()
+  103                     if(exists $i{$prevpack} || exists $isa{$pack});
+  104             }
+  105
+  106             next
+  107==&gt;              if(exists $isa{$pack});
+  108
+  109:a           if ($extra-- &gt; 0) {
+  110:                %isa = ($pack,1);</PRE>
+<P>Breakable lines are marked with <CODE>:</CODE>.  Lines with breakpoints are
+marked by <CODE>b</CODE> and those with actions by <CODE>a</CODE>.  The line that's
+about to be executed is marked by <CODE>==&gt;</CODE>.</P>
+<P>Please be aware that code in debugger listings may not look the same
+as your original source code.  Line directives and external source
+filters can alter the code before Perl sees it, causing code to move
+from its original positions or take on entirely different forms.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Frame_listing">Frame listing</A></STRONG><BR>
+<DD>
+When the <A HREF="#item_frame"><CODE>frame</CODE></A> option is set, the debugger would print entered (and
+optionally exited) subroutines in different styles.  See <A HREF="../../lib/Pod/perldebguts.html">the perldebguts manpage</A>
+for incredibly long examples of these.
+<P></P></DL>
+<P>
+<H2><A NAME="debugging compiletime statements">Debugging compile-time statements</A></H2>
+<P>If you have compile-time executable statements (such as code within
+BEGIN and CHECK blocks or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> statements), these will <EM>not</EM> be
+stopped by debugger, although <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>s and INIT blocks will, and
+compile-time statements can be traced with <A HREF="#item_AutoTrace"><CODE>AutoTrace</CODE></A> option set
+in <CODE>PERLDB_OPTS</CODE>).  From your own Perl code, however, you can
+transfer control back to the debugger using the following statement,
+which is harmless if the debugger is not running:</P>
+<PRE>
+    $DB::single = 1;</PRE>
+<P>If you set <CODE>$DB::single</CODE> to 2, it's equivalent to having
+just typed the <A HREF="../../lib/Pod/perlguts.html#item_n"><CODE>n</CODE></A> command, whereas a value of 1 means the <A HREF="../../lib/Pod/perlguts.html#item_s"><CODE>s</CODE></A>
+command.  The <CODE>$DB::trace</CODE>  variable should be set to 1 to simulate
+having typed the <A HREF="#item_t"><CODE>t</CODE></A> command.</P>
+<P>Another way to debug compile-time code is to start the debugger, set a
+breakpoint on the <EM>load</EM> of some module:</P>
+<PRE>
+    DB&lt;7&gt; b load f:/perllib/lib/Carp.pm
+  Will stop on load of `f:/perllib/lib/Carp.pm'.</PRE>
+<P>and then restart the debugger using the <A HREF="#item_R"><CODE>R</CODE></A> command (if possible).  One can use <A HREF="#item_b_compile_subname"><CODE>b
+compile subname</CODE></A> for the same purpose.</P>
+<P>
+<H2><A NAME="debugger customization">Debugger Customization</A></H2>
+<P>The debugger probably contains enough configuration hooks that you
+won't ever have to modify it yourself.  You may change the behaviour
+of debugger from within the debugger using its <CODE>O</CODE> command, from
+the command line via the <CODE>PERLDB_OPTS</CODE> environment variable, and
+from customization files.</P>
+<P>You can do some customization by setting up a <EM>.perldb</EM> file, which
+contains initialization code.  For instance, you could make aliases
+like these (the last one is one people expect to be there):</P>
+<PRE>
+    $DB::alias{'len'}  = 's/^len(.*)/p length($1)/';
+    $DB::alias{'stop'} = 's/^stop (at|in)/b/';
+    $DB::alias{'ps'}   = 's/^ps\b/p scalar /';
+    $DB::alias{'quit'} = 's/^quit(\s*)/exit/';</PRE>
+<P>You can change options from <EM>.perldb</EM> by using calls like this one;</P>
+<PRE>
+    parse_options(&quot;NonStop=1 LineInfo=db.out AutoTrace=1 frame=2&quot;);</PRE>
+<P>The code is executed in the package <CODE>DB</CODE>.  Note that <EM>.perldb</EM> is
+processed before processing <CODE>PERLDB_OPTS</CODE>.  If <EM>.perldb</EM> defines the
+subroutine <CODE>afterinit</CODE>, that function is called after debugger
+initialization ends.  <EM>.perldb</EM> may be contained in the current
+directory, or in the home directory.  Because this file is sourced
+in by Perl and may contain arbitrary commands, for security reasons,
+it must be owned by the superuser or the current user, and writable
+by no one but its owner.</P>
+<P>If you want to modify the debugger, copy <EM>perl5db.pl</EM> from the
+Perl library to another name and hack it to your heart's content.
+You'll then want to set your <A HREF="../../lib/Pod/perlrun.html#item_PERL5DB"><CODE>PERL5DB</CODE></A> environment variable to say
+something like this:</P>
+<PRE>
+    BEGIN { require &quot;myperl5db.pl&quot; }</PRE>
+<P>As a last resort, you could also use <A HREF="../../lib/Pod/perlrun.html#item_PERL5DB"><CODE>PERL5DB</CODE></A> to customize the debugger
+by directly setting internal variables or calling debugger functions.</P>
+<P>Note that any variables and functions that are not documented in
+this document (or in <A HREF="../../lib/Pod/perldebguts.html">the perldebguts manpage</A>) are considered for internal
+use only, and as such are subject to change without notice.</P>
+<P>
+<H2><A NAME="readline support">Readline Support</A></H2>
+<P>As shipped, the only command-line history supplied is a simplistic one
+that checks for leading exclamation points.  However, if you install
+the Term::ReadKey and Term::ReadLine modules from CPAN, you will
+have full editing capabilities much like GNU <EM>readline</EM>(3) provides.
+Look for these in the <EM>modules/by-module/Term</EM> directory on CPAN.
+These do not support normal <STRONG>vi</STRONG> command-line editing, however.</P>
+<P>A rudimentary command-line completion is also available.
+Unfortunately, the names of lexical variables are not available for
+completion.</P>
+<P>
+<H2><A NAME="editor support for debugging">Editor Support for Debugging</A></H2>
+<P>If you have the FSF's version of <STRONG>emacs</STRONG> installed on your system,
+it can interact with the Perl debugger to provide an integrated
+software development environment reminiscent of its interactions
+with C debuggers.</P>
+<P>Perl comes with a start file for making <STRONG>emacs</STRONG> act like a
+syntax-directed editor that understands (some of) Perl's syntax.
+Look in the <EM>emacs</EM> directory of the Perl source distribution.</P>
+<P>A similar setup by Tom Christiansen for interacting with any
+vendor-shipped <STRONG>vi</STRONG> and the X11 window system is also available.
+This works similarly to the integrated multiwindow support that
+<STRONG>emacs</STRONG> provides, where the debugger drives the editor.  At the
+time of this writing, however, that tool's eventual location in the
+Perl distribution was uncertain.</P>
+<P>Users of <STRONG>vi</STRONG> should also look into <STRONG>vim</STRONG> and <STRONG>gvim</STRONG>, the mousey
+and windy version, for coloring of Perl keywords.</P>
+<P>Note that only perl can truly parse Perl, so all such CASE tools
+fall somewhat short of the mark, especially if you don't program
+your Perl as a C programmer might.</P>
+<P>
+<H2><A NAME="the perl profiler">The Perl Profiler</A></H2>
+<P>If you wish to supply an alternative debugger for Perl to run, just
+invoke your script with a colon and a package argument given to the
+<STRONG>-d</STRONG> flag.  The most popular alternative debuggers for Perl is the
+Perl profiler.  Devel::DProf is now included with the standard Perl
+distribution.  To profile your Perl program in the file <EM>mycode.pl</EM>,
+just type:</P>
+<PRE>
+    $ perl -d:DProf mycode.pl</PRE>
+<P>When the script terminates the profiler will dump the profile
+information to a file called <EM>tmon.out</EM>.  A tool like <STRONG>dprofpp</STRONG>,
+also supplied with the standard Perl distribution, can be used to
+interpret the information in that profile.</P>
+<P>
+<HR>
+<H1><A NAME="debugging regular expressions">Debugging regular expressions</A></H1>
+<P><CODE>use re 'debug'</CODE> enables you to see the gory details of how the
+Perl regular expression engine works.  In order to understand this
+typically voluminous output, one must not only have some idea about
+about how regular expression matching works in general, but also
+know how Perl's regular expressions are internally compiled into
+an automaton.  These matters are explored in some detail in
+<A HREF="../../lib/Pod/perldebguts.html#debugging regular expressions">Debugging regular expressions in the perldebguts manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="debugging memory usage">Debugging memory usage</A></H1>
+<P>Perl contains internal support for reporting its own memory usage,
+but this is a fairly advanced concept that requires some understanding
+of how memory allocation works.
+See <A HREF="../../lib/Pod/perldebguts.html#debugging perl memory usage">Debugging Perl memory usage in the perldebguts manpage</A> for the details.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>You did try the <STRONG>-w</STRONG> switch, didn't you?</P>
+<P><A HREF="../../lib/Pod/perldebguts.html">the perldebguts manpage</A>,
+<A HREF="../../lib/re.html">the re manpage</A>,
+<A HREF="../../lib/DB.html">the DB manpage</A>,
+<A HREF="../../Devel/Dprof.html">the Devel::Dprof manpage</A>,
+<EM>dprofpp</EM>,
+<A HREF="../../lib/Dumpvalue.html">the Dumpvalue manpage</A>,
+and
+<A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>You cannot get stack frame information or in any fashion debug functions
+that were not compiled by Perl, such as those from C or C++ extensions.</P>
+<P>If you alter your @_ arguments in a subroutine (such as with <A HREF="../../lib/Pod/perlfunc.html#item_shift"><CODE>shift</CODE></A>
+or <A HREF="../../lib/Pod/perlfunc.html#item_pop"><CODE>pop</CODE></A>, the stack backtrace will not show the original values.</P>
+<P>The debugger does not currently work in conjunction with the <STRONG>-W</STRONG>
+command-line switch, because it itself is not free of warnings.</P>
+<P>If you're in a slow syscall (like <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait</CODE></A>ing, <A HREF="../../lib/Pod/perlfunc.html#item_accept"><CODE>accept</CODE></A>ing, or <A HREF="../../lib/Pod/perlfunc.html#item_read"><CODE>read</CODE></A>ing
+from your keyboard or a socket) and haven't set up your own <CODE>$SIG{INT}</CODE>
+handler, then you won't be able to CTRL-C your way back to the debugger,
+because the debugger's own <CODE>$SIG{INT}</CODE> handler doesn't understand that
+it needs to raise an exception to <CODE>longjmp(3)</CODE> out of slow syscalls.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perldebug - Perl debugging</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

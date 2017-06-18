@@ -1,0 +1,190 @@
+
+<HTML>
+<HEAD>
+<TITLE>inet_ntoa - load the C socket.h defines and structure manipulators</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;inet_ntoa - load the C socket.h defines and structure manipulators</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Socket, sockaddr_in, sockaddr_un, inet_aton, inet_ntoa - load the C socket.h defines and structure manipulators</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Socket;</PRE>
+<PRE>
+    $proto = getprotobyname('udp');
+    socket(Socket_Handle, PF_INET, SOCK_DGRAM, $proto);
+    $iaddr = gethostbyname('hishost.com');
+    $port = getservbyname('time', 'udp');
+    $sin = sockaddr_in($port, $iaddr);
+    send(Socket_Handle, 0, 0, $sin);</PRE>
+<PRE>
+    $proto = getprotobyname('tcp');
+    socket(Socket_Handle, PF_INET, SOCK_STREAM, $proto);
+    $port = getservbyname('smtp', 'tcp');
+    $sin = sockaddr_in($port,inet_aton(&quot;127.1&quot;));
+    $sin = sockaddr_in(7,inet_aton(&quot;localhost&quot;));
+    $sin = sockaddr_in(7,INADDR_LOOPBACK);
+    connect(Socket_Handle,$sin);</PRE>
+<PRE>
+    ($port, $iaddr) = sockaddr_in(getpeername(Socket_Handle));
+    $peer_host = gethostbyaddr($iaddr, AF_INET);
+    $peer_addr = inet_ntoa($iaddr);</PRE>
+<PRE>
+    $proto = getprotobyname('tcp');
+    socket(Socket_Handle, PF_UNIX, SOCK_STREAM, $proto);
+    unlink('/tmp/usock');
+    $sun = sockaddr_un('/tmp/usock');
+    connect(Socket_Handle,$sun);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module is just a translation of the C <EM>socket.h</EM> file.
+Unlike the old mechanism of requiring a translated <EM>socket.ph</EM>
+file, this uses the <STRONG>h2xs</STRONG> program (see the Perl source distribution)
+and your native C compiler.  This means that it has a 
+far more likely chance of getting the numbers right.  This includes
+all of the commonly used pound-defines like AF_INET, SOCK_STREAM, etc.</P>
+<P>Also, some common socket ``newline'' constants are provided: the
+constants <CODE>CR</CODE>, <CODE>LF</CODE>, and <CODE>CRLF</CODE>, as well as <CODE>$CR</CODE>, <CODE>$LF</CODE>, and
+<CODE>$CRLF</CODE>, which map to <CODE>\015</CODE>, <CODE>\012</CODE>, and <CODE>\015\012</CODE>.  If you do
+not want to use the literal characters in your programs, then use
+the constants provided here.  They are not exported by default, but can
+be imported individually, and with the <CODE>:crlf</CODE> export tag:</P>
+<PRE>
+    use Socket qw(:DEFAULT :crlf);</PRE>
+<P>In addition, some structure manipulation functions are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_inet_aton_HOSTNAME">inet_aton HOSTNAME</A></STRONG><BR>
+<DD>
+Takes a string giving the name of a host, and translates that
+to the 4-byte string (structure). Takes arguments of both
+the 'rtfm.mit.edu' type and '18.181.0.24'. If the host name
+cannot be resolved, returns undef. For multi-homed hosts (hosts
+with more than one address), the first address found is returned.
+<P></P>
+<DT><STRONG><A NAME="item_inet_ntoa_IP_ADDRESS">inet_ntoa IP_ADDRESS</A></STRONG><BR>
+<DD>
+Takes a four byte ip address (as returned by <CODE>inet_aton())</CODE>
+and translates it into a string of the form 'd.d.d.d'
+where the 'd's are numbers less than 256 (the normal
+readable four dotted number notation for internet addresses).
+<P></P>
+<DT><STRONG><A NAME="item_INADDR_ANY">INADDR_ANY</A></STRONG><BR>
+<DD>
+Note: does not return a number, but a packed string.
+<P>Returns the 4-byte wildcard ip address which specifies any
+of the hosts ip addresses. (A particular machine can have
+more than one ip address, each address corresponding to
+a particular network interface. This wildcard address
+allows you to bind to all of them simultaneously.)
+Normally equivalent to inet_aton('0.0.0.0').</P>
+<P></P>
+<DT><STRONG><A NAME="item_INADDR_BROADCAST">INADDR_BROADCAST</A></STRONG><BR>
+<DD>
+Note: does not return a number, but a packed string.
+<P>Returns the 4-byte 'this-lan' ip broadcast address.
+This can be useful for some protocols to solicit information
+from all servers on the same LAN cable.
+Normally equivalent to inet_aton('255.255.255.255').</P>
+<P></P>
+<DT><STRONG><A NAME="item_INADDR_LOOPBACK">INADDR_LOOPBACK</A></STRONG><BR>
+<DD>
+Note - does not return a number.
+<P>Returns the 4-byte loopback address. Normally equivalent
+to inet_aton('localhost').</P>
+<P></P>
+<DT><STRONG><A NAME="item_INADDR_NONE">INADDR_NONE</A></STRONG><BR>
+<DD>
+Note - does not return a number.
+<P>Returns the 4-byte 'invalid' ip address. Normally equivalent
+to inet_aton('255.255.255.255').</P>
+<P></P>
+<DT><STRONG><A NAME="item_sockaddr_in_PORT%2C_ADDRESS">sockaddr_in PORT, ADDRESS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_sockaddr_in_SOCKADDR_IN">sockaddr_in SOCKADDR_IN</A></STRONG><BR>
+<DD>
+In a list context, unpacks its SOCKADDR_IN argument and returns an array
+consisting of (PORT, ADDRESS).  In a scalar context, packs its (PORT,
+ADDRESS) arguments as a SOCKADDR_IN and returns it.  If this is confusing,
+use <CODE>pack_sockaddr_in()</CODE> and <CODE>unpack_sockaddr_in()</CODE> explicitly.
+<P></P>
+<DT><STRONG><A NAME="item_pack_sockaddr_in_PORT%2C_IP_ADDRESS">pack_sockaddr_in PORT, IP_ADDRESS</A></STRONG><BR>
+<DD>
+Takes two arguments, a port number and a 4 byte IP_ADDRESS (as returned by
+inet_aton()). Returns the sockaddr_in structure with those arguments
+packed in with AF_INET filled in.  For internet domain sockets, this
+structure is normally what you need for the arguments in bind(),
+connect(), and send(), and is also returned by getpeername(),
+<A HREF="../lib/Pod/perlfunc.html#item_getsockname"><CODE>getsockname()</CODE></A> and recv().
+<P></P>
+<DT><STRONG><A NAME="item_unpack_sockaddr_in_SOCKADDR_IN">unpack_sockaddr_in SOCKADDR_IN</A></STRONG><BR>
+<DD>
+Takes a sockaddr_in structure (as returned by <CODE>pack_sockaddr_in())</CODE> and
+returns an array of two elements: the port and the 4-byte ip-address.
+Will croak if the structure does not have AF_INET in the right place.
+<P></P>
+<DT><STRONG><A NAME="item_sockaddr_un_PATHNAME">sockaddr_un PATHNAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_sockaddr_un_SOCKADDR_UN">sockaddr_un SOCKADDR_UN</A></STRONG><BR>
+<DD>
+In a list context, unpacks its SOCKADDR_UN argument and returns an array
+consisting of (PATHNAME).  In a scalar context, packs its PATHNAME
+arguments as a SOCKADDR_UN and returns it.  If this is confusing, use
+<CODE>pack_sockaddr_un()</CODE> and <CODE>unpack_sockaddr_un()</CODE> explicitly.
+These are only supported if your system has &lt;<EM>sys/un.h</EM>&gt;.
+<P></P>
+<DT><STRONG><A NAME="item_pack_sockaddr_un_PATH">pack_sockaddr_un PATH</A></STRONG><BR>
+<DD>
+Takes one argument, a pathname. Returns the sockaddr_un structure with
+that path packed in with AF_UNIX filled in. For unix domain sockets, this
+structure is normally what you need for the arguments in bind(),
+connect(), and send(), and is also returned by getpeername(),
+<A HREF="../lib/Pod/perlfunc.html#item_getsockname"><CODE>getsockname()</CODE></A> and recv().
+<P></P>
+<DT><STRONG><A NAME="item_unpack_sockaddr_un_SOCKADDR_UN">unpack_sockaddr_un SOCKADDR_UN</A></STRONG><BR>
+<DD>
+Takes a sockaddr_un structure (as returned by <CODE>pack_sockaddr_un())</CODE>
+and returns the pathname.  Will croak if the structure does not
+have AF_UNIX in the right place.
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;inet_ntoa - load the C socket.h defines and structure manipulators</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

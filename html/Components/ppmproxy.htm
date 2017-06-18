@@ -1,0 +1,108 @@
+<html>
+
+<head>
+<title>ActiveState Tool Corp. - Perl Mastery</title>
+<meta name="description" content="Perl Resource Kit -- Win32 Edition">
+<meta name="keywords" content="Oreilly, ActiveState, ActivePerl">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<link rel="stylesheet" href="../Active.css" type="text/css">
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl - PPM, Proxies and Firewalls</p>
+      </strong></td>
+  </tr>
+</table>
+<br>
+<p><b>PPM and Proxies</b></p>
+<p>If you use a proxy server or firewall, you might have trouble running PPM.
+Here is the solution.</p>
+<blockquote>
+  <p><b><i>NOTE</i></b>: If none of the changes in this document work for you,
+  you may download individual packages from <a href="http://www.activestate.com/PPMpackages/5.6/zips">here
+  [ActivePerl 613 and later]</a> or <a href="http://www.activestate.com/PPMpackages/5.005/zips">here
+  [ActivePerl 522 and earlier]</a> and install and install them according to the
+  directions in the README file contained within the ZIP file. If you want, you
+  can also keep a local repository, with several .ppd files in a permanent
+  repository directory, and their .tar.gz files in an <i>x86</i> directory
+  beneath that.</p>
+</blockquote>
+<ol start="1">
+  <li>
+    <p><b>Set Environment Vars</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>Up to three environment variables need to be set.</p>
+</blockquote>
+<blockquote>
+  <p><strong>Under Windows NT<br>
+  </strong>Right click on &quot;My Computer&quot;, click on
+  &quot;properties&quot;, select the &quot;environment&quot; tab. These are your
+  environment settings. Make the following changes:<br>
+  <br>
+  <ol>
+    <li>Add the setting HTTP_proxy, with your proxy name as the value (<em><strong>you
+      must include &quot;http://&quot; </strong></em>), followed by a colon and
+      the proxy port, if applicable; e.g., &quot;http://proxy:8080&quot;</li>
+    <li>If you require a user name and/or password to access your proxy, add the
+      settings HTTP_proxy_user and HTTP_proxy_pass, with your user name and
+      password as the respective values</li>
+    <br>
+  </ol>
+</blockquote>
+<blockquote>
+  <p><strong>Under Windows 95<br>
+  </strong>In your AUTOEXEC.BAT file, place the following lines then reboot so
+  the changes can take effect:</p>
+</blockquote>
+<blockquote>
+  <ol start="1">
+    <li>SET HTTP_proxy=&lt;your proxy server (<strong><em>you must include
+      &quot;http://&quot; </em></strong>&gt;, followed by a colon and the proxy
+      port, if applicable; e.g., SET HTTP_proxy=http://proxy:8080</li>
+    <li>SET HTTP_proxy_user=&lt;your user name&gt; (if required)</li>
+    <li>SET HTTP_proxy_pass=&lt;your password&gt; (if required)<br>
+      <br>
+    </li>
+  </ol>
+</blockquote>
+<ol start="2">
+  <li>
+    <p><b>Try using PPM</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>With your internet connection active, try using PPM again. Try to install a
+  small package, like File-Slurp. You'll know that it still fails if you see an
+  error stating that it can't find a ppd file for the specified package.
+</blockquote>
+<ol start="3">
+  <li>
+    <p><b>Further Information and Help</b></p>
+  </li>
+</ol>
+<blockquote>
+  <p>If there were problems with any of the above hints, please see <a href="../readme.html#More_Info">here</a>
+  on how to get further help.</p>
+</blockquote>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl - PPM, Proxies and Firewalls</p>
+      </strong></td>
+  </tr>
+</table>
+<ul>
+  <font color="#808080" face="verdana, arial, helvetica"><strong>Copyright&nbsp;
+  © 1996-2000 ActiveState Tool Corp. <a href="http://www.activestate.com/corporate/legal.htm">All
+  rights reserved.</a>
+  <p></strong></font>
+</ul>
+
+</body>

@@ -1,0 +1,174 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::ProfileDumper - profile DBI usage and output data to a file</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileDumper - profile DBI usage and output data to a file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#data format">DATA FORMAT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT AND LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>DBI::ProfileDumper - profile DBI usage and output data to a file</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>To profile an existing program using DBI::ProfileDumper, set the
+DBI_PROFILE environment variable and run your program as usual.  For
+example, using bash:</P>
+<PRE>
+  DBI_PROFILE=DBI::ProfileDumper program.pl</PRE>
+<P>Then analyze the generated file (<EM>dbi.prof</EM>) with <A HREF="..\..\..\bin/dbiprof.html">dbiprof</A>:</P>
+<PRE>
+  dbiprof</PRE>
+<P>You can also activate DBI::ProfileDumper from within your code:</P>
+<PRE>
+  use DBI;</PRE>
+<PRE>
+  # profile with default path (2) and output file (dbi.prof)
+  $dbh-&gt;{Profile} = &quot;DBI::ProfileDumper&quot;;</PRE>
+<PRE>
+  # same thing, spelled out
+  $dbh-&gt;{Profile} = &quot;2/DBI::ProfileDumper/File/dbi.prof&quot;;</PRE>
+<PRE>
+  # another way to say it
+  use DBI::Profile qw(DBIprofile_Statement);
+  $dbh-&gt;{Profile} = DBI::ProfileDumper-&gt;new(
+                      { Path =&gt; [ DBIprofile_Statement ]
+                        File =&gt; 'dbi.prof' });</PRE>
+<PRE>
+  # using a custom path
+  $dbh-&gt;{Profile} = DBI::ProfileDumper-&gt;new({ Path =&gt; [ &quot;foo&quot;, &quot;bar&quot; ],
+                                              File =&gt; 'dbi.prof' });</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>DBI::ProfileDumper is a subclass of <A HREF="..\..\..\site\lib/DBI/Profile.html">DBI::Profile</A> which
+dumps profile data to disk instead of printing a summary to your
+screen.  You can then use <A HREF="..\..\..\bin/dbiprof.html">dbiprof</A> to analyze the data in
+a number of interesting ways, or you can roll your own analysis using
+<A HREF="..\..\..\site\lib/DBI/ProfileData.html">DBI::ProfileData</A>.</P>
+<P><STRONG>NOTE:</STRONG> For Apache/mod_perl applications, use
+<A HREF="..\..\..\site\lib/DBI/ProfileDumper/Apache.html">DBI::ProfileDumper::Apache</A>.</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<P>One way to use this module is just to enable it in your <CODE>$dbh</CODE>:</P>
+<PRE>
+  $dbh-&gt;{Profile} = &quot;DBI::ProfileDumper&quot;;</PRE>
+<P>This will write out profile data by statement into a file called
+<EM>dbi.prof</EM>.  If you want to modify either of these properties, you
+can construct the DBI::ProfileDumper object yourself:</P>
+<PRE>
+  use DBI::Profile qw(DBIprofile_Statement);
+  $dbh-&gt;{Profile} = DBI::ProfileDumper-&gt;new(
+                      { Path =&gt; [ DBIprofile_Statement ]
+                        File =&gt; 'dbi.prof' });</PRE>
+<P>The <CODE>Path</CODE> option takes the same values as in
+<EM>DBI::Profile</EM>.  The <CODE>File</CODE> option gives the name of the
+file where results will be collected.  If it already exists it will be
+overwritten.</P>
+<P>You can also activate this module by setting the DBI_PROFILE
+environment variable:</P>
+<PRE>
+  $ENV{DBI_PROFILE} = &quot;DBI::ProfileDumper&quot;;</PRE>
+<P>This will cause all DBI handles to share the same profiling object.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are available to be called using the profile
+object.  You can get access to the profile object from the Profile key
+in any DBI handle:</P>
+<PRE>
+  my $profile = $dbh-&gt;{Profile};</PRE>
+<DL>
+<DT><STRONG><A NAME="item_flush_to_disk">$profile-&gt;<CODE>flush_to_disk()</CODE></A></STRONG><BR>
+<DD>
+Flushes all collected profile data to disk and empties the Data hash.
+This method may be called multiple times during a program run.
+<P></P>
+<DT><STRONG><A NAME="item_empty">$profile-&gt;<CODE>empty()</CODE></A></STRONG><BR>
+<DD>
+Clears the Data hash without writing to disk.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="data format">DATA FORMAT</A></H1>
+<P>The data format written by DBI::ProfileDumper starts with a header
+containing the version number of the module used to generate it.  Then
+a block of variable declarations describes the profile.  After two
+newlines, the profile data forms the body of the file.  For example:</P>
+<PRE>
+  DBI::ProfileDumper 1.0
+  Path = [ DBIprofile_Statement, DBIprofile_MethodName ]
+  Program = t/42profile_data.t
+</PRE>
+<PRE>
+
+  + 1 SELECT name FROM users WHERE id = ?
+  + 2 prepare
+  = 1 0.0312958955764771 0.000490069389343262 0.000176072120666504 0.00140702724456787 1023115819.83019 1023115819.86576
+  + 2 execute
+  1 0.0312958955764771 0.000490069389343262 0.000176072120666504 0.00140702724456787 1023115819.83019 1023115819.86576
+  + 2 fetchrow_hashref
+  = 1 0.0312958955764771 0.000490069389343262 0.000176072120666504 0.00140702724456787 1023115819.83019 1023115819.86576
+  + 1 UPDATE users SET name = ? WHERE id = ?
+  + 2 prepare
+  = 1 0.0312958955764771 0.000490069389343262 0.000176072120666504 0.00140702724456787 1023115819.83019 1023115819.86576
+  + 2 execute
+  = 1 0.0312958955764771 0.000490069389343262 0.000176072120666504 0.00140702724456787 1023115819.83019 1023115819.86576</PRE>
+<P>The lines beginning with <CODE>+</CODE> signs signify keys.  The number after
+the <CODE>+</CODE> sign shows the nesting level of the key.  Lines beginning
+with <CODE>=</CODE> are the actual profile data, in the same order as
+in DBI::Profile.</P>
+<P>Note that the same path may be present multiple times in the data file
+since <CODE>format()</CODE> may be called more than once.  When read by
+DBI::ProfileData the data points will be merged to produce a single
+data set for each distinct path.</P>
+<P>The key strings are transformed in three ways.  First, all backslashes
+are doubled.  Then all newlines and carriage-returns are transformed
+into <CODE>\n</CODE> and <CODE>\r</CODE> respectively.  Finally, any NULL bytes (<CODE>\0</CODE>)
+are entirely removed.  When DBI::ProfileData reads the file the first
+two transformations will be reversed, but NULL bytes will not be
+restored.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Sam Tregar &lt;<A HREF="mailto:sam@tregar.com">sam@tregar.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT AND LICENSE</A></H1>
+<P>Copyright (C) 2002 Sam Tregar</P>
+<P>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileDumper - profile DBI usage and output data to a file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

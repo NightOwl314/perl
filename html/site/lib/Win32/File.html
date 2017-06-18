@@ -1,0 +1,104 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::File - manage file attributes in perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::File - manage file attributes in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">Functions</A></LI>
+	<UL>
+
+		<LI><A HREF="#note">NOTE</A></LI>
+	</UL>
+
+	<LI><A HREF="#constants">Constants</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::File - manage file attributes in perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Win32::File;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module offers the retrieval and setting of file attributes.</P>
+<P>
+<HR>
+<H1><A NAME="functions">Functions</A></H1>
+<P>
+<H2><A NAME="note">NOTE</A></H2>
+<P>All of the functions return FALSE (0) if they fail, unless otherwise noted.
+The function names are exported into the caller's namespace by request.</P>
+<DL>
+<DT><STRONG><A NAME="item_GetAttributes">GetAttributes(filename, returnedAttributes)</A></STRONG><BR>
+<DD>
+Gets the attributes of a file or directory. returnedAttributes will be set
+to the OR-ed combination of the filename attributes.
+<P></P>
+<DT><STRONG><A NAME="item_SetAttributes">SetAttributes(filename, newAttributes)</A></STRONG><BR>
+<DD>
+Sets the attributes of a file or directory. newAttributes must be an OR-ed
+combination of the attributes.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="constants">Constants</A></H1>
+<P>The following constants are exported by default.</P>
+<DL>
+<DT><STRONG><A NAME="item_ARCHIVE">ARCHIVE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_COMPRESSED">COMPRESSED</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_DIRECTORY">DIRECTORY</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_HIDDEN">HIDDEN</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_NORMAL">NORMAL</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_OFFLINE">OFFLINE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_READONLY">READONLY</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_SYSTEM">SYSTEM</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TEMPORARY">TEMPORARY</A></STRONG><BR>
+<DD>
+</DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::File - manage file attributes in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

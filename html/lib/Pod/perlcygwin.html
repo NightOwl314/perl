@@ -1,0 +1,595 @@
+<HTML>
+<HEAD>
+<TITLE>README.cygwin - Perl for Cygwin</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.cygwin - Perl for Cygwin</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#prerequisites">PREREQUISITES</A></LI>
+	<UL>
+
+		<LI><A HREF="#cygwin = gnu+cygnus+windows (don't leave unix without it)">Cygwin = GNU+Cygnus+Windows (Don't leave UNIX without it)</A></LI>
+		<LI><A HREF="#cygwin configuration">Cygwin Configuration</A></LI>
+	</UL>
+
+	<LI><A HREF="#configure">CONFIGURE</A></LI>
+	<UL>
+
+		<LI><A HREF="#strip binaries">Strip Binaries</A></LI>
+		<LI><A HREF="#optional libraries">Optional Libraries</A></LI>
+		<LI><A HREF="#configuretime options">Configure-time Options</A></LI>
+		<LI><A HREF="#suspicious warnings">Suspicious Warnings</A></LI>
+	</UL>
+
+	<LI><A HREF="#make">MAKE</A></LI>
+	<UL>
+
+		<LI><A HREF="#warnings">Warnings</A></LI>
+		<LI><A HREF="#ld2">ld2</A></LI>
+	</UL>
+
+	<LI><A HREF="#test">TEST</A></LI>
+	<UL>
+
+		<LI><A HREF="#file permissions">File Permissions</A></LI>
+		<LI><A HREF="#hard links">Hard Links</A></LI>
+		<LI><A HREF="#filetime granularity">Filetime Granularity</A></LI>
+		<LI><A HREF="#tainting checks">Tainting Checks</A></LI>
+		<LI><A HREF="#/etc/group">/etc/group</A></LI>
+		<LI><A HREF="#script portability">Script Portability</A></LI>
+	</UL>
+
+	<LI><A HREF="#install">INSTALL</A></LI>
+	<LI><A HREF="#manifest">MANIFEST</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>README.cygwin - Perl for Cygwin</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document will help you configure, make, test and install Perl
+on Cygwin.  This document also describes features of Cygwin that will
+affect how Perl behaves at runtime.</P>
+<P><STRONG>NOTE:</STRONG> There are pre-built Perl packages available for Cygwin and a
+version of Perl is provided on the Cygwin CD.  If you do not need to
+customize the configuration, consider using one of these packages:</P>
+<PRE>
+  <A HREF="http://cygutils.netpedia.net/">http://cygutils.netpedia.net/</A></PRE>
+<P>
+<HR>
+<H1><A NAME="prerequisites">PREREQUISITES</A></H1>
+<P>
+<H2><A NAME="cygwin = gnu+cygnus+windows (don't leave unix without it)">Cygwin = GNU+Cygnus+Windows (Don't leave UNIX without it)</A></H2>
+<P>The Cygwin tools are ports of the popular GNU development tools for Win32
+platforms.  They run thanks to the Cygwin library which provides the UNIX
+system calls and environment these programs expect.  More information
+about this project can be found at:</P>
+<PRE>
+  <A HREF="http://www.cygwin.com/">http://www.cygwin.com/</A></PRE>
+<P>A recent net or commercial release of Cygwin is required.</P>
+<P>At the time this document was last updated, Cygwin 1.1.5 was current.</P>
+<P><STRONG>NOTE:</STRONG> At this point, minimal effort has been made to provide
+compatibility with old (beta) Cygwin releases.  The focus has been to
+provide a high quality release and not worry about working around old
+bugs.  If you wish to use Perl with Cygwin B20.1 or earlier, consider
+using perl5.005_03, which is available in source and binary form at
+<CODE>http://cygutils.netpedia.net/</CODE>.  If there is significant demand,
+a patch kit can be developed to port back to earlier Cygwin versions.</P>
+<P>
+<H2><A NAME="cygwin configuration">Cygwin Configuration</A></H2>
+<P>While building Perl some changes may be necessary to your Cygwin setup so
+that Perl builds cleanly.  These changes are <STRONG>not</STRONG> required for normal
+Perl usage.</P>
+<P><STRONG>NOTE:</STRONG> The binaries that are built will run on all Win32 versions.
+They do not depend on your host system (Win9x/WinME, WinNT/Win2K)
+or your Cygwin configuration (<EM>ntea</EM>, <EM>ntsec</EM>, binary/text mounts).
+The only dependencies come from hard-coded pathnames like <CODE>/usr/local</CODE>.
+However, your host system and Cygwin configuration will affect Perl's
+runtime behavior (see <A HREF="#test">TEST</A>).</P>
+<UL>
+<LI><STRONG><A NAME="item_PATH"><CODE>PATH</CODE></A></STRONG><BR>
+
+Set the <A HREF="#item_PATH"><CODE>PATH</CODE></A> environment variable so that Configure finds the Cygwin
+versions of programs.  Any Windows directories should be removed or
+moved to the end of your <A HREF="#item_PATH"><CODE>PATH</CODE></A>.
+<P></P>
+<LI><STRONG><A NAME="item_nroff"><EM>nroff</EM></A></STRONG><BR>
+
+If you do not have <EM>nroff</EM> (which is part of the <EM>groff</EM> package),
+Configure will <STRONG>not</STRONG> prompt you to install <EM>man</EM> pages.
+<P></P>
+<LI><STRONG><A NAME="item_Permissions">Permissions</A></STRONG><BR>
+
+On WinNT with either the <EM>ntea</EM> or <EM>ntsec</EM> <CODE>CYGWIN</CODE> settings, directory
+and file permissions may not be set correctly.  Since the build process
+creates directories and files, to be safe you may want to run a `<CODE>chmod
+-R +w *</CODE>' on the entire Perl source tree.
+<P>Also, it is a well known WinNT ``feature'' that files created by a login
+that is a member of the <EM>Administrators</EM> group will be owned by the
+<EM>Administrators</EM> group.  Depending on your umask, you may find that you
+can not write to files that you just created (because you are no longer
+the owner).  When using the <EM>ntsec</EM> <CODE>CYGWIN</CODE> setting, this is not an
+issue because it ``corrects'' the ownership to what you would expect on
+a UNIX system.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="configure">CONFIGURE</A></H1>
+<P>The default options gathered by Configure with the assistance of
+<EM>hints/cygwin.sh</EM> will build a Perl that supports dynamic loading
+(which requires a shared <EM>libperl.dll</EM>).</P>
+<P>This will run Configure and keep a record:</P>
+<PRE>
+  ./Configure 2&gt;&amp;1 | tee log.configure</PRE>
+<P>If you are willing to accept all the defaults run Configure with <STRONG>-de</STRONG>.
+However, several useful customizations are available.</P>
+<P>
+<H2><A NAME="strip binaries">Strip Binaries</A></H2>
+<P>It is possible to strip the EXEs and DLLs created by the build process.
+The resulting binaries will be significantly smaller.  If you want the
+binaries to be stripped, you can either add a <STRONG>-s</STRONG> option when Configure
+prompts you,</P>
+<PRE>
+  Any additional ld flags (NOT including libraries)? [none] -s
+  Any special flags to pass to gcc to use dynamic linking? [none] -s
+  Any special flags to pass to ld2 to create a dynamically loaded library?
+  [none] -s</PRE>
+<P>or you can edit <EM>hints/cygwin.sh</EM> and uncomment the relevant variables
+near the end of the file.</P>
+<P>
+<H2><A NAME="optional libraries">Optional Libraries</A></H2>
+<P>Several Perl functions and modules depend on the existence of
+some optional libraries.  Configure will find them if they are
+installed in one of the directories listed as being used for library
+searches.  Pre-built packages for most of these are available at
+<CODE>http://cygutils.netpedia.net/</CODE>.</P>
+<UL>
+<LI><STRONG><A NAME="item_%2Dlcrypt"><CODE>-lcrypt</CODE></A></STRONG><BR>
+
+The crypt package distributed with Cygwin is a Linux compatible 56-bit
+DES crypt port by Corinna Vinschen.
+<P>Alternatively, the crypt libraries in GNU libc have been ported to Cygwin.</P>
+<P>The DES based Ultra Fast Crypt port was done by Alexey Truhan:</P>
+<PRE>
+  <A HREF="ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/cw32crypt-dist-0.tgz">ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/cw32crypt-dist-0.tgz</A></PRE>
+<P>NOTE: There are various export restrictions on DES implementations,
+see the glibc README for more details.</P>
+<P>The MD5 port was done by Andy Piper:</P>
+<PRE>
+  <A HREF="ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/libcrypt.tgz">ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/libcrypt.tgz</A></PRE>
+<P></P>
+<LI><STRONG><A NAME="item_lgdbm"><CODE>-lgdbm</CODE> (<CODE>use GDBM_File</CODE>)</A></STRONG><BR>
+
+GDBM is available for Cygwin.  GDBM's ndbm/dbm compatibility feature
+also makes <CODE>NDBM_File</CODE> and <CODE>ODBM_File</CODE> possible (although they add
+little extra value).
+<P>NOTE: The ndbm/dbm emulations only completely work on NTFS partitions.</P>
+<P></P>
+<LI><STRONG><A NAME="item_ldb"><CODE>-ldb</CODE> (<CODE>use DB_File</CODE>)</A></STRONG><BR>
+
+BerkeleyDB is available for Cygwin.  Some details can be found in
+<EM>ext/DB_File/DB_File.pm</EM>.
+<P>NOTE: The BerkeleyDB library only completely works on NTFS partitions.</P>
+<P></P>
+<LI><STRONG><A NAME="item_lcygipc"><CODE>-lcygipc</CODE> (<CODE>use IPC::SysV</CODE>)</A></STRONG><BR>
+
+A port of SysV IPC is available for Cygwin.
+<P>NOTE: This has <STRONG>not</STRONG> been extensively tested.  In particular,
+<CODE>d_semctl_semun</CODE> is undefined because it fails a Configure test
+and on Win9x the <EM>shm*()</EM> functions seem to hang.  It also creates
+a compile time dependency because <EM>perl.h</EM> includes <EM>&lt;sys/ipc.h</EM>&gt;
+and <EM>&lt;sys/sem.h</EM>&gt; (which will be required in the future when compiling
+CPAN modules).</P>
+<P></P></UL>
+<P>
+<H2><A NAME="configuretime options">Configure-time Options</A></H2>
+<P>The <EM>INSTALL</EM> document describes several Configure-time options.  Some of
+these will work with Cygwin, others are not yet possible.  Also, some of
+these are experimental.  You can either select an option when Configure
+prompts you or you can define (undefine) symbols on the command line.</P>
+<UL>
+<LI><STRONG><A NAME="item_%2DUusedl"><CODE>-Uusedl</CODE></A></STRONG><BR>
+
+Undefining this symbol forces Perl to be compiled statically.
+<P></P>
+<LI><STRONG><A NAME="item_%2DUusemymalloc"><CODE>-Uusemymalloc</CODE></A></STRONG><BR>
+
+By default Perl uses the <CODE>malloc()</CODE> included with the Perl source.  If you
+want to force Perl to build with the system <CODE>malloc()</CODE> undefine this symbol.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDusemultiplicity"><CODE>-Dusemultiplicity</CODE></A></STRONG><BR>
+
+Multiplicity is required when embedding Perl in a C program and using
+more than one interpreter instance.  This works with the Cygwin port.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDuseperlio"><CODE>-Duseperlio</CODE></A></STRONG><BR>
+
+The PerlIO abstraction works with the Cygwin port.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDuse64bitint"><CODE>-Duse64bitint</CODE></A></STRONG><BR>
+
+<EM>gcc</EM> supports 64-bit integers.  However, several additional long long
+functions are necessary to use them within Perl (<EM>{strtol,strtoul}l</EM>).
+These are <STRONG>not</STRONG> yet available with Cygwin.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDuselongdouble"><CODE>-Duselongdouble</CODE></A></STRONG><BR>
+
+<EM>gcc</EM> supports long doubles (12 bytes).  However, several additional
+long double math functions are necessary to use them within Perl
+(<EM>{atan2,cos,exp,floor,fmod,frexp,isnan,log,modf,pow,sin,sqrt}l,strtold</EM>).
+These are <STRONG>not</STRONG> yet available with Cygwin.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDusethreads"><CODE>-Dusethreads</CODE></A></STRONG><BR>
+
+POSIX threads are <STRONG>not</STRONG> yet implemented in Cygwin.
+<P></P>
+<LI><STRONG><A NAME="item_%2DDuselargefiles"><CODE>-Duselargefiles</CODE></A></STRONG><BR>
+
+Although Win32 supports large files, Cygwin currently uses 32-bit integers
+for internal size and position calculations.
+<P></P></UL>
+<P>
+<H2><A NAME="suspicious warnings">Suspicious Warnings</A></H2>
+<P>You may see some messages during Configure that seem suspicious.</P>
+<UL>
+<LI><STRONG><A NAME="item_dlsym"><EM>dlsym()</EM></A></STRONG><BR>
+
+<EM>ld2</EM> is needed to build dynamic libraries, but it does not exist
+when <A HREF="#item_dlsym"><CODE>dlsym()</CODE></A> checking occurs (it is not created until `<CODE>make</CODE>' runs).
+You will see the following message:
+<PRE>
+  Checking whether your dlsym() needs a leading underscore ...
+  ld2: not found
+  I can't compile and run the test program.
+  I'm guessing that dlsym doesn't need a leading underscore.</PRE>
+<P>Since the guess is correct, this is not a problem.</P>
+<P></P>
+<LI><STRONG><A NAME="item_Win9x_and_d_eofnblk">Win9x and <CODE>d_eofnblk</CODE></A></STRONG><BR>
+
+Win9x does not correctly report <CODE>EOF</CODE> with a non-blocking read on a
+closed pipe.  You will see the following messages:
+<PRE>
+  But it also returns -1 to signal EOF, so be careful!
+  WARNING: you can't distinguish between EOF and no data!</PRE>
+<PRE>
+  *** WHOA THERE!!! ***
+      The recommended value for $d_eofnblk on this machine was &quot;define&quot;!
+      Keep the recommended value? [y]</PRE>
+<P>At least for consistency with WinNT, you should keep the recommended
+value.</P>
+<P></P>
+<LI><STRONG><A NAME="item_Compiler%2FPreprocessor_defines">Compiler/Preprocessor defines</A></STRONG><BR>
+
+The following error occurs because of the Cygwin <CODE>#define</CODE> of
+<CODE>_LONG_DOUBLE</CODE>:
+<PRE>
+  Guessing which symbols your C compiler and preprocessor define...
+  try.c:&lt;line#&gt;: parse error</PRE>
+<P>This failure does not seem to cause any problems.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="make">MAKE</A></H1>
+<P>Simply run <EM>make</EM> and wait:</P>
+<PRE>
+  make 2&gt;&amp;1 | tee log.make</PRE>
+<P>
+<H2><A NAME="warnings">Warnings</A></H2>
+<P>Warnings like these are normal:</P>
+<PRE>
+  warning: overriding commands for target &lt;file&gt;
+  warning: ignoring old commands for target &lt;file&gt;</PRE>
+<PRE>
+  dllwrap: no export definition file provided
+  dllwrap: creating one, but that may not be what you want</PRE>
+<P>
+<H2><A NAME="ld2">ld2</A></H2>
+<P>During `<CODE>make</CODE>', <EM>ld2</EM> will be created and installed in your $installbin
+directory (where you said to put public executables).  It does not
+wait until the `<CODE>make install</CODE>' process to install the <EM>ld2</EM> script,
+this is because the remainder of the `<CODE>make</CODE>' refers to <EM>ld2</EM> without
+fully specifying its path and does this from multiple subdirectories.
+The assumption is that $installbin is in your current <A HREF="#item_PATH"><CODE>PATH</CODE></A>.  If this
+is not the case `<CODE>make</CODE>' will fail at some point.  If this happens,
+just manually copy <EM>ld2</EM> from the source directory to somewhere in
+your <A HREF="#item_PATH"><CODE>PATH</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="test">TEST</A></H1>
+<P>There are two steps to running the test suite:</P>
+<PRE>
+  make test 2&gt;&amp;1 | tee log.make-test</PRE>
+<PRE>
+  cd t;./perl harness 2&gt;&amp;1 | tee ../log.harness</PRE>
+<P>The same tests are run both times, but more information is provided when
+running as `<CODE>./perl harness</CODE>'.</P>
+<P>Test results vary depending on your host system and your Cygwin
+configuration.  If a test can pass in some Cygwin setup, it is always
+attempted and explainable test failures are documented.  It is possible
+for Perl to pass all the tests, but it is more likely that some tests
+will fail for one of the reasons listed below.</P>
+<P>
+<H2><A NAME="file permissions">File Permissions</A></H2>
+<P>UNIX file permissions are based on sets of mode bits for
+{read,write,execute} for each {user,group,other}.  By default Cygwin
+only tracks the Win32 read-only attribute represented as the UNIX file
+user write bit (files are always readable, files are executable if they
+have a <EM>.{com,bat,exe}</EM> extension or begin with <CODE>#!</CODE>, directories are
+always readable and executable).  On WinNT with the <EM>ntea</EM> <CODE>CYGWIN</CODE>
+setting, the additional mode bits are stored as extended file attributes.
+On WinNT with the <EM>ntsec</EM> <CODE>CYGWIN</CODE> setting, permissions use the standard
+WinNT security descriptors and access control lists.  Without one of
+these options, these tests will fail:</P>
+<PRE>
+  Failed Test           List of failed
+  ------------------------------------
+  io/fs.t               5, 7, 9-10
+  lib/anydbm.t          2
+  lib/db-btree.t        20
+  lib/db-hash.t         16
+  lib/db-recno.t        18
+  lib/gdbm.t            2
+  lib/ndbm.t            2
+  lib/odbm.t            2
+  lib/sdbm.t            2
+  op/stat.t             9, 20 (.tmp not an executable extension)</PRE>
+<P>
+<H2><A NAME="hard links">Hard Links</A></H2>
+<P>FAT partitions do not support hard links (whereas NTFS does), in which
+case Cygwin implements <A HREF="../../lib/Pod/perlfunc.html#item_link"><CODE>link()</CODE></A> by copying the file.  On remote (network)
+drives Cygwin's <A HREF="../../lib/Pod/perlfunc.html#item_stat"><CODE>stat()</CODE></A> always sets <CODE>st_nlink</CODE> to 1, so the link count
+for remote directories and files is not available.  In either case,
+these tests will fail:</P>
+<PRE>
+  Failed Test           List of failed
+  ------------------------------------
+  io/fs.t               4
+  op/stat.t             3</PRE>
+<P>
+<H2><A NAME="filetime granularity">Filetime Granularity</A></H2>
+<P>On FAT partitions the filetime granularity is 2 seconds.  The following
+test will fail:</P>
+<PRE>
+  Failed Test           List of failed
+  ------------------------------------
+  io/fs.t               18</PRE>
+<P>
+<H2><A NAME="tainting checks">Tainting Checks</A></H2>
+<P>When Perl is running in taint mode, <CODE>$ENV{PATH}</CODE> is considered tainted
+and not used, so DLLs not in the default system directories will not
+be found.  While the tests are running you will see warnings popup from
+the system with messages like:</P>
+<PRE>
+  Win9x
+    Error Starting Program
+    A required .DLL file, CYGWIN1.DLL, was not found</PRE>
+<PRE>
+  WinNT
+    perl.exe - Unable to Locate DLL
+    The dynamic link library cygwin1.dll could not be found in the
+      specified path ...</PRE>
+<P>Just click OK and ignore them.  When running `<CODE>make test</CODE>', 2 popups
+occur.  During `<CODE>./perl harness</CODE>', 4 popups occur.  Also, these tests
+will fail:</P>
+<PRE>
+  Failed Test           List of failed
+  ------------------------------------
+  op/taint.t            1, 3, 31, 37</PRE>
+<P>Alternatively, you can copy <EM>cygwin1.dll</EM> into the directory where the
+tests run:</P>
+<PRE>
+  cp /bin/cygwin1.dll t</PRE>
+<P>or one of the Windows system directories (although, this is <STRONG>not</STRONG>
+recommended).</P>
+<P>
+<H2><A NAME="/etc/group">/etc/group</A></H2>
+<P>Cygwin does not require <EM>/etc/group</EM>, in which case the <EM>op/grent.t</EM>
+test will be skipped.  The check performed by <EM>op/grent.t</EM> expects to
+see entries that use the members field, otherwise this test will fail:</P>
+<PRE>
+  Failed Test           List of failed
+  ------------------------------------
+  op/grent.t            1</PRE>
+<P>
+<H2><A NAME="script portability">Script Portability</A></H2>
+<P>Cygwin does an outstanding job of providing UNIX-like semantics on top of
+Win32 systems.  However, in addition to the items noted above, there are
+some differences that you should know about.  This is a very brief guide
+to portability, more information can be found in the Cygwin documentation.</P>
+<UL>
+<LI><STRONG><A NAME="item_Pathnames">Pathnames</A></STRONG><BR>
+
+Cygwin pathnames can be separated by forward (<EM>/</EM>) or backward (<EM>\</EM>)
+slashes.  They may also begin with drive letters (<EM>C:</EM>) or Universal
+Naming Codes (<EM>//UNC</EM>).  DOS device names (<EM>aux</EM>, <EM>con</EM>, <EM>prn</EM>,
+<EM>com*</EM>, <EM>lpt?</EM>, <EM>nul</EM>) are invalid as base filenames.  However, they
+can be used in extensions (e.g., <EM>hello.aux</EM>).  Names may contain all
+printable characters except these:
+<PRE>
+  : * ? &quot; &lt; &gt; |</PRE>
+<P>File names are case insensitive, but case preserving.  A pathname that
+contains a backslash or drive letter is a Win32 pathname (and not subject
+to the translations applied to POSIX style pathnames).</P>
+<P></P>
+<LI><STRONG><A NAME="item_Text%2FBinary">Text/Binary</A></STRONG><BR>
+
+When a file is opened it is in either text or binary mode.  In text mode
+a file is subject to CR/LF/Ctrl-Z translations.  With Cygwin, the default
+mode for an <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A> is determined by the mode of the mount that underlies
+the file.  Perl provides a <A HREF="../../lib/Pod/perlfunc.html#item_binmode"><CODE>binmode()</CODE></A> function to set binary mode on files
+that otherwise would be treated as text.  <A HREF="../../lib/Pod/perlfunc.html#item_sysopen"><CODE>sysopen()</CODE></A> with the <CODE>O_TEXT</CODE>
+flag sets text mode on files that otherwise would be treated as binary:
+<PRE>
+    sysopen(FOO, &quot;bar&quot;, O_WRONLY|O_CREAT|O_TEXT)</PRE>
+<P>lseek(), <A HREF="../../lib/Pod/perlfunc.html#item_tell"><CODE>tell()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_sysseek"><CODE>sysseek()</CODE></A> only work with files opened in binary mode.</P>
+<P>The text/binary issue is covered at length in the Cygwin documentation.</P>
+<P></P>
+<LI><STRONG><A NAME="item_%2Eexe"><EM>.exe</EM></A></STRONG><BR>
+
+The Cygwin stat(), <A HREF="../../lib/Pod/perlfunc.html#item_lstat"><CODE>lstat()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_readlink"><CODE>readlink()</CODE></A> functions make the <EM>.exe</EM>
+extension transparent by looking for <EM>foo.exe</EM> when you ask for <EM>foo</EM>
+(unless a <EM>foo</EM> also exists).  Cygwin does not require a <EM>.exe</EM>
+extension, but <EM>gcc</EM> adds it automatically when building a program.
+However, when accessing an executable as a normal file (e.g., <EM>cp</EM>
+in a makefile) the <EM>.exe</EM> is not transparent.  The <EM>install</EM> included
+with Cygwin automatically appends a <EM>.exe</EM> when necessary.
+<P></P>
+<LI><STRONG><A NAME="item_chown"><CODE>chown()</CODE></A></STRONG><BR>
+
+On WinNT <A HREF="#item_chown"><CODE>chown()</CODE></A> can change a file's user and group IDs.  On Win9x <A HREF="#item_chown"><CODE>chown()</CODE></A>
+is a no-op, although this is appropriate since there is no security model.
+<P></P>
+<LI><STRONG><A NAME="item_Miscellaneous">Miscellaneous</A></STRONG><BR>
+
+File locking using the <CODE>F_GETLK</CODE> command to <A HREF="../../lib/Pod/perlfunc.html#item_fcntl"><CODE>fcntl()</CODE></A> is a stub that
+returns <CODE>ENOSYS</CODE>.
+<P>Win9x can not <A HREF="../../lib/Pod/perlfunc.html#item_rename"><CODE>rename()</CODE></A> an open file (although WinNT can).</P>
+<P>The Cygwin <A HREF="../../lib/Pod/perlfunc.html#item_chroot"><CODE>chroot()</CODE></A> implementation has holes (it can not restrict file
+access by native Win32 programs).</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="install">INSTALL</A></H1>
+<P>This will install Perl, including <EM>man</EM> pages.</P>
+<PRE>
+  make install | tee log.make-install</PRE>
+<P>NOTE: If <CODE>STDERR</CODE> is redirected `<CODE>make install</CODE>' will <STRONG>not</STRONG> prompt
+you to install <EM>perl</EM> into <EM>/usr/bin</EM>.</P>
+<P>You may need to be <EM>Administrator</EM> to run `<CODE>make install</CODE>'.  If you
+are not, you must have write access to the directories in question.</P>
+<P>Information on installing the Perl documentation in HTML format can be
+found in the <EM>INSTALL</EM> document.</P>
+<P>
+<HR>
+<H1><A NAME="manifest">MANIFEST</A></H1>
+<P>These are the files in the Perl release that contain references to Cygwin.
+These very brief notes attempt to explain the reason for all conditional
+code.  Hopefully, keeping this up to date will allow the Cygwin port to
+be kept as clean as possible.</P>
+<DL>
+<DT><STRONG><A NAME="item_Documentation">Documentation</A></STRONG><BR>
+<DD>
+<PRE>
+  INSTALL README.cygwin README.win32 MANIFEST
+  Changes Changes5.005 Changes5.004 Changes5.6
+  pod/perl.pod pod/<A HREF="../../lib/Pod/perlport.html">perlport</A>.pod pod/<A HREF="../../lib/Pod/perlfaq3.html">perlfaq3</A>.pod
+  pod/<A HREF="../../lib/Pod/perldelta.html">perldelta</A>.pod pod/<A HREF="../../lib/Pod/perl5004delta.html">perl5004delta</A>.pod pod/perl56delta.pod
+  pod/<A HREF="../../lib/Pod/perlhist.html">perlhist</A>.pod pod/<A HREF="../../lib/Pod/perlmodlib.html">perlmodlib</A>.pod pod/buildtoc.PL pod/<A HREF="../../lib/Pod/perltoc.html">perltoc</A>.pod</PRE>
+<DT><STRONG><A NAME="item_Build%2C_Configure%2C_Make%2C_Install">Build, Configure, Make, Install</A></STRONG><BR>
+<DD>
+<PRE>
+  cygwin/Makefile.SHs
+  cygwin/ld2.in
+  cygwin/perlld.in
+  ext/IPC/SysV/hints/cygwin.pl
+  ext/NDBM_File/hints/cygwin.pl
+  ext/ODBM_File/hints/cygwin.pl
+  hints/cygwin.sh
+  Configure             - help finding hints from uname,
+                          shared libperl required for dynamic loading
+  Makefile.SH           - linklibperl
+  Porting/patchls       - cygwin in port list
+  installman            - man pages with :: translated to .
+  installperl           - install dll/ld2/perlld, install to pods
+  makedepend.SH         - uwinfix</PRE>
+<DT><STRONG><A NAME="item_Tests">Tests</A></STRONG><BR>
+<DD>
+<PRE>
+  t/io/tell.t           - binmode
+  t/lib/b.t             - ignore Cwd from os_extras
+  t/lib/glob-basic.t    - Win32 directory list access differs from read mode
+  t/op/magic.t          - $^X/symlink WORKAROUND, s/.exe//
+  t/op/stat.t           - no /dev, skip Win32 ftCreationTime quirk
+                          (cache manager sometimes preserves ctime of file
+                          previously created and deleted), no -u (setuid)</PRE>
+<DT><STRONG><A NAME="item_Compiled_Perl_Source">Compiled Perl Source</A></STRONG><BR>
+<DD>
+<PRE>
+  EXTERN.h              - __declspec(dllimport)
+  XSUB.h                - __declspec(dllexport)
+  cygwin/cygwin.c       - os_extras (getcwd, spawn)
+  perl.c                - os_extras
+  perl.h                - binmode
+  doio.c                - win9x can not rename a file when it is open
+  pp_sys.c              - do not define h_errno, pp_system with spawn
+  util.c                - use setenv</PRE>
+<DT><STRONG><A NAME="item_Compiled_Module_Source">Compiled Module Source</A></STRONG><BR>
+<DD>
+<PRE>
+  ext/POSIX/POSIX.xs    - tzname defined externally
+  ext/SDBM_File/sdbm/pair.c
+                        - EXTCONST needs to be redefined from EXTERN.h
+  ext/SDBM_File/sdbm/sdbm.c
+                        - binary open</PRE>
+<DT><STRONG><A NAME="item_Perl_Modules%2FScripts">Perl Modules/Scripts</A></STRONG><BR>
+<DD>
+<PRE>
+  lib/Cwd.pm            - hook to internal Cwd::cwd
+  lib/ExtUtils/MakeMaker.pm
+                        - require MM_Cygwin.pm
+  lib/ExtUtils/MM_Cygwin.pm
+                        - canonpath, cflags, manifypods, perl_archive
+  lib/File/Find.pm      - on remote drives stat() always sets st_nlink to 1
+  lib/File/Spec/Unix.pm - preserve //unc
+  lib/File/Temp.pm      - no directory sticky bit
+  lib/perl5db.pl        - use stdin not /dev/tty
+  utils/perldoc.PL      - version comment</PRE>
+</DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>When <EM>make</EM> starts, it warns about overriding commands for <EM>perlmain.o</EM>.</P>
+<P>`<CODE>make clean</CODE>' does not remove library <EM>.def</EM> or <EM>.exe.stackdump</EM>
+files.</P>
+<P>The <EM>ld2</EM> script contains references to the source directory.  You should
+change these to $installbin after `<CODE>make install</CODE>'.</P>
+<P>Support for swapping real and effective user and group IDs is incomplete.
+On WinNT Cygwin provides setuid(), seteuid(), <CODE>setgid()</CODE> and setegid().
+However, additional Cygwin calls for manipulating WinNT access tokens
+and security contexts are required.</P>
+<P>When building DLLs, `<CODE>dllwrap --export-all-symbols</CODE>' is used to export
+global symbols.  It might be better to generate an explicit <EM>.def</EM> file
+(see <EM>makedef.pl</EM>).  Also, DLLs can now be build with `<CODE>gcc -shared</CODE>'.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Charles Wilson &lt;<A HREF="mailto:cwilson@ece.gatech.edu">cwilson@ece.gatech.edu</A>&gt;,
+Eric Fifer &lt;<A HREF="mailto:egf7@columbia.edu">egf7@columbia.edu</A>&gt;,
+alexander smishlajev &lt;<A HREF="mailto:als@turnhere.com">als@turnhere.com</A>&gt;,
+Steven Morlock &lt;<A HREF="mailto:newspost@morlock.net">newspost@morlock.net</A>&gt;,
+Sebastien Barre &lt;<A HREF="mailto:Sebastien.Barre@utc.fr">Sebastien.Barre@utc.fr</A>&gt;,
+Teun Burgers &lt;<A HREF="mailto:burgers@ecn.nl">burgers@ecn.nl</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>Last updated: 9 November 2000</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.cygwin - Perl for Cygwin</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

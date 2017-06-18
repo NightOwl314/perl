@@ -1,0 +1,162 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::SNPP - Simple Network Pager Protocol Client</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::SNPP - Simple Network Pager Protocol Client</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::SNPP - Simple Network Pager Protocol Client</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::SNPP;
+</PRE>
+<PRE>
+
+    # Constructors
+    $snpp = Net::SNPP-&gt;new('snpphost');
+    $snpp = Net::SNPP-&gt;new('snpphost', Timeout =&gt; 60);</PRE>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>This module is not complete, yet !</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module implements a client interface to the SNPP protocol, enabling
+a perl5 application to talk to SNPP servers. This documentation assumes
+that you are familiar with the SNPP protocol described in RFC1861.</P>
+<P>A new Net::SNPP object must be created with the <EM>new</EM> method. Once
+this has been done, all SNPP commands are accessed through this object.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>This example will send a pager message in one hour saying ``Your lunch is ready''</P>
+<PRE>
+    #!/usr/local/bin/perl -w
+</PRE>
+<PRE>
+
+    use Net::SNPP;</PRE>
+<PRE>
+
+    $snpp = Net::SNPP-&gt;new('snpphost');</PRE>
+<PRE>
+
+    $snpp-&gt;send( Pager   =&gt; $some_pager_number,
+                 Message =&gt; &quot;Your lunch is ready&quot;,
+                 Alert   =&gt; 1,
+                 Hold    =&gt; time + 3600, # lunch ready in 1 hour :-)
+               ) || die $snpp-&gt;message;</PRE>
+<PRE>
+
+    $snpp-&gt;quit;</PRE>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [ HOST, ] [ OPTIONS ] )</A></STRONG><BR>
+<DD>
+This is the constructor for a new Net::SNPP object. <CODE>HOST</CODE> is the
+name of the remote host to which a SNPP connection is required.
+<P>If <CODE>HOST</CODE> is not given, then the <CODE>SNPP_Host</CODE> specified in <CODE>Net::Config</CODE>
+will be used.</P>
+<P><CODE>OPTIONS</CODE> are passed in a hash like fashion, using key and value pairs.
+Possible options are:</P>
+<P><STRONG>Timeout</STRONG> - Maximum time, in seconds, to wait for a response from the
+SNPP server (default: 120)</P>
+<P><STRONG>Debug</STRONG> - Enable debugging information</P>
+<P>Example:</P>
+<PRE>
+    $snpp = Net::SNPP-&gt;new('snpphost',
+                           Debug =&gt; 1,
+                          );</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>Unless otherwise stated all methods return either a <EM>true</EM> or <EM>false</EM>
+value, with <EM>true</EM> meaning that the operation was a success. When a method
+states that it returns a value, failure will be returned as <EM>undef</EM> or an
+empty list.</P>
+<DL>
+<DT><STRONG><A NAME="item_reset">reset ()</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_help">help ()</A></STRONG><BR>
+<DD>
+Request help text from the server. Returns the text or undef upon failure
+<P></P>
+<DT><STRONG><A NAME="item_quit">quit ()</A></STRONG><BR>
+<DD>
+Send the QUIT command to the remote SNPP server and close the socket connection.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P><CODE>Net::SNPP</CODE> exports all that <CODE>Net::CMD</CODE> exports, plus three more subroutines
+that can bu used to compare against the result of <CODE>status</CODE>. These are :-
+<CODE>CMD_2WAYERROR</CODE>, <CODE>CMD_2WAYOK</CODE>, and <CODE>CMD_2WAYQUEUED</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/Net/Cmd.html">the Net::Cmd manpage</A>
+RFC1861</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::SNPP - Simple Network Pager Protocol Client</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,217 @@
+<HTML>
+<HEAD>
+<TITLE>DBI::ProfileData - manipulate DBI::ProfileDumper data dumps</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileData - manipulate DBI::ProfileDumper data dumps</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT AND LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>DBI::ProfileData - manipulate DBI::ProfileDumper data dumps</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>The easiest way to use this module is through the dbiprof frontend
+(see <A HREF="..\..\..\bin/dbiprof.html">the dbiprof manpage</A> for details):</P>
+<PRE>
+  dbiprof --number 15 --sort count</PRE>
+<P>This module can also be used to roll your own profile analysis:</P>
+<PRE>
+  # load data from dbi.prof
+  $prof = DBI::ProfileData-&gt;new(File =&gt; &quot;dbi.prof&quot;);</PRE>
+<PRE>
+  # get a count of the records in the data set
+  $count = $prof-&gt;count();</PRE>
+<PRE>
+  # sort by longest overall time
+  $prof-&gt;sort(field =&gt; &quot;longest&quot;);</PRE>
+<PRE>
+  # sort by longest overall time, least to greatest
+  $prof-&gt;sort(field =&gt; &quot;longest&quot;, reverse =&gt; 1);</PRE>
+<PRE>
+  # exclude records with key2 eq 'disconnect'
+  $prof-&gt;exclude(key2 =&gt; 'disconnect');</PRE>
+<PRE>
+  # exclude records with key1 matching /^UPDATE/i
+  $prof-&gt;exclude(key1 =&gt; qr/^UPDATE/i);</PRE>
+<PRE>
+  # remove all records except those where key1 matches /^SELECT/i
+  $prof-&gt;match(key1 =&gt; qr/^SELECT/i);</PRE>
+<PRE>
+  # produce a formatted report with the given number of items
+  $report = $prof-&gt;report(number =&gt; 10);</PRE>
+<PRE>
+  # clone the profile data set
+  $clone = $prof-&gt;clone();</PRE>
+<PRE>
+  # get access to hash of header values
+  $header = $prof-&gt;header();</PRE>
+<PRE>
+  # get access to sorted array of nodes
+  $nodes = $prof-&gt;nodes();</PRE>
+<PRE>
+  # format a single node in the same style as report()
+  $text = $prof-&gt;format($nodes-&gt;[0]);</PRE>
+<PRE>
+  # get access to Data hash in DBI::Profile format
+  $Data = $prof-&gt;Data();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module offers the ability to read, manipulate and format
+DBI::ProfileDumper profile data.</P>
+<P>Conceptually, a profile consists of a series of records, or nodes,
+each of each has a set of statistics and set of keys.  Each record
+must have a unique set of keys, but there is no requirement that every
+record have the same number of keys.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are supported by DBI::ProfileData objects.</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$prof = DBI::ProfileData-&gt;new(File =&gt; ``dbi.prof'')</A></STRONG><BR>
+<DD>
+<DT><STRONG>$prof = DBI::ProfileData-&gt;new(Files =&gt; [ ``dbi.prof.1'', ``dbi.prof.2'' ])</STRONG><BR>
+<DD>
+Creates a a new DBI::ProfileData object.  Takes either a single file
+through the File option or a list of Files in an array ref.  If
+multiple files are specified then the header data from the first file
+is used.
+<P></P>
+<DT><STRONG><A NAME="item_clone">$copy = $prof-&gt;clone();</A></STRONG><BR>
+<DD>
+Clone a profile data set creating a new object.
+<P></P>
+<DT><STRONG><A NAME="item_header">$header = $prof-&gt;header();</A></STRONG><BR>
+<DD>
+Returns a reference to a hash of header values.  These are the key
+value pairs included in the header section of the DBI::ProfileDumper
+data format.  For example:
+<PRE>
+  $header = {
+              Path    =&gt; '[ DBIprofile_Statement, DBIprofile_MethodName ]',
+              Program =&gt; 't/42profile_data.t',
+            };</PRE>
+<P>Note that modifying this hash will modify the header data stored
+inside the profile object.</P>
+<P></P>
+<DT><STRONG><A NAME="item_nodes">$nodes = $prof-&gt;<CODE>nodes()</CODE></A></STRONG><BR>
+<DD>
+Returns a reference the sorted nodes array.  Each element in the array
+is a single record in the data set.  The first seven elements are the
+same as the elements provided by DBI::Profile.  After that each key is
+in a separate element.  For example:
+<PRE>
+ $nodes = [
+            [
+              2,                      # 0, count
+              0.0312958955764771,     # 1, total duration
+              0.000490069389343262,   # 2, first duration
+              0.000176072120666504,   # 3, shortest duration
+              0.00140702724456787,    # 4, longest duration
+              1023115819.83019,       # 5, time of first event
+              1023115819.86576,       # 6, time of last event
+              'SELECT foo FROM bar'   # 7, key1
+              'execute'               # 8, key2
+                                      # 6+N, keyN
+            ],
+                                      # ...
+          ];</PRE>
+<P>Note that modifying this array will modify the node data stored inside
+the profile object.</P>
+<P></P>
+<DT><STRONG><A NAME="item_count">$count = $prof-&gt;<CODE>count()</CODE></A></STRONG><BR>
+<DD>
+Returns the number of items in the profile data set.
+<P></P>
+<DT><STRONG><A NAME="item_sort">$prof-&gt;sort(field =&gt; ``field'')</A></STRONG><BR>
+<DD>
+<DT><STRONG>$prof-&gt;sort(field =&gt; ``field'', reverse =&gt; 1)</STRONG><BR>
+<DD>
+Sorts data by the given field.  Available fields are:
+<PRE>
+  longest
+  total
+  count
+  shortest</PRE>
+<P>The default sort is greatest to smallest, which is the opposite of the
+normal Perl meaning.  This, however, matches the expected behavior of
+the dbiprof frontend.</P>
+<P></P>
+<DT><STRONG><A NAME="item_exclude">$count = $prof-&gt;exclude(key2 =&gt; ``disconnect'')</A></STRONG><BR>
+<DD>
+<DT><STRONG>$count = $prof-&gt;exclude(key2 =&gt; ``disconnect'', case_sensitive =&gt; 1)</STRONG><BR>
+<DD>
+<DT><STRONG>$count = $prof-&gt;exclude(key1 =&gt; qr/^SELECT/i)</STRONG><BR>
+<DD>
+Removes records from the data set that match the given string or
+regular expression.  This method modifies the data in a permanent
+fashion - use <A HREF="#item_clone"><CODE>clone()</CODE></A> first to maintain the original data after
+exclude().  Returns the number of nodes left in the profile data set.
+<P></P>
+<DT><STRONG><A NAME="item_match">$count = $prof-&gt;match(key2 =&gt; ``disconnect'')</A></STRONG><BR>
+<DD>
+<DT><STRONG>$count = $prof-&gt;match(key2 =&gt; ``disconnect'', case_sensitive =&gt; 1)</STRONG><BR>
+<DD>
+<DT><STRONG>$count = $prof-&gt;match(key1 =&gt; qr/^SELECT/i)</STRONG><BR>
+<DD>
+Removes records from the data set that do not match the given string
+or regular expression.  This method modifies the data in a permanent
+fashion - use <A HREF="#item_clone"><CODE>clone()</CODE></A> first to maintain the original data after
+match().  Returns the number of nodes left in the profile data set.
+<P></P>
+<DT><STRONG><A NAME="item_Data">$Data = $prof-&gt;<CODE>Data()</CODE></A></STRONG><BR>
+<DD>
+Returns the same Data hash structure as seen in DBI::Profile.  This
+structure is not sorted.  The <A HREF="#item_nodes"><CODE>nodes()</CODE></A> structure probably makes more
+sense for most analysis.
+<P></P>
+<DT><STRONG><A NAME="item_format">$text = $prof-&gt;format($nodes-&gt;[0])</A></STRONG><BR>
+<DD>
+Formats a single node into a human-readable block of text.
+<P></P>
+<DT><STRONG><A NAME="item_report">$text = $prof-&gt;report(number =&gt; 10)</A></STRONG><BR>
+<DD>
+Produces a report with the given number of items.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Sam Tregar &lt;<A HREF="mailto:sam@tregar.com">sam@tregar.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT AND LICENSE</A></H1>
+<P>Copyright (C) 2002 Sam Tregar</P>
+<P>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;DBI::ProfileData - manipulate DBI::ProfileDumper data dumps</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

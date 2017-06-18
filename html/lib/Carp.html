@@ -1,0 +1,94 @@
+
+<HTML>
+<HEAD>
+<TITLE>carp    - warn of errors</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;carp    - warn of errors</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#forcing a stack trace">Forcing a Stack Trace</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>carp    - warn of errors (from perspective of caller)</P>
+<P>cluck   - warn of errors with stack backtrace
+          (not exported by default)</P>
+<P>croak   - die of errors (from perspective of caller)</P>
+<P>confess - die of errors with stack backtrace</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Carp;
+    croak &quot;We're outta here!&quot;;</PRE>
+<PRE>
+    use Carp qw(cluck);
+    cluck &quot;This is how we got here!&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Carp routines are useful in your own modules because
+they act like <A HREF="../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> or warn(), but report where the error
+was in the code they were called from.  Thus if you have a 
+routine <CODE>Foo()</CODE> that has a <CODE>carp()</CODE> in it, then the <CODE>carp()</CODE> 
+will report the error as occurring where <CODE>Foo()</CODE> was called, 
+not where <CODE>carp()</CODE> was called.</P>
+<P>
+<H2><A NAME="forcing a stack trace">Forcing a Stack Trace</A></H2>
+<P>As a debugging aid, you can force Carp to treat a croak as a confess
+and a carp as a cluck across <EM>all</EM> modules. In other words, force a
+detailed stack trace to be given.  This can be very helpful when trying
+to understand why, or from where, a warning or error is being generated.</P>
+<P>This feature is enabled by 'importing' the non-existent symbol
+'verbose'. You would typically enable it by saying</P>
+<PRE>
+    perl -MCarp=verbose script.pl</PRE>
+<P>or by including the string <CODE>MCarp=verbose</CODE> in the <A HREF="../lib/Pod/perlrun.html#item_PERL5OPT">PERL5OPT</A>
+environment variable.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The Carp routines don't handle exception objects currently.
+If called with a first argument that is a reference, they simply
+call <A HREF="../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> or warn(), as appropriate.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;carp    - warn of errors</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,87 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Compare - Compare files or filehandles</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Compare - Compare files or filehandles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#return">RETURN</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Compare - Compare files or filehandles</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use File::Compare;</PRE>
+<PRE>
+        if (compare(&quot;file1&quot;,&quot;file2&quot;) == 0) {
+            print &quot;They're equal\n&quot;;
+        }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The File::Compare::compare function compares the contents of two
+sources, each of which can be a file or a file handle.  It is exported
+from File::Compare by default.</P>
+<P>File::Compare::cmp is a synonym for File::Compare::compare.  It is
+exported from File::Compare only by request.</P>
+<P>File::Compare::compare_text does a line by line comparison of the two
+files. It stops as soon as a difference is detected. <CODE>compare_text()</CODE>
+accepts an optional third argument: This must be a CODE reference to
+a line comparison function, which returns 0 when both lines are considered
+equal. For example:</P>
+<PRE>
+    compare_text($file1, $file2)</PRE>
+<P>is basically equivalent to</P>
+<PRE>
+    compare_text($file1, $file2, sub {$_[0] ne $_[1]} )</PRE>
+<P>
+<HR>
+<H1><A NAME="return">RETURN</A></H1>
+<P>File::Compare::compare return 0 if the files are equal, 1 if the
+files are unequal, or -1 if an error was encountered.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>File::Compare was written by Nick Ing-Simmons.
+Its original documentation was written by Chip Salzenberg.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Compare - Compare files or filehandles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

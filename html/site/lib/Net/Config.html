@@ -1,0 +1,156 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Config - Local configuration data for libnet</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Config - Local configuration data for libnet</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsys">SYNOPSYS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#netconfig values">NetConfig VALUES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Config - Local configuration data for libnet</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsys">SYNOPSYS</A></H1>
+<PRE>
+    use Net::Config qw(%NetConfig);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::Config</CODE> holds configuration data for the modules in the libnet
+distribuion. During installation you will be asked for these values.</P>
+<P>The configuration data is held globally in a file in the perl installation
+tree, but a user may override any of these values by providing thier own. This
+can be done by having a <CODE>.libnetrc</CODE> file in thier home directory. This file
+should return a reference to a HASH containing the keys described below.
+For example</P>
+<PRE>
+    # .libnetrc
+    {
+        nntp_hosts =&gt; [ &quot;my_prefered_host&quot; ],
+        ph_hosts   =&gt; [ &quot;my_ph_server&quot; ],
+    }
+    __END__</PRE>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P><CODE>Net::Config</CODE> defines the following methods. They are methods as they are
+invoked as class methods. This is because <CODE>Net::Config</CODE> inherits from
+<CODE>Net::LocalCfg</CODE> so you can override these methods if you want.</P>
+<DL>
+<DT><STRONG><A NAME="item_requires_firewall_HOST">requires_firewall HOST</A></STRONG><BR>
+<DD>
+Attempts to determine if a given host is outside your firewall. Possible
+return values are.
+<PRE>
+  -1  Cannot lookup hostname
+   0  Host is inside firewall (or there is no ftp_firewall entry)
+   1  Host is outside the firewall</PRE>
+<P>This is done by using hostname lookup and the <A HREF="#item_local_netmask"><CODE>local_netmask</CODE></A> entry in
+the configuration data.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="netconfig values">NetConfig VALUES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_nntp_hosts">nntp_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_snpp_hosts">snpp_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pop3_hosts">pop3_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_smtp_hosts">smtp_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_ph_hosts">ph_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_daytime_hosts">daytime_hosts</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_time_hosts">time_hosts</A></STRONG><BR>
+<DD>
+Each is a reference to an array of hostnames (in order of preference),
+which should be used for the given protocol
+<P></P>
+<DT><STRONG><A NAME="item_inet_domain">inet_domain</A></STRONG><BR>
+<DD>
+Your internet domain name
+<P></P>
+<DT><STRONG><A NAME="item_ftp_firewall">ftp_firewall</A></STRONG><BR>
+<DD>
+If you have an FTP proxy firewall (<STRONG>NOT</STRONG> a HTTP or SOCKS firewall)
+then this value should be set to the firewall hostname. If your firewall
+does not listen to port 21, then this value should be set to
+<CODE>&quot;hostname:port&quot;</CODE> (eg <CODE>&quot;hostname:99&quot;</CODE>)
+<P></P>
+<DT><STRONG><A NAME="item_ftp_ext_passive">ftp_ext_passive</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_ftp_int_pasive">ftp_int_pasive</A></STRONG><BR>
+<DD>
+FTP servers normally work on a non-passive mode. That is when you want to
+transfer data you have to tell the server the address and port to
+connect to.
+<P>With some firewalls this does not work as te server cannot
+connect to your machine (because you are beind a firewall) and the firewall
+does not re-write te command. In this case you should set <A HREF="#item_ftp_ext_passive"><CODE>ftp_ext_passive</CODE></A>
+to a <EM>true</EM> value.</P>
+<P>Some servers are configured to only work in passive mode. If you have
+one of these you can force <CODE>Net::FTP</CODE> to always transfer in passive
+mode, when not going via a firewall, by cetting <CODE>ftp_int_passive</CODE> to
+a <EM>true</EM> value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_local_netmask">local_netmask</A></STRONG><BR>
+<DD>
+A reference to a list of netmask strings in the form <CODE>&quot;134.99.4.0/24&quot;</CODE>.
+These are used by the <CODE>requires_firewall</CODE> function to determine if a given
+host is inside or outside your firewall.
+<P></P></DL>
+<P>The following entries are used during installation &amp; testing on the
+libnet package</P>
+<DL>
+<DT><STRONG><A NAME="item_test_hosts">test_hosts</A></STRONG><BR>
+<DD>
+If true them <CODE>make test</CODE> may attempt to connect to hosts given in the
+configuration.
+<P></P>
+<DT><STRONG><A NAME="item_test_exists">test_exists</A></STRONG><BR>
+<DD>
+If true the <CODE>Configure</CODE> will check each hostname given that it exists
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Config - Local configuration data for libnet</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

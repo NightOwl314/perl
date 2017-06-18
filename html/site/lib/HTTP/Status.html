@@ -1,0 +1,179 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Status - HTTP Status code processing</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Status - HTTP Status code processing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constants">CONSTANTS</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Status - HTTP Status code processing</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTTP::Status;</PRE>
+<PRE>
+ if ($rc != RC_OK) {
+     print status_message($rc), &quot;\n&quot;;
+ }</PRE>
+<PRE>
+ if (is_success($rc)) { ... }
+ if (is_error($rc)) { ... }
+ if (is_redirect($rc)) { ... }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><EM>HTTP::Status</EM> is a library of routines for defining and
+classifying HTTP status codes for libwww-perl.  Status codes are
+used to encode the overall outcome of a HTTP response message.  Codes
+correspond to those defined in RFC 2616 and RFC 2518.</P>
+<P>
+<HR>
+<H1><A NAME="constants">CONSTANTS</A></H1>
+<P>The following constant functions can be used as mnemonic status code
+names:</P>
+<PRE>
+   RC_CONTINUE                          (100)
+   RC_SWITCHING_PROTOCOLS               (101)
+   RC_PROCESSING                        (102)</PRE>
+<PRE>
+   RC_OK                                (200)
+   RC_CREATED                           (201)
+   RC_ACCEPTED                          (202)
+   RC_NON_AUTHORITATIVE_INFORMATION     (203)
+   RC_NO_CONTENT                        (204)
+   RC_RESET_CONTENT                     (205)
+   RC_PARTIAL_CONTENT                   (206)
+   RC_MULTI_STATUS                      (207)</PRE>
+<PRE>
+   RC_MULTIPLE_CHOICES                  (300)
+   RC_MOVED_PERMANENTLY                 (301)
+   RC_FOUND                             (302)
+   RC_SEE_OTHER                         (303)
+   RC_NOT_MODIFIED                      (304)
+   RC_USE_PROXY                         (305)
+   RC_TEMPORARY_REDIRECT                (307)</PRE>
+<PRE>
+   RC_BAD_REQUEST                       (400)
+   RC_UNAUTHORIZED                      (401)
+   RC_PAYMENT_REQUIRED                  (402)
+   RC_FORBIDDEN                         (403)
+   RC_NOT_FOUND                         (404)
+   RC_METHOD_NOT_ALLOWED                (405)
+   RC_NOT_ACCEPTABLE                    (406)
+   RC_PROXY_AUTHENTICATION_REQUIRED     (407)
+   RC_REQUEST_TIMEOUT                   (408)
+   RC_CONFLICT                          (409)
+   RC_GONE                              (410)
+   RC_LENGTH_REQUIRED                   (411)
+   RC_PRECONDITION_FAILED               (412)
+   RC_REQUEST_ENTITY_TOO_LARGE          (413)
+   RC_REQUEST_URI_TOO_LARGE             (414)
+   RC_UNSUPPORTED_MEDIA_TYPE            (415)
+   RC_REQUEST_RANGE_NOT_SATISFIABLE     (416)
+   RC_EXPECTATION_FAILED                (417)
+   RC_UNPROCESSABLE_ENTITY              (422)
+   RC_LOCKED                            (423)
+   RC_FAILED_DEPENDENCY                 (424)</PRE>
+<PRE>
+   RC_INTERNAL_SERVER_ERROR             (500)
+   RC_NOT_IMPLEMENTED                   (501)
+   RC_BAD_GATEWAY                       (502)
+   RC_SERVICE_UNAVAILABLE               (503)
+   RC_GATEWAY_TIMEOUT                   (504)
+   RC_HTTP_VERSION_NOT_SUPPORTED        (505)
+   RC_INSUFFICIENT_STORAGE              (507)</PRE>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>The following additional functions are provided.  Most of them are
+exported by default.</P>
+<DL>
+<DT><STRONG><A NAME="item_status_message"><CODE>status_message($code)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_status_message"><CODE>status_message()</CODE></A> function will translate status codes to human
+readable strings. The string is the same as found in the constant
+names above.  If the $code is unknown, then <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> is returned.
+<P></P>
+<DT><STRONG><A NAME="item_is_info"><CODE>is_info($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is an <EM>Informational</EM> status code.  This
+class of status code indicates a provisional response which can't have
+any content.
+<P></P>
+<DT><STRONG><A NAME="item_is_success"><CODE>is_success($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is a <EM>Successful</EM> status code.
+<P></P>
+<DT><STRONG><A NAME="item_is_redirect"><CODE>is_redirect($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is a <EM>Redirection</EM> status code. This class of
+status code indicates that further action needs to be taken by the
+user agent in order to fulfill the request.
+<P></P>
+<DT><STRONG><A NAME="item_is_error"><CODE>is_error($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is an <EM>Error</EM> status code.  The function
+return TRUE for both client error or a server error status codes.
+<P></P>
+<DT><STRONG><A NAME="item_is_client_error"><CODE>is_client_error($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is an <EM>Client Error</EM> status code. This class
+of status code is intended for cases in which the client seems to have
+erred.
+<P>This function is <STRONG>not</STRONG> exported by default.</P>
+<P></P>
+<DT><STRONG><A NAME="item_is_server_error"><CODE>is_server_error($code)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if <CODE>$code</CODE> is an <EM>Server Error</EM> status code. This class
+of status codes is intended for cases in which the server is aware
+that it has erred or is incapable of performing the request.
+<P>This function is <STRONG>not</STRONG> exported by default.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Wished @EXPORT_OK had been used instead of @EXPORT in the beginning.
+Now too much is exported by default.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Status - HTTP Status code processing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,149 @@
+
+<HTML>
+<HEAD>
+<TITLE>warnings - Perl pragma to control optional warnings</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;warnings - Perl pragma to control optional warnings</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>warnings - Perl pragma to control optional warnings</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use warnings;
+    no warnings;</PRE>
+<PRE>
+    use warnings &quot;all&quot;;
+    no warnings &quot;all&quot;;</PRE>
+<PRE>
+    use warnings::register;
+    if (warnings::enabled()) {
+        warnings::warn(&quot;some warning&quot;);
+    }</PRE>
+<PRE>
+    if (warnings::enabled(&quot;void&quot;)) {
+        warnings::warn(&quot;void&quot;, &quot;some warning&quot;);
+    }</PRE>
+<PRE>
+    if (warnings::enabled($object)) {
+        warnings::warn($object, &quot;some warning&quot;);
+    }</PRE>
+<PRE>
+    warnif(&quot;some warning&quot;);
+    warnif(&quot;void&quot;, &quot;some warning&quot;);
+    warnif($object, &quot;some warning&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>If no import list is supplied, all possible warnings are either enabled
+or disabled.</P>
+<P>A number of functions are provided to assist module authors.</P>
+<DL>
+<DT><STRONG><A NAME="item_use_warnings%3A%3Aregister">use warnings::register</A></STRONG><BR>
+<DD>
+Creates a new warnings category with the same name as the package where
+the call to the pragma is used.
+<P></P>
+<DT><STRONG><A NAME="item_enabled">warnings::enabled()</A></STRONG><BR>
+<DD>
+Use the warnings category with the same name as the current package.
+<P>Return TRUE if that warnings category is enabled in the calling module.
+Otherwise returns FALSE.</P>
+<P></P>
+<DT><STRONG>warnings::enabled($category)</STRONG><BR>
+<DD>
+Return TRUE if the warnings category, <CODE>$category</CODE>, is enabled in the
+calling module.
+Otherwise returns FALSE.
+<P></P>
+<DT><STRONG>warnings::enabled($object)</STRONG><BR>
+<DD>
+Use the name of the class for the object reference, <CODE>$object</CODE>, as the
+warnings category.
+<P>Return TRUE if that warnings category is enabled in the first scope
+where the object is used.
+Otherwise returns FALSE.</P>
+<P></P>
+<DT><STRONG><A NAME="item_warn">warnings::warn($message)</A></STRONG><BR>
+<DD>
+Print <CODE>$message</CODE> to STDERR.
+<P>Use the warnings category with the same name as the current package.</P>
+<P>If that warnings category has been set to ``FATAL'' in the calling module
+then die. Otherwise return.</P>
+<P></P>
+<DT><STRONG>warnings::warn($category, $message)</STRONG><BR>
+<DD>
+Print <CODE>$message</CODE> to STDERR.
+<P>If the warnings category, <CODE>$category</CODE>, has been set to ``FATAL'' in the
+calling module then die. Otherwise return.</P>
+<P></P>
+<DT><STRONG>warnings::warn($object, $message)</STRONG><BR>
+<DD>
+Print <CODE>$message</CODE> to STDERR.
+<P>Use the name of the class for the object reference, <CODE>$object</CODE>, as the
+warnings category.</P>
+<P>If that warnings category has been set to ``FATAL'' in the scope where <CODE>$object</CODE>
+is first used then die. Otherwise return.</P>
+<P></P>
+<DT><STRONG><A NAME="item_warnif">warnings::warnif($message)</A></STRONG><BR>
+<DD>
+Equivalent to:
+<PRE>
+    if (warnings::enabled())
+      { warnings::warn($message) }</PRE>
+<P></P>
+<DT><STRONG>warnings::warnif($category, $message)</STRONG><BR>
+<DD>
+Equivalent to:
+<PRE>
+    if (warnings::enabled($category))
+      { warnings::warn($category, $message) }</PRE>
+<P></P>
+<DT><STRONG>warnings::warnif($object, $message)</STRONG><BR>
+<DD>
+Equivalent to:
+<PRE>
+    if (warnings::enabled($object))
+      { warnings::warn($object, $message) }</PRE>
+<P></P></DL>
+<P>See <A HREF="../lib/Pod/perlmodlib.html#pragmatic modules">Pragmatic Modules in the perlmodlib manpage</A> and <A HREF="../lib/Pod/perllexwarn.html">the perllexwarn manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;warnings - Perl pragma to control optional warnings</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

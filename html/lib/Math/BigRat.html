@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Math::BigRat - arbitrarily big rationals</title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Math::BigRat - arbitrarily big rationals</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#math_library">MATH LIBRARY</a></li>
+	</ul>
+
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new()"><code>new()</code></a></li>
+		<li><a href="#numerator()"><code>numerator()</code></a></li>
+		<li><a href="#denominator()"><code>denominator()</code></a></li>
+		<li><a href="#parts()"><code>parts()</code></a></li>
+		<li><a href="#as_number()"><code>as_number()</code></a></li>
+		<li><a href="#bfac()"><code>bfac()</code></a></li>
+		<li><a href="#blog()"><code>blog()</code></a></li>
+		<li><a href="#bround()/round()/bfround()"><code>bround()/round()/bfround()</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Math::BigRat - arbitrarily big rationals</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Math::BigRat;</pre>
+<pre>
+  $x = Math::BigRat-&gt;new('3/7');</pre>
+<pre>
+  print $x-&gt;bstr(),&quot;\n&quot;;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This is just a placeholder until the real thing is up and running. Watch this
+space...</p>
+<p>
+</p>
+<h2><a name="math_library">MATH LIBRARY</a></h2>
+<p>Math with the numbers is done (by default) by a module called
+Math::BigInt::Calc. This is equivalent to saying:</p>
+<pre>
+        use Math::BigRat lib =&gt; 'Calc';</pre>
+<p>You can change this by using:</p>
+<pre>
+        use Math::BigRat lib =&gt; 'BitVect';</pre>
+<p>The following would first try to find Math::BigInt::Foo, then
+Math::BigInt::Bar, and when this also fails, revert to Math::BigInt::Calc:</p>
+<pre>
+        use Math::BigRat lib =&gt; 'Foo,Math::BigInt::Bar';</pre>
+<p>Calc.pm uses as internal format an array of elements of some decimal base
+(usually 1e7, but this might be differen for some systems) with the least
+significant digit first, while BitVect.pm uses a bit vector of base 2, most
+significant bit first. Other modules might use even different means of
+representing the numbers. See the respective module documentation for further
+details.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Any method not listed here is dervied from Math::BigFloat (or
+Math::BigInt), so make sure you check these two modules for further
+information.</p>
+<p>
+</p>
+<h2><a name="new()"><code>new()</code></a></h2>
+<pre>
+        $x = Math::BigRat-&gt;new('1/3');</pre>
+<p>Create a new Math::BigRat object. Input can come in various forms:</p>
+<pre>
+        $x = Math::BigRat-&gt;new('1/3');                          # simple string
+        $x = Math::BigRat-&gt;new('1 / 3');                        # spaced
+        $x = Math::BigRat-&gt;new('1 / 0.1');                      # w/ floats
+        $x = Math::BigRat-&gt;new(Math::BigInt-&gt;new(3));           # BigInt
+        $x = Math::BigRat-&gt;new(Math::BigFloat-&gt;new('3.1'));     # BigFloat
+        $x = Math::BigRat-&gt;new(Math::BigInt::Lite-&gt;new('2'));   # BigLite</pre>
+<p>
+</p>
+<h2><a name="numerator()"><code>numerator()</code></a></h2>
+<pre>
+        $n = $x-&gt;numerator();</pre>
+<p>Returns a copy of the numerator (the part above the line) as signed BigInt.</p>
+<p>
+</p>
+<h2><a name="denominator()"><code>denominator()</code></a></h2>
+<pre>
+
+        $d = $x-&gt;denominator();</pre>
+<p>Returns a copy of the denominator (the part under the line) as positive BigInt.</p>
+<p>
+</p>
+<h2><a name="parts()"><code>parts()</code></a></h2>
+<pre>
+        ($n,$d) = $x-&gt;parts();</pre>
+<p>Return a list consisting of (signed) numerator and (unsigned) denominator as
+BigInts.</p>
+<p>
+</p>
+<h2><a name="as_number()"><code>as_number()</code></a></h2>
+<p>Returns a copy of the object as BigInt by truncating it to integer.</p>
+<p>
+</p>
+<h2><a name="bfac()"><code>bfac()</code></a></h2>
+<pre>
+        $x-&gt;bfac();</pre>
+<p>Calculates the factorial of $x. For instance:</p>
+<pre>
+        print Math::BigRat-&gt;new('3/1')-&gt;bfac(),&quot;\n&quot;;    # 1*2*3
+        print Math::BigRat-&gt;new('5/1')-&gt;bfac(),&quot;\n&quot;;    # 1*2*3*4*5</pre>
+<p>Only works for integers for now.</p>
+<p>
+</p>
+<h2><a name="blog()"><code>blog()</code></a></h2>
+<p>Is not yet implemented.</p>
+<p>
+</p>
+<h2><a name="bround()/round()/bfround()"><code>bround()/round()/bfround()</code></a></h2>
+<p>Are not yet implemented.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Some things are not yet implemented, or only implemented half-way.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../lib/Math/BigFloat.html">the Math::BigFloat manpage</a> and <a href="../../Math/Big.html">the Math::Big manpage</a> as well as <a href="../../Math/BigInt/BitVect.html">the Math::BigInt::BitVect manpage</a>,
+<a href="../../Math/BigInt/Pari.html">the Math::BigInt::Pari manpage</a> and  <a href="../../Math/BigInt/GMP.html">the Math::BigInt::GMP manpage</a>.</p>
+<p>The package at
+<a href="http://search.cpan.org/search?mode=module&query=Math%3A%3ABigRat">http://search.cpan.org/search</a> may
+contain more documentation and examples as well as testcases.</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>(C) by Tels <a href="http://bloodgate.com/">http://bloodgate.com/</a> 2001-2002. 
+
+</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Math::BigRat - arbitrarily big rationals</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Request - Class encapsulating HTTP Requests</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Request - Class encapsulating HTTP Requests</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Request - Class encapsulating HTTP Requests</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require HTTP::Request;
+ $request = HTTP::Request-&gt;new(GET =&gt; '<A HREF="http://www.oslonett.no/">http://www.oslonett.no/</A>');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>HTTP::Request</CODE> is a class encapsulating HTTP style requests,
+consisting of a request line, some headers, and some (potentially empty)
+content. Note that the LWP library also uses this HTTP style requests
+for non-HTTP protocols.</P>
+<P>Instances of this class are usually passed to the <CODE>request()</CODE> method
+of an <CODE>LWP::UserAgent</CODE> object:</P>
+<PRE>
+ $ua = LWP::UserAgent-&gt;new;
+ $request = HTTP::Request-&gt;new(GET =&gt; '<A HREF="http://www.oslonett.no/">http://www.oslonett.no/</A>');
+ $response = $ua-&gt;request($request);</PRE>
+<P><CODE>HTTP::Request</CODE> is a subclass of <CODE>HTTP::Message</CODE> and therefore
+inherits its methods.  The inherited methods most often used are header(),
+push_header(), remove_header(), <CODE>headers_as_string()</CODE> and content().
+See <A HREF="../../../site/lib/HTTP/Message.html">the HTTP::Message manpage</A> for details.</P>
+<P>The following additional methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$r = HTTP::Request-&gt;new($method, $uri, [$header, [$content]])</A></STRONG><BR>
+<DD>
+Constructs a new <CODE>HTTP::Request</CODE> object describing a request on the
+object <CODE>$uri</CODE> using method <CODE>$method</CODE>.  The <CODE>$uri</CODE> argument can be
+either a string, or a reference to a <CODE>URI</CODE> object.  The $header
+argument should be a reference to an <CODE>HTTP::Headers</CODE> object.
+<P></P>
+<DT><STRONG><A NAME="item_method">$r-&gt;<CODE>method([$val])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_uri">$r-&gt;<CODE>uri([$val])</CODE></A></STRONG><BR>
+<DD>
+These methods provide public access to the attributes containing
+respectively the method of the request and the URI object of the
+request.
+<P>If an argument is given the attribute is given that as its new
+value. If no argument is given the value is not touched. In either
+case the previous value is returned.</P>
+<P>The <A HREF="#item_uri"><CODE>uri()</CODE></A> method accept both a reference to a URI object and a
+string as its argument.  If a string is given, then it should be
+parseable as an absolute URI.</P>
+<P></P>
+<DT><STRONG><A NAME="item_as_string">$r-&gt;<CODE>as_string()</CODE></A></STRONG><BR>
+<DD>
+Method returning a textual representation of the request.
+Mainly useful for debugging purposes. It takes no arguments.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/HTTP/Headers.html">the HTTP::Headers manpage</A>, <A HREF="../../../site/lib/HTTP/Message.html">the HTTP::Message manpage</A>, <A HREF="../../../site/lib/HTTP/Request/Common.html">the HTTP::Request::Common manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Request - Class encapsulating HTTP Requests</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

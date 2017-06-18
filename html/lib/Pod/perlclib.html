@@ -1,0 +1,226 @@
+<HTML>
+<HEAD>
+<TITLE>perlclib - Internal replacements for standard C library functions</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlclib - Internal replacements for standard C library functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#conventions">Conventions</A></LI>
+		<LI><A HREF="#file operations">File Operations</A></LI>
+		<LI><A HREF="#file input and output">File Input and Output</A></LI>
+		<LI><A HREF="#file positioning">File Positioning</A></LI>
+		<LI><A HREF="#memory management and string handling">Memory Management and String Handling</A></LI>
+		<LI><A HREF="#character class tests">Character Class Tests</A></LI>
+		<LI><A HREF="#stdlib.h functions"><EM>stdlib.h</EM> functions</A></LI>
+		<LI><A HREF="#miscellaneous functions">Miscellaneous functions</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlclib - Internal replacements for standard C library functions</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>One thing Perl porters should note is that <EM>perl</EM> doesn't tend to use that
+much of the C standard library internally; you'll see very little use of, 
+for example, the <EM>ctype.h</EM> functions in there. This is because Perl
+tends to reimplement or abstract standard library functions, so that we
+know exactly how they're going to operate.</P>
+<P>This is a reference card for people who are familiar with the C library
+and who want to do things the Perl way; to tell them which functions
+they ought to use instead of the more normal C functions.</P>
+<P>
+<H2><A NAME="conventions">Conventions</A></H2>
+<P>In the following tables:</P>
+<DL>
+<DT><STRONG><A NAME="item_t"><CODE>t</CODE></A></STRONG><BR>
+<DD>
+is a type.
+<P></P>
+<DT><STRONG><A NAME="item_p"><CODE>p</CODE></A></STRONG><BR>
+<DD>
+is a pointer.
+<P></P>
+<DT><STRONG><A NAME="item_n"><CODE>n</CODE></A></STRONG><BR>
+<DD>
+is a number.
+<P></P>
+<DT><STRONG><A NAME="item_s"><CODE>s</CODE></A></STRONG><BR>
+<DD>
+is a string.
+<P></P></DL>
+<P><CODE>sv</CODE>, <CODE>av</CODE>, <CODE>hv</CODE>, etc. represent variables of their respective types.</P>
+<P>
+<H2><A NAME="file operations">File Operations</A></H2>
+<P>Instead of the <EM>stdio.h</EM> functions, you should use the Perl abstraction
+layer. Instead of <CODE>FILE*</CODE> types, you need to be handling <CODE>PerlIO*</CODE>
+types.  Don't forget that with the new PerlIO layered I/O abstraction 
+<CODE>FILE*</CODE> types may not even be available. See also the <CODE>perlapio</CODE>
+documentation for more information about the following functions:</P>
+<PRE>
+    Instead Of:                 Use:</PRE>
+<PRE>
+    stdin                       PerlIO_stdin()
+    stdout                      PerlIO_stdout()
+    stderr                      PerlIO_stderr()</PRE>
+<PRE>
+    fopen(fn, mode)             PerlIO_open(fn, mode)
+    freopen(fn, mode, stream)   PerlIO_reopen(fn, mode, perlio) (Deprecated)
+    fflush(stream)              PerlIO_flush(perlio)
+    fclose(stream)              PerlIO_close(perlio)</PRE>
+<P>
+<H2><A NAME="file input and output">File Input and Output</A></H2>
+<PRE>
+    Instead Of:                 Use:</PRE>
+<PRE>
+    fprintf(stream, fmt, ...)   PerlIO_printf(perlio, fmt, ...)</PRE>
+<PRE>
+    [f]getc(stream)             PerlIO_getc(perlio)
+    [f]putc(stream, n)          PerlIO_putc(perlio, n)
+    ungetc(n, stream)           PerlIO_ungetc(perlio, n)</PRE>
+<P>Note that the PerlIO equivalents of <CODE>fread</CODE> and <CODE>fwrite</CODE> are slightly
+different from their C library counterparts:</P>
+<PRE>
+    fread(p, size, n, stream)   PerlIO_read(perlio, buf, numbytes)
+    fwrite(p, size, n, stream)  PerlIO_write(perlio, buf, numbytes)</PRE>
+<PRE>
+    fputs(s, stream)            PerlIO_puts(perlio, s)</PRE>
+<P>There is no equivalent to <CODE>fgets</CODE>; one should use <CODE>sv_gets</CODE> instead:</P>
+<PRE>
+    fgets(s, n, stream)         sv_gets(sv, perlio, append)</PRE>
+<P>
+<H2><A NAME="file positioning">File Positioning</A></H2>
+<PRE>
+    Instead Of:                 Use:</PRE>
+<PRE>
+    feof(stream)                PerlIO_eof(perlio)
+    fseek(stream, n, whence)    PerlIO_seek(perlio, n, whence)
+    rewind(stream)              PerlIO_rewind(perlio)</PRE>
+<PRE>
+    fgetpos(stream, p)          PerlIO_getpos(perlio, sv)
+    fsetpos(stream, p)          PerlIO_setpos(perlio, sv)</PRE>
+<PRE>
+    ferror(stream)              PerlIO_error(perlio)
+    clearerr(stream)            PerlIO_clearerr(perlio)</PRE>
+<P>
+<H2><A NAME="memory management and string handling">Memory Management and String Handling</A></H2>
+<PRE>
+    Instead Of:                 Use:</PRE>
+<PRE>
+    t* p = malloc(n)            New(id, p, n, t)
+    t* p = calloc(n, s)         Newz(id, p, n, t)
+    p = realloc(p, n)           Renew(p, n, t)
+    memcpy(dst, src, n)         Copy(src, dst, n, t)
+    memmove(dst, src, n)        Move(src, dst, n, t)
+    memcpy/*(struct foo *)      StructCopy(src, dst, t)
+    free(p)                     Safefree(p)</PRE>
+<PRE>
+    strdup(p)                   savepv(p)
+    strndup(p, n)               savepvn(p, n) (Hey, strndup doesn't exist!)</PRE>
+<PRE>
+    strstr(big, little)         instr(big, little)
+    strcmp(s1, s2)              strLE(s1, s2) / strEQ(s1, s2) / strGT(s1,s2)
+    strncmp(s1, s2, n)          strnNE(s1, s2, n) / strnEQ(s1, s2, n)</PRE>
+<P>Notice the different order of arguments to <CODE>Copy</CODE> and <CODE>Move</CODE> than used
+in <CODE>memcpy</CODE> and <CODE>memmove</CODE>.</P>
+<P>Most of the time, though, you'll want to be dealing with SVs internally
+instead of raw <CODE>char *</CODE> strings:</P>
+<PRE>
+    strlen(s)                   sv_len(sv)
+    strcpy(dt, src)             sv_setpv(sv, s)
+    strncpy(dt, src, n)         sv_setpvn(sv, s, n)
+    strcat(dt, src)             sv_catpv(sv, s)
+    strncat(dt, src)            sv_catpvn(sv, s)
+    sprintf(s, fmt, ...)        sv_setpvf(sv, fmt, ...)</PRE>
+<P>Note also the existence of <CODE>sv_catpvf</CODE> and <CODE>sv_catpvfn</CODE>, combining
+concatenation with formatting.</P>
+<P>
+<H2><A NAME="character class tests">Character Class Tests</A></H2>
+<P>There are two types of character class tests that Perl implements: one
+type deals in <CODE>char</CODE>s and are thus <STRONG>not</STRONG> Unicode aware (and hence
+deprecated unless you <STRONG>know</STRONG> you should use them) and the other type
+deal in <CODE>UV</CODE>s and know about Unicode properties. In the following
+table, <CODE>c</CODE> is a <CODE>char</CODE>, and <CODE>u</CODE> is a Unicode codepoint.</P>
+<PRE>
+    Instead Of:                 Use:            But better use:</PRE>
+<PRE>
+    isalnum(c)                  isALNUM(c)      isALNUM_uni(u)
+    isalpha(c)                  isALPHA(c)      isALPHA_uni(u)
+    iscntrl(c)                  isCNTRL(c)      isCNTRL_uni(u)
+    isdigit(c)                  isDIGIT(c)      isDIGIT_uni(u)
+    isgraph(c)                  isGRAPH(c)      isGRAPH_uni(u)
+    islower(c)                  isLOWER(c)      isLOWER_uni(u)
+    isprint(c)                  isPRINT(c)      isPRINT_uni(u)
+    ispunct(c)                  isPUNCT(c)      isPUNCT_uni(u)
+    isspace(c)                  isSPACE(c)      isSPACE_uni(u)
+    isupper(c)                  isUPPER(c)      isUPPER_uni(u)
+    isxdigit(c)                 isXDIGIT(c)     isXDIGIT_uni(u)</PRE>
+<PRE>
+    tolower(c)                  toLOWER(c)      toLOWER_uni(u)
+    toupper(c)                  toUPPER(c)      toUPPER_uni(u)</PRE>
+<P>
+<H2><A NAME="stdlib.h functions"><EM>stdlib.h</EM> functions</A></H2>
+<PRE>
+    Instead Of:                 Use:</PRE>
+<PRE>
+    atof(s)                     Atof(s)
+    atol(s)                     Atol(s)
+    strtod(s, *p)               Nothing.  Just don't use it.
+    strtol(s, *p, n)            Strtol(s, *p, n)
+    strtoul(s, *p, n)           Strtoul(s, *p, n)</PRE>
+<P>Notice also the <CODE>scan_bin</CODE>, <CODE>scan_hex</CODE>, and <CODE>scan_oct</CODE> functions in
+<EM>util.c</EM> for converting strings representing numbers in the respective
+bases into <CODE>NV</CODE>s.</P>
+<P>In theory <CODE>Strtol</CODE> and <CODE>Strtoul</CODE> may not be defined if the machine perl is
+built on doesn't actually have strtol and strtoul. But as those 2
+functions are part of the 1989 ANSI C spec we suspect you'll find them
+everywhere by now.</P>
+<PRE>
+    int rand()                  double Drand01()
+    srand(n)                    { seedDrand01((Rand_seed_t)n); 
+                                  PL_srand_called = TRUE; }</PRE>
+<PRE>
+    exit(n)                     my_exit(n)
+    system(s)                   Don't. Look at pp_system or use my_popen</PRE>
+<PRE>
+    getenv(s)                   PerlEnv_getenv(s)
+    setenv(s, val)              my_putenv(s, val)</PRE>
+<P>
+<H2><A NAME="miscellaneous functions">Miscellaneous functions</A></H2>
+<P>You should not even <STRONG>want</STRONG> to use <EM>setjmp.h</EM> functions, but if you
+think you do, use the <CODE>JMPENV</CODE> stack in <EM>scope.h</EM> instead.</P>
+<P>For <CODE>signal</CODE>/<CODE>sigaction</CODE>, use <CODE>rsignal(signo, handler)</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>perlapi</CODE>, <CODE>perlapio</CODE>, <CODE>perlguts</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlclib - Internal replacements for standard C library functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

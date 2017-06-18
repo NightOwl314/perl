@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>ActivePerl Install Notes</title>
+<link rel="STYLESHEET" href="../../Active.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;Install Notes</p>
+      </strong></td>
+  </tr>
+</table>
+<h1><b>Contents</b></h1>
+<ul>
+  <li><a href="#System_Requirements">Requirements</a></li>
+  <li><a href="#Installation_Guidelines">Installing ActivePerl</a></li>
+  <li><a href="#Getting_Started">Further Information</a></li>
+</ul>
+<hr>
+<h1><a name="System_Requirements"><b>Requirements</b></a></h1>
+<p><b>Hardware</b></p>
+<ul>
+  <li>recommended 35MB hard disk space for typical install</li>
+</ul>
+<p><b>Operating System</b></p>
+<p>Windows 2000</p>
+<ul>
+  <li>no extra requirements</li>
+</ul>
+<p>Windows NT</p>
+<ul>
+  <li>service pack 5+</li>
+  <li>Microsoft Windows Installer 1.1+ (available from <a href="http://download.microsoft.com/download/platformsdk/wininst/1.1/NT4/EN-US/InstMsi.exe">http://download.microsoft.com/download/platformsdk/wininst/1.1/NT4/EN-US/InstMsi.exe</a>)</li>
+  <li>Internet Explorer 5+ (available from <a href="http://windowsupdate.microsoft.com">http://windowsupdate.microsoft.com</a>)</li>
+</ul>
+<p>Windows Me</p>
+<ul>
+  <li>no extra requirements</li>
+</ul>
+<p>Windows 98</p>
+<ul>
+  <li>Microsoft Windows Installer 1.1+ (available from <a href="http://download.microsoft.com/download/platformsdk/wininst/1.1/W9X/EN-US/InstMsi.exe">http://download.microsoft.com/download/platformsdk/wininst/1.1/W9X/EN-US/InstMsi.exe</a>)</li>
+  <li>Internet Explorer 5+ (available from <a href="http://windowsupdate.microsoft.com">http://windowsupdate.microsoft.com</a>)</li>
+  <li>DCOM for Windows 98 (available from <a href="http://www.microsoft.com/com/resources/downloads.asp">http://www.microsoft.com/com/resources/downloads.asp</a>)</li>
+</ul>
+<p>Windows 95</p>
+<ul>
+  <li>Microsoft Windows Installer 1.1+ (available from <a href="http://download.microsoft.com/download/platformsdk/wininst/1.1/W9X/EN-US/InstMsi.exe">http://download.microsoft.com/download/platformsdk/wininst/1.1/W9X/EN-US/InstMsi.exe</a>)</li>
+  <li>Internet Explorer 5 (available from <a href="http://windowsupdate.microsoft.com">http://windowsupdate.microsoft.com</a>)</li>
+  <li>DCOM for Windows 95 (available from <a href="http://www.microsoft.com/com/resources/downloads.asp">http://www.microsoft.com/com/resources/downloads.asp</a>)</li>
+  <li>MSVCRT (available from <a href="ftp://ftp.microsoft.com/softlib/mslfiles/msvcrt.exe">ftp://ftp.microsoft.com/softlib/mslfiles/msvcrt.exe</a></li>
+</ul>
+<p><b>Perl for ISAPI</b></p>
+<ul>
+  <li>ISAPI compatible Web server such as IIS 4.0+ or PWS 4.0+</li>
+</ul>
+<p><b>PerlScript</b></p>
+<ul>
+  <li>ActiveX scripting host such as IE 4.0+, or Windows Scripting Host</li>
+</ul>
+<hr>
+<h1><a name="Installation_Guidelines"><b>Installing ActivePerl</b></a></h1>
+<p>Run the ActivePerl-5.6.0.6xx.msi installation package to start the installation wizard, which will guide you through
+the setup, and give you options on what and where to install stuff.</p>
+<p><b>What happens during install?</b></p>
+<p>Perl is installed by default in <code>C:\Perl</code>. The drive &quot;<code>C</code>&quot; will be the same drive
+that the operating system is installed on.</p>
+<p>If you run Perl at the command prompt, the script will be executed by the first Perl.exe it encounters in the list of
+paths in the PATH environment variable. To ensure the script is executed by the Perl build you want it to be executed
+by, you can specify the complete path to the Perl.exe you want to use. (typing <code>perl -v</code> at the command
+prompt will tell you which version of Perl is currently first in your PATH)</p>
+<p>Installing ActivePerl will change your Path environment variable and may change registry settings, such as file
+associations, which may affect your Web server. If you want to use a previously installed copy of Perl, you will need to
+modify these settings.</p>
+<hr>
+<p><b>Running Perl scripts on your Web server</b></p>
+<p>ActivePerl, PerlScript and Perl for ISAPI are all useful additions to your
+Web server. However, they do have specific requirements, (<a
+href="#System_Requirements"><i>see above</i></a><i>)</i> and may require some
+additional configuration to work properly. For more information on
+compatibility, installation, configuration and other useful information, have a
+look at the Web server section of the ActivePerl FAQ included with the
+ActivePerl package.</p>
+<hr>
+
+<p><strong>Installing ActivePerl from the Command Line</strong></p>
+<p><em>Introduction</em></p>
+<p>You can install ActivePerl from the command line using the 'msiexec'
+program. For example:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt;
+</pre>
+</p>
+
+<p><em>Selecting ActivePerl Features</em></p>
+<p>You can also control which ActivePerl features are installed using the
+'ADDLOCAL' command line property. This property may be set to a comma (,)
+delimited list of features to be installed locally. For instance:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt; ADDLOCAL="Perl,PerlIS"
+</pre>
+
+ActivePerl has the following features:
+<ul>
+    <li>Perl        - The Perl core</li>
+    <li>PerlIS      - The Perl ISAMI interpreter</li>
+    <li>PerlSE      - The Perl ActiveX Scripting Engine</li>
+    <li>Examples    - Some simple examples</li>
+    <li>Docs        - ActivePerl documentation</li>
+</ul>
+By default all features of ActivePerl are installed on Windows 2000.
+</p>
+
+<p><em>Configuring ActivePerl</em></p>
+<p>Command line properties may be specified to configure ActivePerl
+installation options. For example:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt; TARGETDIR="c:\perl" PERL_PATH="Yes"
+</pre>
+The ActivePerl MSI installer recognizes the following command line properties:
+
+<ul>
+    <li>TARGETDIR  - Using this property you can specify absolute path to where
+		   ActivePerl will be installed. This property is optional. If
+		   not specified, ActivePerl will be installed in a default
+		   location determined by the Windows Installer Service,
+		   usually the root of the drive with the most available space.
+		   The value of this option is required and should be the
+		   absolute path to the directory in which ActivePerl will be
+		   installed.</li>
+
+    <li>PL_IISMAP  - Setting this property to 'Yes' causes the installer to
+		   create a global IIS script mapping for '.pl' and Perl. This
+		   property is optional. The default is to not create the
+		   script mapping.</li>
+
+    <li>PLX_IISMAP - Setting this property to 'Yes' causes the installer to create
+                   a global IIS script mapping for '.plx' and PerlIS. This
+                   property is optional. The default is to not create the
+                   script mapping.</li>
+
+    <li>PERL_PATH  - Setting this property to 'Yes' causes the Perl/bin directory
+		   to be added to the system PATH environment variable. This
+		   property is optional. The default is to not add the Perl/bin
+		   directory to the path.</li>
+</ul>
+</p>
+
+<p><em>Running ActivePerl Installer in Silent Mode</em></p>
+<p>To run ActivePerl installer in silent mode you need to specify the '/q'
+command line option. This causes the installer to run with no UI. For example:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt; /q
+</pre>
+</p>
+
+<p><em>Turning on Logging During ActivePerl Installation</em>
+<p>To turn on logging during ActivePerl installation you need to specify the 
+'/l' command line option. This option requires you to provide the name of the
+log file as an argument. For instance:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt; /l &lt;log_file&gt;
+</pre>
+You can turn on verbose logging by using the '*v' modifier with the '/l' 
+command line option. For instance:
+<pre>
+    c:\&gt; msiexec /i &lt;msi_file&gt; /l*v &lt;log_file&gt;
+</pre>
+</p>
+<hr>
+
+<h1><b><a name="Getting_Started">Further Information</a></b></h1>
+<p>See the ActivePerl <a href="../../readme.html">Readme</a> for more information.</p>
+<p>&nbsp;</p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;Install Notes</p>
+      </strong></td>
+  </tr>
+</table>
+
+</body>
+
+</html>

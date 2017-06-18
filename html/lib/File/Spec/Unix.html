@@ -1,0 +1,221 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec::Unix - methods used by File::Spec</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Unix - methods used by File::Spec</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec::Unix - methods used by File::Spec</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require File::Spec::Unix; # Done automatically by File::Spec</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Methods for manipulating file specifications.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_canonpath">canonpath</A></STRONG><BR>
+<DD>
+No physical check on the filesystem, but a logical cleanup of a
+path. On UNIX eliminated successive slashes and successive ``/.''.
+<PRE>
+    $cpath = File::Spec-&gt;canonpath( $path ) ;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_catdir">catdir</A></STRONG><BR>
+<DD>
+Concatenate two or more directory names to form a complete path ending
+with a directory. But remove the trailing slash from the resulting
+string, because it doesn't look good, isn't necessary and confuses
+OS2. Of course, if this is the root directory, don't cut off the
+trailing slash :-)
+<P></P>
+<DT><STRONG><A NAME="item_catfile">catfile</A></STRONG><BR>
+<DD>
+Concatenate one or more directory names and a filename to form a
+complete path ending with a filename
+<P></P>
+<DT><STRONG><A NAME="item_curdir">curdir</A></STRONG><BR>
+<DD>
+Returns a string representation of the current directory.  ``.'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_devnull">devnull</A></STRONG><BR>
+<DD>
+Returns a string representation of the null device. ``/dev/null'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_rootdir">rootdir</A></STRONG><BR>
+<DD>
+Returns a string representation of the root directory.  ``/'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_tmpdir">tmpdir</A></STRONG><BR>
+<DD>
+Returns a string representation of the first writable directory
+from the following list or ``'' if none are writable:
+<PRE>
+    $ENV{TMPDIR}
+    /tmp</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_updir">updir</A></STRONG><BR>
+<DD>
+Returns a string representation of the parent directory.  ``..'' on UNIX.
+<P></P>
+<DT><STRONG><A NAME="item_no_upwards">no_upwards</A></STRONG><BR>
+<DD>
+Given a list of file names, strip out those that refer to a parent
+directory. (Does not strip symlinks, only '.', '..', and equivalents.)
+<P></P>
+<DT><STRONG><A NAME="item_case_tolerant">case_tolerant</A></STRONG><BR>
+<DD>
+Returns a true or false value indicating, respectively, that alphabetic
+is not or is significant when comparing file specifications.
+<P></P>
+<DT><STRONG><A NAME="item_file_name_is_absolute">file_name_is_absolute</A></STRONG><BR>
+<DD>
+Takes as argument a path and returns true if it is an absolute path.
+<P>This does not consult the local filesystem on Unix, Win32, or OS/2.  It
+does sometimes on MacOS (see <A HREF="../../../File/Spec/MacOS.html#file_name_is_absolute">file_name_is_absolute in the File::Spec::MacOS manpage</A>).
+It does consult the working environment for VMS (see
+<A HREF="../../../lib/File/Spec/VMS.html#file_name_is_absolute">file_name_is_absolute in the File::Spec::VMS manpage</A>).</P>
+<P></P>
+<DT><STRONG><A NAME="item_path">path</A></STRONG><BR>
+<DD>
+Takes no argument, returns the environment variable PATH as an array.
+<P></P>
+<DT><STRONG><A NAME="item_join">join</A></STRONG><BR>
+<DD>
+join is the same as catfile.
+<P></P>
+<DT><STRONG><A NAME="item_splitpath">splitpath</A></STRONG><BR>
+<DD>
+<PRE>
+    ($volume,$directories,$file) = File::Spec-&gt;splitpath( $path );
+    ($volume,$directories,$file) = File::Spec-&gt;splitpath( $path, $no_file );</PRE>
+<P>Splits a path in to volume, directory, and filename portions. On systems
+with no concept of volume, returns undef for volume.</P>
+<P>For systems with no syntax differentiating filenames from directories, 
+assumes that the last file is a path unless $no_file is true or a 
+trailing separator or /. or /.. is present. On Unix this means that $no_file
+true makes this return ( '', $path, '' ).</P>
+<P>The directory portion may or may not be returned with a trailing '/'.</P>
+<P>The results can be passed to <A HREF="#catpath()">catpath()</A> to get back a path equivalent to
+(usually identical to) the original path.</P>
+<DT><STRONG><A NAME="item_splitdir">splitdir</A></STRONG><BR>
+<DD>
+The opposite of <A HREF="#catdir()">catdir()</A>.
+<PRE>
+    @dirs = File::Spec-&gt;splitdir( $directories );</PRE>
+<P>$directories must be only the directory portion of the path on systems 
+that have the concept of a volume or that have path syntax that differentiates
+files from directories.</P>
+<P>Unlike just splitting the directories on the separator, empty
+directory names (<CODE>''</CODE>) can be returned, because these are significant
+on some OSs (e.g. MacOS).</P>
+<P>On Unix,</P>
+<PRE>
+    File::Spec-&gt;splitdir( &quot;/a/b//c/&quot; );</PRE>
+<P>Yields:</P>
+<PRE>
+    ( '', 'a', 'b', '', 'c', '' )</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_catpath">catpath</A></STRONG><BR>
+<DD>
+Takes volume, directory and file portions and returns an entire path. Under
+Unix, $volume is ignored, and directory and file are catenated.  A '/' is
+inserted if need be.  On other OSs, $volume is significant.
+<P></P>
+<DT><STRONG><A NAME="item_abs2rel">abs2rel</A></STRONG><BR>
+<DD>
+Takes a destination path and an optional base path returns a relative path
+from the base path to the destination path:
+<PRE>
+    $rel_path = File::Spec-&gt;abs2rel( $path ) ;
+    $rel_path = File::Spec-&gt;abs2rel( $path, $base ) ;</PRE>
+<P>If $base is not present or '', then <EM>cwd()</EM> is used. If $base is relative, 
+then it is converted to absolute form using <A HREF="#rel2abs()">rel2abs()</A>. This means that it
+is taken to be relative to <EM>cwd()</EM>.</P>
+<P>On systems with the concept of a volume, this assumes that both paths 
+are on the $destination volume, and ignores the $base volume.</P>
+<P>On systems that have a grammar that indicates filenames, this ignores the 
+$base filename as well. Otherwise all path components are assumed to be
+directories.</P>
+<P>If $path is relative, it is converted to absolute form using <A HREF="#rel2abs()">rel2abs()</A>.
+This means that it is taken to be relative to <EM>cwd()</EM>.</P>
+<P>No checks against the filesystem are made on most systems.  On MacOS,
+the filesystem may be consulted (see
+<A HREF="../../../File/Spec/MacOS.html#file_name_is_absolute">file_name_is_absolute in the File::Spec::MacOS manpage</A>).  On VMS, there is
+interaction with the working environment, as logicals and
+macros are expanded.</P>
+<P>Based on code written by Shigio Yamaguchi.</P>
+<P></P>
+<DT><STRONG><A NAME="item_rel2abs">rel2abs</A></STRONG><BR>
+<DD>
+Converts a relative path to an absolute path.
+<PRE>
+    $abs_path = File::Spec-&gt;rel2abs( $path ) ;
+    $abs_path = File::Spec-&gt;rel2abs( $path, $base ) ;</PRE>
+<P>If $base is not present or '', then <EM>cwd()</EM> is used. If $base is relative, 
+then it is converted to absolute form using <A HREF="#rel2abs()">rel2abs()</A>. This means that it
+is taken to be relative to <EM>cwd()</EM>.</P>
+<P>On systems with the concept of a volume, this assumes that both paths 
+are on the $base volume, and ignores the $path volume.</P>
+<P>On systems that have a grammar that indicates filenames, this ignores the 
+$base filename as well. Otherwise all path components are assumed to be
+directories.</P>
+<P>If $path is absolute, it is cleaned up and returned using <A HREF="#canonpath()">canonpath()</A>.</P>
+<P>No checks against the filesystem are made on most systems.  On MacOS,
+the filesystem may be consulted (see
+<A HREF="../../../File/Spec/MacOS.html#file_name_is_absolute">file_name_is_absolute in the File::Spec::MacOS manpage</A>).  On VMS, there is
+interaction with the working environment, as logicals and
+macros are expanded.</P>
+<P>Based on code written by Shigio Yamaguchi.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/File/Spec.html">the File::Spec manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Unix - methods used by File::Spec</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

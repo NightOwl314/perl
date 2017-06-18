@@ -1,0 +1,1160 @@
+<HTML>
+<HEAD>
+<TITLE>perlvar - Perl predefined variables</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlvar - Perl predefined variables</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#predefined names">Predefined Names</A></LI>
+		<LI><A HREF="#error indicators">Error Indicators</A></LI>
+		<LI><A HREF="#technical note on the syntax of variable names">Technical Note on the Syntax of Variable Names</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlvar - Perl predefined variables</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="predefined names">Predefined Names</A></H2>
+<P>The following names have special meaning to Perl.  Most 
+punctuation names have reasonable mnemonics, or analogs in the
+shells.  Nevertheless, if you wish to use long variable names,
+you need only say</P>
+<PRE>
+    use English;</PRE>
+<P>at the top of your program.  This will alias all the short names to the
+long names in the current package.  Some even have medium names,
+generally borrowed from <STRONG>awk</STRONG>.</P>
+<P>If you don't mind the performance hit, variables that depend on the
+currently selected filehandle may instead be set by calling an
+appropriate object method on the IO::Handle object.  (Summary lines
+below for this contain the word HANDLE.)  First you must say</P>
+<PRE>
+    use IO::Handle;</PRE>
+<P>after which you may use either</P>
+<PRE>
+    method HANDLE EXPR</PRE>
+<P>or more safely,</P>
+<PRE>
+    HANDLE-&gt;method(EXPR)</PRE>
+<P>Each method returns the old value of the IO::Handle attribute.
+The methods each take an optional EXPR, which if supplied specifies the
+new value for the IO::Handle attribute in question.  If not supplied,
+most methods do nothing to the current value--except for
+autoflush(), which will assume a 1 for you, just to be different.
+Because loading in the IO::Handle class is an expensive operation, you should
+learn how to use the regular built-in variables.</P>
+<P>A few of these variables are considered ``read-only''.  This means that if
+you try to assign to this variable, either directly or indirectly through
+a reference, you'll raise a run-time exception.</P>
+<P>The following list is ordered by scalar variables first, then the
+arrays, then the hashes.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24ARG">$ARG</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24_">$_</A></STRONG><BR>
+<DD>
+The default input and pattern-searching space.  The following pairs are
+equivalent:
+<PRE>
+    while (&lt;&gt;) {...}    # equivalent only in while!
+    while (defined($_ = &lt;&gt;)) {...}</PRE>
+<PRE>
+    /^Subject:/
+    $_ =~ /^Subject:/</PRE>
+<PRE>
+    tr/a-z/A-Z/
+    $_ =~ tr/a-z/A-Z/</PRE>
+<PRE>
+    chomp
+    chomp($_)</PRE>
+<P>Here are the places where Perl will assume $_ even if you
+don't use it:</P>
+<UL>
+<LI>
+Various unary functions, including functions like <A HREF="../../lib/Pod/perlfunc.html#item_ord"><CODE>ord()</CODE></A> and int(), as well
+as the all file tests (<CODE>-f</CODE>, <A HREF="../../lib/Pod/perlrun.html#item_%2Dd"><CODE>-d</CODE></A>) except for <CODE>-t</CODE>, which defaults to
+STDIN.
+<P></P>
+<LI>
+Various list functions like <A HREF="../../lib/Pod/perlfunc.html#item_print"><CODE>print()</CODE></A> and unlink().
+<P></P>
+<LI>
+The pattern matching operations <A HREF="../../lib/Pod/perlfunc.html#item_m/"><CODE>m//</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_s/"><CODE>s///</CODE></A>, and <A HREF="../../lib/Pod/perlfunc.html#item_tr/"><CODE>tr///</CODE></A> when used
+without an <CODE>=~</CODE> operator.
+<P></P>
+<LI>
+The default iterator variable in a <CODE>foreach</CODE> loop if no other
+variable is supplied.
+<P></P>
+<LI>
+The implicit iterator variable in the <A HREF="../../lib/Pod/perlfunc.html#item_grep"><CODE>grep()</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_map"><CODE>map()</CODE></A> functions.
+<P></P>
+<LI>
+The default place to put an input record when a <CODE>&lt;FH&gt;</CODE>
+operation's result is tested by itself as the sole criterion of a <CODE>while</CODE>
+test.  Outside a <CODE>while</CODE> test, this will not happen.
+<P></P></UL>
+<P>(Mnemonic: underline is understood in certain operations.)</P>
+</DL>
+<DL>
+<DT><STRONG><A NAME="item_%24%3Cdigits%3E">$&lt;<EM>digits</EM>&gt;</A></STRONG><BR>
+<DD>
+Contains the subpattern from the corresponding set of capturing
+parentheses from the last pattern match, not counting patterns
+matched in nested blocks that have been exited already.  (Mnemonic:
+like \digits.)  These variables are all read-only and dynamically
+scoped to the current BLOCK.
+<P></P>
+<DT><STRONG><A NAME="item_%24MATCH">$MATCH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%26">$&amp;</A></STRONG><BR>
+<DD>
+The string matched by the last successful pattern match (not counting
+any matches hidden within a BLOCK or <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> enclosed by the current
+BLOCK).  (Mnemonic: like &amp; in some editors.)  This variable is read-only
+and dynamically scoped to the current BLOCK.
+<P>The use of this variable anywhere in a program imposes a considerable
+performance penalty on all regular expression matches.  See <EM>BUGS</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24PREMATCH">$PREMATCH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%60">$`</A></STRONG><BR>
+<DD>
+The string preceding whatever was matched by the last successful
+pattern match (not counting any matches hidden within a BLOCK or eval
+enclosed by the current BLOCK).  (Mnemonic: <CODE>`</CODE> often precedes a quoted
+string.)  This variable is read-only.
+<P>The use of this variable anywhere in a program imposes a considerable
+performance penalty on all regular expression matches.  See <EM>BUGS</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24POSTMATCH">$POSTMATCH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%27">$'</A></STRONG><BR>
+<DD>
+The string following whatever was matched by the last successful
+pattern match (not counting any matches hidden within a BLOCK or <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A>
+enclosed by the current BLOCK).  (Mnemonic: <CODE>'</CODE> often follows a quoted
+string.)  Example:
+<PRE>
+    $_ = 'abcdefghi';
+    /def/;
+    print &quot;$`:$&amp;:$'\n&quot;;         # prints abc:def:ghi</PRE>
+<P>This variable is read-only and dynamically scoped to the current BLOCK.</P>
+<P>The use of this variable anywhere in a program imposes a considerable
+performance penalty on all regular expression matches.  See <EM>BUGS</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24LAST_PAREN_MATCH">$LAST_PAREN_MATCH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2B">$+</A></STRONG><BR>
+<DD>
+The last bracket matched by the last search pattern.  This is useful if
+you don't know which one of a set of alternative patterns matched.  For
+example:
+<PRE>
+    /Version: (.*)|Revision: (.*)/ &amp;&amp; ($rev = $+);</PRE>
+<P>(Mnemonic: be positive and forward looking.)
+This variable is read-only and dynamically scoped to the current BLOCK.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%40LAST_MATCH_END">@LAST_MATCH_END</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%40%2B">@+</A></STRONG><BR>
+<DD>
+This array holds the offsets of the ends of the last successful
+submatches in the currently active dynamic scope.  <CODE>$+[0]</CODE> is
+the offset into the string of the end of the entire match.  This
+is the same value as what the <A HREF="../../lib/Pod/perlfunc.html#item_pos"><CODE>pos</CODE></A> function returns when called
+on the variable that was matched against.  The <EM>n</EM>th element
+of this array holds the offset of the <EM>n</EM>th submatch, so
+<CODE>$+[1]</CODE> is the offset past where $1 ends, <CODE>$+[2]</CODE> the offset
+past where $2 ends, and so on.  You can use <CODE>$#+</CODE> to determine
+how many subgroups were in the last successful match.  See the
+examples given for the <A HREF="#item_%40%2D"><CODE>@-</CODE></A> variable.
+<P></P>
+<DT><STRONG><A NAME="item_%24MULTILINE_MATCHING">$MULTILINE_MATCHING</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2A">$*</A></STRONG><BR>
+<DD>
+Set to a non-zero integer value to do multi-line matching within a
+string, 0 (or undefined) to tell Perl that it can assume that strings
+contain a single line, for the purpose of optimizing pattern matches.
+Pattern matches on strings containing multiple newlines can produce
+confusing results when <A HREF="#item_%24%2A"><CODE>$*</CODE></A> is 0 or undefined. Default is undefined.
+(Mnemonic: * matches multiple things.) This variable influences the
+interpretation of only <CODE>^</CODE> and <CODE>$</CODE>. A literal newline can be searched
+for even when <CODE>$* == 0</CODE>.
+<P>Use of <A HREF="#item_%24%2A"><CODE>$*</CODE></A> is deprecated in modern Perl, supplanted by 
+the <CODE>/s</CODE> and <CODE>/m</CODE> modifiers on pattern matching.</P>
+<P>Assigning a non-numerical value to <A HREF="#item_%24%2A"><CODE>$*</CODE></A> triggers a warning (and makes
+<A HREF="#item_%24%2A"><CODE>$*</CODE></A> act if <CODE>$* == 0</CODE>), while assigning a numerical value to <A HREF="#item_%24%2A"><CODE>$*</CODE></A>
+makes that an implicit <A HREF="../../lib/Pod/perlfunc.html#item_int"><CODE>int</CODE></A> is applied on the value.</P>
+<P></P>
+<DT><STRONG><A NAME="item_input_line_number_HANDLE_EXPR">input_line_number HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24INPUT_LINE_NUMBER">$INPUT_LINE_NUMBER</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24NR">$NR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2E">$.</A></STRONG><BR>
+<DD>
+The current input record number for the last file handle from which
+you just <A HREF="../../lib/Pod/perlfunc.html#item_read"><CODE>read()</CODE></A> (or called a <A HREF="../../lib/Pod/perlfunc.html#item_seek"><CODE>seek</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_tell"><CODE>tell</CODE></A> on).  The value
+may be different from the actual physical line number in the file,
+depending on what notion of ``line'' is in effect--see <A HREF="#item_%24%2F"><CODE>$/</CODE></A> on how
+to change that.  An explicit close on a filehandle resets the line
+number.  Because <CODE>&lt;&gt;</CODE> never does an explicit close, line
+numbers increase across ARGV files (but see examples in <A HREF="../../lib/Pod/perlfunc.html#eof">eof in the perlfunc manpage</A>).
+Consider this variable read-only: setting it does not reposition
+the seek pointer; you'll have to do that on your own.  Localizing <A HREF="#item_%24%2E"><CODE>$.</CODE></A>
+has the effect of also localizing Perl's notion of ``the last read
+filehandle''.  (Mnemonic: many programs use ``.'' to mean the current line
+number.)
+<P></P>
+<DT><STRONG><A NAME="item_input_record_separator_HANDLE_EXPR">input_record_separator HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24INPUT_RECORD_SEPARATOR">$INPUT_RECORD_SEPARATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24RS">$RS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2F">$/</A></STRONG><BR>
+<DD>
+The input record separator, newline by default.  This 
+influences Perl's idea of what a ``line'' is.  Works like <STRONG>awk</STRONG>'s RS
+variable, including treating empty lines as a terminator if set to
+the null string.  (An empty line cannot contain any spaces
+or tabs.)  You may set it to a multi-character string to match a
+multi-character terminator, or to <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> to read through the end
+of file.  Setting it to <CODE>&quot;\n\n&quot;</CODE> means something slightly
+different than setting to <CODE>&quot;&quot;</CODE>, if the file contains consecutive
+empty lines.  Setting to <CODE>&quot;&quot;</CODE> will treat two or more consecutive
+empty lines as a single empty line.  Setting to <CODE>&quot;\n\n&quot;</CODE> will
+blindly assume that the next input character belongs to the next
+paragraph, even if it's a newline.  (Mnemonic: / delimits
+line boundaries when quoting poetry.)
+<PRE>
+    undef $/;           # enable &quot;slurp&quot; mode
+    $_ = &lt;FH&gt;;          # whole file now here
+    s/\n[ \t]+/ /g;</PRE>
+<P>Remember: the value of <A HREF="#item_%24%2F"><CODE>$/</CODE></A> is a string, not a regex.  <STRONG>awk</STRONG> has to be
+better for something. :-)</P>
+<P>Setting <A HREF="#item_%24%2F"><CODE>$/</CODE></A> to a reference to an integer, scalar containing an integer, or
+scalar that's convertible to an integer will attempt to read records
+instead of lines, with the maximum record size being the referenced
+integer.  So this:</P>
+<PRE>
+    $/ = \32768; # or \&quot;32768&quot;, or \$var_containing_32768
+    open(FILE, $myfile);
+    $_ = &lt;FILE&gt;;</PRE>
+<P>will read a record of no more than 32768 bytes from FILE.  If you're
+not reading from a record-oriented file (or your OS doesn't have
+record-oriented files), then you'll likely get a full chunk of data
+with every read.  If a record is larger than the record size you've
+set, you'll get the record back in pieces.</P>
+<P>On VMS, record reads are done with the equivalent of <A HREF="../../lib/Pod/perlfunc.html#item_sysread"><CODE>sysread</CODE></A>,
+so it's best not to mix record and non-record reads on the same
+file.  (This is unlikely to be a problem, because any file you'd
+want to read in record mode is probably unusable in line mode.)
+Non-VMS systems do normal I/O, so it's safe to mix record and
+non-record reads of a file.</P>
+<P>See also <A HREF="../../lib/Pod/perlport.html#newlines">Newlines in the perlport manpage</A>.  Also see <A HREF="#item_%24%2E"><CODE>$.</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_autoflush">autoflush HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24OUTPUT_AUTOFLUSH">$OUTPUT_AUTOFLUSH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%7C">$|</A></STRONG><BR>
+<DD>
+If set to nonzero, forces a flush right away and after every write
+or print on the currently selected output channel.  Default is 0
+(regardless of whether the channel is really buffered by the
+system or not; <A HREF="#item_%24%7C"><CODE>$|</CODE></A> tells you only whether you've asked Perl
+explicitly to flush after each write).  STDOUT will
+typically be line buffered if output is to the terminal and block
+buffered otherwise.  Setting this variable is useful primarily when
+you are outputting to a pipe or socket, such as when you are running
+a Perl program under <STRONG>rsh</STRONG> and want to see the output as it's
+happening.  This has no effect on input buffering.  See <A HREF="../../lib/Pod/perlfunc.html#getc">getc in the perlfunc manpage</A>
+for that.  (Mnemonic: when you want your pipes to be piping hot.)
+<P></P>
+<DT><STRONG><A NAME="item_output_field_separator_HANDLE_EXPR">output_field_separator HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24OUTPUT_FIELD_SEPARATOR">$OUTPUT_FIELD_SEPARATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24OFS">$OFS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2C">$,</A></STRONG><BR>
+<DD>
+The output field separator for the print operator.  Ordinarily the
+print operator simply prints out its arguments without further
+adornment.  To get behavior more like <STRONG>awk</STRONG>, set this variable as
+you would set <STRONG>awk</STRONG>'s OFS variable to specify what is printed
+between fields.  (Mnemonic: what is printed when there is a ``,'' in
+your print statement.)
+<P></P>
+<DT><STRONG><A NAME="item_output_record_separator_HANDLE_EXPR">output_record_separator HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24OUTPUT_RECORD_SEPARATOR">$OUTPUT_RECORD_SEPARATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24ORS">$ORS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5C">$\</A></STRONG><BR>
+<DD>
+The output record separator for the print operator.  Ordinarily the
+print operator simply prints out its arguments as is, with no
+trailing newline or other end-of-record string added.  To get
+behavior more like <STRONG>awk</STRONG>, set this variable as you would set
+<STRONG>awk</STRONG>'s ORS variable to specify what is printed at the end of the
+print.  (Mnemonic: you set <A HREF="#item_%24%5C"><CODE>$\</CODE></A> instead of adding ``\n'' at the
+end of the print.  Also, it's just like <A HREF="#item_%24%2F"><CODE>$/</CODE></A>, but it's what you
+get ``back'' from Perl.)
+<P></P>
+<DT><STRONG><A NAME="item_%24LIST_SEPARATOR">$LIST_SEPARATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%22">$``</A></STRONG><BR>
+<DD>
+This is like <A HREF="#item_%24%2C"><CODE>$,</CODE></A> except that it applies to array and slice values
+interpolated into a double-quoted string (or similar interpreted
+string).  Default is a space.  (Mnemonic: obvious, I think.)
+<P></P>
+<DT><STRONG><A NAME="item_%24SUBSCRIPT_SEPARATOR">$SUBSCRIPT_SEPARATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24SUBSEP">$SUBSEP</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3B">$;</A></STRONG><BR>
+<DD>
+The subscript separator for multidimensional array emulation.  If you
+refer to a hash element as
+<PRE>
+    $foo{$a,$b,$c}</PRE>
+<P>it really means</P>
+<PRE>
+    $foo{join($;, $a, $b, $c)}</PRE>
+<P>But don't put</P>
+<PRE>
+    @foo{$a,$b,$c}      # a slice--note the @</PRE>
+<P>which means</P>
+<PRE>
+    ($foo{$a},$foo{$b},$foo{$c})</PRE>
+<P>Default is ``\034'', the same as SUBSEP in <STRONG>awk</STRONG>.  If your
+keys contain binary data there might not be any safe value for <A HREF="#item_%24%3B"><CODE>$;</CODE></A>.
+(Mnemonic: comma (the syntactic subscript separator) is a
+semi-semicolon.  Yeah, I know, it's pretty lame, but <A HREF="#item_%24%2C"><CODE>$,</CODE></A> is already
+taken for something more important.)</P>
+<P>Consider using ``real'' multidimensional arrays as described
+in <A HREF="../../lib/Pod/perllol.html">the perllol manpage</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24OFMT">$OFMT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%23">$#</A></STRONG><BR>
+<DD>
+The output format for printed numbers.  This variable is a half-hearted
+attempt to emulate <STRONG>awk</STRONG>'s OFMT variable.  There are times, however,
+when <STRONG>awk</STRONG> and Perl have differing notions of what counts as 
+numeric.  The initial value is ``%.<EM>n</EM>g'', where <EM>n</EM> is the value
+of the macro DBL_DIG from your system's <EM>float.h</EM>.  This is different from
+<STRONG>awk</STRONG>'s default OFMT setting of ``%.6g'', so you need to set <A HREF="#item_%24%23"><CODE>$#</CODE></A>
+explicitly to get <STRONG>awk</STRONG>'s value.  (Mnemonic: # is the number sign.)
+<P>Use of <A HREF="#item_%24%23"><CODE>$#</CODE></A> is deprecated.</P>
+<P></P>
+<DT><STRONG><A NAME="item_format_page_number_HANDLE_EXPR">format_page_number HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_PAGE_NUMBER">$FORMAT_PAGE_NUMBER</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%25">$%</A></STRONG><BR>
+<DD>
+The current page number of the currently selected output channel.
+Used with formats.
+(Mnemonic: % is page number in <STRONG>nroff</STRONG>.)
+<P></P>
+<DT><STRONG><A NAME="item_format_lines_per_page_HANDLE_EXPR">format_lines_per_page HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_LINES_PER_PAGE">$FORMAT_LINES_PER_PAGE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3D">$=</A></STRONG><BR>
+<DD>
+The current page length (printable lines) of the currently selected
+output channel.  Default is 60.  
+Used with formats.
+(Mnemonic: = has horizontal lines.)
+<P></P>
+<DT><STRONG><A NAME="item_format_lines_left_HANDLE_EXPR">format_lines_left HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_LINES_LEFT">$FORMAT_LINES_LEFT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%2D">$-</A></STRONG><BR>
+<DD>
+The number of lines left on the page of the currently selected output
+channel.  
+Used with formats.
+(Mnemonic: lines_on_page - lines_printed.)
+<P></P>
+<DT><STRONG><A NAME="item_%40LAST_MATCH_START">@LAST_MATCH_START</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%40%2D">@-</A></STRONG><BR>
+<DD>
+$-[0] is the offset of the start of the last successful match.
+<CODE>$-[</CODE><EM>n</EM><CODE>]</CODE> is the offset of the start of the substring matched by
+<EM>n</EM>-th subpattern, or undef if the subpattern did not match.
+<P>Thus after a match against $_, $&amp; coincides with <CODE>substr $_, $-[0],
+$+[0] - $-[0]</CODE>.  Similarly, <CODE>$</CODE><EM>n</EM> coincides with <CODE>substr $_, $-[</CODE><EM>n</EM><CODE>],
+$+[</CODE><EM>n</EM><CODE>] - $-[</CODE><EM>n</EM><CODE>]</CODE> if <CODE>$-[</CODE><EM>n</EM><CODE>]</CODE> is defined, and $+ coincides with
+<CODE>substr $_, $-[$#-], $+[$#-]</CODE>.  One can use <CODE>$#-</CODE> to find the last
+matched subgroup in the last successful match.  Contrast with
+<CODE>$#+</CODE>, the number of subgroups in the regular expression.  Compare
+with <A HREF="#item_%40%2B"><CODE>@+</CODE></A>.</P>
+<P>This array holds the offsets of the beginnings of the last
+successful submatches in the currently active dynamic scope.
+<CODE>$-[0]</CODE> is the offset into the string of the beginning of the
+entire match.  The <EM>n</EM>th element of this array holds the offset
+of the <EM>n</EM>th submatch, so <CODE>$+[1]</CODE> is the offset where $1
+begins, <CODE>$+[2]</CODE> the offset where $2 begins, and so on.
+You can use <CODE>$#-</CODE> to determine how many subgroups were in the
+last successful match.  Compare with the <A HREF="#item_%40%2B"><CODE>@+</CODE></A> variable.</P>
+<P>After a match against some variable $var:</P>
+<DL>
+<DT><STRONG><A NAME="item_substr"><A HREF="#item_%24%60"><CODE>$`</CODE></A> is the same as <CODE>substr($var, 0, $-[0])</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A HREF="#item_%24%26"><CODE>$&amp;</CODE></A> is the same as <CODE>substr($var, $-[0], $+[0] - $-[0])</CODE></STRONG><BR>
+<DD>
+<DT><STRONG><A HREF="#item_%24%27"><CODE>$'</CODE></A> is the same as <CODE>substr($var, $+[0])</CODE></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>$1</CODE> is the same as <CODE>substr($var, $-[1], $+[1] - $-[1])</CODE></STRONG><BR>
+<DD>
+<DT><STRONG><CODE>$2</CODE> is the same as <CODE>substr($var, $-[2], $+[2] - $-[2])</CODE></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%243_is_the_same_as_substr_%24var%2C_%24%2D%5B3%5D"><CODE>$3</CODE> is the same as <CODE>substr $var, $-[3], $+[3] - $-[3])</CODE></A></STRONG><BR>
+<DD>
+</DL>
+<DT><STRONG><A NAME="item_format_name_HANDLE_EXPR">format_name HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_NAME">$FORMAT_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%7E">$~</A></STRONG><BR>
+<DD>
+The name of the current report format for the currently selected output
+channel.  Default is the name of the filehandle.  (Mnemonic: brother to
+<A HREF="#item_%24%5E"><CODE>$^</CODE></A>.)
+<P></P>
+<DT><STRONG><A NAME="item_format_top_name_HANDLE_EXPR">format_top_name HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_TOP_NAME">$FORMAT_TOP_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5E">$^</A></STRONG><BR>
+<DD>
+The name of the current top-of-page format for the currently selected
+output channel.  Default is the name of the filehandle with _TOP
+appended.  (Mnemonic: points to top of page.)
+<P></P>
+<DT><STRONG><A NAME="item_format_line_break_characters_HANDLE_EXPR">format_line_break_characters HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_LINE_BREAK_CHARACTERS">$FORMAT_LINE_BREAK_CHARACTERS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3A">$:</A></STRONG><BR>
+<DD>
+The current set of characters after which a string may be broken to
+fill continuation fields (starting with ^) in a format.  Default is
+``&nbsp;\n-'', to break on whitespace or hyphens.  (Mnemonic: a ``colon'' in
+poetry is a part of a line.)
+<P></P>
+<DT><STRONG><A NAME="item_format_formfeed_HANDLE_EXPR">format_formfeed HANDLE EXPR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24FORMAT_FORMFEED">$FORMAT_FORMFEED</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EL">$^L</A></STRONG><BR>
+<DD>
+What formats output as a form feed.  Default is \f.
+<P></P>
+<DT><STRONG><A NAME="item_%24ACCUMULATOR">$ACCUMULATOR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EA">$^A</A></STRONG><BR>
+<DD>
+The current value of the <A HREF="../../lib/Pod/perlfunc.html#item_write"><CODE>write()</CODE></A> accumulator for <A HREF="../../lib/Pod/perlfunc.html#item_format"><CODE>format()</CODE></A> lines.  A format
+contains <A HREF="../../lib/Pod/perlfunc.html#item_formline"><CODE>formline()</CODE></A> calls that put their result into <A HREF="#item_%24%5EA"><CODE>$^A</CODE></A>.  After
+calling its format, <A HREF="../../lib/Pod/perlfunc.html#item_write"><CODE>write()</CODE></A> prints out the contents of <A HREF="#item_%24%5EA"><CODE>$^A</CODE></A> and empties.
+So you never really see the contents of <A HREF="#item_%24%5EA"><CODE>$^A</CODE></A> unless you call
+<A HREF="../../lib/Pod/perlfunc.html#item_formline"><CODE>formline()</CODE></A> yourself and then look at it.  See <A HREF="../../lib/Pod/perlform.html">the perlform manpage</A> and
+<A HREF="../../lib/Pod/perlfunc.html#formline()">formline() in the perlfunc manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%24CHILD_ERROR">$CHILD_ERROR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3F">$?</A></STRONG><BR>
+<DD>
+The status returned by the last pipe close, backtick (<CODE>``</CODE>) command,
+successful call to <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait()</CODE></A> or waitpid(), or from the <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A>
+operator.  This is just the 16-bit status word returned by the
+<A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait()</CODE></A> system call (or else is made up to look like it).  Thus, the
+exit value of the subprocess is really (<CODE>$? &gt;&gt; 8</CODE>), and
+<CODE>$? &amp; 127</CODE> gives which signal, if any, the process died from, and
+<CODE>$? &amp; 128</CODE> reports whether there was a core dump.  (Mnemonic:
+similar to <STRONG>sh</STRONG> and <STRONG>ksh</STRONG>.)
+<P>Additionally, if the <CODE>h_errno</CODE> variable is supported in C, its value
+is returned via $? if any <CODE>gethost*()</CODE> function fails.</P>
+<P>If you have installed a signal handler for <CODE>SIGCHLD</CODE>, the
+value of <A HREF="#item_%24%3F"><CODE>$?</CODE></A> will usually be wrong outside that handler.</P>
+<P>Inside an <CODE>END</CODE> subroutine <A HREF="#item_%24%3F"><CODE>$?</CODE></A> contains the value that is going to be
+given to <A HREF="../../lib/Pod/perlfunc.html#item_exit"><CODE>exit()</CODE></A>.  You can modify <A HREF="#item_%24%3F"><CODE>$?</CODE></A> in an <CODE>END</CODE> subroutine to
+change the exit status of your program.  For example:</P>
+<PRE>
+    END {
+        $? = 1 if $? == 255;  # die would make it 255
+    }</PRE>
+<P>Under VMS, the pragma <CODE>use vmsish 'status'</CODE> makes <A HREF="#item_%24%3F"><CODE>$?</CODE></A> reflect the
+actual VMS exit status, instead of the default emulation of POSIX
+status.</P>
+<P>Also see <A HREF="#error indicators">Error Indicators</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24OS_ERROR">$OS_ERROR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24ERRNO">$ERRNO</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%21">$!</A></STRONG><BR>
+<DD>
+If used numerically, yields the current value of the C <CODE>errno</CODE>
+variable, with all the usual caveats.  (This means that you shouldn't
+depend on the value of <A HREF="#item_%24%21"><CODE>$!</CODE></A> to be anything in particular unless
+you've gotten a specific error return indicating a system error.)
+If used an a string, yields the corresponding system error string.
+You can assign a number to <A HREF="#item_%24%21"><CODE>$!</CODE></A> to set <EM>errno</EM> if, for instance,
+you want <CODE>&quot;$!&quot;</CODE> to return the string for error <EM>n</EM>, or you want
+to set the exit value for the <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> operator.  (Mnemonic: What just
+went bang?)
+<P>Also see <A HREF="#error indicators">Error Indicators</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24EXTENDED_OS_ERROR">$EXTENDED_OS_ERROR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EE">$^E</A></STRONG><BR>
+<DD>
+Error information specific to the current operating system.  At
+the moment, this differs from <A HREF="#item_%24%21"><CODE>$!</CODE></A> under only VMS, OS/2, and Win32
+(and for MacPerl).  On all other platforms, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> is always just
+the same as <A HREF="#item_%24%21"><CODE>$!</CODE></A>.
+<P>Under VMS, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> provides the VMS status value from the last
+system error.  This is more specific information about the last
+system error than that provided by <A HREF="#item_%24%21"><CODE>$!</CODE></A>.  This is particularly
+important when <A HREF="#item_%24%21"><CODE>$!</CODE></A> is set to <STRONG>EVMSERR</STRONG>.</P>
+<P>Under OS/2, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> is set to the error code of the last call to
+OS/2 API either via CRT, or directly from perl.</P>
+<P>Under Win32, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> always returns the last error information
+reported by the Win32 call <CODE>GetLastError()</CODE> which describes
+the last error from within the Win32 API.  Most Win32-specific
+code will report errors via <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>.  ANSI C and Unix-like calls
+set <CODE>errno</CODE> and so most portable Perl code will report errors
+via <A HREF="#item_%24%21"><CODE>$!</CODE></A>.</P>
+<P>Caveats mentioned in the description of <A HREF="#item_%24%21"><CODE>$!</CODE></A> generally apply to
+<A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>, also.  (Mnemonic: Extra error explanation.)</P>
+<P>Also see <A HREF="#error indicators">Error Indicators</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24EVAL_ERROR">$EVAL_ERROR</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%40">$@</A></STRONG><BR>
+<DD>
+The Perl syntax error message from the last <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> operator.  If null, the
+last <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> parsed and executed correctly (although the operations you
+invoked may have failed in the normal fashion).  (Mnemonic: Where was
+the syntax error ``at''?)
+<P>Warning messages are not collected in this variable.  You can,
+however, set up a routine to process warnings by setting <CODE>$SIG{__WARN__}</CODE>
+as described below.</P>
+<P>Also see <A HREF="#error indicators">Error Indicators</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24PROCESS_ID">$PROCESS_ID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24PID">$PID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%24">$$</A></STRONG><BR>
+<DD>
+The process number of the Perl running this script.  You should
+consider this variable read-only, although it will be altered
+across <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> calls.  (Mnemonic: same as shells.)
+<P></P>
+<DT><STRONG><A NAME="item_%24REAL_USER_ID">$REAL_USER_ID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24UID">$UID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3C">$&lt;</A></STRONG><BR>
+<DD>
+The real uid of this process.  (Mnemonic: it's the uid you came <EM>from</EM>,
+if you're running setuid.)
+<P></P>
+<DT><STRONG><A NAME="item_%24EFFECTIVE_USER_ID">$EFFECTIVE_USER_ID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24EUID">$EUID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%3E">$&gt;</A></STRONG><BR>
+<DD>
+The effective uid of this process.  Example:
+<PRE>
+    $&lt; = $&gt;;            # set real to effective uid
+    ($&lt;,$&gt;) = ($&gt;,$&lt;);  # swap real and effective uid</PRE>
+<P>(Mnemonic: it's the uid you went <EM>to</EM>, if you're running setuid.)
+<A HREF="#item_%24%3C"><CODE>$&lt;</CODE></A> and <A HREF="#item_%24%3E"><CODE>$&gt;</CODE></A> can be swapped only on machines
+supporting setreuid().</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24REAL_GROUP_ID">$REAL_GROUP_ID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24GID">$GID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%28">$(</A></STRONG><BR>
+<DD>
+The real gid of this process.  If you are on a machine that supports
+membership in multiple groups simultaneously, gives a space separated
+list of groups you are in.  The first number is the one returned by
+getgid(), and the subsequent ones by getgroups(), one of which may be
+the same as the first number.
+<P>However, a value assigned to <A HREF="#item_%24%28"><CODE>$(</CODE></A> must be a single number used to
+set the real gid.  So the value given by <A HREF="#item_%24%28"><CODE>$(</CODE></A> should <EM>not</EM> be assigned
+back to <A HREF="#item_%24%28"><CODE>$(</CODE></A> without being forced numeric, such as by adding zero.</P>
+<P>(Mnemonic: parentheses are used to <EM>group</EM> things.  The real gid is the
+group you <EM>left</EM>, if you're running setgid.)</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24EFFECTIVE_GROUP_ID">$EFFECTIVE_GROUP_ID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24EGID">$EGID</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%29">$)</A></STRONG><BR>
+<DD>
+The effective gid of this process.  If you are on a machine that
+supports membership in multiple groups simultaneously, gives a space
+separated list of groups you are in.  The first number is the one
+returned by getegid(), and the subsequent ones by getgroups(), one of
+which may be the same as the first number.
+<P>Similarly, a value assigned to <A HREF="#item_%24%29"><CODE>$)</CODE></A> must also be a space-separated
+list of numbers.  The first number sets the effective gid, and
+the rest (if any) are passed to setgroups().  To get the effect of an
+empty list for setgroups(), just repeat the new effective gid; that is,
+to force an effective gid of 5 and an effectively empty <CODE>setgroups()</CODE>
+list, say <CODE> $) = &quot;5 5&quot; </CODE>.</P>
+<P>(Mnemonic: parentheses are used to <EM>group</EM> things.  The effective gid
+is the group that's <EM>right</EM> for you, if you're running setgid.)</P>
+<P><A HREF="#item_%24%3C"><CODE>$&lt;</CODE></A>, <A HREF="#item_%24%3E"><CODE>$&gt;</CODE></A>, <A HREF="#item_%24%28"><CODE>$(</CODE></A> and <A HREF="#item_%24%29"><CODE>$)</CODE></A> can be set only on
+machines that support the corresponding <EM>set[re][ug]id()</EM> routine.  <A HREF="#item_%24%28"><CODE>$(</CODE></A>
+and <A HREF="#item_%24%29"><CODE>$)</CODE></A> can be swapped only on machines supporting setregid().</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24PROGRAM_NAME">$PROGRAM_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%240">$0</A></STRONG><BR>
+<DD>
+Contains the name of the program being executed.  On some operating
+systems assigning to <A HREF="#item_%240"><CODE>$0</CODE></A> modifies the argument area that the <STRONG>ps</STRONG>
+program sees.  This is more useful as a way of indicating the current
+program state than it is for hiding the program you're running.
+(Mnemonic: same as <STRONG>sh</STRONG> and <STRONG>ksh</STRONG>.)
+<P>Note for BSD users: setting <A HREF="#item_%240"><CODE>$0</CODE></A> does not completely remove ``perl''
+from the <CODE>ps(1)</CODE> output.  For example, setting <A HREF="#item_%240"><CODE>$0</CODE></A> to <CODE>&quot;foobar&quot;</CODE> will
+result in <CODE>&quot;perl: foobar (perl)&quot;</CODE>.  This is an operating system
+feature.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24%5B">$[</A></STRONG><BR>
+<DD>
+The index of the first element in an array, and of the first character
+in a substring.  Default is 0, but you could theoretically set it
+to 1 to make Perl behave more like <STRONG>awk</STRONG> (or Fortran) when
+subscripting and when evaluating the <A HREF="../../lib/Pod/perlfunc.html#item_index"><CODE>index()</CODE></A> and <A HREF="#item_substr"><CODE>substr()</CODE></A> functions.
+(Mnemonic: [ begins subscripts.)
+<P>As of release 5 of Perl, assignment to <A HREF="#item_%24%5B"><CODE>$[</CODE></A> is treated as a compiler
+directive, and cannot influence the behavior of any other file.
+Its use is highly discouraged.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24%5D">$]</A></STRONG><BR>
+<DD>
+The version + patchlevel / 1000 of the Perl interpreter.  This variable
+can be used to determine whether the Perl interpreter executing a
+script is in the right range of versions.  (Mnemonic: Is this version
+of perl in the right bracket?)  Example:
+<PRE>
+    warn &quot;No checksumming!\n&quot; if $] &lt; 3.019;</PRE>
+<P>See also the documentation of <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use VERSION</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require VERSION</CODE></A>
+for a convenient way to fail if the running Perl interpreter is too old.</P>
+<P>The use of this variable is deprecated.  The floating point representation
+can sometimes lead to inaccurate numeric comparisons.  See <A HREF="#item_%24%5EV"><CODE>$^V</CODE></A> for a
+more modern representation of the Perl version that allows accurate string
+comparisons.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24COMPILING">$COMPILING</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EC">$^C</A></STRONG><BR>
+<DD>
+The current value of the flag associated with the <STRONG>-c</STRONG> switch.
+Mainly of use with <STRONG>-MO=...</STRONG> to allow code to alter its behavior
+when being compiled, such as for example to AUTOLOAD at compile
+time rather than normal, deferred loading.  See <EM>perlcc</EM>.  Setting
+<CODE>$^C = 1</CODE> is similar to calling <CODE>B::minus_c</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_%24DEBUGGING">$DEBUGGING</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5ED">$^D</A></STRONG><BR>
+<DD>
+The current value of the debugging flags.  (Mnemonic: value of <STRONG>-D</STRONG>
+switch.)
+<P></P>
+<DT><STRONG><A NAME="item_%24SYSTEM_FD_MAX">$SYSTEM_FD_MAX</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EF">$^F</A></STRONG><BR>
+<DD>
+The maximum system file descriptor, ordinarily 2.  System file
+descriptors are passed to exec()ed processes, while higher file
+descriptors are not.  Also, during an open(), system file descriptors are
+preserved even if the <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A> fails.  (Ordinary file descriptors are
+closed before the <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A> is attempted.)  The close-on-exec
+status of a file descriptor will be decided according to the value of
+<A HREF="#item_%24%5EF"><CODE>$^F</CODE></A> when the corresponding file, pipe, or socket was opened, not the
+time of the exec().
+<P></P>
+<DT><STRONG><A NAME="item_%24%5EH">$^H</A></STRONG><BR>
+<DD>
+WARNING: This variable is strictly for internal use only.  Its availability,
+behavior, and contents are subject to change without notice.
+<P>This variable contains compile-time hints for the Perl interpreter.  At the
+end of compilation of a BLOCK the value of this variable is restored to the
+value when the interpreter started to compile the BLOCK.</P>
+<P>When perl begins to parse any block construct that provides a lexical scope
+(e.g., eval body, required file, subroutine body, loop body, or conditional
+block), the existing value of $^H is saved, but its value is left unchanged.
+When the compilation of the block is completed, it regains the saved value.
+Between the points where its value is saved and restored, code that
+executes within BEGIN blocks is free to change the value of $^H.</P>
+<P>This behavior provides the semantic of lexical scoping, and is used in,
+for instance, the <CODE>use strict</CODE> pragma.</P>
+<P>The contents should be an integer; different bits of it are used for
+different pragmatic flags.  Here's an example:</P>
+<PRE>
+    sub add_100 { $^H |= 0x100 }</PRE>
+<PRE>
+    sub foo {
+        BEGIN { add_100() }
+        bar-&gt;baz($boon);
+    }</PRE>
+<P>Consider what happens during execution of the BEGIN block.  At this point
+the BEGIN block has already been compiled, but the body of <CODE>foo()</CODE> is still
+being compiled.  The new value of $^H will therefore be visible only while
+the body of <CODE>foo()</CODE> is being compiled.</P>
+<P>Substitution of the above BEGIN block with:</P>
+<PRE>
+    BEGIN { require strict; strict-&gt;import('vars') }</PRE>
+<P>demonstrates how <CODE>use strict 'vars'</CODE> is implemented.  Here's a conditional
+version of the same lexical pragma:</P>
+<PRE>
+    BEGIN { require strict; strict-&gt;import('vars') if $condition }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%^H">%^H</A></STRONG><BR>
+<DD>
+WARNING: This variable is strictly for internal use only.  Its availability,
+behavior, and contents are subject to change without notice.
+<P>The %^H hash provides the same scoping semantic as $^H.  This makes it
+useful for implementation of lexically scoped pragmas.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24INPLACE_EDIT">$INPLACE_EDIT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EI">$^I</A></STRONG><BR>
+<DD>
+The current value of the inplace-edit extension.  Use <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> to disable
+inplace editing.  (Mnemonic: value of <STRONG>-i</STRONG> switch.)
+<P></P>
+<DT><STRONG><A NAME="item_%24%5EM">$^M</A></STRONG><BR>
+<DD>
+By default, running out of memory is an untrappable, fatal error.
+However, if suitably built, Perl can use the contents of <A HREF="#item_%24%5EM"><CODE>$^M</CODE></A>
+as an emergency memory pool after die()ing.  Suppose that your Perl
+were compiled with -DPERL_EMERGENCY_SBRK and used Perl's malloc.
+Then
+<PRE>
+    $^M = 'a' x (1 &lt;&lt; 16);</PRE>
+<P>would allocate a 64K buffer for use in an emergency.  See the
+<EM>INSTALL</EM> file in the Perl distribution for information on how to
+enable this option.  To discourage casual use of this advanced
+feature, there is no <A HREF="../../lib/English.html">English</A> long name for this variable.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24OSNAME">$OSNAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EO">$^O</A></STRONG><BR>
+<DD>
+The name of the operating system under which this copy of Perl was
+built, as determined during the configuration process.  The value
+is identical to <CODE>$Config{'osname'}</CODE>.  See also <A HREF="../../lib/Config.html">the Config manpage</A> and the 
+<STRONG>-V</STRONG> command-line switch documented in <A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%24PERLDB">$PERLDB</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EP">$^P</A></STRONG><BR>
+<DD>
+The internal variable for debugging support.  The meanings of the
+various bits are subject to change, but currently indicate:
+<OL>
+<LI><STRONG><A NAME="item_x01">x01</A></STRONG><BR>
+
+Debug subroutine enter/exit.
+<P></P>
+<LI><STRONG><A NAME="item_x02">x02</A></STRONG><BR>
+
+Line-by-line debugging.
+<P></P>
+<LI><STRONG><A NAME="item_x04">x04</A></STRONG><BR>
+
+Switch off optimizations.
+<P></P>
+<LI><STRONG><A NAME="item_x08">x08</A></STRONG><BR>
+
+Preserve more data for future interactive inspections.
+<P></P>
+<LI><STRONG><A NAME="item_x10">x10</A></STRONG><BR>
+
+Keep info about source lines on which a subroutine is defined.
+<P></P>
+<LI><STRONG><A NAME="item_x20">x20</A></STRONG><BR>
+
+Start with single-step on.
+<P></P>
+<LI><STRONG><A NAME="item_x40">x40</A></STRONG><BR>
+
+Use subroutine address instead of name when reporting.
+<P></P>
+<LI><STRONG><A NAME="item_x80">x80</A></STRONG><BR>
+
+Report <CODE>goto &amp;subroutine</CODE> as well.
+<P></P>
+<LI><STRONG><A NAME="item_x100">x100</A></STRONG><BR>
+
+Provide informative ``file'' names for evals based on the place they were compiled.
+<P></P>
+<LI><STRONG><A NAME="item_x200">x200</A></STRONG><BR>
+
+Provide informative names to anonymous subroutines based on the place they
+were compiled.
+<P></P></OL>
+<P>Some bits may be relevant at compile-time only, some at
+run-time only.  This is a new mechanism and the details may change.</P>
+<DT><STRONG><A NAME="item_%24LAST_REGEXP_CODE_RESULT">$LAST_REGEXP_CODE_RESULT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5ER">$^R</A></STRONG><BR>
+<DD>
+The result of evaluation of the last successful <CODE>(?{ code })</CODE>
+regular expression assertion (see <A HREF="../../lib/Pod/perlre.html">the perlre manpage</A>).  May be written to.
+<P></P>
+<DT><STRONG><A NAME="item_%24EXCEPTIONS_BEING_CAUGHT">$EXCEPTIONS_BEING_CAUGHT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5ES">$^S</A></STRONG><BR>
+<DD>
+Current state of the interpreter.  Undefined if parsing of the current
+module/eval is not finished (may happen in $SIG{__DIE__} and
+$SIG{__WARN__} handlers).  True if inside an eval(), otherwise false.
+<P></P>
+<DT><STRONG><A NAME="item_%24BASETIME">$BASETIME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5ET">$^T</A></STRONG><BR>
+<DD>
+The time at which the program began running, in seconds since the
+epoch (beginning of 1970).  The values returned by the <STRONG>-M</STRONG>, <STRONG>-A</STRONG>,
+and <STRONG>-C</STRONG> filetests are based on this value.
+<P></P>
+<DT><STRONG><A NAME="item_%24PERL_VERSION">$PERL_VERSION</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EV">$^V</A></STRONG><BR>
+<DD>
+The revision, version, and subversion of the Perl interpreter, represented
+as a string composed of characters with those ordinals.  Thus in Perl v5.6.0
+it equals <A HREF="../../lib/Pod/perlfunc.html#item_chr"><CODE>chr(5) . chr(6) . chr(0)</CODE></A> and will return true for
+<CODE>$^V eq v5.6.0</CODE>.  Note that the characters in this string value can
+potentially be in Unicode range.
+<P>This can be used to determine whether the Perl interpreter executing a
+script is in the right range of versions.  (Mnemonic: use ^V for Version
+Control.)  Example:</P>
+<PRE>
+    warn &quot;No \&quot;our\&quot; declarations!\n&quot; if $^V and $^V lt v5.6.0;</PRE>
+<P>See the documentation of <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use VERSION</CODE></A> and <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require VERSION</CODE></A>
+for a convenient way to fail if the running Perl interpreter is too old.</P>
+<P>See also <A HREF="#item_%24%5D"><CODE>$]</CODE></A> for an older representation of the Perl version.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24WARNING">$WARNING</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EW">$^W</A></STRONG><BR>
+<DD>
+The current value of the warning switch, initially true if <STRONG>-w</STRONG>
+was used, false otherwise, but directly modifiable.  (Mnemonic:
+related to the <STRONG>-w</STRONG> switch.)  See also <A HREF="../../lib/warnings.html">the warnings manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%24%7B%5EWARNING_BITS%7D">${^WARNING_BITS}</A></STRONG><BR>
+<DD>
+The current set of warning checks enabled by the <CODE>use warnings</CODE> pragma.
+See the documentation of <CODE>warnings</CODE> for more details.
+<P></P>
+<DT><STRONG><A NAME="item_%24%7B%5EWIDE_SYSTEM_CALLS%7D">${^WIDE_SYSTEM_CALLS}</A></STRONG><BR>
+<DD>
+Global flag that enables system calls made by Perl to use wide character
+APIs native to the system, if available.  This is currently only implemented
+on the Windows platform.
+<P>This can also be enabled from the command line using the <A HREF="../../lib/Pod/perlrun.html#item_%2DC"><CODE>-C</CODE></A> switch.</P>
+<P>The initial value is typically <CODE>0</CODE> for compatibility with Perl versions
+earlier than 5.6, but may be automatically set to <CODE>1</CODE> by Perl if the system
+provides a user-settable default (e.g., <CODE>$ENV{LC_CTYPE}</CODE>).</P>
+<P>The <CODE>bytes</CODE> pragma always overrides the effect of this flag in the current
+lexical scope.  See <A HREF="../../lib/bytes.html">the bytes manpage</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24EXECUTABLE_NAME">$EXECUTABLE_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24%5EX">$^X</A></STRONG><BR>
+<DD>
+The name that the Perl binary itself was executed as, from C's <CODE>argv[0]</CODE>.
+This may not be a full pathname, nor even necessarily in your path.
+<P></P>
+<DT><STRONG><A NAME="item_%24ARGV">$ARGV</A></STRONG><BR>
+<DD>
+contains the name of the current file when reading from &lt;&gt;.
+<P></P>
+<DT><STRONG><A NAME="item_%40ARGV">@ARGV</A></STRONG><BR>
+<DD>
+The array @ARGV contains the command-line arguments intended for
+the script.  <CODE>$#ARGV</CODE> is generally the number of arguments minus
+one, because <CODE>$ARGV[0]</CODE> is the first argument, <EM>not</EM> the program's
+command name itself.  See <A HREF="#item_%240"><CODE>$0</CODE></A> for the command name.
+<P></P>
+<DT><STRONG><A NAME="item_%40INC">@INC</A></STRONG><BR>
+<DD>
+The array @INC contains the list of places that the <A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do EXPR</CODE></A>,
+<A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> constructs look for their library files.  It
+initially consists of the arguments to any <STRONG>-I</STRONG> command-line
+switches, followed by the default Perl library, probably
+<EM>/usr/local/lib/perl</EM>, followed by ``.'', to represent the current
+directory.  If you need to modify this at runtime, you should use
+the <CODE>use lib</CODE> pragma to get the machine-dependent library properly
+loaded also:
+<PRE>
+    use lib '/mypath/libdir/';
+    use SomeMod;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%40_">@_</A></STRONG><BR>
+<DD>
+Within a subroutine the array @_ contains the parameters passed to that
+subroutine.  See <A HREF="../../lib/Pod/perlsub.html">the perlsub manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%INC">%INC</A></STRONG><BR>
+<DD>
+The hash %INC contains entries for each filename included via the
+<A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> operators.  The key is the filename
+you specified (with module names converted to pathnames), and the
+value is the location of the file found.  The <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>
+operator uses this hash to determine whether a particular file has
+already been included.
+<P></P>
+<DT><STRONG><A NAME="item_%ENV">%ENV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24ENV%7Bexpr%7D">$ENV{expr}</A></STRONG><BR>
+<DD>
+The hash %ENV contains your current environment.  Setting a
+value in <CODE>ENV</CODE> changes the environment for any child processes
+you subsequently <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> off.
+<P></P>
+<DT><STRONG><A NAME="item_%SIG">%SIG</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24SIG%7Bexpr%7D">$SIG{expr}</A></STRONG><BR>
+<DD>
+The hash %SIG contains signal handlers for signals.  For example:
+<PRE>
+    sub handler {       # 1st argument is signal name
+        my($sig) = @_;
+        print &quot;Caught a SIG$sig--shutting down\n&quot;;
+        close(LOG);
+        exit(0);
+    }</PRE>
+<PRE>
+    $SIG{'INT'}  = \&amp;handler;
+    $SIG{'QUIT'} = \&amp;handler;
+    ...
+    $SIG{'INT'}  = 'DEFAULT';   # restore default action
+    $SIG{'QUIT'} = 'IGNORE';    # ignore SIGQUIT</PRE>
+<P>Using a value of <CODE>'IGNORE'</CODE> usually has the effect of ignoring the
+signal, except for the <CODE>CHLD</CODE> signal.  See <A HREF="../../lib/Pod/perlipc.html">the perlipc manpage</A> for more about
+this special case.</P>
+<P>Here are some other examples:</P>
+<PRE>
+    $SIG{&quot;PIPE&quot;} = &quot;Plumber&quot;;   # assumes main::Plumber (not recommended)
+    $SIG{&quot;PIPE&quot;} = \&amp;Plumber;   # just fine; assume current Plumber
+    $SIG{&quot;PIPE&quot;} = *Plumber;    # somewhat esoteric
+    $SIG{&quot;PIPE&quot;} = Plumber();   # oops, what did Plumber() return??</PRE>
+<P>Be sure not to use a bareword as the name of a signal handler,
+lest you inadvertently call it.</P>
+<P>If your system has the <CODE>sigaction()</CODE> function then signal handlers are
+installed using it.  This means you get reliable signal handling.  If
+your system has the SA_RESTART flag it is used when signals handlers are
+installed.  This means that system calls for which restarting is supported
+continue rather than returning when a signal arrives.  If you want your
+system calls to be interrupted by signal delivery then do something like
+this:</P>
+<PRE>
+    use POSIX ':signal_h';</PRE>
+<PRE>
+    my $alarm = 0;
+    sigaction SIGALRM, new POSIX::SigAction sub { $alarm = 1 }
+        or die &quot;Error setting SIGALRM handler: $!\n&quot;;</PRE>
+<P>See <A HREF="../../lib/POSIX.html">the POSIX manpage</A>.</P>
+<P>Certain internal hooks can be also set using the %SIG hash.  The
+routine indicated by <CODE>$SIG{__WARN__}</CODE> is called when a warning message is
+about to be printed.  The warning message is passed as the first
+argument.  The presence of a __WARN__ hook causes the ordinary printing
+of warnings to STDERR to be suppressed.  You can use this to save warnings
+in a variable, or turn warnings into fatal errors, like this:</P>
+<PRE>
+    local $SIG{__WARN__} = sub { die $_[0] };
+    eval $proggie;</PRE>
+<P>The routine indicated by <CODE>$SIG{__DIE__}</CODE> is called when a fatal exception
+is about to be thrown.  The error message is passed as the first
+argument.  When a __DIE__ hook routine returns, the exception
+processing continues as it would have in the absence of the hook,
+unless the hook routine itself exits via a <A HREF="../../lib/Pod/perlfunc.html#item_goto"><CODE>goto</CODE></A>, a loop exit, or a die().
+The <CODE>__DIE__</CODE> handler is explicitly disabled during the call, so that you
+can die from a <CODE>__DIE__</CODE> handler.  Similarly for <CODE>__WARN__</CODE>.</P>
+<P>Due to an implementation glitch, the <CODE>$SIG{__DIE__}</CODE> hook is called
+even inside an eval().  Do not use this to rewrite a pending exception
+in <A HREF="#item_%24%40"><CODE>$@</CODE></A>, or as a bizarre substitute for overriding CORE::GLOBAL::die().
+This strange action at a distance may be fixed in a future release
+so that <CODE>$SIG{__DIE__}</CODE> is only called if your program is about
+to exit, as was the original intent.  Any other use is deprecated.</P>
+<P><CODE>__DIE__</CODE>/<CODE>__WARN__</CODE> handlers are very special in one respect:
+they may be called to report (probable) errors found by the parser.
+In such a case the parser may be in inconsistent state, so any
+attempt to evaluate Perl code from such a handler will probably
+result in a segfault.  This means that warnings or errors that
+result from parsing Perl should be used with extreme caution, like
+this:</P>
+<PRE>
+    require Carp if defined $^S;
+    Carp::confess(&quot;Something wrong&quot;) if defined &amp;Carp::confess;
+    die &quot;Something wrong, but could not load Carp to give backtrace...
+         To see backtrace try starting Perl with -MCarp switch&quot;;</PRE>
+<P>Here the first line will load Carp <EM>unless</EM> it is the parser who
+called the handler.  The second line will print backtrace and die if
+Carp was available.  The third line will be executed only if Carp was
+not available.</P>
+<P>See <A HREF="../../lib/Pod/perlfunc.html#die">die in the perlfunc manpage</A>, <A HREF="../../lib/Pod/perlfunc.html#warn">warn in the perlfunc manpage</A>, <A HREF="../../lib/Pod/perlfunc.html#eval">eval in the perlfunc manpage</A>, and
+<A HREF="../../lib/warnings.html">the warnings manpage</A> for additional information.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="error indicators">Error Indicators</A></H2>
+<P>The variables <A HREF="#item_%24%40"><CODE>$@</CODE></A>, <A HREF="#item_%24%21"><CODE>$!</CODE></A>, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>, and <A HREF="#item_%24%3F"><CODE>$?</CODE></A> contain information
+about different types of error conditions that may appear during
+execution of a Perl program.  The variables are shown ordered by
+the ``distance'' between the subsystem which reported the error and
+the Perl process.  They correspond to errors detected by the Perl
+interpreter, C library, operating system, or an external program,
+respectively.</P>
+<P>To illustrate the differences between these variables, consider the 
+following Perl expression, which uses a single-quoted string:</P>
+<PRE>
+    eval q{
+        open PIPE, &quot;/cdrom/install |&quot;;
+        @res = &lt;PIPE&gt;;
+        close PIPE or die &quot;bad pipe: $?, $!&quot;;
+    };</PRE>
+<P>After execution of this statement all 4 variables may have been set.</P>
+<P><A HREF="#item_%24%40"><CODE>$@</CODE></A> is set if the string to be <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>-ed did not compile (this
+may happen if <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_close"><CODE>close</CODE></A> were imported with bad prototypes),
+or if Perl code executed during evaluation die()d .  In these cases
+the value of $@ is the compile error, or the argument to <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A>
+(which will interpolate <A HREF="#item_%24%21"><CODE>$!</CODE></A> and <A HREF="#item_%24%3F"><CODE>$?</CODE></A>!).  (See also <A HREF="../../lib/Fatal.html">the Fatal manpage</A>,
+though.)</P>
+<P>When the <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> expression above is executed, open(), <CODE>&lt;PIPE&gt;</CODE>,
+and <A HREF="../../lib/Pod/perlfunc.html#item_close"><CODE>close</CODE></A> are translated to calls in the C run-time library and
+thence to the operating system kernel.  <A HREF="#item_%24%21"><CODE>$!</CODE></A> is set to the C library's
+<CODE>errno</CODE> if one of these calls fails.</P>
+<P>Under a few operating systems, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A> may contain a more verbose
+error indicator, such as in this case, ``CDROM tray not closed.''
+Systems that do not support extended error messages leave <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>
+the same as <A HREF="#item_%24%21"><CODE>$!</CODE></A>.</P>
+<P>Finally, <A HREF="#item_%24%3F"><CODE>$?</CODE></A> may be set to non-0 value if the external program
+<EM>/cdrom/install</EM> fails.  The upper eight bits reflect specific
+error conditions encountered by the program (the program's <A HREF="../../lib/Pod/perlfunc.html#item_exit"><CODE>exit()</CODE></A>
+value).   The lower eight bits reflect mode of failure, like signal
+death and core dump information  See <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait(2)</CODE></A> for details.  In
+contrast to <A HREF="#item_%24%21"><CODE>$!</CODE></A> and <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>, which are set only if error condition
+is detected, the variable <A HREF="#item_%24%3F"><CODE>$?</CODE></A> is set on each <A HREF="../../lib/Pod/perlfunc.html#item_wait"><CODE>wait</CODE></A> or pipe
+<A HREF="../../lib/Pod/perlfunc.html#item_close"><CODE>close</CODE></A>, overwriting the old value.  This is more like <A HREF="#item_%24%40"><CODE>$@</CODE></A>, which
+on every <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> is always set on failure and cleared on success.</P>
+<P>For more details, see the individual descriptions at <A HREF="#item_%24%40"><CODE>$@</CODE></A>, <A HREF="#item_%24%21"><CODE>$!</CODE></A>, <A HREF="#item_%24%5EE"><CODE>$^E</CODE></A>,
+and <A HREF="#item_%24%3F"><CODE>$?</CODE></A>.</P>
+<P>
+<H2><A NAME="technical note on the syntax of variable names">Technical Note on the Syntax of Variable Names</A></H2>
+<P>Variable names in Perl can have several formats.  Usually, they
+must begin with a letter or underscore, in which case they can be
+arbitrarily long (up to an internal limit of 251 characters) and
+may contain letters, digits, underscores, or the special sequence
+<CODE>::</CODE> or <CODE>'</CODE>.  In this case, the part before the last <CODE>::</CODE> or
+<CODE>'</CODE> is taken to be a <EM>package qualifier</EM>; see <A HREF="../../lib/Pod/perlmod.html">the perlmod manpage</A>.</P>
+<P>Perl variable names may also be a sequence of digits or a single
+punctuation or control character.  These names are all reserved for
+special uses by Perl; for example, the all-digits names are used
+to hold data captured by backreferences after a regular expression
+match.  Perl has a special syntax for the single-control-character
+names: It understands <CODE>^X</CODE> (caret <CODE>X</CODE>) to mean the control-<CODE>X</CODE>
+character.  For example, the notation <A HREF="#item_%24%5EW"><CODE>$^W</CODE></A> (dollar-sign caret
+<CODE>W</CODE>) is the scalar variable whose name is the single character
+control-<CODE>W</CODE>.  This is better than typing a literal control-<CODE>W</CODE>
+into your program.</P>
+<P>Finally, new in Perl 5.6, Perl variable names may be alphanumeric
+strings that begin with control characters (or better yet, a caret).
+These variables must be written in the form <CODE>${^Foo}</CODE>; the braces
+are not optional.  <CODE>${^Foo}</CODE> denotes the scalar variable whose
+name is a control-<CODE>F</CODE> followed by two <A HREF="../../lib/Pod/perlguts.html#item_o"><CODE>o</CODE></A>'s.  These variables are
+reserved for future special uses by Perl, except for the ones that
+begin with <CODE>^_</CODE> (control-underscore or caret-underscore).  No
+control-character name that begins with <CODE>^_</CODE> will acquire a special
+meaning in any future version of Perl; such names may therefore be
+used safely in programs.  <CODE>$^_</CODE> itself, however, <EM>is</EM> reserved.</P>
+<P>Perl identifiers that begin with digits, control characters, or
+punctuation characters are exempt from the effects of the <A HREF="../../lib/Pod/perlfunc.html#item_package"><CODE>package</CODE></A>
+declaration and are always forced to be in package <CODE>main</CODE>.  A few
+other names are also exempt:</P>
+<PRE>
+        ENV             STDIN
+        INC             STDOUT
+        ARGV            STDERR
+        ARGVOUT
+        SIG</PRE>
+<P>In particular, the new special <CODE>${^_XYZ}</CODE> variables are always taken
+to be in package <CODE>main</CODE>, regardless of any <A HREF="../../lib/Pod/perlfunc.html#item_package"><CODE>package</CODE></A> declarations
+presently in scope.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Due to an unfortunate accident of Perl's implementation, <CODE>use
+English</CODE> imposes a considerable performance penalty on all regular
+expression matches in a program, regardless of whether they occur
+in the scope of <CODE>use English</CODE>.  For that reason, saying <CODE>use
+English</CODE> in libraries is strongly discouraged.  See the
+Devel::SawAmpersand module documentation from CPAN
+(http://www.perl.com/CPAN/modules/by-module/Devel/)
+for more information.</P>
+<P>Having to even think about the <A HREF="#item_%24%5ES"><CODE>$^S</CODE></A> variable in your exception
+handlers is simply wrong.  <CODE>$SIG{__DIE__}</CODE> as currently implemented
+invites grievous and difficult to track down errors.  Avoid it
+and use an <CODE>END{}</CODE> or CORE::GLOBAL::die override instead.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlvar - Perl predefined variables</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

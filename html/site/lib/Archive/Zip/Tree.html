@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Archive::Zip::Tree -- methods for adding/extracting trees using Archive::Zip</title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Archive::Zip::Tree -- methods for adding/extracting trees using Archive::Zip</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Archive::Zip::Tree -- methods for adding/extracting trees using Archive::Zip</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Archive::Zip;
+  use Archive::Zip::Tree;
+  my $zip = Archive::Zip-&gt;new();
+  # add all readable files and directories below . as xyz/*
+  $zip-&gt;addTree( '.', 'xyz' );  
+  # add all readable plain files below /abc as /def/*
+  $zip-&gt;addTree( '/abc', '/def', sub { -f &amp;&amp; -r } );    
+  # add all .c files below /tmp as stuff/*
+  $zip-&gt;addTreeMatching( '/tmp', 'stuff', '\.c$' );
+  # add all .o files below /tmp as stuff/* if they aren't writable
+  $zip-&gt;addTreeMatching( '/tmp', 'stuff', '\.o$', sub { ! -w } );
+  # and write them into a file
+  $zip-&gt;writeToFile('xxx.zip');</pre>
+<pre>
+  # now extract the same files into /tmpx
+  $zip-&gt;extractTree( 'stuff', '/tmpx' );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_addtree">$zip-&gt;addTree( $root, $dest [,$pred] )</a></strong><br />
+</dt>
+<dd>
+$root is the root of the tree of files and directories to be added
+</dd>
+<dd>
+<p>$dest is the name for the root in the zip file (undef or blank means to use
+relative pathnames)</p>
+</dd>
+<dd>
+<p><code>$pred</code> is an optional subroutine reference to select files: it is passed the
+name of the prospective file or directory using <a href="../../../../lib/Pod/perlvar.html#item_%24_"><code>$_</code></a>,
+and if it returns true, the file or
+directory will be included.  The default is to add all readable files and
+directories.</p>
+</dd>
+<dd>
+<p>For instance, using</p>
+</dd>
+<dd>
+<pre>
+  my $pred = sub { /\.txt/ };
+  $zip-&gt;addTree( '.', '.', $pred );</pre>
+</dd>
+<dd>
+<p>will add all the .txt files in and below the current directory,
+using relative names, and making the names identical in the zipfile:</p>
+</dd>
+<dd>
+<pre>
+  original name           zip member name
+  ./xyz                   xyz
+  ./a/                    a/
+  ./a/b                   a/b</pre>
+</dd>
+<dd>
+<p>To use absolute pathnames, just pass them in:</p>
+</dd>
+<dd>
+<p>$zip-&gt;addTree( '/a/b', '/a/b' );</p>
+</dd>
+<dd>
+<pre>
+  original name           zip member name
+  /a/                     /a/
+  /a/b                    /a/b</pre>
+</dd>
+<dd>
+<p>To translate relative to absolute pathnames, just pass them in:</p>
+</dd>
+<dd>
+<p>$zip-&gt;addTree( '.', '/c/d' );</p>
+</dd>
+<dd>
+<pre>
+  original name           zip member name
+  ./xyz                   /c/d/xyz
+  ./a/                    /c/d/a/
+  ./a/b                   /c/d/a/b</pre>
+</dd>
+<dd>
+<p>To translate absolute to relative pathnames, just pass them in:</p>
+</dd>
+<dd>
+<p>$zip-&gt;addTree( '/c/d', 'a' );</p>
+</dd>
+<dd>
+<pre>
+  original name           zip member name
+  /c/d/xyz                a/xyz
+  /c/d/a/                 a/a/
+  /c/d/a/b                a/a/b</pre>
+</dd>
+<dd>
+<p>Returns AZ_OK on success.</p>
+</dd>
+<dd>
+<p>Note that this will not follow symbolic links to directories.</p>
+</dd>
+<dd>
+<p>Note also that this does not check for the validity of filenames.</p>
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_addtreematching">$zip-&gt;addTreeMatching( $root, $dest, $pattern [,$pred] )</a></strong><br />
+</dt>
+<dd>
+$root is the root of the tree of files and directories to be added
+</dd>
+<dd>
+<p>$dest is the name for the root in the zip file (undef means to use relative
+pathnames)</p>
+</dd>
+<dd>
+<p>$pattern is a (non-anchored) regular expression for filenames to match</p>
+</dd>
+<dd>
+<p>$pred is an optional subroutine reference to select files: it is passed the
+name of the prospective file or directory in <a href="../../../../lib/Pod/perlvar.html#item_%24_"><code>$_</code></a>,
+and if it returns true, the file or
+directory will be included.  The default is to add all readable files and
+directories.</p>
+</dd>
+<dd>
+<p>To add all files in and below the current dirctory
+whose names end in <code>.pl</code>, and make them extract into a subdirectory
+named <code>xyz</code>, do this:</p>
+</dd>
+<dd>
+<pre>
+  $zip-&gt;addTreeMatching( '.', 'xyz', '\.pl$' )</pre>
+</dd>
+<dd>
+<p>To add all <em>writable</em> files in and below the dirctory named <code>/abc</code>
+whose names end in <code>.pl</code>, and make them extract into a subdirectory
+named <code>xyz</code>, do this:</p>
+</dd>
+<dd>
+<pre>
+  $zip-&gt;addTreeMatching( '/abc', 'xyz', '\.pl$', sub { -w } )</pre>
+</dd>
+<dd>
+<p>Returns AZ_OK on success.</p>
+</dd>
+<dd>
+<p>Note that this will not follow symbolic links to directories.</p>
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_extracttree">$zip-&gt;extractTree( $root, $dest )</a></strong><br />
+</dt>
+<dd>
+Extracts all the members below a given root. Will
+translate that root to a given dest pathname.
+</dd>
+<dd>
+<p>For instance,</p>
+</dd>
+<dd>
+<pre>
+   $zip-&gt;extractTree( '/a/', 'd/e/' );</pre>
+</dd>
+<dd>
+<p>when applied to a zip containing the files:
+ /a/x /a/b/c /d/e</p>
+</dd>
+<dd>
+<p>will extract:
+ /a/x to d/e/x
+ /a/b/c to d/e/b/c</p>
+</dd>
+<dd>
+<p>and ignore /d/e</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ned Konz, <a href="mailto:perl@bike-nomad.com">perl@bike-nomad.com</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2000 Ned Konz. All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../site/lib/Compress/Zlib.html">the Compress::Zlib manpage</a>
+<a href="../../../../site/lib/Archive/Zip.html">the Archive::Zip manpage</a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Archive::Zip::Tree -- methods for adding/extracting trees using Archive::Zip</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

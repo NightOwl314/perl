@@ -1,0 +1,99 @@
+
+<HTML>
+<HEAD>
+<TITLE>User::grent - by-name interface to Perl's built-in getgr* functions</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;User::grent - by-name interface to Perl's built-in getgr* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#note">NOTE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>User::grent - by-name interface to Perl's built-in getgr*() functions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use User::grent;
+ $gr = getgrgid(0) or die &quot;No group zero&quot;;
+ if ( $gr-&gt;name eq 'wheel' &amp;&amp; @{$gr-&gt;members} &gt; 1 ) {
+     print &quot;gid zero name wheel, with other members&quot;;
+ }</PRE>
+<PRE>
+ use User::grent qw(:FIELDS;
+ getgrgid(0) or die &quot;No group zero&quot;;
+ if ( $gr_name eq 'wheel' &amp;&amp; @gr_members &gt; 1 ) {
+     print &quot;gid zero name wheel, with other members&quot;;
+ }</PRE>
+<PRE>
+ $gr = getgr($whoever);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module's default exports override the core getgrent(), getgruid(),
+and <A HREF="../../lib/Pod/perlfunc.html#item_getgrnam"><CODE>getgrnam()</CODE></A> functions, replacing them with versions that return
+``User::grent'' objects.  This object has methods that return the similarly
+named structure field name from the C's passwd structure from <EM>grp.h</EM>; 
+namely name, passwd, gid, and members (not mem).  The first three
+return scalars, the last an array reference.</P>
+<P>You may also import all the structure fields directly into your namespace
+as regular variables using the :FIELDS import tag.  (Note that this still
+overrides your core functions.)  Access these fields as variables named
+with a preceding <CODE>gr_</CODE>.  Thus, <CODE>$group_obj-&gt;gid()</CODE> corresponds
+to $gr_gid if you import the fields.  Array references are available as
+regular array variables, so <CODE>@{ $group_obj-&gt;members() }</CODE> would be
+simply @gr_members.</P>
+<P>The <CODE>getpw()</CODE> function is a simple front-end that forwards
+a numeric argument to <A HREF="../../lib/Pod/perlfunc.html#item_getpwuid"><CODE>getpwuid()</CODE></A> and the rest to getpwnam().</P>
+<P>To access this functionality without the core overrides,
+pass the <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> an empty import list, and then access
+function functions with their full qualified names.
+On the other hand, the built-ins are still available
+via the <CODE>CORE::</CODE> pseudo-package.</P>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>While this class is currently implemented using the Class::Struct
+module to build a struct-like class, you shouldn't rely upon this.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;User::grent - by-name interface to Perl's built-in getgr* functions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Name</title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Name</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">Name</a></li>
+	<li><a href="#description">Description</a></li>
+	<li><a href="#build">Build</a></li>
+	<ul>
+
+		<li><a href="#tools_&_sdk">Tools &amp; SDK</a></li>
+		<li><a href="#make">Make</a></li>
+	</ul>
+
+	<li><a href="#acknowledgements">Acknowledgements</a></li>
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">Name</a></h1>
+<p>Perl for WinCE</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">Description</a></h1>
+<p>This file gives the instructions for building Perl5.6 and above for
+WinCE.  Please read and understand the terms under which this
+software is distributed.</p>
+<p>
+</p>
+<hr />
+<h1><a name="build">Build</a></h1>
+<p>This section describes the steps to be performed to build PerlCE.</p>
+<p>
+</p>
+<h2><a name="tools_&_sdk">Tools &amp; SDK</a></h2>
+<p>For compiling, you need Microsoft Embedded Visual Tools, my
+celib-sources, my console-sources and a perl for win32.</p>
+<p>Needed source files can be downloaded via:
+www.rainer-keuchel.de/wince/dirlist.html</p>
+<p>Some portions of the makefile need a shell for win32, rm, cp, mv,
+xmkdir (mkdir with a -p option).  It also uses my cecopy program for
+copying files to the ce device.</p>
+<p>
+</p>
+<h2><a name="make">Make</a></h2>
+<p>Miniperl is not built. A pre-existent win32 perl is used.</p>
+<p>The paths for tools and additional libraries have to be changed in
+wince/makefile.ce.</p>
+<p>Different ce targets can be specified with the TARGET macro.</p>
+<p>Before you start, you need to build celib.dll and w32console.
+See instructions in these packages for building.</p>
+<p>In the wince directory, type ``nmake -f makefile.ce''. This should
+build perl.exe and perl.dll. For building extension dlls,
+type ``nmake -f makefile.ce dlls''</p>
+<p>When building ext dlls, you get lots of macro redefinition
+errors. Just ignore them.</p>
+<p>For further information, look in the text files in the wince
+sub-directory.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">Acknowledgements</a></h1>
+<p>The port for Win32 was used as a reference.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Rainer Keuchel (<a href="mailto:keuchel@netwave.de">keuchel@netwave.de</a>)</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Name</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

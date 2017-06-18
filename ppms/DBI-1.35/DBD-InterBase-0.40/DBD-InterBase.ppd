@@ -1,0 +1,11 @@
+<SOFTPKG NAME="DBD-InterBase" VERSION="0,40,0,0">
+	<TITLE>DBD-InterBase</TITLE>
+	<ABSTRACT>DBD::InterBase is a DBI driver for InterBase, written using InterBase C API.</ABSTRACT>
+	<AUTHOR>Edwin Pratomo (edpratomo@cpan.org) and Daniel Ritz (daniel.ritz@gmx.ch)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="DBI" VERSION="1,08,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/DBD-InterBase.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

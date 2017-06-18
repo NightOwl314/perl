@@ -1,0 +1,311 @@
+
+<HTML>
+<HEAD>
+<TITLE>SOAP::Transport::HTTP - Server/Client side HTTP support for SOAP::Lite</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SOAP::Transport::HTTP - Server/Client side HTTP support for SOAP::Lite</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#proxy settings">PROXY SETTINGS</A></LI>
+	</UL>
+
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#troubleshooting">TROUBLESHOOTING</A></LI>
+	<LI><A HREF="#dependencies">DEPENDENCIES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SOAP::Transport::HTTP - Server/Client side HTTP support for SOAP::Lite</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Client">Client</A></STRONG><BR>
+<DD>
+<PRE>
+  use SOAP::Lite 
+    uri =&gt; '<A HREF="http://my.own.site.com/My/Examples">http://my.own.site.com/My/Examples</A>',
+    proxy =&gt; '<A HREF="http://localhost/">http://localhost/</A>', 
+  # proxy =&gt; '<A HREF="http://localhost/cgi-bin/soap.cgi">http://localhost/cgi-bin/soap.cgi</A>', # local CGI server
+  # proxy =&gt; '<A HREF="http://localhost/">http://localhost/</A>',                 # local daemon server
+  # proxy =&gt; '<A HREF="http://localhost/soap">http://localhost/soap</A>',             # local mod_perl server
+  # proxy =&gt; 'https://localhost/soap',            # local mod_perl SECURE server
+  # proxy =&gt; '<A HREF="http://login:password@localhost/cgi-bin/soap.cgi">http://login:password@localhost/cgi-bin/soap.cgi</A>', # local CGI server with authentication
+  ;</PRE>
+<PRE>
+  print getStateName(1);</PRE>
+<DT><STRONG><A NAME="item_CGI_server">CGI server</A></STRONG><BR>
+<DD>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  SOAP::Transport::HTTP::CGI
+    # specify path to My/Examples.pm here
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+    -&gt; handle
+  ;</PRE>
+<DT><STRONG><A NAME="item_Daemon_server">Daemon server</A></STRONG><BR>
+<DD>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  # change LocalPort to 81 if you want to test it with soapmark.pl</PRE>
+<PRE>
+  my $daemon = SOAP::Transport::HTTP::Daemon
+    -&gt; new (LocalAddr =&gt; 'localhost', LocalPort =&gt; 80)
+    # specify list of objects-by-reference here 
+    -&gt; objects_by_reference(qw(My::PersistentIterator My::SessionIterator My::Chat))
+    # specify path to My/Examples.pm here
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+  ;
+  print &quot;Contact to SOAP server at &quot;, $daemon-&gt;url, &quot;\n&quot;;
+  $daemon-&gt;handle;</PRE>
+<DT><STRONG><A NAME="item_Apache_mod_perl_server">Apache mod_perl server</A></STRONG><BR>
+<DD>
+See <EM>examples/server/Apache.pm</EM> and <A HREF="#examples">EXAMPLES</A> section for more information.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class encapsulates all HTTP related logic for a SOAP server,
+independent of what web server it's attached to. 
+If you want to use this class you should follow simple guideline
+mentioned above.</P>
+<P>Following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_on_action"><CODE>on_action()</CODE></A></STRONG><BR>
+<DD>
+on_action method lets you specify SOAPAction understanding. It accepts
+reference to subroutine that takes three parameters:
+<PRE>
+  SOAPAction, method_uri and method_name.</PRE>
+<P><CODE>SOAPAction</CODE> is taken from HTTP header and method_uri and method_name are 
+extracted from request's body. Default behavior is match <CODE>SOAPAction</CODE> if 
+present and ignore it otherwise. You can specify you own, for example 
+die if <CODE>SOAPAction</CODE> doesn't match with following code:</P>
+<PRE>
+  $server-&gt;on_action(sub {
+    (my $action = shift) =~ s/^(&quot;?)(.+)\1$/$2/;
+    die &quot;SOAPAction shall match 'uri#method'\n&quot; if $action ne join '#', @_;
+  });</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_dispatch_to"><CODE>dispatch_to()</CODE></A></STRONG><BR>
+<DD>
+dispatch_to lets you specify where you want to dispatch your services 
+to. More precisely, you can specify <A HREF="../../../../lib/Pod/perlrun.html#item_PATH"><CODE>PATH</CODE></A>, <CODE>MODULE</CODE>, <CODE>method</CODE> or 
+combination <CODE>MODULE::method</CODE>. Example:
+<PRE>
+  dispatch_to( 
+    'PATH/',          # dynamic: load anything from there, any module, any method
+    'MODULE',         # static: any method from this module 
+    'MODULE::method', # static: specified method from this module
+    'method',         # static: specified method from main:: 
+  );</PRE>
+<P>If you specify <CODE>PATH/</CODE> name of module/classes will be taken from uri as 
+path component and converted to Perl module name with substitution 
+'::' for '/'. Example:</P>
+<PRE>
+  urn:My/Examples              =&gt; My::Examples
+  urn://localhost/My/Examples  =&gt; My::Examples
+  <A HREF="http://localhost/My/Examples">http://localhost/My/Examples</A> =&gt; My::Examples</PRE>
+<P>For consistency first '/' in the path will be ignored.</P>
+<P>According to this scheme to deploy new class you should put this
+class in one of the specified directories and enjoy its services.
+Easy, eh?</P>
+<P></P>
+<DT><STRONG><A NAME="item_handle"><CODE>handle()</CODE></A></STRONG><BR>
+<DD>
+handle method will handle your request. You should provide parameters
+with <A HREF="#item_request"><CODE>request()</CODE></A> method, call <A HREF="#item_handle"><CODE>handle()</CODE></A> and get it back with <A HREF="#item_response"><CODE>response()</CODE></A> .
+<P></P>
+<DT><STRONG><A NAME="item_request"><CODE>request()</CODE></A></STRONG><BR>
+<DD>
+request method gives you access to HTTP::Request object which you
+can provide for Server component to handle request.
+<P></P>
+<DT><STRONG><A NAME="item_response"><CODE>response()</CODE></A></STRONG><BR>
+<DD>
+response method gives you access to HTTP::Response object which 
+you can access to get results from Server component after request was
+handled.
+<P></P></DL>
+<P>
+<H2><A NAME="proxy settings">PROXY SETTINGS</A></H2>
+<P>You can use any proxy setting you use with LWP::UserAgent modules:</P>
+<PRE>
+ SOAP::Lite-&gt;proxy('<A HREF="http://endpoint.server">http://endpoint.server</A>', 
+                   proxy =&gt; ['http' =&gt; '<A HREF="http://my.proxy.server">http://my.proxy.server</A>']);</PRE>
+<P>or</P>
+<PRE>
+ $soap-&gt;transport-&gt;proxy('http' =&gt; '<A HREF="http://my.proxy.server">http://my.proxy.server</A>');</PRE>
+<P>should specify proxy server for you. And if you use <CODE>HTTP_proxy_user</CODE> 
+and <CODE>HTTP_proxy_pass</CODE> for proxy authorization SOAP::Lite should know 
+how to handle it properly.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Consider following examples of SOAP servers:</P>
+<DL>
+<DT><STRONG><A NAME="item_CGI%3A">CGI:</A></STRONG><BR>
+<DD>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  SOAP::Transport::HTTP::CGI
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+    -&gt; handle
+  ;</PRE>
+<DT><STRONG><A NAME="item_daemon%3A">daemon:</A></STRONG><BR>
+<DD>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  my $daemon = SOAP::Transport::HTTP::Daemon
+    -&gt; new (LocalAddr =&gt; 'localhost', LocalPort =&gt; 80)
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+  ;
+  print &quot;Contact to SOAP server at &quot;, $daemon-&gt;url, &quot;\n&quot;;
+  $daemon-&gt;handle;</PRE>
+<DT><STRONG><A NAME="item_mod_perl%3A">mod_perl:</A></STRONG><BR>
+<DD>
+httpd.conf:
+<PRE>
+  &lt;Location /soap&gt;
+    SetHandler perl-script
+    PerlHandler SOAP::Apache
+  &lt;/Location&gt;</PRE>
+<P>Apache.pm:</P>
+<PRE>
+  package SOAP::Apache;</PRE>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  my $server = SOAP::Transport::HTTP::Apache
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method');</PRE>
+<PRE>
+  sub handler { $server-&gt;handler(@_) }</PRE>
+<PRE>
+  1;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Apache%3A%3ARegistry%3A">Apache::Registry:</A></STRONG><BR>
+<DD>
+httpd.conf:
+<PRE>
+  Alias /mod_perl/ &quot;/Apache/mod_perl/&quot;
+  &lt;Location /mod_perl&gt;
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    PerlSendHeader On
+    Options +ExecCGI
+  &lt;/Location&gt;</PRE>
+<P>soap.mod_cgi (put it in /Apache/mod_perl/ directory mentioned above)</P>
+<PRE>
+  use SOAP::Transport::HTTP;</PRE>
+<PRE>
+  SOAP::Transport::HTTP::CGI
+    -&gt; dispatch_to('/Your/Path/To/Deployed/Modules', 'Module::Name', 'Module::method') 
+    -&gt; handle
+  ;</PRE>
+<P></P></DL>
+<P>WARNING: dynamic deployment with Apache::Registry will fail, because 
+module will be loaded dynamically only for the first time. After that 
+it is already in the memory, that will bypass dynamic deployment and 
+produces error about denied access. Specify both PATH/ and MODULE name 
+in <A HREF="#item_dispatch_to"><CODE>dispatch_to()</CODE></A> and module will be loaded dynamically and then will work 
+as under static deployment. See examples/server/soap.mod_cgi for example.</P>
+<P>
+<HR>
+<H1><A NAME="troubleshooting">TROUBLESHOOTING</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Dynamic_libraries_are_not_found">Dynamic libraries are not found</A></STRONG><BR>
+<DD>
+If you see in webserver's log file something like this:
+<P>Can't load '/usr/local/lib/perl5/site_perl/.../XML/Parser/Expat/Expat.so' 
+for module XML::Parser::Expat: dynamic linker: /usr/local/bin/perl:
+ libexpat.so.0 is NEEDED, but object does not exist at
+/usr/local/lib/perl5/.../DynaLoader.pm line 200.</P>
+<P>and you are using Apache web server, try to put into your httpd.conf</P>
+<PRE>
+ &lt;IfModule mod_env.c&gt;
+     PassEnv LD_LIBRARY_PATH
+ &lt;/IfModule&gt;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Apache_is_crashing_with_segfaults">Apache is crashing with segfaults</A></STRONG><BR>
+<DD>
+If using SOAP::Lite (or XML::Parser::Expat) in combination with mod_perl
+causes random segmentation faults in httpd processes try to configure
+Apache with:
+<PRE>
+ RULE_EXPAT=no</PRE>
+<P>See <A HREF="http://archive.covalent.net/modperl/2000/04/0185.xml">http://archive.covalent.net/modperl/2000/04/0185.xml</A> for more 
+details and lot of thanks to Robert Barta (<A HREF="mailto:rho@bigpond.net.au">rho@bigpond.net.au</A>) for
+explaining this weird behavior.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="dependencies">DEPENDENCIES</A></H1>
+<PRE>
+ Crypt::SSLeay             for HTTPS/SSL
+ SOAP::Lite, URI           for SOAP::Transport::HTTP::Server
+ LWP::UserAgent, URI       for SOAP::Transport::HTTP::Client
+ HTTP::Daemon              for SOAP::Transport::HTTP::Daemon
+ Apache, Apache::Constants for SOAP::Transport::HTTP::Apache</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<PRE>
+ See ::CGI, ::Daemon and ::Apache for implementation details.
+ See examples/server/soap.cgi as SOAP::Transport::HTTP::CGI example.
+ See examples/server/soap.daemon as SOAP::Transport::HTTP::Daemon example.
+ See examples/My/Apache.pm as SOAP::Transport::HTTP::Apache example.</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2000-2001 Paul Kulchenko. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Kulchenko (<A HREF="mailto:paulclinger@yahoo.com">paulclinger@yahoo.com</A>)</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SOAP::Transport::HTTP - Server/Client side HTTP support for SOAP::Lite</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

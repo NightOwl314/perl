@@ -1,0 +1,236 @@
+<HTML>
+<HEAD>
+<TITLE>README.epoc - Perl for EPOC</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.epoc - Perl for EPOC</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#introduction">INTRODUCTION</A></LI>
+	<LI><A HREF="#installing perl on epoc">INSTALLING PERL ON EPOC</A></LI>
+	<LI><A HREF="#starting perl on epoc">STARTING PERL ON EPOC</A></LI>
+	<LI><A HREF="#stopping perl on epoc">STOPPING PERL ON EPOC</A></LI>
+	<LI><A HREF="#using perl on epoc">USING PERL ON EPOC</A></LI>
+	<UL>
+
+		<LI><A HREF="#i/o redirection">I/O Redirection</A></LI>
+		<LI><A HREF="#path names">PATH Names</A></LI>
+		<LI><A HREF="#editors">Editors</A></LI>
+		<LI><A HREF="#features">Features</A></LI>
+		<LI><A HREF="#restrictions">Restrictions</A></LI>
+		<LI><A HREF="#compiling perl 5 on the epoc cross compiling environment">Compiling Perl 5 on the EPOC cross compiling environment</A></LI>
+	</UL>
+
+	<LI><A HREF="#support status">SUPPORT STATUS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#last update">LAST UPDATE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>README.epoc - Perl for EPOC</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>Perl 5 README file for the EPOC operating system.</P>
+<P>
+<HR>
+<H1><A NAME="introduction">INTRODUCTION</A></H1>
+<P>EPOC is a OS for palmtops and mobile phones. For more informations look at:
+<A HREF="http://www.symbian.com/">http://www.symbian.com/</A></P>
+<P>This is a port of perl to EPOC. It runs on ER5 machines: Psion 5mx,
+5mx Pro, Psion Revo and on the Ericson M128. I have no report about
+the Psion Netbook or the S7. It runs on ER3 Hardware (Series 5
+classic), too. For more information about this hardware please refer
+to <A HREF="http://www.psion.com.">http://www.psion.com.</A></P>
+<P>Vendors which like to have support for their devices are free to send
+me a sample.</P>
+<P>
+<HR>
+<H1><A NAME="installing perl on epoc">INSTALLING PERL ON EPOC</A></H1>
+<P>You can download a ready-to-install version from
+<A HREF="http://www.science-computing.de/o.flebbe/perl.">http://www.science-computing.de/o.flebbe/perl.</A> You may find other
+versions with some CPAN modules included at this location.</P>
+<P>You will need at least 4MB free space in order to install and run
+perl.</P>
+<P>Install perl.sis on the EPOC machine. If you do not know how to do
+that, consult your PsiWin documentation.</P>
+<P>Perl itself and its standard library is using 2.9 MB disk space.
+Unicode support and some other modules are left out. (For details,
+please look into epoc/createpkg.pl). If you like to use these modules,
+you are free to copy them from a current perl release.</P>
+<P>
+<HR>
+<H1><A NAME="starting perl on epoc">STARTING PERL ON EPOC</A></H1>
+<P>For ER5 machines, you can get the software Perlstart
+<A HREF="http://www.science-computing.de/o.flebbe/perl.">http://www.science-computing.de/o.flebbe/perl.</A> It contains file
+recognizers for files with the extension .pl and .pm. With it you can
+start perl with a double click on the camel icon. Be sure to configure
+the perl installation drive first. You can even provide a script with
+a special commandline, if needed.</P>
+<P>Alternativly you can get ESHELL from symbian: 
+<A HREF="http://developer.epocworld.com/downloads/progs/Eshell.zip">http://developer.epocworld.com/downloads/progs/Eshell.zip</A></P>
+<P>Running ESHELL you can enter: perl -de 0 in order to run the perl
+debugger. If you are leaving perl, you get into the system screen. You
+have to switch back manually to ESHELL. When perl is running, you will
+see a task with the name STDOUT in the task list.</P>
+<P>If you have a ER3 machine (i.e. a PSION 5), you may have to supply the
+full path to the perl executable C:\system\programs\perl.exe.</P>
+<P>If you need to set the current directory of perl, please use the
+command line switch '-x'. See <A HREF="../../lib/Pod/perlrun.html">the perlrun manpage</A> for details.</P>
+<P>
+<HR>
+<H1><A NAME="stopping perl on epoc">STOPPING PERL ON EPOC</A></H1>
+<P>You can stop a running perl process in the task list by closing the
+application `STDOUT'. You cannot stop a running perl process if it has
+not written anyting to stdout or stderr! Be very cautious with I/O
+redirection. You will have to reboot the PDA!</P>
+<P>
+<HR>
+<H1><A NAME="using perl on epoc">USING PERL ON EPOC</A></H1>
+<P>
+<H2><A NAME="i/o redirection">I/O Redirection</A></H2>
+<P>You can redirect the output with the UNIX bourne shell syntax (this is
+built into perl rather then eshell) For instance the following command
+line will run the script test.pl with the output redirected to
+stdout_file, the errors to stderr_file and input from stdin_file.</P>
+<P>perl test.pl &gt;stdout_file &lt;stdin_file 2&gt;stderr_file</P>
+<P>Alternatively you can use 2&gt;&amp;1 in order to add the standard error
+output to stdout.</P>
+<P>
+<H2><A NAME="path names">PATH Names</A></H2>
+<P>ESHELL looks for executables in ?:/System/Programs. The SIS file
+installs perl in this special folder directory. The default drive and
+path are the same as folder the executable resides. The EPOC
+filesystem is case-preserving, not case-sensitive.</P>
+<P>The EPOC estdlib uses the ?: syntax for establishing a search order:
+First in C: (RAM), then on D: (CF Card, if present) and last in Z:
+(ROM). For instance ?:\a.txt searches for C:\a.txt, D:\a.txt (and
+Z:\a.txt)</P>
+<P>The perl @INC search path is implemented with '?:'. Your perl
+executable can live on a different drive than the perl library or even
+your scripts.</P>
+<P>ESHELL paths have to be written with backslashes '\', file arguments
+to perl with slashes '/'. Remember that I/O redirection is done
+internally in perl, so please use slashes for redirects.</P>
+<P>perl.exe C:/test.pl &gt;C:/output.txt</P>
+<P>
+<H2><A NAME="editors">Editors</A></H2>
+<P>A suitable text editor can be downloaded from symbian
+ <A HREF="http://developer.epocworld.com/downloads/progs/Editor.zip">http://developer.epocworld.com/downloads/progs/Editor.zip</A></P>
+<P>
+<H2><A NAME="features">Features</A></H2>
+<P>The built-in function EPOC::getcwd returns the current directory.</P>
+<P>
+<H2><A NAME="restrictions">Restrictions</A></H2>
+<P>Features are left out, because of restrictions of the POSIX support in
+EPOC:</P>
+<UL>
+<LI>
+backquoting, pipes etc.
+<P></P>
+<LI>
+<A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> does not inherit ressources like: file descriptors,
+environment etc.
+<P></P>
+<LI>
+signal, kill, alarm. Do not try to use them. This may be
+impossible to implement on EPOC.
+<P></P>
+<LI>
+select is missing.
+<P></P>
+<LI>
+binmode does not exist. (No CR LF to LF translation for text files)
+<P></P>
+<LI>
+EPOC does not handle the notion of current drive and current
+directory very well (i.e. not at all, but it tries hard to emulate
+one) See PATH.
+<P></P>
+<LI>
+Heap is limited to 4MB.
+<P></P>
+<LI>
+Dynamic loading is not implemented.
+<P></P></UL>
+<P>
+<H2><A NAME="compiling perl 5 on the epoc cross compiling environment">Compiling Perl 5 on the EPOC cross compiling environment</A></H2>
+<P>Sorry, this is far too short.</P>
+<UL>
+<LI>
+You will need the C++ SDK from <A HREF="http://developer.epocworld.com/.">http://developer.epocworld.com/.</A>
+<P></P>
+<LI>
+You will need to set up the cross SDK from 
+<A HREF="http://www.science-computing.de/o.flebbe/sdk">http://www.science-computing.de/o.flebbe/sdk</A>
+<P></P>
+<LI>
+You may have to adjust config.sh (cc, cppflags) to reflect your epoc 
+and SDK location.
+<P></P>
+<LI>
+Get the Perl sources from your nearest CPAN site.
+<P></P>
+<LI>
+Unpack the sources.
+<P></P>
+<LI>
+Build a native perl from this sources... Make sure to save the
+miniperl executable as miniperl.native.
+<P>Start again from scratch</P>
+<PRE>
+      cp epoc/* .
+      ./Configure -S
+      make 
+      cp miniperl.native miniperl
+      make
+      make ext/Errno/pm_to_blib 
+      perl link.pl perlmain.o lib/auto/DynaLoader/DynaLoader.a \
+         lib/auto/Data/Dumper/Dumper.a \
+         lib/auto/File/Glob/Glob.a lib/auto/IO/IO.a \
+         lib/auto/Socket/Socket.a \
+         lib/auto/Fcntl/Fcntl.a lib/auto/Sys/Hostname/Hostname.a \
+        perl.a `cat ext.libs`
+      perl createpkg.pl</PRE>
+<PRE>
+      wine G:/bin/makesis perl.pkg perl.sis</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="support status">SUPPORT STATUS</A></H1>
+<P>I'm offering this port ``as is''. You can ask me questions, but I can't
+guarantee I'll be able to answer them.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Olaf Flebbe &lt;<A HREF="mailto:o.flebbe@science-computing.de">o.flebbe@science-computing.de</A>&gt;
+<A HREF="http://www.science-computing.de/o.flebbe/perl/">http://www.science-computing.de/o.flebbe/perl/</A></P>
+<P>
+<HR>
+<H1><A NAME="last update">LAST UPDATE</A></H1>
+<P>2001-02-26</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;README.epoc - Perl for EPOC</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

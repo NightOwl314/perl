@@ -1,0 +1,111 @@
+
+<HTML>
+<HEAD>
+<TITLE>Tie::RefHash - use references as hash keys</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::RefHash - use references as hash keys</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tie::RefHash - use references as hash keys</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    require 5.004;
+    use Tie::RefHash;
+    tie HASHVARIABLE, 'Tie::RefHash', LIST;
+    tie HASHVARIABLE, 'Tie::RefHash::Nestable', LIST;</PRE>
+<PRE>
+    untie HASHVARIABLE;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides the ability to use references as hash keys if you
+first <A HREF="../../lib/Pod/perlfunc.html#item_tie"><CODE>tie</CODE></A> the hash variable to this module.  Normally, only the
+keys of the tied hash itself are preserved as references; to use
+references as keys in hashes-of-hashes, use Tie::RefHash::Nestable,
+included as part of Tie::RefHash.</P>
+<P>It is implemented using the standard perl TIEHASH interface.  Please
+see the <A HREF="../../lib/Pod/perlfunc.html#item_tie"><CODE>tie</CODE></A> entry in <CODE>perlfunc(1)</CODE> and <CODE>perltie(1)</CODE> for more information.</P>
+<P>The Nestable version works by looking for hash references being stored
+and converting them to tied hashes so that they too can have
+references as keys.  This will happen without warning whenever you
+store a reference to one of your own hashes in the tied hash.</P>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<PRE>
+    use Tie::RefHash;
+    tie %h, 'Tie::RefHash';
+    $a = [];
+    $b = {};
+    $c = \*main;
+    $d = \&quot;gunk&quot;;
+    $e = sub { 'foo' };
+    %h = ($a =&gt; 1, $b =&gt; 2, $c =&gt; 3, $d =&gt; 4, $e =&gt; 5);
+    $a-&gt;[0] = 'foo';
+    $b-&gt;{foo} = 'bar';
+    for (keys %h) {
+       print ref($_), &quot;\n&quot;;
+    }</PRE>
+<PRE>
+    tie %h, 'Tie::RefHash::Nestable';
+    $h{$a}-&gt;{$b} = 1;
+    for (keys %h, keys %{$h{$a}}) {
+       print ref($_), &quot;\n&quot;;
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Gurusamy Sarathy        <A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A></P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Version 1.3    8 Apr 2001</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1), perlfunc(1), <CODE>perltie(1)</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::RefHash - use references as hash keys</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

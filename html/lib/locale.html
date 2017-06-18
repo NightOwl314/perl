@@ -1,0 +1,67 @@
+
+<HTML>
+<HEAD>
+<TITLE>locale - Perl pragma to use and avoid POSIX locales for built-in operations</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;locale - Perl pragma to use and avoid POSIX locales for built-in operations</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>locale - Perl pragma to use and avoid POSIX locales for built-in operations</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    @x = sort @y;       # ASCII sorting order
+    {
+        use locale;
+        @x = sort @y;   # Locale-defined sorting order
+    }
+    @x = sort @y;       # ASCII sorting order again</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This pragma tells the compiler to enable (or disable) the use of POSIX
+locales for built-in operations (LC_CTYPE for regular expressions, and
+LC_COLLATE for string comparison).  Each ``use locale'' or ``no locale''
+affects statements to the end of the enclosing BLOCK.</P>
+<P>See <A HREF="../lib/Pod/perllocale.html">the perllocale manpage</A> for more detailed information on how Perl supports
+locales.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;locale - Perl pragma to use and avoid POSIX locales for built-in operations</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

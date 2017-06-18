@@ -1,0 +1,196 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Cookies - Cookie storage and management</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Cookies - Cookie storage and management</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#sub classes">SUB CLASSES</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Cookies - Cookie storage and management</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTTP::Cookies;
+ $cookie_jar = HTTP::Cookies-&gt;new;</PRE>
+<PRE>
+ $cookie_jar-&gt;add_cookie_header($request);
+ $cookie_jar-&gt;extract_cookies($response);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Cookies are a general mechanism which server side connections can use
+to both store and retrieve information on the client side of the
+connection.  For more information about cookies refer to
+&lt;URL:http://www.netscape.com/newsref/std/cookie_spec.html&gt; and
+&lt;URL:http://www.cookiecentral.com/&gt;.  This module also implements the
+new style cookies described in <EM>draft-ietf-http-state-man-mec-08.txt</EM>.
+The two variants of cookies are supposed to be able to coexist happily.</P>
+<P>Instances of the class <EM>HTTP::Cookies</EM> are able to store a collection
+of Set-Cookie2: and Set-Cookie: headers and are able to use this
+information to initialize Cookie-headers in <EM>HTTP::Request</EM> objects.
+The state of a <EM>HTTP::Cookies</EM> object can be saved in and restored from
+files.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are provided:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$cookie_jar = HTTP::Cookies-&gt;new;</A></STRONG><BR>
+<DD>
+The constructor takes hash style parameters.  The following
+parameters are recognized:
+<PRE>
+  file:            name of the file to restore cookies from and save cookies to
+  autosave:        save during destruction (bool)
+  ignore_discard:  save even cookies that are requested to be discarded (bool)</PRE>
+<P>Future parameters might include (not yet implemented):</P>
+<PRE>
+  max_cookies               300
+  max_cookies_per_domain    20
+  max_cookie_size           4096</PRE>
+<PRE>
+  no_cookies   list of domain names that we never return cookies to</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_add_cookie_header">$cookie_jar-&gt;add_cookie_header($request);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_add_cookie_header"><CODE>add_cookie_header()</CODE></A> method will set the appropriate Cookie:-header
+for the <EM>HTTP::Request</EM> object given as argument.  The $request must
+have a valid url attribute before this method is called.
+<P></P>
+<DT><STRONG><A NAME="item_extract_cookies">$cookie_jar-&gt;extract_cookies($response);</A></STRONG><BR>
+<DD>
+The <A HREF="#item_extract_cookies"><CODE>extract_cookies()</CODE></A> method will look for Set-Cookie: and
+Set-Cookie2: headers in the <EM>HTTP::Response</EM> object passed as
+argument.  Any of these headers that are found are used to update
+the state of the $cookie_jar.
+<P></P>
+<DT><STRONG><A NAME="item_set_cookie">$cookie_jar-&gt;set_cookie($version, $key, $val, $path, $domain, $port, $path_spec, $secure, $maxage, $discard, \%rest)</A></STRONG><BR>
+<DD>
+The <A HREF="#item_set_cookie"><CODE>set_cookie()</CODE></A> method updates the state of the $cookie_jar.  The
+$key, $val, $domain, $port and $path arguments are strings.  The
+$path_spec, $secure, $discard arguments are boolean values. The $maxage
+value is a number indicating number of seconds that this cookie will
+live.  A value &lt;= 0 will delete this cookie.  %rest defines
+various other attributes like ``Comment'' and ``CommentURL''.
+<P></P>
+<DT><STRONG><A NAME="item_save">$cookie_jar-&gt;save( [$file] );</A></STRONG><BR>
+<DD>
+This method file saves the state of the $cookie_jar to a file.
+The state can then be restored later using the <A HREF="#item_load"><CODE>load()</CODE></A> method.  If a
+filename is not specified we will use the name specified during
+construction.  If the attribute <EM>ignore_discared</EM> is set, then we
+will even save cookies that are marked to be discarded.
+<P>The default is to save a sequence of ``Set-Cookie3'' lines.
+``Set-Cookie3'' is a proprietary LWP format, not known to be compatible
+with any browser.  The <EM>HTTP::Cookies::Netscape</EM> sub-class can
+be used to save in a format compatible with Netscape.</P>
+<P></P>
+<DT><STRONG><A NAME="item_load">$cookie_jar-&gt;load( [$file] );</A></STRONG><BR>
+<DD>
+This method reads the cookies from the file and adds them to the
+$cookie_jar.  The file must be in the format written by the <A HREF="#item_save"><CODE>save()</CODE></A>
+method.
+<P></P>
+<DT><STRONG><A NAME="item_revert">$cookie_jar-&gt;revert;</A></STRONG><BR>
+<DD>
+This method empties the $cookie_jar and re-loads the $cookie_jar
+from the last save file.
+<P></P>
+<DT><STRONG><A NAME="item_clear">$cookie_jar-&gt;clear( [$domain, [$path, [$key] ] ]);</A></STRONG><BR>
+<DD>
+Invoking this method without arguments will empty the whole
+$cookie_jar.  If given a single argument only cookies belonging to
+that domain will be removed.  If given two arguments, cookies
+belonging to the specified path within that domain are removed.  If
+given three arguments, then the cookie with the specified key, path
+and domain is removed.
+<P></P>
+<DT><STRONG><A NAME="item_scan">$cookie_jar-&gt;scan( \&amp;callback );</A></STRONG><BR>
+<DD>
+The argument is a subroutine that will be invoked for each cookie
+stored in the $cookie_jar.  The subroutine will be invoked with
+the following arguments:
+<PRE>
+  0  version
+  1  key
+  2  val
+  3  path
+  4  domain
+  5  port
+  6  path_spec
+  7  secure
+  8  expires
+  9  discard
+ 10  hash</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_as_string">$cookie_jar-&gt;as_string( [$skip_discard] );</A></STRONG><BR>
+<DD>
+The <A HREF="#item_as_string"><CODE>as_string()</CODE></A> method will return the state of the $cookie_jar
+represented as a sequence of ``Set-Cookie3'' header lines separated by
+``\n''.  If $skip_discard is TRUE, it will not return lines for
+cookies with the <EM>Discard</EM> attribute.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="sub classes">SUB CLASSES</A></H1>
+<P>We also provide a subclass called <EM>HTTP::Cookies::Netscape</EM> which
+loads and saves Netscape compatible cookie files.  You
+should be able to have LWP share Netscape's cookies by constructing
+your $cookie_jar like this:</P>
+<PRE>
+ $cookie_jar = HTTP::Cookies::Netscape-&gt;new(
+                   File     =&gt; &quot;$ENV{HOME}/.netscape/cookies&quot;,
+                   AutoSave =&gt; 1,
+               );</PRE>
+<P>Please note that the Netscape cookie file format is not able to store
+all the information available in the Set-Cookie2 headers, so you will
+probably loose some information if you save in this format.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1997-1999 Gisle Aas</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Cookies - Cookie storage and management</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

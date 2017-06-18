@@ -1,0 +1,133 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::DosGlob - DOS like globbing and then some</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::DosGlob - DOS like globbing and then some</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#exports (by request only)">EXPORTS (by request only)</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::DosGlob - DOS like globbing and then some</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    require 5.004;</PRE>
+<PRE>
+    # override CORE::glob in current package
+    use File::DosGlob 'glob';</PRE>
+<PRE>
+    # override CORE::glob in ALL packages (use with extreme caution!)
+    use File::DosGlob 'GLOBAL_glob';</PRE>
+<PRE>
+    @perlfiles = glob  &quot;..\\pe?l/*.p?&quot;;
+    print &lt;..\\pe?l/*.p?&gt;;</PRE>
+<PRE>
+    # from the command line (overrides only in main::)
+    &gt; perl -MFile::DosGlob=glob -e &quot;print &lt;../pe*/*p?&gt;&quot;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A module that implements DOS-like globbing with a few enhancements.
+It is largely compatible with perlglob.exe (the M$ setargv.obj
+version) in all but one respect--it understands wildcards in
+directory components.</P>
+<P>For example, <CODE>&lt;..\\l*b\\file/*glob.p?</CODE>&gt; will work as expected (in
+that it will find something like '..\lib\File/DosGlob.pm' alright).
+Note that all path components are case-insensitive, and that
+backslashes and forward slashes are both accepted, and preserved.
+You may have to double the backslashes if you are putting them in
+literally, due to double-quotish parsing of the pattern by perl.</P>
+<P>Spaces in the argument delimit distinct patterns, so
+<A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob('*.exe *.dll')</CODE></A> globs all filenames that end in <CODE>.exe</CODE>
+or <CODE>.dll</CODE>.  If you want to put in literal spaces in the glob
+pattern, you can escape them with either double quotes, or backslashes.
+e.g. <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob('c:/&quot;Program Files&quot;/*/*.dll')</CODE></A>, or
+<A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob('c:/Program\ Files/*/*.dll')</CODE></A>.  The argument is tokenized using
+<CODE>Text::ParseWords::parse_line()</CODE>, so see <A HREF="../../lib/Text/ParseWords.html">the Text::ParseWords manpage</A> for details
+of the quoting rules used.</P>
+<P>Extending it to csh patterns is left as an exercise to the reader.</P>
+<P>
+<HR>
+<H1><A NAME="exports (by request only)">EXPORTS (by request only)</A></H1>
+<P><A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob()</CODE></A></P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Should probably be built into the core, and needs to stop
+pandering to DOS habits.  Needs a dose of optimizium too.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Gurusamy Sarathy &lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<UL>
+<LI>
+Support for globally overriding <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob()</CODE></A> (GSAR 3-JUN-98)
+<P></P>
+<LI>
+Scalar context, independent iterator context fixes (GSAR 15-SEP-97)
+<P></P>
+<LI>
+A few dir-vs-file optimizations result in glob importation being
+10 times faster than using perlglob.exe, and using perlglob.bat is
+only twice as slow as perlglob.exe (GSAR 28-MAY-97)
+<P></P>
+<LI>
+Several cleanups prompted by lack of compatible perlglob.exe
+under Borland (GSAR 27-MAY-97)
+<P></P>
+<LI>
+Initial version (GSAR 20-FEB-97)
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl</P>
+<P>perlglob.bat</P>
+<P>Text::ParseWords</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::DosGlob - DOS like globbing and then some</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

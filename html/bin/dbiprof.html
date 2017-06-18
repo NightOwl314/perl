@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<TITLE>dbiprof - command-line client for DBI::ProfileData</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;dbiprof - command-line client for DBI::ProfileData</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT AND LICENSE</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>dbiprof - command-line client for DBI::ProfileData</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>See a report of the ten queries with the longest total runtime in the
+profile dump file <EM>prof1.out</EM>:</P>
+<PRE>
+ dbiprof prof1.out</PRE>
+<P>See the top 10 most frequently run queries in the profile file
+<EM>dbi.prof</EM> (the default):</P>
+<PRE>
+  dbiprof --sort count</PRE>
+<P>See the same report with 15 entries:</P>
+<PRE>
+  dbiprof --sort count --number 15</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This tool is a command-line client for the DBI::ProfileData.  It
+allows you to analyze the profile data file produced by
+DBI::ProfileDumper and produce various useful reports.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>This program accepts the following options:</P>
+<DL>
+<DT><STRONG><A NAME="item_%2D%2Dnumber_N">--number N</A></STRONG><BR>
+<DD>
+Produce this many items in the report.  Defaults to 10.  If set to
+``all'' then all results are shown.
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dsort_field">--sort field</A></STRONG><BR>
+<DD>
+Sort results by the given field.  The available sort fields are:
+<DL>
+<DT><STRONG><A NAME="item_total">total</A></STRONG><BR>
+<DD>
+Sorts by total time run time across all runs.  This is the default
+sort.
+<P></P>
+<DT><STRONG><A NAME="item_longest">longest</A></STRONG><BR>
+<DD>
+Sorts by the longest single run.
+<P></P>
+<DT><STRONG><A NAME="item_count">count</A></STRONG><BR>
+<DD>
+Sorts by total number of runs.
+<P></P>
+<DT><STRONG><A NAME="item_first">first</A></STRONG><BR>
+<DD>
+Sorts by the time taken in the first run.
+<P></P>
+<DT><STRONG><A NAME="item_shortest">shortest</A></STRONG><BR>
+<DD>
+Sorts by the shortest single run.
+<P></P></DL>
+<DT><STRONG><A NAME="item_%2D%2Dreverse">--reverse</A></STRONG><BR>
+<DD>
+Reverses the selected sort.  For example, to see a report of the
+shortest overall time:
+<PRE>
+  dbiprof --sort total --reverse</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dmatch_keyN%3Dvalue">--match keyN=value</A></STRONG><BR>
+<DD>
+Consider only items where the specified key matches the given value.
+Keys are numbered from 1.  For example, let's say you used a
+DBI::Profile Path of:
+<PRE>
+  [ DBIprofile_Statement, DBIprofile_Methodname ]</PRE>
+<P>And called dbiprof as in:</P>
+<PRE>
+  dbiprof --match key2=execute</PRE>
+<P>Your report would only show execute queries, leaving out prepares,
+fetches, etc.</P>
+<P>If the value given starts and ends with slashes (<CODE>/</CODE>) then it will be
+treated as a regular expression.  For example, to only include SELECT
+queries where key1 is the statement:</P>
+<PRE>
+  dbiprof --match key1=/^SELECT/</PRE>
+<P>By default the match expression is matched case-insensitively, but
+this can be changed with the --case-sensitive option.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dexclude_keyN%3Dvalue">--exclude keyN=value</A></STRONG><BR>
+<DD>
+Remove items for where the specified key matches the given value.  For
+example, to exclude all prepare entries where key2 is the method name:
+<PRE>
+  dbiprof --exclude key2=prepare</PRE>
+<P>Like <CODE>--match</CODE>, If the value given starts and ends with slashes
+(<CODE>/</CODE>) then it will be treated as a regular expression.  For example,
+to exclude UPDATE queries where key1 is the statement:</P>
+<PRE>
+  dbiprof --match key1=/^UPDATE/</PRE>
+<P>By default the exclude expression is matched case-insensitively, but
+this can be changed with the --case-sensitive option.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dcase%2Dsensitive">--case-sensitive</A></STRONG><BR>
+<DD>
+Using this option causes --match and --exclude to work
+case-sensitively.  Defaults to off.
+<P></P>
+<DT><STRONG><A NAME="item_%2D%2Dversion">--version</A></STRONG><BR>
+<DD>
+Print the dbiprof version number and exit.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Sam Tregar &lt;<A HREF="mailto:sam@tregar.com">sam@tregar.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT AND LICENSE</A></H1>
+<P>Copyright (C) 2002 Sam Tregar</P>
+<P>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="..\site\lib/DBI/ProfileDumper.html">DBI::ProfileDumper</A>,
+<A HREF="..\site\lib/DBI/Profile.html">DBI::Profile</A>, <A HREF="..\site\lib/DBI.html">DBI</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;dbiprof - command-line client for DBI::ProfileData</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

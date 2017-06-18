@@ -1,0 +1,620 @@
+
+<HTML>
+<HEAD>
+<TITLE>B - The Perl Compiler</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B - The Perl Compiler</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#overview of classes">OVERVIEW OF CLASSES</A></LI>
+	<UL>
+
+		<LI><A HREF="#svrelated classes">SV-RELATED CLASSES</A></LI>
+		<LI><A HREF="#b::sv methods">B::SV METHODS</A></LI>
+		<LI><A HREF="#b::iv methods">B::IV METHODS</A></LI>
+		<LI><A HREF="#b::nv methods">B::NV METHODS</A></LI>
+		<LI><A HREF="#b::rv methods">B::RV METHODS</A></LI>
+		<LI><A HREF="#b::pv methods">B::PV METHODS</A></LI>
+		<LI><A HREF="#b::pvmg methods">B::PVMG METHODS</A></LI>
+		<LI><A HREF="#b::magic methods">B::MAGIC METHODS</A></LI>
+		<LI><A HREF="#b::pvlv methods">B::PVLV METHODS</A></LI>
+		<LI><A HREF="#b::bm methods">B::BM METHODS</A></LI>
+		<LI><A HREF="#b::gv methods">B::GV METHODS</A></LI>
+		<LI><A HREF="#b::io methods">B::IO METHODS</A></LI>
+		<LI><A HREF="#b::av methods">B::AV METHODS</A></LI>
+		<LI><A HREF="#b::cv methods">B::CV METHODS</A></LI>
+		<LI><A HREF="#b::hv methods">B::HV METHODS</A></LI>
+		<LI><A HREF="#oprelated classes">OP-RELATED CLASSES</A></LI>
+		<LI><A HREF="#b::op methods">B::OP METHODS</A></LI>
+		<LI><A HREF="#b::unop method">B::UNOP METHOD</A></LI>
+		<LI><A HREF="#b::binop method">B::BINOP METHOD</A></LI>
+		<LI><A HREF="#b::logop method">B::LOGOP METHOD</A></LI>
+		<LI><A HREF="#b::listop method">B::LISTOP METHOD</A></LI>
+		<LI><A HREF="#b::pmop methods">B::PMOP METHODS</A></LI>
+		<LI><A HREF="#b::svop method">B::SVOP METHOD</A></LI>
+		<LI><A HREF="#b::padop method">B::PADOP METHOD</A></LI>
+		<LI><A HREF="#b::pvop method">B::PVOP METHOD</A></LI>
+		<LI><A HREF="#b::loop methods">B::LOOP METHODS</A></LI>
+		<LI><A HREF="#b::cop methods">B::COP METHODS</A></LI>
+	</UL>
+
+	<LI><A HREF="#functions exported by b">FUNCTIONS EXPORTED BY <CODE>B</CODE></A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>B - The Perl Compiler</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use B;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>B</CODE> module supplies classes which allow a Perl program to delve
+into its own innards. It is the module used to implement the
+``backends'' of the Perl compiler. Usage of the compiler does not
+require knowledge of this module: see the <EM>O</EM> module for the
+user-visible part. The <CODE>B</CODE> module is of use to those who want to
+write new compiler backends. This documentation assumes that the
+reader knows a fair amount about perl's internals including such
+things as SVs, OPs and the internal symbol table and syntax tree
+of a program.</P>
+<P>
+<HR>
+<H1><A NAME="overview of classes">OVERVIEW OF CLASSES</A></H1>
+<P>The C structures used by Perl's internals to hold SV and OP
+information (PVIV, AV, HV, ..., OP, SVOP, UNOP, ...) are modelled on a
+class hierarchy and the <CODE>B</CODE> module gives access to them via a true
+object hierarchy. Structure fields which point to other objects
+(whether types of SV or types of OP) are represented by the <CODE>B</CODE>
+module as Perl objects of the appropriate class. The bulk of the <CODE>B</CODE>
+module is the methods for accessing fields of these structures. Note
+that all access is read-only: you cannot modify the internals by
+using this module.</P>
+<P>
+<H2><A NAME="svrelated classes">SV-RELATED CLASSES</A></H2>
+<P>B::IV, B::NV, B::RV, B::PV, B::PVIV, B::PVNV, B::PVMG, B::BM, B::PVLV,
+B::AV, B::HV, B::CV, B::GV, B::FM, B::IO. These classes correspond in
+the obvious way to the underlying C structures of similar names. The
+inheritance hierarchy mimics the underlying C ``inheritance''. Access
+methods correspond to the underlying C macros for field access,
+usually with the leading ``class indication'' prefix removed (Sv, Av,
+Hv, ...). The leading prefix is only left in cases where its removal
+would cause a clash in method name. For example, <A HREF="#item_GvREFCNT"><CODE>GvREFCNT</CODE></A> stays
+as-is since its abbreviation would clash with the ``superclass'' method
+<A HREF="#item_REFCNT"><CODE>REFCNT</CODE></A> (corresponding to the C function <CODE>SvREFCNT</CODE>).</P>
+<P>
+<H2><A NAME="b::sv methods">B::SV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_REFCNT">REFCNT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FLAGS">FLAGS</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::iv methods">B::IV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_IV">IV</A></STRONG><BR>
+<DD>
+Returns the value of the IV, <EM>interpreted as
+a signed integer</EM>. This will be misleading
+if <CODE>FLAGS &amp; SVf_IVisUV</CODE>. Perhaps you want the
+<A HREF="#item_int_value"><CODE>int_value</CODE></A> method instead?
+<P></P>
+<DT><STRONG><A NAME="item_IVX">IVX</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_UVX">UVX</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_int_value">int_value</A></STRONG><BR>
+<DD>
+This method returns the value of the IV as an integer.
+It differs from <A HREF="#item_IV"><CODE>IV</CODE></A> in that it returns the correct
+value regardless of whether it's stored signed or
+unsigned.
+<P></P>
+<DT><STRONG><A NAME="item_needs64bits">needs64bits</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_packiv">packiv</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::nv methods">B::NV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_NV">NV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_NVX">NVX</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::rv methods">B::RV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_RV">RV</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::pv methods">B::PV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_PV">PV</A></STRONG><BR>
+<DD>
+This method is the one you usually want. It constructs a
+string using the length and offset information in the struct:
+for ordinary scalars it will return the string that you'd see
+from Perl, even if it contains null characters.
+<P></P>
+<DT><STRONG><A NAME="item_PVX">PVX</A></STRONG><BR>
+<DD>
+This method is less often useful. It assumes that the string
+stored in the struct is null-terminated, and disregards the
+length information.
+<P>It is the appropriate method to use if you need to get the name
+of a lexical variable from a padname array. Lexical variable names
+are always stored with a null terminator, and the length field
+(SvCUR) is overloaded for other purposes and can't be relied on here.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="b::pvmg methods">B::PVMG METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_MAGIC">MAGIC</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_SvSTASH">SvSTASH</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::magic methods">B::MAGIC METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_MOREMAGIC">MOREMAGIC</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PRIVATE">PRIVATE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TYPE">TYPE</A></STRONG><BR>
+<DD>
+<DT><STRONG>FLAGS</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_OBJ">OBJ</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PTR">PTR</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::pvlv methods">B::PVLV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_TARGOFF">TARGOFF</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TARGLEN">TARGLEN</A></STRONG><BR>
+<DD>
+<DT><STRONG>TYPE</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TARG">TARG</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::bm methods">B::BM METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_USEFUL">USEFUL</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PREVIOUS">PREVIOUS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_RARE">RARE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TABLE">TABLE</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::gv methods">B::GV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_is_empty">is_empty</A></STRONG><BR>
+<DD>
+This method returns TRUE if the GP field of the GV is NULL.
+<P></P>
+<DT><STRONG><A NAME="item_NAME">NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_SAFENAME">SAFENAME</A></STRONG><BR>
+<DD>
+This method returns the name of the glob, but if the first
+character of the name is a control character, then it converts
+it to ^X first, so that *^G would return ``^G'' rather than ``\cG''.
+<P>It's useful if you want to print out the name of a variable.
+If you restrict yourself to globs which exist at compile-time
+then the result ought to be unambiguous, because code like
+<CODE>${&quot;^G&quot;} = 1</CODE> is compiled as two ops - a constant string and
+a dereference (rv2gv) - so that the glob is created at runtime.</P>
+<P>If you're working with globs at runtime, and need to disambiguate
+*^G from *{``^G''}, then you should use the raw NAME method.</P>
+<P></P>
+<DT><STRONG><A NAME="item_STASH">STASH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_SV">SV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_IO">IO</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FORM">FORM</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_AV">AV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_HV">HV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_EGV">EGV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_CV">CV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_CVGEN">CVGEN</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_LINE">LINE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FILE">FILE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FILEGV">FILEGV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_GvREFCNT">GvREFCNT</A></STRONG><BR>
+<DD>
+<DT><STRONG>FLAGS</STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::io methods">B::IO METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_LINES">LINES</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PAGE">PAGE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PAGE_LEN">PAGE_LEN</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_LINES_LEFT">LINES_LEFT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TOP_NAME">TOP_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_TOP_GV">TOP_GV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FMT_NAME">FMT_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_FMT_GV">FMT_GV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_BOTTOM_NAME">BOTTOM_NAME</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_BOTTOM_GV">BOTTOM_GV</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_SUBPROCESS">SUBPROCESS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_IoTYPE">IoTYPE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_IoFLAGS">IoFLAGS</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::av methods">B::AV METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_FILL">FILL</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_MAX">MAX</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_OFF">OFF</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_ARRAY">ARRAY</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_AvFLAGS">AvFLAGS</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::cv methods">B::CV METHODS</A></H2>
+<DL>
+<DT><STRONG>STASH</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_START">START</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_ROOT">ROOT</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_GV">GV</A></STRONG><BR>
+<DD>
+<DT><STRONG>FILE</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_DEPTH">DEPTH</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PADLIST">PADLIST</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_OUTSIDE">OUTSIDE</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_XSUB">XSUB</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_XSUBANY">XSUBANY</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_CvFLAGS">CvFLAGS</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::hv methods">B::HV METHODS</A></H2>
+<DL>
+<DT><STRONG>FILL</STRONG><BR>
+<DD>
+<DT><STRONG>MAX</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_KEYS">KEYS</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_RITER">RITER</A></STRONG><BR>
+<DD>
+<DT><STRONG>NAME</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_PMROOT">PMROOT</A></STRONG><BR>
+<DD>
+<DT><STRONG>ARRAY</STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="oprelated classes">OP-RELATED CLASSES</A></H2>
+<P>B::OP, B::UNOP, B::BINOP, B::LOGOP, B::LISTOP, B::PMOP,
+B::SVOP, B::PADOP, B::PVOP, B::CVOP, B::LOOP, B::COP.
+These classes correspond in
+the obvious way to the underlying C structures of similar names. The
+inheritance hierarchy mimics the underlying C ``inheritance''. Access
+methods correspond to the underlying C structre field names, with the
+leading ``class indication'' prefix removed (op_).</P>
+<P>
+<H2><A NAME="b::op methods">B::OP METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_next">next</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_sibling">sibling</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_name">name</A></STRONG><BR>
+<DD>
+This returns the op name as a string (e.g. ``add'', ``rv2av'').
+<P></P>
+<DT><STRONG><A NAME="item_ppaddr">ppaddr</A></STRONG><BR>
+<DD>
+This returns the function name as a string (e.g. ``PL_ppaddr[OP_ADD]'',
+``PL_ppaddr[OP_RV2AV]'').
+<P></P>
+<DT><STRONG><A NAME="item_desc">desc</A></STRONG><BR>
+<DD>
+This returns the op description from the global C PL_op_desc array
+(e.g. ``addition'' ``array deref'').
+<P></P>
+<DT><STRONG><A NAME="item_targ">targ</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_type">type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_seq">seq</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_flags">flags</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_private">private</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::unop method">B::UNOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_first">first</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::binop method">B::BINOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_last">last</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::logop method">B::LOGOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_other">other</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::listop method">B::LISTOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_children">children</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::pmop methods">B::PMOP METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_pmreplroot">pmreplroot</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pmreplstart">pmreplstart</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pmnext">pmnext</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pmregexp">pmregexp</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pmflags">pmflags</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pmpermflags">pmpermflags</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_precomp">precomp</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::svop method">B::SVOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_sv">sv</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_gv">gv</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::padop method">B::PADOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_padix">padix</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::pvop method">B::PVOP METHOD</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_pv">pv</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::loop methods">B::LOOP METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_redoop">redoop</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_nextop">nextop</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_lastop">lastop</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<H2><A NAME="b::cop methods">B::COP METHODS</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_label">label</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_stash">stash</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_file">file</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_cop_seq">cop_seq</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_arybase">arybase</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_line">line</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="functions exported by b">FUNCTIONS EXPORTED BY <CODE>B</CODE></A></H1>
+<P>The <CODE>B</CODE> module exports a variety of functions: some are simple
+utility functions, others provide a Perl program with a way to
+get an initial ``handle'' on an internal object.</P>
+<DL>
+<DT><STRONG><A NAME="item_main_cv">main_cv</A></STRONG><BR>
+<DD>
+Return the (faked) CV corresponding to the main part of the Perl
+program.
+<P></P>
+<DT><STRONG><A NAME="item_init_av">init_av</A></STRONG><BR>
+<DD>
+Returns the AV object (i.e. in class B::AV) representing INIT blocks.
+<P></P>
+<DT><STRONG><A NAME="item_main_root">main_root</A></STRONG><BR>
+<DD>
+Returns the root op (i.e. an object in the appropriate B::OP-derived
+class) of the main part of the Perl program.
+<P></P>
+<DT><STRONG><A NAME="item_main_start">main_start</A></STRONG><BR>
+<DD>
+Returns the starting op of the main part of the Perl program.
+<P></P>
+<DT><STRONG><A NAME="item_comppadlist">comppadlist</A></STRONG><BR>
+<DD>
+Returns the AV object (i.e. in class B::AV) of the global comppadlist.
+<P></P>
+<DT><STRONG><A NAME="item_sv_undef">sv_undef</A></STRONG><BR>
+<DD>
+Returns the SV object corresponding to the C variable <A HREF="#item_sv_undef"><CODE>sv_undef</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_sv_yes">sv_yes</A></STRONG><BR>
+<DD>
+Returns the SV object corresponding to the C variable <A HREF="#item_sv_yes"><CODE>sv_yes</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_sv_no">sv_no</A></STRONG><BR>
+<DD>
+Returns the SV object corresponding to the C variable <A HREF="#item_sv_no"><CODE>sv_no</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_amagic_generation">amagic_generation</A></STRONG><BR>
+<DD>
+Returns the SV object corresponding to the C variable <A HREF="#item_amagic_generation"><CODE>amagic_generation</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_walkoptree">walkoptree(OP, METHOD)</A></STRONG><BR>
+<DD>
+Does a tree-walk of the syntax tree based at OP and calls METHOD on
+each op it visits. Each node is visited before its children. If
+<A HREF="#item_walkoptree_debug"><CODE>walkoptree_debug</CODE></A> (q.v.) has been called to turn debugging on then
+the method <A HREF="#item_walkoptree_debug"><CODE>walkoptree_debug</CODE></A> is called on each op before METHOD is
+called.
+<P></P>
+<DT><STRONG><A NAME="item_walkoptree_debug"><CODE>walkoptree_debug(DEBUG)</CODE></A></STRONG><BR>
+<DD>
+Returns the current debugging flag for <A HREF="#item_walkoptree"><CODE>walkoptree</CODE></A>. If the optional
+DEBUG argument is non-zero, it sets the debugging flag to that. See
+the description of <A HREF="#item_walkoptree"><CODE>walkoptree</CODE></A> above for what the debugging flag
+does.
+<P></P>
+<DT><STRONG><A NAME="item_walksymtable">walksymtable(SYMREF, METHOD, RECURSE)</A></STRONG><BR>
+<DD>
+Walk the symbol table starting at SYMREF and call METHOD on each
+symbol visited. When the walk reached package symbols ``Foo::'' it
+invokes RECURSE and only recurses into the package if that sub
+returns true.
+<P></P>
+<DT><STRONG><A NAME="item_svref_2object"><CODE>svref_2object(SV)</CODE></A></STRONG><BR>
+<DD>
+Takes any Perl variable and turns it into an object in the
+appropriate B::OP-derived or B::SV-derived class. Apart from functions
+such as <A HREF="#item_main_root"><CODE>main_root</CODE></A>, this is the primary way to get an initial
+``handle'' on a internal perl data structure which can then be followed
+with the other access methods.
+<P></P>
+<DT><STRONG><A NAME="item_ppname"><CODE>ppname(OPNUM)</CODE></A></STRONG><BR>
+<DD>
+Return the PP function name (e.g. ``pp_add'') of op number OPNUM.
+<P></P>
+<DT><STRONG><A NAME="item_hash"><CODE>hash(STR)</CODE></A></STRONG><BR>
+<DD>
+Returns a string in the form ``0x...'' representing the value of the
+internal hash function used by perl on string STR.
+<P></P>
+<DT><STRONG><A NAME="item_cast_I32"><CODE>cast_I32(I)</CODE></A></STRONG><BR>
+<DD>
+Casts I to the internal I32 type used by that perl.
+<P></P>
+<DT><STRONG><A NAME="item_minus_c">minus_c</A></STRONG><BR>
+<DD>
+Does the equivalent of the <A HREF="../lib/Pod/perlrun.html#item_%2Dc"><CODE>-c</CODE></A> command-line option. Obviously, this
+is only useful in a BEGIN block or else the flag is set too late.
+<P></P>
+<DT><STRONG><A NAME="item_cstring"><CODE>cstring(STR)</CODE></A></STRONG><BR>
+<DD>
+Returns a double-quote-surrounded escaped version of STR which can
+be used as a string in C source code.
+<P></P>
+<DT><STRONG><A NAME="item_class"><CODE>class(OBJ)</CODE></A></STRONG><BR>
+<DD>
+Returns the class of an object without the part of the classname
+preceding the first ``::''. This is used to turn ``B::UNOP'' into
+``UNOP'' for example.
+<P></P>
+<DT><STRONG><A NAME="item_threadsv_names">threadsv_names</A></STRONG><BR>
+<DD>
+In a perl compiled for threads, this returns a list of the special
+per-thread threadsv variables.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Malcolm Beattie, <CODE>mbeattie@sable.ox.ac.uk</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B - The Perl Compiler</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

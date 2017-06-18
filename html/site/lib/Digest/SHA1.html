@@ -1,0 +1,140 @@
+
+<HTML>
+<HEAD>
+<TITLE>Digest::SHA1 - Perl interface to the SHA-1 Algorithm</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Digest::SHA1 - Perl interface to the SHA-1 Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Digest::SHA1 - Perl interface to the SHA-1 Algorithm</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ # Functional style
+ use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);</PRE>
+<PRE>
+ $digest = sha1($data);
+ $digest = sha1_hex($data);
+ $digest = sha1_base64($data);</PRE>
+<PRE>
+ # OO style
+ use Digest::SHA1;</PRE>
+<PRE>
+ $ctx = Digest::SHA1-&gt;new;</PRE>
+<PRE>
+ $ctx-&gt;add($data);
+ $ctx-&gt;addfile(*FILE);</PRE>
+<PRE>
+ $digest = $ctx-&gt;digest;
+ $digest = $ctx-&gt;hexdigest;
+ $digest = $ctx-&gt;b64digest;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>Digest::SHA1</CODE> module allows you to use the NIST SHA-1 message
+digest algorithm from within Perl programs.  The algorithm takes as
+input a message of arbitrary length and produces as output a 160-bit
+``fingerprint'' or ``message digest'' of the input.</P>
+<P>The <CODE>Digest::SHA1</CODE> module provide a procedural interface for simple
+use, as well as an object oriented interface that can handle messages
+of arbitrary length and which can read files directly.</P>
+<P>A binary digest will be 20 bytes long.  A hex digest will be 40
+characters long.  A base64 digest will be 27 characters long.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>The following functions can be exported from the <CODE>Digest::SHA1</CODE>
+module.  No functions are exported by default.</P>
+<DL>
+<DT><STRONG><A NAME="item_sha1"><CODE>sha1($data,...)</CODE></A></STRONG><BR>
+<DD>
+This function will concatenate all arguments, calculate the SHA-1
+digest of this ``message'', and return it in binary form.
+<P></P>
+<DT><STRONG><A NAME="item_sha1_hex"><CODE>sha1_hex($data,...)</CODE></A></STRONG><BR>
+<DD>
+Same as sha1(), but will return the digest in hexadecimal form.
+<P></P>
+<DT><STRONG><A NAME="item_sha1_base64"><CODE>sha1_base64($data,...)</CODE></A></STRONG><BR>
+<DD>
+Same as sha1(), but will return the digest as a base64 encoded string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The <CODE>Digest::SHA1</CODE> module provide the standard <CODE>Digest</CODE> OO-interface.
+The constructor looks like this:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$sha1 = Digest-&gt;<CODE>new('SHA-1')</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG>$sha1 = Digest::SHA1-&gt;new</STRONG><BR>
+<DD>
+The constructor returns a new <CODE>Digest::SHA1</CODE> object which encapsulate
+the state of the SHA-1 message-digest algorithm.  You can add data to
+the object and finally ask for the digest using the methods described
+in <A HREF="../../../site/lib/Digest.html">the Digest manpage</A>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/Digest.html">the Digest manpage</A>, <A HREF="../../../site/lib/Digest/HMAC_SHA1.html">the Digest::HMAC_SHA1 manpage</A>, <A HREF="../../../site/lib/Digest/MD5.html">the Digest::MD5 manpage</A></P>
+<P><A HREF="http://www.itl.nist.gov/fipspubs/fip180-1.htm">http://www.itl.nist.gov/fipspubs/fip180-1.htm</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<PRE>
+ Copyright 1999 Gisle Aas.
+ Copyright 1997 Uwe Hollerbach.</PRE>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Peter C. Gutmann,
+Uwe Hollerbach &lt;<A HREF="mailto:uh@alumni.caltech.edu">uh@alumni.caltech.edu</A>&gt;,
+Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Digest::SHA1 - Perl interface to the SHA-1 Algorithm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,103 @@
+
+<HTML>
+<HEAD>
+<TITLE>Thread::Semaphore - thread-safe semaphores</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Semaphore - thread-safe semaphores</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions and methods">FUNCTIONS AND METHODS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Thread::Semaphore - thread-safe semaphores</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Thread::Semaphore;
+    my $s = new Thread::Semaphore;
+    $s-&gt;up;     # Also known as the semaphore V -operation.
+    # The guarded section is here
+    $s-&gt;down;   # Also known as the semaphore P -operation.</PRE>
+<PRE>
+    # The default semaphore value is 1.
+    my $s = new Thread::Semaphore($initial_value);
+    $s-&gt;up($up_value);
+    $s-&gt;down($up_value);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Semaphores provide a mechanism to regulate access to resources. Semaphores,
+unlike locks, aren't tied to particular scalars, and so may be used to
+control access to anything you care to use them for.</P>
+<P>Semaphores don't limit their values to zero or one, so they can be used to
+control access to some resource that may have more than one of. (For
+example, filehandles) Increment and decrement amounts aren't fixed at one
+either, so threads can reserve or return multiple resources at once.</P>
+<P>
+<HR>
+<H1><A NAME="functions and methods">FUNCTIONS AND METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+<DT><STRONG>new NUMBER</STRONG><BR>
+<DD>
+<A HREF="#item_new"><CODE>new</CODE></A> creates a new semaphore, and initializes its count to the passed
+number. If no number is passed, the semaphore's count is set to one.
+<P></P>
+<DT><STRONG><A NAME="item_down">down</A></STRONG><BR>
+<DD>
+<DT><STRONG>down NUMBER</STRONG><BR>
+<DD>
+The <A HREF="#item_down"><CODE>down</CODE></A> method decreases the semaphore's count by the specified number,
+or one if no number has been specified. If the semaphore's count would drop
+below zero, this method will block until such time that the semaphore's
+count is equal to or larger than the amount you're <A HREF="#item_down"><CODE>down</CODE></A>ing the
+semaphore's count by.
+<P></P>
+<DT><STRONG><A NAME="item_up">up</A></STRONG><BR>
+<DD>
+<DT><STRONG>up NUMBER</STRONG><BR>
+<DD>
+The <A HREF="#item_up"><CODE>up</CODE></A> method increases the semaphore's count by the number specified,
+or one if no number's been specified. This will unblock any thread blocked
+trying to <A HREF="#item_down"><CODE>down</CODE></A> the semaphore if the <A HREF="#item_up"><CODE>up</CODE></A> raises the semaphore count
+above what the <A HREF="#item_down"><CODE>down</CODE></A>s are trying to decrement it by.
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Semaphore - thread-safe semaphores</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,128 @@
+
+<HTML>
+<HEAD>
+<TITLE>Term::Cap - Perl termcap interface</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::Cap - Perl termcap interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Term::Cap - Perl termcap interface</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    require Term::Cap;
+    $terminal = Tgetent Term::Cap { TERM =&gt; undef, OSPEED =&gt; $ospeed };
+    $terminal-&gt;Trequire(qw/ce ku kd/);
+    $terminal-&gt;Tgoto('cm', $col, $row, $FH);
+    $terminal-&gt;Tputs('dl', $count, $FH);
+    $terminal-&gt;Tpad($string, $count, $FH);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>These are low-level functions to extract and use capabilities from
+a terminal capability (termcap) database.</P>
+<P>The <STRONG>Tgetent</STRONG> function extracts the entry of the specified terminal
+type <EM>TERM</EM> (defaults to the environment variable <EM>TERM</EM>) from the
+database.</P>
+<P>It will look in the environment for a <EM>TERMCAP</EM> variable.  If
+found, and the value does not begin with a slash, and the terminal
+type name is the same as the environment string <EM>TERM</EM>, the
+<EM>TERMCAP</EM> string is used instead of reading a termcap file.  If
+it does begin with a slash, the string is used as a path name of
+the termcap file to search.  If <EM>TERMCAP</EM> does not begin with a
+slash and name is different from <EM>TERM</EM>, <STRONG>Tgetent</STRONG> searches the
+files <EM>$HOME/.termcap</EM>, <EM>/etc/termcap</EM>, and <EM>/usr/share/misc/termcap</EM>,
+in that order, unless the environment variable <EM>TERMPATH</EM> exists,
+in which case it specifies a list of file pathnames (separated by
+spaces or colons) to be searched <STRONG>instead</STRONG>.  Whenever multiple
+files are searched and a tc field occurs in the requested entry,
+the entry it names must be found in the same file or one of the
+succeeding files.  If there is a <CODE>:tc=...:</CODE> in the <EM>TERMCAP</EM>
+environment variable string it will continue the search in the
+files as above.</P>
+<P><EM>OSPEED</EM> is the terminal output bit rate (often mistakenly called
+the baud rate).  <EM>OSPEED</EM> can be specified as either a POSIX
+termios/SYSV termio speeds (where 9600 equals 9600) or an old
+BSD-style speeds (where 13 equals 9600).</P>
+<P><STRONG>Tgetent</STRONG> returns a blessed object reference which the user can
+then use to send the control strings to the terminal using <STRONG>Tputs</STRONG>
+and <STRONG>Tgoto</STRONG>.  It calls <CODE>croak</CODE> on failure.</P>
+<P><STRONG>Tgoto</STRONG> decodes a cursor addressing string with the given parameters.</P>
+<P>The output strings for <STRONG>Tputs</STRONG> are cached for counts of 1 for performance.
+<STRONG>Tgoto</STRONG> and <STRONG>Tpad</STRONG> do not cache.  <CODE>$self-&gt;{_xx}</CODE> is the raw termcap
+data and <CODE>$self-&gt;{xx}</CODE> is the cached version.</P>
+<PRE>
+    print $terminal-&gt;Tpad($self-&gt;{_xx}, 1);</PRE>
+<P><STRONG>Tgoto</STRONG>, <STRONG>Tputs</STRONG>, and <STRONG>Tpad</STRONG> return the string and will also
+output the string to $FH if specified.</P>
+<P>The extracted termcap entry is available in the object
+as <CODE>$self-&gt;{TERMCAP}</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+    # Get terminal output speed
+    require POSIX;
+    my $termios = new POSIX::Termios;
+    $termios-&gt;getattr;
+    my $ospeed = $termios-&gt;getospeed;</PRE>
+<PRE>
+    # Old-style ioctl code to get ospeed:
+    #     require 'ioctl.pl';
+    #     ioctl(TTY,$TIOCGETP,$sgtty);
+    #     ($ispeed,$ospeed) = unpack('cc',$sgtty);</PRE>
+<PRE>
+    # allocate and initialize a terminal structure
+    $terminal = Tgetent Term::Cap { TERM =&gt; undef, OSPEED =&gt; $ospeed };</PRE>
+<PRE>
+    # require certain capabilities to be available
+    $terminal-&gt;Trequire(qw/ce ku kd/);</PRE>
+<PRE>
+    # Output Routines, if $FH is undefined these just return the string</PRE>
+<PRE>
+    # Tgoto does the % expansion stuff with the given args
+    $terminal-&gt;Tgoto('cm', $col, $row, $FH);</PRE>
+<PRE>
+    # Tputs doesn't do any % expansion.
+    $terminal-&gt;Tputs('dl', $count = 1, $FH);</PRE>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Term::Cap - Perl termcap interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

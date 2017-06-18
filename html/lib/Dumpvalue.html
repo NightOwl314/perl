@@ -1,0 +1,188 @@
+
+<HTML>
+<HEAD>
+<TITLE>Dumpvalue - provides screen dump of Perl data.</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Dumpvalue - provides screen dump of Perl data.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#creation">Creation</A></LI>
+		<LI><A HREF="#methods">Methods</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Dumpvalue - provides screen dump of Perl data.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Dumpvalue;
+  my $dumper = new Dumpvalue;
+  $dumper-&gt;set(globPrint =&gt; 1);
+  $dumper-&gt;dumpValue(\*::);
+  $dumper-&gt;dumpvars('main');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="creation">Creation</A></H2>
+<P>A new dumper is created by a call</P>
+<PRE>
+  $d = new Dumpvalue(option1 =&gt; value1, option2 =&gt; value2)</PRE>
+<P>Recognized options:</P>
+<DL>
+<DT><STRONG><A NAME="item_arrayDepth%2C_hashDepth"><CODE>arrayDepth</CODE>, <CODE>hashDepth</CODE></A></STRONG><BR>
+<DD>
+Print only first N elements of arrays and hashes.  If false, prints all the
+elements.
+<P></P>
+<DT><STRONG><A NAME="item_compactDump%2C_veryCompact"><A HREF="#item_compactDump"><CODE>compactDump</CODE></A>, <A HREF="#item_veryCompact"><CODE>veryCompact</CODE></A></A></STRONG><BR>
+<DD>
+Change style of array and hash dump.  If true, short array
+may be printed on one line.
+<P></P>
+<DT><STRONG><A NAME="item_globPrint"><CODE>globPrint</CODE></A></STRONG><BR>
+<DD>
+Whether to print contents of globs.
+<P></P>
+<DT><STRONG><A NAME="item_DumpDBFiles"><CODE>DumpDBFiles</CODE></A></STRONG><BR>
+<DD>
+Dump arrays holding contents of debugged files.
+<P></P>
+<DT><STRONG><A NAME="item_DumpPackages"><CODE>DumpPackages</CODE></A></STRONG><BR>
+<DD>
+Dump symbol tables of packages.
+<P></P>
+<DT><STRONG><A NAME="item_DumpReused"><CODE>DumpReused</CODE></A></STRONG><BR>
+<DD>
+Dump contents of ``reused'' addresses.
+<P></P>
+<DT><STRONG><A NAME="item_tick%2C_HighBit%2C_printUndef"><CODE>tick</CODE>, <CODE>HighBit</CODE>, <CODE>printUndef</CODE></A></STRONG><BR>
+<DD>
+Change style of string dump.  Default value of <CODE>tick</CODE> is <CODE>auto</CODE>, one
+can enable either double-quotish dump, or single-quotish by setting it
+to <CODE>&quot;</CODE> or <CODE>'</CODE>.  By default, characters with high bit set are printed
+<EM>as is</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_UsageOnly"><CODE>UsageOnly</CODE></A></STRONG><BR>
+<DD>
+<EM>very</EM> rudimentally per-package memory usage dump.  If set,
+<A HREF="#item_dumpvars"><CODE>dumpvars</CODE></A> calculates total size of strings in variables in the package.
+<P></P>
+<DT><STRONG><A NAME="item_unctrl">unctrl</A></STRONG><BR>
+<DD>
+Changes the style of printout of strings.  Possible values are
+<A HREF="#item_unctrl"><CODE>unctrl</CODE></A> and <CODE>quote</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_subdump">subdump</A></STRONG><BR>
+<DD>
+Whether to try to find the subroutine name given the reference.
+<P></P>
+<DT><STRONG><A NAME="item_bareStringify">bareStringify</A></STRONG><BR>
+<DD>
+Whether to write the non-overloaded form of the stringify-overloaded objects.
+<P></P>
+<DT><STRONG><A NAME="item_quoteHighBit">quoteHighBit</A></STRONG><BR>
+<DD>
+Whether to print chars with high bit set in binary or ``as is''.
+<P></P>
+<DT><STRONG><A NAME="item_stopDbSignal">stopDbSignal</A></STRONG><BR>
+<DD>
+Whether to abort printing if debugger signal flag is raised.
+<P></P></DL>
+<P>Later in the life of the object the methods may be queries with <A HREF="#item_get"><CODE>get()</CODE></A>
+method and <A HREF="#item_set"><CODE>set()</CODE></A> method (which accept multiple arguments).</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_dumpValue">dumpValue</A></STRONG><BR>
+<DD>
+<PRE>
+  $dumper-&gt;dumpValue($value);
+  $dumper-&gt;dumpValue([$value1, $value2]);</PRE>
+<DT><STRONG><A NAME="item_dumpValues">dumpValues</A></STRONG><BR>
+<DD>
+<PRE>
+  $dumper-&gt;dumpValues($value1, $value2);</PRE>
+<DT><STRONG><A NAME="item_dumpvars">dumpvars</A></STRONG><BR>
+<DD>
+<PRE>
+  $dumper-&gt;dumpvars('my_package');
+  $dumper-&gt;dumpvars('my_package', 'foo', '~bar$', '!......');</PRE>
+<P>The optional arguments are considered as literal strings unless they
+start with <CODE>~</CODE> or <CODE>!</CODE>, in which case they are interpreted as regular
+expressions (possibly negated).</P>
+<P>The second example prints entries with names <CODE>foo</CODE>, and also entries
+with names which ends on <CODE>bar</CODE>, or are shorter than 5 chars.</P>
+<DT><STRONG><A NAME="item_set_quote">set_quote</A></STRONG><BR>
+<DD>
+<PRE>
+  $d-&gt;set_quote('&quot;');</PRE>
+<P>Sets <CODE>tick</CODE> and <A HREF="#item_unctrl"><CODE>unctrl</CODE></A> options to suitable values for printout with the
+given quote char.  Possible values are <CODE>auto</CODE>, <CODE>'</CODE> and <CODE>&quot;</CODE>.</P>
+<DT><STRONG><A NAME="item_set_unctrl">set_unctrl</A></STRONG><BR>
+<DD>
+<PRE>
+  $d-&gt;set_unctrl('&quot;');</PRE>
+<P>Sets <A HREF="#item_unctrl"><CODE>unctrl</CODE></A> option with checking for an invalid argument.
+Possible values are <A HREF="#item_unctrl"><CODE>unctrl</CODE></A> and <CODE>quote</CODE>.</P>
+<DT><STRONG><A NAME="item_compactDump">compactDump</A></STRONG><BR>
+<DD>
+<PRE>
+  $d-&gt;compactDump(1);</PRE>
+<P>Sets <A HREF="#item_compactDump"><CODE>compactDump</CODE></A> option.  If the value is 1, sets to a reasonable
+big number.</P>
+<DT><STRONG><A NAME="item_veryCompact">veryCompact</A></STRONG><BR>
+<DD>
+<PRE>
+  $d-&gt;veryCompact(1);</PRE>
+<P>Sets <A HREF="#item_compactDump"><CODE>compactDump</CODE></A> and <A HREF="#item_veryCompact"><CODE>veryCompact</CODE></A> options simultaneously.</P>
+<DT><STRONG><A NAME="item_set">set</A></STRONG><BR>
+<DD>
+<PRE>
+  $d-&gt;set(option1 =&gt; value1, option2 =&gt; value2);</PRE>
+<DT><STRONG><A NAME="item_get">get</A></STRONG><BR>
+<DD>
+<PRE>
+  @values = $d-&gt;get('option1', 'option2');</PRE>
+</DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Dumpvalue - provides screen dump of Perl data.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

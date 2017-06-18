@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ExtUtils::Command::MM - Commands for the MM's to use in Makefiles</title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ExtUtils::Command::MM - Commands for the MM's to use in Makefiles</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>ExtUtils::Command::MM - Commands for the MM's to use in Makefiles</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  perl -MExtUtils::Command::MM -e &quot;function&quot; files...</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>FOR INTERNAL USE ONLY!</strong>  The interface is not stable.</p>
+<p>ExtUtils::Command::MM encapsulates code which would otherwise have to
+be done with large ``one'' liners.</p>
+<p>They all read their input from @ARGV unless otherwise noted.</p>
+<p>Any $(FOO) used in the examples are make variables, not Perl.</p>
+<dl>
+<dt><strong><a name="item_test_harness"><strong>test_harness</strong></a></strong><br />
+</dt>
+<dd>
+<pre>
+  test_harness($verbose, @test_libs);</pre>
+</dd>
+<dd>
+<p>Runs the tests on @ARGV via Test::Harness passing through the $verbose
+flag.  Any @test_libs will be unshifted onto the test's @INC.</p>
+</dd>
+<dd>
+<p>@test_libs are run in alphabetical order.</p>
+</dd>
+</dl>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ExtUtils::Command::MM - Commands for the MM's to use in Makefiles</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

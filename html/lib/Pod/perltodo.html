@@ -1,0 +1,948 @@
+<HTML>
+<HEAD>
+<TITLE>perltodo - Perl TO-DO List</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perltodo - Perl TO-DO List</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#infrastructure">Infrastructure</A></LI>
+	<UL>
+
+		<LI><A HREF="#mailing list archives">Mailing list archives</A></LI>
+		<LI><A HREF="#bug tracking system">Bug tracking system</A></LI>
+		<LI><A HREF="#regression tests">Regression Tests</A></LI>
+	</UL>
+
+	<LI><A HREF="#configure">Configure</A></LI>
+	<UL>
+
+		<LI><A HREF="#install html">Install HTML</A></LI>
+	</UL>
+
+	<LI><A HREF="#perl language">Perl Language</A></LI>
+	<UL>
+
+		<LI><A HREF="#64bit perl">64-bit Perl</A></LI>
+		<LI><A HREF="#prototypes">Prototypes</A></LI>
+	</UL>
+
+	<LI><A HREF="#perl internals">Perl Internals</A></LI>
+	<UL>
+
+		<LI><A HREF="#magic_setisa">magic_setisa</A></LI>
+		<LI><A HREF="#garbage collection">Garbage Collection</A></LI>
+		<LI><A HREF="#reliable signals">Reliable signals</A></LI>
+		<LI><A HREF="#interpolated regex performance bugs">Interpolated regex performance bugs</A></LI>
+		<LI><A HREF="#memory leaks from failed eval/regcomp">Memory leaks from failed eval/regcomp</A></LI>
+		<LI><A HREF="#make xs easier to use">Make XS easier to use</A></LI>
+		<LI><A HREF="#make embedded perl easier to use">Make embedded Perl easier to use</A></LI>
+		<LI><A HREF="#namespace cleanup">Namespace cleanup</A></LI>
+		<LI><A HREF="#multiplicity">MULTIPLICITY</A></LI>
+		<LI><A HREF="#macperl">MacPerl</A></LI>
+	</UL>
+
+	<LI><A HREF="#documentation">Documentation</A></LI>
+	<UL>
+
+		<LI><A HREF="#a clear division into tutorial and reference">A clear division into tutorial and reference</A></LI>
+		<LI><A HREF="#remove the artificial distinction between operators and functions">Remove the artificial distinction between operators and functions</A></LI>
+		<LI><A HREF="#more tutorials">More tutorials</A></LI>
+		<LI><A HREF="#include a search tool">Include a search tool</A></LI>
+		<LI><A HREF="#include a locate tool">Include a locate tool</A></LI>
+		<LI><A HREF="#separate function manpages by default">Separate function manpages by default</A></LI>
+		<LI><A HREF="#users can't find the manpages">Users can't find the manpages</A></LI>
+		<LI><A HREF="#install all documentation">Install ALL Documentation</A></LI>
+		<LI><A HREF="#outstanding issues to be documented">Outstanding issues to be documented</A></LI>
+		<LI><A HREF="#adapt www.linuxhq.com for perl">Adapt www.linuxhq.com for Perl</A></LI>
+		<LI><A HREF="#replace man with a perl program">Replace man with a perl program</A></LI>
+		<LI><A HREF="#unicode tutorial">Unicode tutorial</A></LI>
+	</UL>
+
+	<LI><A HREF="#modules">Modules</A></LI>
+	<UL>
+
+		<LI><A HREF="#update the posix extension to conform with the posix 1003.1 edition 2">Update the POSIX extension to conform with the POSIX 1003.1 Edition 2</A></LI>
+		<LI><A HREF="#module versions">Module versions</A></LI>
+		<LI><A HREF="#new modules">New modules</A></LI>
+		<LI><A HREF="#profiler">Profiler</A></LI>
+		<LI><A HREF="#tie modules">Tie Modules</A></LI>
+		<LI><A HREF="#procedural options">Procedural options</A></LI>
+		<LI><A HREF="#rpc">RPC</A></LI>
+		<LI><A HREF="#y2k localtime/gmtime">y2k localtime/gmtime</A></LI>
+		<LI><A HREF="#export file::find variables">Export File::Find variables</A></LI>
+		<LI><A HREF="#ioctl">Ioctl</A></LI>
+		<LI><A HREF="#debugger attach/detach">Debugger attach/detach</A></LI>
+		<LI><A HREF="#regular expression debugger">Regular Expression debugger</A></LI>
+		<LI><A HREF="#alternative re syntax">Alternative RE Syntax</A></LI>
+		<LI><A HREF="#bundled modules">Bundled modules</A></LI>
+		<LI><A HREF="#expect">Expect</A></LI>
+		<LI><A HREF="#gui::native">GUI::Native</A></LI>
+		<LI><A HREF="#update semibroken auxiliary tools; h2ph, a2p, etc.">Update semibroken auxiliary tools; h2ph, a2p, etc.</A></LI>
+		<LI><A HREF="#pod2html">pod2html</A></LI>
+		<LI><A HREF="#podchecker">Podchecker</A></LI>
+	</UL>
+
+	<LI><A HREF="#tom's wishes">Tom's Wishes</A></LI>
+	<UL>
+
+		<LI><A HREF="#webperl">Webperl</A></LI>
+		<LI><A HREF="#mobile agents">Mobile agents</A></LI>
+		<LI><A HREF="#posix on nonposix">POSIX on non-POSIX</A></LI>
+		<LI><A HREF="#portable installations">Portable installations</A></LI>
+	</UL>
+
+	<LI><A HREF="#win32 stuff">Win32 Stuff</A></LI>
+	<UL>
+
+		<LI><A HREF="#rename new headers to be consistent with the rest">Rename new headers to be consistent with the rest</A></LI>
+		<LI><A HREF="#sort out the spawnvp() mess">Sort out the <CODE>spawnvp()</CODE> mess</A></LI>
+		<LI><A HREF="#work out dll versioning">Work out DLL versioning</A></LI>
+		<LI><A HREF="#stylecheck">Style-check</A></LI>
+	</UL>
+
+	<LI><A HREF="#would be nice to have">Would be nice to have</A></LI>
+	<LI><A HREF="#possible pragmas">Possible pragmas</A></LI>
+	<UL>
+
+		<LI><A HREF="#'less'">'less'</A></LI>
+	</UL>
+
+	<LI><A HREF="#optimizations">Optimizations</A></LI>
+	<UL>
+
+		<LI><A HREF="#constant function cache">constant function cache</A></LI>
+		<LI><A HREF="#foreach(reverse...)"><CODE>foreach(reverse...)</CODE></A></LI>
+		<LI><A HREF="#cache eval tree">Cache eval tree</A></LI>
+		<LI><A HREF="#rcatmaybe">rcatmaybe</A></LI>
+		<LI><A HREF="#shrink opcode tables">Shrink opcode tables</A></LI>
+		<LI><A HREF="#cache hash value">Cache hash value</A></LI>
+		<LI><A HREF="#optimize away @_ where possible">Optimize away @_ where possible</A></LI>
+		<LI><A HREF="#optimize sort by { $a <=> $b }">Optimize sort by { $a &lt;=&gt; $b }</A></LI>
+		<LI><A HREF="#rewrite regexp parser for better integrated optimization">Rewrite regexp parser for better integrated optimization</A></LI>
+	</UL>
+
+	<LI><A HREF="#vague possibilities">Vague possibilities</A></LI>
+	<LI><A HREF="#to do or not to do">To Do Or Not To Do</A></LI>
+	<UL>
+
+		<LI><A HREF="#making my() work on package variables">Making <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A> work on ``package'' variables</A></LI>
+		<LI><A HREF="#or testing defined not truth">``or'' testing defined not truth</A></LI>
+		<LI><A HREF="#dynamic lexicals">``dynamic'' lexicals</A></LI>
+		<LI><A HREF="#classbased, rather than packagebased lexicals">``class''-based, rather than package-based ``lexicals''</A></LI>
+	</UL>
+
+	<LI><A HREF="#threading">Threading</A></LI>
+	<UL>
+
+		<LI><A HREF="#modules">Modules</A></LI>
+		<LI><A HREF="#testing">Testing</A></LI>
+		<LI><A HREF="#$autoload">$AUTOLOAD</A></LI>
+		<LI><A HREF="#exit/die">exit/die</A></LI>
+		<LI><A HREF="#external threads">External threads</A></LI>
+		<LI><A HREF="#thread::pool">Thread::Pool</A></LI>
+		<LI><A HREF="#threadsafety">thread-safety</A></LI>
+		<LI><A HREF="#perthread gvs">Per-thread GVs</A></LI>
+	</UL>
+
+	<LI><A HREF="#compiler">Compiler</A></LI>
+	<UL>
+
+		<LI><A HREF="#optimization">Optimization</A></LI>
+		<LI><A HREF="#byteperl">Byteperl</A></LI>
+		<LI><A HREF="#precompiled modules">Precompiled modules</A></LI>
+		<LI><A HREF="#executables">Executables</A></LI>
+		<LI><A HREF="#typed lexicals">Typed lexicals</A></LI>
+		<LI><A HREF="#win32">Win32</A></LI>
+		<LI><A HREF="#end blocks">END blocks</A></LI>
+		<LI><A HREF="#_autoload">_AUTOLOAD</A></LI>
+		<LI><A HREF="#comppadlist">comppadlist</A></LI>
+		<LI><A HREF="#cached compilation">Cached compilation</A></LI>
+	</UL>
+
+	<LI><A HREF="#recently finished tasks">Recently Finished Tasks</A></LI>
+	<UL>
+
+		<LI><A HREF="#figure a way out of $^(capital letter)">Figure a way out of $^(capital letter)</A></LI>
+		<LI><A HREF="#filenames">Filenames</A></LI>
+		<LI><A HREF="#foreign lines">Foreign lines</A></LI>
+		<LI><A HREF="#namespace cleanup">Namespace cleanup</A></LI>
+		<LI><A HREF="#isa.pm">ISA.pm</A></LI>
+		<LI><A HREF="#gettimeofday">gettimeofday</A></LI>
+		<LI><A HREF="#autocroak">autocroak?</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perltodo - Perl TO-DO List</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a list of wishes for Perl.  It is maintained by Nathan
+Torkington for the Perl porters.  Send updates to
+<EM><A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A></EM>.  If you want to work on any of these
+projects, be sure to check the perl5-porters archives for past ideas,
+flames, and propaganda.  This will save you time and also prevent you
+from implementing something that Larry has already vetoed.  One set
+of archives may be found at:</P>
+<PRE>
+    <A HREF="http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/">http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/</A></PRE>
+<P>
+<HR>
+<H1><A NAME="infrastructure">Infrastructure</A></H1>
+<P>
+<H2><A NAME="mailing list archives">Mailing list archives</A></H2>
+<P>Chaim suggests contacting egroup and asking them to archive the other
+perl.org mailing lists.  Probably not advocacy, but definitely
+perl6-porters, etc.</P>
+<P>
+<H2><A NAME="bug tracking system">Bug tracking system</A></H2>
+<P>Richard Foley <EM><A HREF="mailto:richard@perl.org">richard@perl.org</A></EM> is writing one.  We looked at
+several, like gnats and the Debian system, but at the time we
+investigated them, none met our needs.  Since then, Jitterbug has
+matured, and may be worth reinvestigation.</P>
+<P>The system we've developed is the recipient of perlbug mail, and any
+followups it generates from perl5-porters.  New bugs are entered
+into a mysql database, and sent on to
+perl5-porters with the subject line rewritten to include a ``ticket
+number'' (unique ID for the new bug).  If the incoming message already
+had a ticket number in the subject line, then the message is logged
+against that bug.  There is a separate email interface (not forwarding
+to p5p) that permits porters to claim, categorize, and close tickets.</P>
+<P>There is also a web interface to the system at <A HREF="http://bugs.perl.org.">http://bugs.perl.org.</A></P>
+<P>The current delay in implementation is caused by perl.org lockups.
+One suspect is the mail handling system, possibly going into loops.</P>
+<P>We still desperately need a bugmaster, someone who will look at
+every new ``bug'' and kill those that we already know about, those
+that are not bugs at all, etc.</P>
+<P>
+<H2><A NAME="regression tests">Regression Tests</A></H2>
+<P>The test suite for Perl serves two needs: ensuring features work, and
+ensuring old bugs have not been reintroduced.  Both need work.</P>
+<P>Brent LaVelle (<A HREF="mailto:lavelle@metronet.com">lavelle@metronet.com</A>) has stepped forward to work on
+performance tests and improving the size of the test suite.</P>
+<DL>
+<DT><STRONG><A NAME="item_Coverage">Coverage</A></STRONG><BR>
+<DD>
+Do the tests that come with Perl exercise every line (or every block,
+or ...)  of the Perl interpreter, and if not then how can we make them
+do so?
+<P></P>
+<DT><STRONG><A NAME="item_Regression">Regression</A></STRONG><BR>
+<DD>
+No bug fixes should be made without a corresponding testsuite addition.
+This needs a dedicated enforcer, as the current pumpking is either too
+lazy or too stupid or both and lets enforcement wander all over the
+map.  :-)
+<P></P>
+<DT><STRONG><A NAME="item___DIE__">__DIE__</A></STRONG><BR>
+<DD>
+Tests that fail need to be of a form that can be readily mailed
+to perlbug and diagnosed with minimal back-and-forth's to determine
+which test failed, due to what cause, etc.
+<P></P>
+<DT><STRONG><A NAME="item_suidperl">suidperl</A></STRONG><BR>
+<DD>
+We need regression/sanity tests for suidperl
+<P></P>
+<DT><STRONG><A NAME="item_The_25%25_slowdown_from_perl4_to_perl5">The 25% slowdown from perl4 to perl5</A></STRONG><BR>
+<DD>
+This value may or may not be accurate, but it certainly is
+eye-catching.  For some things perl5 is faster than perl4, but often
+the reliability and extensibility have come at a cost of speed.  The
+benchmark suite that Gisle released earlier has been hailed as both a
+fantastic solution and as a source of entirely meaningless figures.
+Do we need to test ``real applications''?  Can you do so?  Anyone have
+machines to dedicate to the task?  Identify the things that have grown
+slower, and see if there's a way to make them faster.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="configure">Configure</A></H1>
+<P>Andy Dougherty <CODE>maintain(ed|s)</CODE> a list of ``todo'' items for the configure
+that comes with Perl.  See Porting/pumpkin.pod in the latest
+source release.</P>
+<P>
+<H2><A NAME="install html">Install HTML</A></H2>
+<P>Have ``make install'' give you the option to install HTML as well.  This
+would be part of Configure.  Andy Wardley (certified Perl studmuffin)
+will look into the current problems of HTML installation--is
+'installhtml' preventing this from happening cleanly, or is pod2html
+the problem?  If the latter, Brad Appleton's pod work may fix the
+problem for free.</P>
+<P>
+<HR>
+<H1><A NAME="perl language">Perl Language</A></H1>
+<P>
+<H2><A NAME="64bit perl">64-bit Perl</A></H2>
+<P>Verify complete 64 bit support so that the value of sysseek, or <A HREF="../../lib/Pod/perlrun.html#item_%2Ds"><CODE>-s</CODE></A>, or
+stat(), or tell can fit into a perl number without losing precision.
+Work with the perl-64bit mailing list on perl.org.</P>
+<P>
+<H2><A NAME="prototypes">Prototypes</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Named_prototypes">Named prototypes</A></STRONG><BR>
+<DD>
+Add proper named prototypes that actually work usefully.
+<P></P>
+<DT><STRONG><A NAME="item_Indirect_objects">Indirect objects</A></STRONG><BR>
+<DD>
+Fix prototype bug that forgets indirect objects.
+<P></P>
+<DT><STRONG><A NAME="item_Method_calls">Method calls</A></STRONG><BR>
+<DD>
+Prototypes for method calls.
+<P></P>
+<DT><STRONG><A NAME="item_Context">Context</A></STRONG><BR>
+<DD>
+Return context prototype declarations.
+<P></P>
+<DT><STRONG><A NAME="item_Scoped_subs">Scoped subs</A></STRONG><BR>
+<DD>
+lexically-scoped subs, e.g. my sub
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="perl internals">Perl Internals</A></H1>
+<P>
+<H2><A NAME="magic_setisa">magic_setisa</A></H2>
+<P><CODE>magic_setisa</CODE> should be made to update %FIELDS [???]</P>
+<P>
+<H2><A NAME="garbage collection">Garbage Collection</A></H2>
+<P>There was talk of a mark-and-sweep garbage collector at TPC2, but the
+(to users) unpredictable nature of its behaviour put some off.
+Sarathy, I believe, did the work.  Here's what he has to say:</P>
+<P>Yeah, I hope to implement it someday too.  The points that were
+raised in TPC2 were all to do with calling <CODE>DESTROY()</CODE> methods, but
+I think we can accommodate that by extending <A HREF="../../lib/Pod/perlfunc.html#item_bless"><CODE>bless()</CODE></A> to stash
+extra information for objects so we track their lifetime accurately
+for those that want their <CODE>DESTROY()</CODE> to be predictable (this will be
+a speed hit, naturally, and will therefore be optional, naturally. :)</P>
+<P>[N.B. Don't even ask me about this now!  When I have the time to
+write a cogent summary, I'll post it.]</P>
+<P>
+<H2><A NAME="reliable signals">Reliable signals</A></H2>
+<P>Sarathy and Dan Sugalski are working on this.  Chip posted a patch
+earlier, but it was not accepted into 5.005.  The issue is tricky,
+because it has the potential to greatly slow down the core.</P>
+<P>There are at least three things to consider:</P>
+<DL>
+<DT><STRONG><A NAME="item_runops">Alternate <CODE>runops()</CODE> for signal despatch</A></STRONG><BR>
+<DD>
+Sarathy and Dan are discussed this on perl5-porters.
+<P></P>
+<DT><STRONG><A NAME="item_die">Figure out how to <CODE>die()</CODE> in delayed sighandler</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Add_tests_for_Thread%3A%3ASignal">Add tests for Thread::Signal</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Automatic_tests_against_CPAN">Automatic tests against CPAN</A></STRONG><BR>
+<DD>
+Is there some way to automatically build all/most of CPAN with
+the new Perl and check that the modules there pass all the tests?
+<P></P></DL>
+<P>
+<H2><A NAME="interpolated regex performance bugs">Interpolated regex performance bugs</A></H2>
+<PRE>
+  while (&lt;&gt;) {
+    $found = 0;
+    foreach $pat (@patterns) {
+      $found++ if /$pat/o;
+    }
+    print if $found;
+  }</PRE>
+<P>The qr// syntax added in 5.005 has solved this problem, but
+it needs more thorough documentation.</P>
+<P>
+<H2><A NAME="memory leaks from failed eval/regcomp">Memory leaks from failed eval/regcomp</A></H2>
+<P>The only known memory leaks in Perl are in failed code or regexp
+compilation.  Fix this.  Hugo Van Der Sanden will attempt this but
+won't have tuits until January 1999.</P>
+<P>
+<H2><A NAME="make xs easier to use">Make XS easier to use</A></H2>
+<P>There was interest in SWIG from porters, but nothing has happened
+lately.</P>
+<P>
+<H2><A NAME="make embedded perl easier to use">Make embedded Perl easier to use</A></H2>
+<P>This is probably difficult for the same reasons that ``XS For Dummies''
+will be difficult.</P>
+<P>
+<H2><A NAME="namespace cleanup">Namespace cleanup</A></H2>
+<PRE>
+    CPP-space:    restrict CPP symbols exported from headers
+    header-space: move into CORE/perl/
+    API-space:    begin list of things that constitute public api
+    env-space:    Configure should use PERL_CONFIG instead of CONFIG etc.</PRE>
+<P>
+<H2><A NAME="multiplicity">MULTIPLICITY</A></H2>
+<P>Complete work on safe recursive interpreters <CODE>Perl-&gt;new()</CODE>.
+Sarathy says that a reference implementation exists.</P>
+<P>
+<H2><A NAME="macperl">MacPerl</A></H2>
+<P>Chris Nandor and Matthias Neeracher are working on better integrating
+MacPerl into the Perl distribution.</P>
+<P>
+<HR>
+<H1><A NAME="documentation">Documentation</A></H1>
+<P>There's a lot of documentation that comes with Perl.  The quantity of
+documentation makes it difficult for users to know which section of
+which manpage to read in order to solve their problem.  Tom
+Christiansen has done much of the documentation work in the past.</P>
+<P>
+<H2><A NAME="a clear division into tutorial and reference">A clear division into tutorial and reference</A></H2>
+<P>Some manpages (e.g., perltoot and perlreftut) clearly set out to
+educate the reader about a subject.  Other manpages (e.g., perlsub)
+are references for which there is no tutorial, or are references with
+a slight tutorial bent.  If things are either tutorial or reference,
+then the reader knows which manpage to read to learn about a subject,
+and which manpage to read to learn all about an aspect of that
+subject.  Part of the solution to this is:</P>
+<P>
+<H2><A NAME="remove the artificial distinction between operators and functions">Remove the artificial distinction between operators and functions</A></H2>
+<P>History shows us that users, and often porters, aren't clear on the
+operator-function distinction.  The present split in reference
+material between perlfunc and perlop hinders user navigation.  Given
+that perlfunc is by far the larger of the two, move operator reference
+into perlfunc.</P>
+<P>
+<H2><A NAME="more tutorials">More tutorials</A></H2>
+<P>More documents of a tutorial nature could help.  Here are some
+candidates:</P>
+<DL>
+<DT><STRONG><A NAME="item_Regular_expressions">Regular expressions</A></STRONG><BR>
+<DD>
+Robin Berjon (<A HREF="mailto:r.berjon@ltconsulting.net">r.berjon@ltconsulting.net</A>) has volunteered.
+<P></P>
+<DT><STRONG><A NAME="item_I%2FO">I/O</A></STRONG><BR>
+<DD>
+Mark-Jason Dominus (<A HREF="mailto:mjd@plover.com">mjd@plover.com</A>) has an outline for perliotut.
+<P></P>
+<DT><STRONG><A NAME="item_pack%2Funpack">pack/unpack</A></STRONG><BR>
+<DD>
+This is badly needed.  There has been some discussion on the
+subject on perl5-porters.
+<P></P>
+<DT><STRONG><A NAME="item_Debugging">Debugging</A></STRONG><BR>
+<DD>
+Ronald Kimball (<A HREF="mailto:rjk@linguist.dartmouth.edu">rjk@linguist.dartmouth.edu</A>) has volunteered.
+<P></P></DL>
+<P>
+<H2><A NAME="include a search tool">Include a search tool</A></H2>
+<P>perldoc should be able to 'grep' fulltext indices of installed POD
+files.  This would let people say:</P>
+<PRE>
+  perldoc -find printing numbers with commas</PRE>
+<P>and get back the perlfaq entry on 'commify'.</P>
+<P>This solution, however, requires documentation to contain the keywords
+the user is searching for.  Even when the users know what they're
+looking for, often they can't spell it.</P>
+<P>
+<H2><A NAME="include a locate tool">Include a locate tool</A></H2>
+<P>perldoc should be able to help people find the manpages on a
+particular high-level subject:</P>
+<PRE>
+  perldoc -find web</PRE>
+<P>would tell them manpages, web pages, and books with material on web
+programming.  Similarly <CODE>perldoc -find databases</CODE>, <CODE>perldoc -find
+references</CODE> and so on.</P>
+<P>We need something in the vicinity of:</P>
+<PRE>
+  % perl -help random stuff
+  No documentation for perl function `random stuff' found
+  The following entry in <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>.pod matches /random/a:
+    =item rand EXPR</PRE>
+<PRE>
+    =item rand</PRE>
+<PRE>
+    Returns a random fractional number greater than or equal to C&lt;0&gt; and less
+    than the value of EXPR.  (EXPR should be positive.)  If EXPR is
+    omitted, the value C&lt;1&gt; is used.  Automatically calls C&lt;srand()&gt; unless
+    C&lt;srand()&gt; has already been called.  See also C&lt;srand()&gt;.</PRE>
+<PRE>
+    (Note: If your rand function consistently returns numbers that are too
+    large or too small, then your version of Perl was probably compiled
+    with the wrong number of RANDBITS.)
+  The following pod pages seem to have /stuff/a:
+    <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>.pod        (7 hits)
+    <A HREF="../../lib/Pod/perlfaq7.html">perlfaq7</A>.pod        (6 hits)
+    <A HREF="../../lib/Pod/perlmod.html">perlmod</A>.pod         (4 hits)
+    <A HREF="../../lib/Pod/perlsyn.html">perlsyn</A>.pod         (3 hits)
+    <A HREF="../../lib/Pod/perlfaq8.html">perlfaq8</A>.pod        (2 hits)
+    <A HREF="../../lib/Pod/perlipc.html">perlipc</A>.pod         (2 hits)
+    <A HREF="../../lib/Pod/perl5004delta.html">perl5004delta</A>.pod   (1 hit)
+    <A HREF="../../lib/Pod/perl5005delta.html">perl5005delta</A>.pod   (1 hit)
+    <A HREF="../../lib/Pod/perlcall.html">perlcall</A>.pod        (1 hit)
+    <A HREF="../../lib/Pod/perldelta.html">perldelta</A>.pod       (1 hit)
+    <A HREF="../../lib/Pod/perlfaq3.html">perlfaq3</A>.pod        (1 hit)
+    <A HREF="../../lib/Pod/perlfaq5.html">perlfaq5</A>.pod        (1 hit)
+    <A HREF="../../lib/Pod/perlhist.html">perlhist</A>.pod        (1 hit)
+    <A HREF="../../lib/Pod/perlref.html">perlref</A>.pod         (1 hit)
+    <A HREF="../../lib/Pod/perltoc.html">perltoc</A>.pod         (1 hit)
+    <A HREF="../../lib/Pod/perltrap.html">perltrap</A>.pod        (1 hit)
+  Proceed to open <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>.pod? [y] n
+  Do you want to speak perl interactively? [y] n
+  Should I dial 911? [y] n
+  Do you need psychiatric help? [y] y
+  &lt;PELIZA&gt; Hi, what bothers you today?
+           A Python programmer in the next cubby is driving me nuts!
+  &lt;PELIZA&gt; Hmm, thats fixable.  Just [rest censored]</PRE>
+<P>
+<H2><A NAME="separate function manpages by default">Separate function manpages by default</A></H2>
+<P>Perl should install 'manpages' for every function/operator into the
+3pl or 3p manual section.  By default.  The splitman program in the
+Perl source distribution does the work of turning big perlfunc into
+little 3p pages.</P>
+<P>
+<H2><A NAME="users can't find the manpages">Users can't find the manpages</A></H2>
+<P>Make <CODE>perldoc</CODE> tell users what they need to add to their .login or
+.cshrc to set their MANPATH correctly.</P>
+<P>
+<H2><A NAME="install all documentation">Install ALL Documentation</A></H2>
+<P>Make the standard documentation kit include the VMS, OS/2, Win32,
+Threads, etc information.  installperl and pod/Makefile should know
+enough to copy README.foo to perlfoo.pod before building everything,
+when appropriate.</P>
+<P>
+<H2><A NAME="outstanding issues to be documented">Outstanding issues to be documented</A></H2>
+<P>Tom has a list of 5.005_5* features or changes that require
+documentation.</P>
+<P>Create one document that coherently explains the delta between the
+last camel release and the current release.  perldelta was supposed
+to be that, but no longer.  The things in perldelta never seemed to
+get placed in the right places in the real manpages, either.  This
+needs work.</P>
+<P>
+<H2><A NAME="adapt www.linuxhq.com for perl">Adapt www.linuxhq.com for Perl</A></H2>
+<P>This should help glorify documentation and get more people involved in
+perl development.</P>
+<P>
+<H2><A NAME="replace man with a perl program">Replace man with a perl program</A></H2>
+<P>Can we reimplement man in Perl?  Tom has a start.  I believe some of
+the Linux systems distribute a manalike.  Alternatively, build on
+perldoc to remove the unfeatures like ``is slow'' and ``has no apropos''.</P>
+<P>
+<H2><A NAME="unicode tutorial">Unicode tutorial</A></H2>
+<P>We could use more work on helping people understand Perl's new
+Unicode support that Larry has created.</P>
+<P>
+<HR>
+<H1><A NAME="modules">Modules</A></H1>
+<P>
+<H2><A NAME="update the posix extension to conform with the posix 1003.1 edition 2">Update the POSIX extension to conform with the POSIX 1003.1 Edition 2</A></H2>
+<P>The current state of the POSIX extension is as of Edition 1, 1991,
+whereas the Edition 2 came out in 1996.  ISO/IEC 9945:1-1996(E),
+ANSI/IEEE Std 1003.1, 1996 Edition. ISBN 1-55937-573-6.  The updates
+were legion: threads, IPC, and real time extensions.</P>
+<P>
+<H2><A NAME="module versions">Module versions</A></H2>
+<P>Automate the checking of versions in the standard distribution so
+it's easy for a pumpking to check whether CPAN has a newer version
+that we should be including?</P>
+<P>
+<H2><A NAME="new modules">New modules</A></H2>
+<P>Which modules should be added to the standard distribution?  This ties
+in with the SDK discussed on the perl-sdk list at perl.org.</P>
+<P>
+<H2><A NAME="profiler">Profiler</A></H2>
+<P>Make the profiler (Devel::DProf) part of the standard release, and
+document it well.</P>
+<P>
+<H2><A NAME="tie modules">Tie Modules</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_VecArray">VecArray</A></STRONG><BR>
+<DD>
+Implement array using vec().  Nathan Torkington has working code to
+do this.
+<P></P>
+<DT><STRONG><A NAME="item_SubstrArray">SubstrArray</A></STRONG><BR>
+<DD>
+Implement array using <A HREF="../../lib/Pod/perlvar.html#item_substr"><CODE>substr()</CODE></A>
+<P></P>
+<DT><STRONG><A NAME="item_VirtualArray">VirtualArray</A></STRONG><BR>
+<DD>
+Implement array using a file
+<P></P>
+<DT><STRONG><A NAME="item_ShiftSplice">ShiftSplice</A></STRONG><BR>
+<DD>
+Defines shift et al in terms of splice method
+<P></P></DL>
+<P>
+<H2><A NAME="procedural options">Procedural options</A></H2>
+<P>Support procedural interfaces for the common cases of Perl's
+gratuitously OOO modules.  Tom objects to ``use IO::File'' reading many
+thousands of lines of code.</P>
+<P>
+<H2><A NAME="rpc">RPC</A></H2>
+<P>Write a module for transparent, portable remote procedure calls.  (Not
+core).  This touches on the CORBA and ILU work.</P>
+<P>
+<H2><A NAME="y2k localtime/gmtime">y2k localtime/gmtime</A></H2>
+<P>Write a module, Y2k::Catch, which overloads localtime and gmtime's
+returned year value and catches ``bad'' attempts to use it.</P>
+<P>
+<H2><A NAME="export file::find variables">Export File::Find variables</A></H2>
+<P>Make File::Find export <CODE>$name</CODE> etc manually, at least if asked to.</P>
+<P>
+<H2><A NAME="ioctl">Ioctl</A></H2>
+<P>Finish a proper Ioctl module.</P>
+<P>
+<H2><A NAME="debugger attach/detach">Debugger attach/detach</A></H2>
+<P>Permit a user to debug an already-running program.</P>
+<P>
+<H2><A NAME="regular expression debugger">Regular Expression debugger</A></H2>
+<P>Create a visual profiler/debugger tool that stepped you through the
+execution of a regular expression point by point.  Ilya has a module
+to color-code and display regular expression parses and executions.
+There's something at <A HREF="http://tkworld.org/">http://tkworld.org/</A> that might be a good start,
+it's a Tk/Tcl RE wizard, that builds regexen of many flavours.</P>
+<P>
+<H2><A NAME="alternative re syntax">Alternative RE Syntax</A></H2>
+<P>Make an alternative regular expression syntax that is accessed through
+a module.  For instance,</P>
+<PRE>
+  use RE;
+  $re = start_of_line()
+      -&gt;literal(&quot;1998/10/08&quot;)
+      -&gt;optional( whitespace() )
+      -&gt;literal(&quot;[&quot;)
+      -&gt;remember( many( or( &quot;-&quot;, digit() ) ) );</PRE>
+<PRE>
+  if (/$re/) {
+    print &quot;time is $1\n&quot;;
+  }</PRE>
+<P>Newbies to regular expressions typically only use a subset of the full
+language.  Perhaps you wouldn't have to implement the full feature set.</P>
+<P>
+<H2><A NAME="bundled modules">Bundled modules</A></H2>
+<P>Nicholas Clark (<A HREF="mailto:nick@flirble.org">nick@flirble.org</A>) had a patch for storing modules in
+zipped format.  This needs exploring and concluding.</P>
+<P>
+<H2><A NAME="expect">Expect</A></H2>
+<P>Adopt IO::Tty, make it as portable as Don Libes' ``expect'' (can we link
+against expect code?), and perfect a Perl version of expect.  IO::Tty
+and expect could then be distributed as part of the core distribution,
+replacing Comm.pl and other hacks.</P>
+<P>
+<H2><A NAME="gui::native">GUI::Native</A></H2>
+<P>A simple-to-use interface to native graphical abilities would
+be welcomed.  Oh, Perl's access Tk is nice enough, and reasonably
+portable, but it's not particularly as fast as one would like.
+Simple access to the mouse's cut buffer or mouse-presses shouldn't
+required loading a few terabytes of Tk code.</P>
+<P>
+<H2><A NAME="update semibroken auxiliary tools; h2ph, a2p, etc.">Update semibroken auxiliary tools; h2ph, a2p, etc.</A></H2>
+<P>Kurt Starsinic is working on h2ph.  mjd has fixed bugs in a2p in the
+past.  a2p apparently doesn't work on nawk and gawk extensions.
+Graham Barr has an Include module that does h2ph work at runtime.</P>
+<P>
+<H2><A NAME="pod2html">pod2html</A></H2>
+<P>A short-term fix: pod2html generates absolute HTML links.  Make it
+generate relative links.</P>
+<P>
+<H2><A NAME="podchecker">Podchecker</A></H2>
+<P>Something like lint for Pod would be good.  Something that catches
+common errors as well as gross ones.  Brad Appleton is putting
+together something as part of his PodParser work.</P>
+<P>
+<HR>
+<H1><A NAME="tom's wishes">Tom's Wishes</A></H1>
+<P>
+<H2><A NAME="webperl">Webperl</A></H2>
+<P>Design a webperl environment that's as tightly integrated and as
+easy-to-use as Perl's current command-line environment.</P>
+<P>
+<H2><A NAME="mobile agents">Mobile agents</A></H2>
+<P>More work on a safe and secure execution environment for mobile
+agents would be neat; the Safe.pm module is a start, but there's a
+still a lot to be done in that area.  Adopt Penguin?</P>
+<P>
+<H2><A NAME="posix on nonposix">POSIX on non-POSIX</A></H2>
+<P>Standard programming constructs for non-POSIX systems would help a
+lot of programmers stuck on primitive, legacy systems.  For example,
+Microsoft still hasn't made a usable POSIX interface on their clunky
+systems, which means that standard operations such as <A HREF="../../lib/Pod/perlfunc.html#item_alarm"><CODE>alarm()</CODE></A> and
+fork(), both critical for sophisticated client-server programming,
+must both be kludged around.</P>
+<P>I'm unsure whether Tom means to emulate alarm( )and fork(), or merely
+to provide a document like perlport.pod to say which features are
+portable and which are not.</P>
+<P>
+<H2><A NAME="portable installations">Portable installations</A></H2>
+<P>Figure out a portable semi-gelled installation, that is, one without
+full paths.  Larry has said that he's thinking about this.  Ilya
+pointed out that <CODE>perllib_mangle()</CODE> is good for this.</P>
+<P>
+<HR>
+<H1><A NAME="win32 stuff">Win32 Stuff</A></H1>
+<P>
+<H2><A NAME="rename new headers to be consistent with the rest">Rename new headers to be consistent with the rest</A></H2>
+<P>
+<H2><A NAME="sort out the spawnvp() mess">Sort out the <CODE>spawnvp()</CODE> mess</A></H2>
+<P>
+<H2><A NAME="work out dll versioning">Work out DLL versioning</A></H2>
+<P>
+<H2><A NAME="stylecheck">Style-check</A></H2>
+<P>
+<HR>
+<H1><A NAME="would be nice to have">Would be nice to have</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_pack_%22%28stuff%29%2A%22"><CODE>pack &quot;(stuff)*&quot;</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Contiguous_bitfields_in_pack%2Funpack">Contiguous bitfields in pack/unpack</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_lexperl">lexperl</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Bundled_perl_preprocessor">Bundled perl preprocessor</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Use_posix_calls_internally_where_possible">Use posix calls internally where possible</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_format">format BOTTOM</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%2Di_rename_file_only_when_successfully_changed">-i rename file only when successfully changed</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_All_ARGV_input_should_act_like_%3C%3E">All ARGV input should act like &lt;&gt;</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_report_HANDLE_%5Bformats%5D%2E">report HANDLE [formats].</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_support_in_perlmain_to_rerun_debugger">support in perlmain to rerun debugger</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_lvalue_functions">lvalue functions</A></STRONG><BR>
+<DD>
+Tuomas Lukka, on behalf of the PDL project, greatly desires this and
+Ilya has a patch for it (probably against an older version of Perl).
+Tuomas points out that what PDL really wants is lvalue <EM>methods</EM>,
+not just subs.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="possible pragmas">Possible pragmas</A></H1>
+<P>
+<H2><A NAME="'less'">'less'</A></H2>
+<P>(use less memory, CPU)</P>
+<P>
+<HR>
+<H1><A NAME="optimizations">Optimizations</A></H1>
+<P>
+<H2><A NAME="constant function cache">constant function cache</A></H2>
+<P>
+<H2><A NAME="foreach(reverse...)"><CODE>foreach(reverse...)</CODE></A></H2>
+<P>
+<H2><A NAME="cache eval tree">Cache eval tree</A></H2>
+<P>Unless lexical outer scope used (mark in &amp;compiling?).</P>
+<P>
+<H2><A NAME="rcatmaybe">rcatmaybe</A></H2>
+<P>
+<H2><A NAME="shrink opcode tables">Shrink opcode tables</A></H2>
+<P>Via multiple implementations selected in peep.</P>
+<P>
+<H2><A NAME="cache hash value">Cache hash value</A></H2>
+<P>Not a win, according to Guido.</P>
+<P>
+<H2><A NAME="optimize away @_ where possible">Optimize away @_ where possible</A></H2>
+<P>
+<H2><A NAME="optimize sort by { $a <=> $b }">Optimize sort by { $a &lt;=&gt; $b }</A></H2>
+<P>Greg Bacon added several more sort optimizations.  These have
+made it into 5.005_55, thanks to Hans Mulder.</P>
+<P>
+<H2><A NAME="rewrite regexp parser for better integrated optimization">Rewrite regexp parser for better integrated optimization</A></H2>
+<P>The regexp parser was rewritten for 5.005.  Ilya's the regexp guru.</P>
+<P>
+<HR>
+<H1><A NAME="vague possibilities">Vague possibilities</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_ref_function_in_list_context">ref function in list context</A></STRONG><BR>
+<DD>
+This seems impossible to do without substantially breaking code.
+<P></P>
+<DT><STRONG><A NAME="item_make_tr%2F%2F%2F_return_histogram_in_list_context%">make tr/// return histogram in list context?</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Loop_control_on_do%7B%7D_et_al">Loop control on do{} et al</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Explicit_switch_statements">Explicit switch statements</A></STRONG><BR>
+<DD>
+Nobody has yet managed to come up with a switch syntax that would
+allow for mixed hash, constant, regexp checks.  Submit implementation
+with syntax, please.
+<P></P>
+<DT><STRONG><A NAME="item_compile_to_real_threaded_code">compile to real threaded code</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_structured_types">structured types</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Modifiable_%241_et_al">Modifiable $1 et al</A></STRONG><BR>
+<DD>
+The intent is for this to be a means of editing the matched portions of
+the target string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="to do or not to do">To Do Or Not To Do</A></H1>
+<P>These are things that have been discussed in the past and roundly
+criticized for being of questionable value.</P>
+<P>
+<H2><A NAME="making my() work on package variables">Making <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A> work on ``package'' variables</A></H2>
+<P>Being able to say my($Foo::Bar), something that sounds ludicrous and
+the 5.6 pumpking has mocked.</P>
+<P>
+<H2><A NAME="or testing defined not truth">``or'' testing defined not truth</A></H2>
+<P>We tell people that <CODE>||</CODE> can be used to give a default value to a
+variable:</P>
+<PRE>
+    $children = shift || 5;             # default is 5 children</PRE>
+<P>which is almost (but not):</P>
+<PRE>
+    $children = shift;
+    $children = 5 unless $children;</PRE>
+<P>but if the first argument was given and is ``0'', then it will be
+considered false by <CODE>||</CODE> and <CODE>5</CODE> used instead.  Really we want
+an <CODE>||</CODE>-like operator that behaves like:</P>
+<PRE>
+    $children = shift;
+    $children = 5 unless defined $children;</PRE>
+<P>Namely, a <CODE>||</CODE> that tests defined-ness rather than truth.  One was
+discussed, and a patch submitted, but the objections were many.  While
+there were objections, many still feel the need.  At least it was
+decided that <CODE>??</CODE> is the best name for the operator.</P>
+<P>
+<H2><A NAME="dynamic lexicals">``dynamic'' lexicals</A></H2>
+<PRE>
+  my $x;
+  sub foo {
+    local $x;
+  }</PRE>
+<P>Localizing, as Tim Bunce points out, is a separate concept from
+whether the variable is global or lexical.  Chip Salzenberg had
+an implementation once, but Larry thought it had potential to
+confuse.</P>
+<P>
+<H2><A NAME="classbased, rather than packagebased lexicals">``class''-based, rather than package-based ``lexicals''</A></H2>
+<P>This is like what the Alias module provides, but the variables would
+be lexicals reserved by perl at compile-time, which really are indices
+pointing into the pseudo-hash object visible inside every method so
+declared.</P>
+<P>
+<HR>
+<H1><A NAME="threading">Threading</A></H1>
+<P>
+<H2><A NAME="modules">Modules</A></H2>
+<P>Which of the standard modules are thread-safe?  Which CPAN modules?
+How easy is it to fix those non-safe modules?</P>
+<P>
+<H2><A NAME="testing">Testing</A></H2>
+<P>Threading is still experimental.  Every reproducible bug identifies
+something else for us to fix.  Find and submit more of these problems.</P>
+<P>
+<H2><A NAME="$autoload">$AUTOLOAD</A></H2>
+<P>
+<H2><A NAME="exit/die">exit/die</A></H2>
+<P>Consistent semantics for exit/die in threads.</P>
+<P>
+<H2><A NAME="external threads">External threads</A></H2>
+<P>Better support for externally created threads.</P>
+<P>
+<H2><A NAME="thread::pool">Thread::Pool</A></H2>
+<P>
+<H2><A NAME="threadsafety">thread-safety</A></H2>
+<P>Spot-check globals like statcache and global GVs for thread-safety.
+``<STRONG>Part done</STRONG>'', says Sarathy.</P>
+<P>
+<H2><A NAME="perthread gvs">Per-thread GVs</A></H2>
+<P>According to Sarathy, this would make @_ be the same in threaded
+and non-threaded, as well as helping solve problems like filehandles
+(the same filehandle currently cannot be used in two threads).</P>
+<P>
+<HR>
+<H1><A NAME="compiler">Compiler</A></H1>
+<P>
+<H2><A NAME="optimization">Optimization</A></H2>
+<P>The compiler's back-end code-generators for creating bytecode or
+compilable C code could use optimization work.</P>
+<P>
+<H2><A NAME="byteperl">Byteperl</A></H2>
+<P>Figure out how and where byteperl will be built for the various
+platforms.</P>
+<P>
+<H2><A NAME="precompiled modules">Precompiled modules</A></H2>
+<P>Save byte-compiled modules on disk.</P>
+<P>
+<H2><A NAME="executables">Executables</A></H2>
+<P>Auto-produce executable.</P>
+<P>
+<H2><A NAME="typed lexicals">Typed lexicals</A></H2>
+<P>Typed lexicals should affect B::CC::load_pad.</P>
+<P>
+<H2><A NAME="win32">Win32</A></H2>
+<P>Workarounds to help Win32 dynamic loading.</P>
+<P>
+<H2><A NAME="end blocks">END blocks</A></H2>
+<P>END blocks need saving in compiled output, now that CHECK blocks
+are available.</P>
+<P>
+<H2><A NAME="_autoload">_AUTOLOAD</A></H2>
+<P>_AUTOLOAD prodding.</P>
+<P>
+<H2><A NAME="comppadlist">comppadlist</A></H2>
+<P>Fix comppadlist (names in comppad_name can have fake SvCUR
+from where newASSIGNOP steals the field).</P>
+<P>
+<H2><A NAME="cached compilation">Cached compilation</A></H2>
+<P>Can we install modules as bytecode?</P>
+<P>
+<HR>
+<H1><A NAME="recently finished tasks">Recently Finished Tasks</A></H1>
+<P>
+<H2><A NAME="figure a way out of $^(capital letter)">Figure a way out of $^(capital letter)</A></H2>
+<P>Figure out a clean way to extend $^(capital letter) beyond
+the 26 alphabets.  (${^WORD} maybe?)</P>
+<P>Mark-Jason Dominus sent a patch which went into 5.005_56.</P>
+<P>
+<H2><A NAME="filenames">Filenames</A></H2>
+<P>Keep filenames in the distribution and in the standard module set
+be 8.3 friendly where feasible.  Good luck changing the standard
+modules, though.</P>
+<P>
+<H2><A NAME="foreign lines">Foreign lines</A></H2>
+<P>Perl should be more generous in accepting foreign line terminations.
+Mostly <STRONG>done</STRONG> in 5.005.</P>
+<P>
+<H2><A NAME="namespace cleanup">Namespace cleanup</A></H2>
+<PRE>
+    symbol-space: &quot;pl_&quot; prefix for all global vars
+                  &quot;Perl_&quot; prefix for all functions</PRE>
+<PRE>
+    CPP-space:    stop malloc()/free() pollution unless asked</PRE>
+<P>
+<H2><A NAME="isa.pm">ISA.pm</A></H2>
+<P>Rename and alter ISA.pm.  <STRONG>Done</STRONG>.  It is now base.pm.</P>
+<P>
+<H2><A NAME="gettimeofday">gettimeofday</A></H2>
+<P>See Time::HiRes.</P>
+<P>
+<H2><A NAME="autocroak">autocroak?</A></H2>
+<P>This is the Fatal.pm module, so any builtin that does
+not return success automatically die()s.  If you're feeling brave, tie
+this in with the unified exceptions scheme.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perltodo - Perl TO-DO List</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

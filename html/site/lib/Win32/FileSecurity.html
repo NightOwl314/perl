@@ -1,0 +1,275 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::FileSecurity - manage FileSecurity Discretionary Access Control Lists in perl</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::FileSecurity - manage FileSecurity Discretionary Access Control Lists in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constants">CONSTANTS</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#note:">NOTE:</A></LI>
+		<LI><A HREF="#%permisshash">%permisshash</A></LI>
+	</UL>
+
+	<LI><A HREF="#example1">EXAMPLE1</A></LI>
+	<LI><A HREF="#example2">EXAMPLE2</A></LI>
+	<LI><A HREF="#common masks from cacls and winfile">COMMON MASKS FROM CACLS AND WINFILE</A></LI>
+	<UL>
+
+		<LI><A HREF="#read">READ</A></LI>
+		<LI><A HREF="#change">CHANGE</A></LI>
+		<LI><A HREF="#add & read">ADD &amp; READ</A></LI>
+		<LI><A HREF="#full">FULL</A></LI>
+	</UL>
+
+	<LI><A HREF="#resources">RESOURCES</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#revision notes">REVISION NOTES</A></LI>
+	<LI><A HREF="#known issues / bugs">KNOWN ISSUES / BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::FileSecurity - manage FileSecurity Discretionary Access Control Lists in perl</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        use Win32::FileSecurity;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module offers control over the administration of system FileSecurity DACLs.  
+You may want to use Get and EnumerateRights to get an idea of what mask values
+correspond to what rights as viewed from File Manager.</P>
+<P>
+<HR>
+<H1><A NAME="constants">CONSTANTS</A></H1>
+<PRE>
+  DELETE, READ_CONTROL, WRITE_DAC, WRITE_OWNER,
+  SYNCHRONIZE, STANDARD_RIGHTS_REQUIRED, 
+  STANDARD_RIGHTS_READ, STANDARD_RIGHTS_WRITE,
+  STANDARD_RIGHTS_EXECUTE, STANDARD_RIGHTS_ALL,
+  SPECIFIC_RIGHTS_ALL, ACCESS_SYSTEM_SECURITY, 
+  MAXIMUM_ALLOWED, GENERIC_READ, GENERIC_WRITE,
+  GENERIC_EXECUTE, GENERIC_ALL, F, FULL, R, READ,
+  C, CHANGE</PRE>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="note:">NOTE:</A></H2>
+<P>All of the functions return FALSE (0) if they fail, unless otherwise noted.
+Errors returned via $! containing both Win32 <CODE>GetLastError()</CODE> and a text message
+indicating Win32 function that failed.</P>
+<DL>
+<DT><STRONG><A NAME="item_constant">constant( $name, $set )</A></STRONG><BR>
+<DD>
+Stores the value of named constant $name into $set.
+Same as <CODE>$set = Win32::FileSecurity::NAME_OF_CONSTANT();</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Get">Get( $filename, \%permisshash )</A></STRONG><BR>
+<DD>
+Gets the DACLs of a file or directory.
+<P></P>
+<DT><STRONG><A NAME="item_Set">Set( $filename, \%permisshash )</A></STRONG><BR>
+<DD>
+Sets the DACL for a file or directory.
+<P></P>
+<DT><STRONG><A NAME="item_EnumerateRights">EnumerateRights( $mask, \@rightslist )</A></STRONG><BR>
+<DD>
+Turns the bitmask in $mask into a list of strings in @rightslist.
+<P></P>
+<DT><STRONG><A NAME="item_MakeMask">MakeMask( qw( DELETE READ_CONTROL ) )</A></STRONG><BR>
+<DD>
+Takes a list of strings representing constants and returns a bitmasked
+integer value.
+<P></P></DL>
+<P>
+<H2><A NAME="%permisshash">%permisshash</A></H2>
+<P>Entries take the form $permisshash{USERNAME} = $mask ;</P>
+<P>
+<HR>
+<H1><A NAME="example1">EXAMPLE1</A></H1>
+<PRE>
+    # Gets the rights for all files listed on the command line.
+    use Win32::FileSecurity qw(Get EnumerateRights);
+</PRE>
+<PRE>
+
+    foreach( @ARGV ) {
+        next unless -e $_ ;
+        if ( Get( $_, \%hash ) ) {
+            while( ($name, $mask) = each %hash ) {
+                print &quot;$name:\n\t&quot;; 
+                EnumerateRights( $mask, \@happy ) ;
+                print join( &quot;\n\t&quot;, @happy ), &quot;\n&quot;;
+            }
+        }
+        else {
+            print( &quot;Error #&quot;, int( $! ), &quot;: $!&quot; ) ;
+        }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="example2">EXAMPLE2</A></H1>
+<PRE>
+    # Gets existing DACL and modifies Administrator rights
+    use Win32::FileSecurity qw(MakeMask Get Set);
+</PRE>
+<PRE>
+
+    # These masks show up as Full Control in File Manager
+    $file = MakeMask( qw( FULL ) );</PRE>
+<PRE>
+
+    $dir = MakeMask( qw(
+            FULL
+        GENERIC_ALL
+    ) );</PRE>
+<PRE>
+
+    foreach( @ARGV ) {
+        s/\\$//;
+        next unless -e;
+        Get( $_, \%hash ) ;
+        $hash{Administrator} = ( -d ) ? $dir : $file ;
+        Set( $_, \%hash ) ;
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="common masks from cacls and winfile">COMMON MASKS FROM CACLS AND WINFILE</A></H1>
+<P>
+<H2><A NAME="read">READ</A></H2>
+<PRE>
+        MakeMask( qw( FULL ) ); # for files
+        MakeMask( qw( READ GENERIC_READ GENERIC_EXECUTE ) ); # for directories</PRE>
+<P>
+<H2><A NAME="change">CHANGE</A></H2>
+<PRE>
+        MakeMask( qw( CHANGE ) ); # for files
+        MakeMask( qw( CHANGE GENERIC_WRITE GENERIC_READ GENERIC_EXECUTE ) ); # for directories</PRE>
+<P>
+<H2><A NAME="add & read">ADD &amp; READ</A></H2>
+<PRE>
+        MakeMask( qw( ADD GENERIC_READ GENERIC_EXECUTE ) ); # for directories only!</PRE>
+<P>
+<H2><A NAME="full">FULL</A></H2>
+<PRE>
+        MakeMask( qw( FULL ) ); # for files
+        MakeMask( qw( FULL  GENERIC_ALL ) ); # for directories</PRE>
+<P>
+<HR>
+<H1><A NAME="resources">RESOURCES</A></H1>
+<P><TABLE CELLSPACING=0 CELLPADDING=0><TR><TD>From Microsoft: check_sd
+<TR><TD><TD><A HREF="http://premium.microsoft.com/download/msdn/samples/2760.exe">http://premium.microsoft.com/download/msdn/samples/2760.exe</A></TABLE></P>
+<P>(thanks to Guert Schimmel at Sybase for turning me on to this one)</P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>1.03 ALPHA	97-12-14</P>
+<P>
+<HR>
+<H1><A NAME="revision notes">REVISION NOTES</A></H1>
+<OL>
+<LI><STRONG><A NAME="item_03_ALPHA_1998%2E01%2E11">03 ALPHA 1998.01.11</A></STRONG><BR>
+
+Imported diffs from 0.67 (parent) version
+<P></P>
+<LI><STRONG><A NAME="item_02_ALPHA_1997%2E12%2E14">02 ALPHA 1997.12.14</A></STRONG><BR>
+
+Pod fixes, @EXPORT list additions &lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt;
+<P>Fix unitialized vars on unknown ACLs &lt;<A HREF="mailto:jmk@exc.bybyte.de">jmk@exc.bybyte.de</A>&gt;</P>
+<P></P>
+<LI><STRONG><A NAME="item_01_ALPHA_1997%2E04%2E25">01 ALPHA 1997.04.25</A></STRONG><BR>
+
+CORE Win32 version imported from 0.66 &lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt;
+<P></P>
+<LI><STRONG><A NAME="item_67_ALPHA_1997%2E07%2E07">67 ALPHA 1997.07.07</A></STRONG><BR>
+
+Kludged bug in mapping bits to separate ACE's.  Notably, this screwed
+up CHANGE access by leaving out a delete bit in the
+<CODE>INHERIT_ONLY_ACE | OBJECT_INHERIT_ACE</CODE> Access Control Entry.
+<P>May need to rethink...</P>
+<P></P>
+<LI><STRONG><A NAME="item_66_ALPHA_1997%2E03%2E13">66 ALPHA 1997.03.13</A></STRONG><BR>
+
+Fixed bug in memory allocation check
+<P></P>
+<LI><STRONG><A NAME="item_65_ALPHA_1997%2E02%2E25">65 ALPHA 1997.02.25</A></STRONG><BR>
+
+Tested with 5.003 build 303
+<P>Added ISA exporter, and @EXPORT_OK</P>
+<P>Added F, FULL, R, READ, C, CHANGE as composite pre-built mask names.</P>
+<P>Added server\ to keys returned in hash from Get</P>
+<P>Made constants and MakeMask case insensitive (I don't know why I did that)</P>
+<P>Fixed mask comparison in ListDacl and Enumerate Rights from simple &amp; mask
+to exact bit match ! ( ( x &amp; y ) ^ x ) makes sure all bits in x
+are set in y</P>
+<P>Fixed some ``wild'' pointers</P>
+<P></P>
+<LI><STRONG><A NAME="item_60_ALPHA_1996%2E07%2E31">60 ALPHA 1996.07.31</A></STRONG><BR>
+
+Now suitable for file and directory permissions
+<P>Included ListDacl.exe in bundle for debugging</P>
+<P>Added ``intuitive'' inheritance for directories, basically functions like FM
+triggered by presence of GENERIC_ rights this may need to change</P>
+<P>see EXAMPLE2</P>
+<P>Changed from AddAccessAllowedAce to AddAce for control over inheritance</P>
+<P></P>
+<LI><STRONG><A NAME="item_51_ALPHA_1996%2E07%2E20">51 ALPHA 1996.07.20</A></STRONG><BR>
+
+Fixed memory allocation bug
+<P></P>
+<LI><STRONG><A NAME="item_50_ALPHA_1996%2E07%2E29">50 ALPHA 1996.07.29</A></STRONG><BR>
+
+Base functionality
+<P>Using AddAccessAllowedAce</P>
+<P>Suitable for file permissions</P>
+<P></P></OL>
+<P>
+<HR>
+<H1><A NAME="known issues / bugs">KNOWN ISSUES / BUGS</A></H1>
+<OL>
+<LI>
+May not work on remote drives.
+<P></P>
+<LI>
+Errors croak, don't return via $! as documented.
+</DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::FileSecurity - manage FileSecurity Discretionary Access Control Lists in perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

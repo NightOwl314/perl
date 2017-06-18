@@ -1,0 +1,1962 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::TieRegistry - Powerful and easy ways to manipulate a registry
+[on Win32 for now].</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::TieRegistry - Powerful and easy ways to manipulate a registry
+[on Win32 for now].</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the registry">The Registry</A></LI>
+		<LI><A HREF="#tied hashes documentation">Tied Hashes Documentation</A></LI>
+		<UL>
+
+			<LI><A HREF="#examples">Examples</A></LI>
+			<LI><A HREF="#deleting items">Deleting items</A></LI>
+			<LI><A HREF="#storing items">Storing items</A></LI>
+			<LI><A HREF="#more examples">More examples</A></LI>
+		</UL>
+
+		<LI><A HREF="#objects documentation">Objects Documentation</A></LI>
+		<LI><A HREF="#exports [use and import()]">Exports [<A HREF="../../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> and <A HREF="../../../lib/Pod/perlfunc.html#item_import"><CODE>import()</CODE></A>]</A></LI>
+		<UL>
+
+			<LI><A HREF="#specifying constants in your perl code">Specifying constants in your Perl code</A></LI>
+		</UL>
+
+	</UL>
+
+	<LI><A HREF="#summary">SUMMARY</A></LI>
+	<UL>
+
+		<LI><A HREF="#objects summary">Objects Summary</A></LI>
+		<UL>
+
+			<LI><A HREF="#other useful methods">Other Useful Methods</A></LI>
+		</UL>
+
+		<LI><A HREF="#tied hashes summary">Tied Hashes Summary</A></LI>
+		<UL>
+
+			<LI><A HREF="#opening keys">Opening keys</A></LI>
+			<LI><A HREF="#reading values">Reading values</A></LI>
+			<LI><A HREF="#setting values">Setting values</A></LI>
+			<LI><A HREF="#adding keys">Adding keys</A></LI>
+			<LI><A HREF="#listing all subkeys and values">Listing all subkeys and values</A></LI>
+			<LI><A HREF="#deleting values or keys with no subkeys">Deleting values or keys with no subkeys</A></LI>
+			<LI><A HREF="#closing keys">Closing keys</A></LI>
+		</UL>
+
+		<LI><A HREF="#tie::registry">Tie::Registry</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#future directions">FUTURE DIRECTIONS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::TieRegistry - Powerful and easy ways to manipulate a registry
+[on Win32 for now].</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32::TieRegistry 0.20 ( UseOptionName=&gt;UseOptionValue[,...] );</PRE>
+<PRE>
+  $Registry-&gt;SomeMethodCall(arg1,...);</PRE>
+<PRE>
+  $subKey= $Registry-&gt;{&quot;Key\\SubKey\\&quot;};
+  $valueData= $Registry-&gt;{&quot;Key\\SubKey\\\\ValueName&quot;};
+  $Registry-&gt;{&quot;Key\\SubKey\\&quot;}= { &quot;NewSubKey&quot; =&gt; {...} };
+  $Registry-&gt;{&quot;Key\\SubKey\\\\ValueName&quot;}= &quot;NewValueData&quot;;
+  $Registry-&gt;{&quot;\\ValueName&quot;}= [ pack(&quot;fmt&quot;,$data), REG_DATATYPE ];</PRE>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+  use Win32::TieRegistry( Delimiter=&gt;&quot;#&quot;, ArrayValues=&gt;0 );
+  $pound= $Registry-&gt;Delimiter(&quot;/&quot;);
+  $diskKey= $Registry-&gt;{&quot;LMachine/System/Disk/&quot;}
+    or  die &quot;Can't read LMachine/System/Disk key: $^E\n&quot;;
+  $data= $key-&gt;{&quot;/Information&quot;}
+    or  die &quot;Can't read LMachine/System/Disk//Information value: $^E\n&quot;;
+  $remoteKey= $Registry-&gt;{&quot;//ServerA/LMachine/System/&quot;}
+    or  die &quot;Can't read //ServerA/LMachine/System/ key: $^E\n&quot;;
+  $remoteData= $remoteKey-&gt;{&quot;Disk//Information&quot;}
+    or  die &quot;Can't read ServerA's System/Disk//Information value: $^E\n&quot;;
+  foreach $entry (  keys(%$diskKey)  ) {
+      ...
+  }
+  foreach $subKey (  $diskKey-&gt;SubKeyNames  ) {
+      ...
+  }
+  $diskKey-&gt;AllowSave( 1 );
+  $diskKey-&gt;RegSaveKey( &quot;C:/TEMP/DiskReg&quot;, [] );</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <EM>Win32::TieRegistry</EM> module lets you manipulate the Registry
+via objects [as in ``object oriented''] or via tied hashes.  But
+you will probably mostly use a combination reference, that is, a
+reference to a tied hash that has also been made an object so that
+you can mix both access methods [as shown above].</P>
+<P>If you did not get this module as part of <EM>libwin32</EM>, you might
+want to get a recent version of <EM>libwin32</EM> from CPAN which should
+include this module and the <EM>Win32API::Registry</EM> module that it
+uses.</P>
+<P>Skip to the <EM>SUMMARY</EM> section if you just want to dive in and start
+using the Registry from Perl.</P>
+<P>Accessing and manipulating the registry is extremely simple using
+<EM>Win32::TieRegistry</EM>.  A single, simple expression can return
+you almost any bit of information stored in the Registry.
+<EM>Win32::TieRegistry</EM> also gives you full access to the ``raw''
+underlying API calls so that you can do anything with the Registry
+in Perl that you could do in C.  But the ``simple'' interface has
+been carefully designed to handle almost all operations itself
+without imposing arbitrary limits while providing sensible
+defaults so you can list only the parameters you care about.</P>
+<P>But first, an overview of the Registry itself.</P>
+<P>
+<H2><A NAME="the registry">The Registry</A></H2>
+<P>The Registry is a forest:  a collection of several tree structures.
+The root of each tree is a key.  These root keys are identified by
+predefined constants whose names start with ``HKEY_''.  Although all
+keys have a few attributes associated with each [a class, a time
+stamp, and security information], the most important aspect of keys
+is that each can contain subkeys and can contain values.</P>
+<P>Each subkey has a name:  a string which cannot be blank and cannot
+contain the delimiter character [backslash: <CODE>'\\'</CODE>] nor nul
+[<CODE>'\0'</CODE>].  Each subkey is also a key and so can contain subkeys
+and values [and has a class, time stamp, and security information].</P>
+<P>Each value has a name:  a string which &can; be blank and &can;
+contain the delimiter character [backslash: <CODE>'\\'</CODE>] and any
+character except for null, <CODE>'\0'</CODE>.  Each value also has data
+associated with it.  Each value's data is a contiguous chunk of
+bytes, which is exactly what a Perl string value is so Perl
+strings will usually be used to represent value data.</P>
+<P>Each value also has a data type which says how to interpret the
+value data.  The primary data types are:</P>
+<DL>
+<DT><STRONG><A NAME="item_REG_SZ">REG_SZ</A></STRONG><BR>
+<DD>
+A null-terminated string.
+<P></P>
+<DT><STRONG><A NAME="item_REG_EXPAND_SZ">REG_EXPAND_SZ</A></STRONG><BR>
+<DD>
+A null-terminated string which contains substrings consisting of a
+percent sign [<CODE>'%'</CODE>], an environment variable name, then a percent
+sign, that should be replaced with the value associate with that
+environment variable.  The system does <EM>not</EM> automatically do this
+substitution.
+<P></P>
+<DT><STRONG><A NAME="item_REG_BINARY">REG_BINARY</A></STRONG><BR>
+<DD>
+Some arbitrary binary value.  You can think of these as being
+``packed'' into a string.
+<P>If your system has the <EM>SetDualVar</EM> module installed,
+the <A HREF="#item_DualBinVals"><CODE>DualBinVals()</CODE></A> option wasn't turned off, and you
+fetch a <A HREF="#item_REG_BINARY"><CODE>REG_BINARY</CODE></A> value of 4 bytes or fewer, then
+you can use the returned value in a numeric context to
+get at the ``unpacked'' numeric value.  See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A>
+for more information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_REG_MULTI_SZ">REG_MULTI_SZ</A></STRONG><BR>
+<DD>
+Several null-terminated strings concatenated together with an
+extra trailing <CODE>'\0'</CODE> at the end of the list.  Note that the list
+can include empty strings so use the value's length to determine
+the end of the list, not the first occurrence of <CODE>'\0\0'</CODE>.
+It is best to set the <A HREF="#item_SplitMultis"><CODE>SplitMultis()</CODE></A> option so <EM>Win32::TieRegistry</EM>
+will split these values into an array of strings for you.
+<P></P>
+<DT><STRONG><A NAME="item_REG_DWORD">REG_DWORD</A></STRONG><BR>
+<DD>
+A long [4-byte] integer value.  These values are expected either
+packed into a 4-character string or as a hex string of &more than;
+4 characters [but <EM>not</EM> as a numeric value, unfortunately, as there is
+no sure way to tell a numeric value from a packed 4-byte string that
+just happens to be a string containing a valid numeric value].
+<P>How such values are returned depends on the <A HREF="#item_DualBinVals"><CODE>DualBinVals()</CODE></A> and
+<A HREF="#item_DWordsToHex"><CODE>DWordsToHex()</CODE></A> options.  See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> for details.</P>
+<P></P></DL>
+<P>In the underlying Registry calls, most places which take a
+subkey name also allow you to pass in a subkey ``path'' -- a
+string of several subkey names separated by the delimiter
+character, backslash [<CODE>'\\'</CODE>].  For example, doing
+<CODE>RegOpenKeyEx(HKEY_LOCAL_MACHINE,&quot;SYSTEM\\DISK&quot;,...)</CODE> is much
+like opening the <CODE>&quot;SYSTEM&quot;</CODE> subkey of <CODE>HKEY_LOCAL_MACHINE</CODE>,
+then opening its <CODE>&quot;DISK&quot;</CODE> subkey, then closing the <CODE>&quot;SYSTEM&quot;</CODE>
+subkey.</P>
+<P>All of the <EM>Win32::TieRegistry</EM> features allow you to use your
+own delimiter in place of the system's delimiter, [<CODE>'\\'</CODE>].  In
+most of our examples we will use a forward slash [<CODE>'/'</CODE>] as our
+delimiter as it is easier to read and less error prone to use when
+writing Perl code since you have to type two backslashes for each
+backslash you want in a string.  Note that this is true even when
+using single quotes -- <CODE>'\\HostName\LMachine\'</CODE> is an invalid
+string and must be written as <CODE>'\\\\HostName\\LMachine\\'</CODE>.</P>
+<P>You can also connect to the registry of other computers on your
+network.  This will be discussed more later.</P>
+<P>Although the Registry does not have a single root key, the
+<EM>Win32::TieRegistry</EM> module creates a virtual root key for you
+which has all of the <EM>HKEY_*</EM> keys as subkeys.</P>
+<P>
+<H2><A NAME="tied hashes documentation">Tied Hashes Documentation</A></H2>
+<P>Before you can use a tied hash, you must create one.  One way to
+do that is via:</P>
+<PRE>
+    use Win32::TieRegistry ( TiedHash =&gt; '%RegHash' );</PRE>
+<P>which exports a <CODE>%RegHash</CODE> variable into your package and ties it
+to the virtual root key of the Registry.  An alternate method is:</P>
+<PRE>
+    my %RegHash;
+    use Win32::TieRegistry ( TiedHash =&gt; \%RegHash );</PRE>
+<P>There are also several ways you can tie a hash variable to any
+other key of the Registry, which are discussed later.</P>
+<P>Note that you will most likely use <CODE>$Registry</CODE> instead of using
+a tied hash.  <CODE>$Registry</CODE> is a reference to a hash that has
+been tied to the virtual root of your computer's Registry [as if,
+<CODE>$Registry= \%RegHash</CODE>].  So you would use <CODE>$Registry-&gt;{Key}</CODE>
+rather than <CODE>$RegHash{Key}</CODE> and use <CODE>keys %{$Registry}</CODE> rather
+than <CODE>keys %RegHash</CODE>, for example.</P>
+<P>For each hash which has been tied to a Registry key, the Perl
+<A HREF="../../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A> function will return a list containing the name of each
+of the key's subkeys with a delimiter character appended to it and
+containing the name of each of the key's values with a delimiter
+prepended to it.  For example:</P>
+<PRE>
+    keys( %{ $Registry-&gt;{&quot;HKEY_CLASSES_ROOT\\batfile\\&quot;} } )</PRE>
+<P>might yield the following list value:</P>
+<PRE>
+    ( &quot;DefaultIcon\\&quot;,  # The subkey named &quot;DefaultIcon&quot;
+      &quot;shell\\&quot;,        # The subkey named &quot;shell&quot;
+      &quot;shellex\\&quot;,      # The subkey named &quot;shellex&quot;
+      &quot;\\&quot;,             # The default value [named &quot;&quot;]
+      &quot;\\EditFlags&quot; )   # The value named &quot;EditFlags&quot;</PRE>
+<P>For the virtual root key, short-hand subkey names are used as
+shown below.  You can use the short-hand name, the regular
+<EM>HKEY_*</EM> name, or any numeric value to access these keys, but
+the short-hand names are all that will be returned by the <A HREF="../../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A>
+function.</P>
+<DL>
+<DT><STRONG><A NAME="item_%22Classes%22_for_HKEY_CLASSES_ROOT">``Classes'' for HKEY_CLASSES_ROOT</A></STRONG><BR>
+<DD>
+Contains mappings between file name extensions and the uses
+for such files along with configuration information for COM
+[MicroSoft's Common Object Model] objects.  Usually a link to
+the <CODE>&quot;SOFTWARE\\Classes&quot;</CODE> subkey of the <CODE>HKEY_LOCAL_MACHINE</CODE>
+key.
+<P></P>
+<DT><STRONG><A NAME="item_%22CUser%22_for_HKEY_CURRENT_USER">``CUser'' for HKEY_CURRENT_USER</A></STRONG><BR>
+<DD>
+Contains information specific to the currently logged-in user.
+Mostly software configuration information.  Usually a link to
+a subkey of the <CODE>HKEY_USERS</CODE> key.
+<P></P>
+<DT><STRONG><A NAME="item_%22LMachine%22_for_HKEY_LOCAL_MACHINE">``LMachine'' for HKEY_LOCAL_MACHINE</A></STRONG><BR>
+<DD>
+Contains all manner of information about the computer.
+<P></P>
+<DT><STRONG><A NAME="item_%22Users%22_for_HKEY_USERS">``Users'' for HKEY_USERS</A></STRONG><BR>
+<DD>
+Contains one subkey, <CODE>&quot;.DEFAULT&quot;</CODE>, which gets copied to a new
+subkey whenever a new user is added.  Also contains a subkey for
+each user of the system, though only those for active users
+[usually only one] are loaded at any given time.
+<P></P>
+<DT><STRONG><A NAME="item_%22PerfData%22_for_HKEY_PERFORMANCE_DATA">``PerfData'' for HKEY_PERFORMANCE_DATA</A></STRONG><BR>
+<DD>
+Used to access data about system performance.  Access via this key
+is ``special'' and all but the most carefully constructed calls will
+fail, usually with <CODE>ERROR_INSUFFICIENT_BUFFER</CODE>.  For example, you
+can't enumerate key names without also enumerating values which
+require huge buffers but the exact buffer size required cannot be
+determined beforehand because <CODE>RegQueryInfoKey()</CODE> &always; fails
+with <CODE>ERROR_INSUFFICIENT_BUFFER</CODE> for <CODE>HKEY_PERFORMANCE_DATA</CODE> no
+matter how it is called.  So it is currently not very useful to
+tie a hash to this key.  You can use it to create an object to use
+for making carefully constructed calls to the underlying Reg*()
+routines.
+<P></P>
+<DT><STRONG><A NAME="item_%22CConfig%22_for_HKEY_CURRENT_CONFIG">``CConfig'' for HKEY_CURRENT_CONFIG</A></STRONG><BR>
+<DD>
+Contains minimal information about the computer's current
+configuration that is required very early in the boot process.
+For example, setting for the display adapter such as screen
+resolution and refresh rate are found in here.
+<P></P>
+<DT><STRONG><A NAME="item_%22DynData%22_for_HKEY_DYN_DATA">``DynData'' for HKEY_DYN_DATA</A></STRONG><BR>
+<DD>
+Dynamic data.  We have found no documentation for this key.
+<P></P></DL>
+<P>A tied hash is much like a regular hash variable in Perl -- you give
+it a key string inside braces, [<CODE>{</CODE> and <CODE>}</CODE>], and it gives you
+back a value [or lets you set a value].  For <EM>Win32::TieRegistry</EM>
+hashes, there are two types of values that will be returned.</P>
+<DL>
+<DT><STRONG><A NAME="item_SubKeys">SubKeys</A></STRONG><BR>
+<DD>
+If you give it a string which represents a subkey, then it will
+give you back a reference to a hash which has been tied to that
+subkey.  It can't return the hash itself, so it returns a
+reference to it.  It also blesses that reference so that it is
+also an object so you can use it to call method functions.
+<P></P>
+<DT><STRONG><A NAME="item_Values">Values</A></STRONG><BR>
+<DD>
+If you give it a string which is a value name, then it will give
+you back a string which is the data for that value.  Alternately,
+you can request that it give you both the data value string and
+the data value type [we discuss how to request this later].  In
+this case, it would return a reference to an array where the value
+data string is element <CODE>[0]</CODE> and the value data type is element
+<CODE>[1]</CODE>.
+<P></P></DL>
+<P>The key string which you use in the tied hash must be interpreted
+to determine whether it is a value name or a key name or a path
+that combines several of these or even other things.  There are
+two simple rules that make this interpretation easy and
+unambiguous:</P>
+<PRE>
+    Put a delimiter after each key name.
+    Put a delimiter in front of each value name.</PRE>
+<P>Exactly how the key string will be intepreted is governed by the
+following cases, in the order listed.  These cases are designed
+to ``do what you mean''.  Most of the time you won't have to think
+about them, especially if you follow the two simple rules above.
+After the list of cases we give several examples which should be
+clear enough so feel free to skip to them unless you are worried
+about the details.</P>
+<DL>
+<DT><STRONG><A NAME="item_Remote_machines">Remote machines</A></STRONG><BR>
+<DD>
+If the hash is tied to the virtual root of the registry [or the
+virtual root of a remote machine's registry], then we treat hash
+key strings which start with the delimiter character specially.
+<P>If the hash key string starts with two delimiters in a row, then
+those should be immediately followed by the name of a remote
+machine whose registry we wish to connect to.  That can be
+followed by a delimiter and more subkey names, etc.  If the
+machine name is not following by anything, then a virtual root
+for the remote machine's registry is created, a hash is tied to
+it, and a reference to that hash it is returned.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Hash_key_string_starts_with_the_delimiter">Hash key string starts with the delimiter</A></STRONG><BR>
+<DD>
+If the hash is tied to a virtual root key, then the leading
+delimiter is ignored.  It should be followed by a valid Registry
+root key name [either a short-hand name like <CODE>&quot;LMachine&quot;</CODE>, an
+<EM>HKEY_*</EM> value, or a numeric value].   This alternate notation is
+allowed in order to be more consistant with the <A HREF="#item_Open"><CODE>Open()</CODE></A> method
+function.
+<P>For all other Registry keys, the leading delimiter indicates
+that the rest of the string is a value name.  The leading
+delimiter is stripped and the rest of the string [which can
+be empty and can contain more delimiters] is used as a value
+name with no further parsing.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Exact_match_with_direct_subkey_name_followed_by_de">Exact match with direct subkey name followed by delimiter</A></STRONG><BR>
+<DD>
+If you have already called the Perl <A HREF="../../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A> function on the tied
+hash [or have already called <A HREF="#item_MemberNames"><CODE>MemberNames</CODE></A> on the object] and the
+hash key string exactly matches one of the strings returned, then
+no further parsing is done.  In other words, if the key string
+exactly matches the name of a direct subkey with a delimiter
+appended, then a reference to a hash tied to that subkey is
+returned [but only if <A HREF="../../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A> or <A HREF="#item_MemberNames"><CODE>MemberNames</CODE></A> has already
+been called for that tied hash].
+<P>This is only important if you have selected a delimiter other than
+the system default delimiter and one of the subkey names contains
+the delimiter you have chosen.  This rule allows you to deal with
+subkeys which contain your chosen delimiter in their name as long
+as you only traverse subkeys one level at a time and always
+enumerate the list of members before doing so.</P>
+<P>The main advantage of this is that Perl code which recursively
+traverses a hash will work on hashes tied to Registry keys even if
+a non-default delimiter has been selected.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Hash_key_string_contains_two_delimiters_in_a_row">Hash key string contains two delimiters in a row</A></STRONG><BR>
+<DD>
+If the hash key string contains two [or more] delimiters in a row,
+then the string is split between the first pair of delimiters.
+The first part is interpreted as a subkey name or a path of subkey
+names separated by delimiters and with a trailing delimiter.  The
+second part is interpreted as a value name with one leading
+delimiter [any extra delimiters are considered part of the value
+name].
+<P></P>
+<DT><STRONG><A NAME="item_Hash_key_string_ends_with_a_delimiter">Hash key string ends with a delimiter</A></STRONG><BR>
+<DD>
+If the key string ends with a delimiter, then it is treated
+as a subkey name or path of subkey names separated by delimiters.
+<P></P>
+<DT><STRONG><A NAME="item_Hash_key_string_contains_a_delimiter">Hash key string contains a delimiter</A></STRONG><BR>
+<DD>
+If the key string contains a delimiter, then it is split after
+the last delimiter.  The first part is treated as a subkey name or
+path of subkey names separated by delimiters.  The second part
+is ambiguous and is treated as outlined in the next item.
+<P></P>
+<DT><STRONG><A NAME="item_Hash_key_string_contains_no_delimiters">Hash key string contains no delimiters</A></STRONG><BR>
+<DD>
+If the hash key string contains no delimiters, then it is ambiguous.
+<P>If you are reading from the hash [fetching], then we first use the
+key string as a value name.  If there is a value with a matching
+name in the Registry key which the hash is tied to, then the value
+data string [and possibly the value data type] is returned.
+Otherwise, we retry by using the hash key string as a subkey name.
+If there is a subkey with a matching name, then we return a
+reference to a hash tied to that subkey.  Otherwise we return
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>.</P>
+<P>If you are writing to the hash [storing], then we use the key
+string as a subkey name only if the value you are storing is a
+reference to a hash value.  Otherwise we use the key string as
+a value name.</P>
+<P></P></DL>
+<P>
+<H3><A NAME="examples">Examples</A></H3>
+<P>Here are some examples showing different ways of accessing Registry
+information using references to tied hashes:</P>
+<DL>
+<DT><STRONG><A NAME="item_Canonical_value_fetch">Canonical value fetch</A></STRONG><BR>
+<DD>
+<PRE>
+    $tip18= $Registry-&gt;{&quot;HKEY_LOCAL_MACHINE\\Software\\Microsoft\\&quot;
+               . 'Windows\\CurrentVersion\\Explorer\\Tips\\\\18'};</PRE>
+<P>Should return the text of important tip number 18.  Note that two
+backslashes, <CODE>&quot;\\&quot;</CODE>, are required to get a single backslash into
+a Perl double-quoted or single-qouted string.  Note that <CODE>&quot;\\&quot;</CODE>
+is appended to each key name [<CODE>&quot;HKEY_LOCAL_MACHINE&quot;</CODE> through
+<CODE>&quot;Tips&quot;</CODE>] and <CODE>&quot;\\&quot;</CODE> is prepended to the value name, <CODE>&quot;18&quot;</CODE>.</P>
+<DT><STRONG><A NAME="item_Changing_your_delimiter">Changing your delimiter</A></STRONG><BR>
+<DD>
+<PRE>
+    $Registry-&gt;Delimiter(&quot;/&quot;);
+    $tip18= $Registry-&gt;{&quot;HKEY_LOCAL_MACHINE/Software/Microsoft/&quot;
+               . 'Windows/CurrentVersion/Explorer/Tips//18'};</PRE>
+<P>This usually makes things easier to read when working in Perl.
+All remaining examples will assume the delimiter has been changed
+as above.</P>
+<DT><STRONG><A NAME="item_Using_intermediate_keys">Using intermediate keys</A></STRONG><BR>
+<DD>
+<PRE>
+    $ms= $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot;};
+    $tips= $ms-&gt;{&quot;Windows/CurrentVersion/Explorer/Tips/&quot;};
+    $tip18= $winlogon-&gt;{&quot;/18&quot;};</PRE>
+<P>Same as above but opens more keys into the Registry which lets you
+efficiently re-access those intermediate keys.  This is slightly
+less efficient if you never reuse those intermediate keys.</P>
+<DT><STRONG><A NAME="item_Chaining_in_a_single_statement">Chaining in a single statement</A></STRONG><BR>
+<DD>
+<PRE>
+    $tip18= $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/Tips/&quot;}-&gt;{&quot;/18&quot;};</PRE>
+<P>Like above, this creates intermediate key objects then uses
+them to access other data.  Once this statement finishes, the
+intermediate key objects are destroyed.  Several handles into
+the Registry are opened and closed by this statement so it is
+less efficient but there are times when this will be useful.</P>
+<DT><STRONG><A NAME="item_Even_less_efficient_example_of_chaining">Even less efficient example of chaining</A></STRONG><BR>
+<DD>
+<PRE>
+    $tip18= $Registry-&gt;{&quot;LMachine/Software/Microsoft&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/Tips&quot;}-&gt;{&quot;/18&quot;};</PRE>
+<P>Because we left off the trailing delimiters, <EM>Win32::TieRegistry</EM>
+doesn't know whether final names, <CODE>&quot;Microsoft&quot;</CODE> and <CODE>&quot;Tips&quot;</CODE>,
+are subkey names or value names.  So this statement ends up
+executing the same code as the next one.</P>
+<DT><STRONG><A NAME="item_What_the_above_really_does">What the above really does</A></STRONG><BR>
+<DD>
+<PRE>
+    $tip18= $Registry-&gt;{&quot;LMachine/Software/&quot;}-&gt;{&quot;Microsoft&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/&quot;}-&gt;{&quot;Tips&quot;}-&gt;{&quot;/18&quot;};</PRE>
+<P>With more chains to go through, more temporary objects are created
+and later destroyed than in our first chaining example.  Also,
+when <CODE>&quot;Microsoft&quot;</CODE> is looked up, <EM>Win32::TieRegistry</EM> first
+tries to open it as a value and fails then tries it as a subkey.
+The same is true for when it looks up <CODE>&quot;Tips&quot;</CODE>.</P>
+<DT><STRONG><A NAME="item_Getting_all_of_the_tips">Getting all of the tips</A></STRONG><BR>
+<DD>
+<PRE>
+    $tips= $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/Tips/&quot;}
+      or  die &quot;Can't find the Windows tips: $^E\n&quot;;
+    foreach(  keys %$tips  ) {
+        print &quot;$_: &quot;, $tips-&gt;{$_}, &quot;\n&quot;;
+    }</PRE>
+<P>First notice that we actually check for failure for the first
+time.  We are assuming that the <CODE>&quot;Tips&quot;</CODE> key contains no subkeys. 
+Otherwise the <A HREF="../../../lib/Pod/perlfunc.html#item_print"><CODE>print</CODE></A> statement would show something like
+<CODE>&quot;Win32::TieRegistry=HASH(0xc03ebc)&quot;</CODE> for each subkey.</P>
+<P>The output from the above code will start something like:</P>
+<PRE>
+    /0: If you don't know how to do something,[...]</PRE>
+</DL>
+<P>
+<H3><A NAME="deleting items">Deleting items</A></H3>
+<P>You can use the Perl <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> function to delete a value from a
+Registry key or to delete a subkey as long that subkey contains
+no subkeys of its own.  See <A HREF="#more examples">More Examples</A>, below, for more
+information.</P>
+<P>
+<H3><A NAME="storing items">Storing items</A></H3>
+<P>You can use the Perl assignment operator [<CODE>=</CODE>] to create new
+keys, create new values, or replace values.  The values you store
+should be in the same format as the values you would fetch from a
+tied hash.  For example, you can use a single assignment statement
+to copy an entire Registry tree.  The following statement:</P>
+<PRE>
+    $Registry-&gt;{&quot;LMachine/Software/Classes/Tie_Registry/&quot;}=
+      $Registry-&gt;{&quot;LMachine/Software/Classes/batfile/&quot;};</PRE>
+<P>creates a <CODE>&quot;Tie_Registry&quot;</CODE> subkey under the <CODE>&quot;Software\\Classes&quot;</CODE>
+subkey of the <CODE>HKEY_LOCAL_MACHINE</CODE> key.  Then it populates it
+with copies of all of the subkeys and values in the <CODE>&quot;batfile&quot;</CODE>
+subkey and all of its subkeys.  Note that you need to have
+called <A HREF="#item_ArrayValues"><CODE>$Registry-&gt;ArrayValues(1)</CODE></A> for the proper value data
+type information to be copied.  Note also that this release of
+<EM>Win32::TieRegistry</EM> does not copy key attributes such as class
+name and security information [this is planned for a future release].</P>
+<P>The following statement creates a whole subtree in the Registry:</P>
+<PRE>
+    $Registry-&gt;{&quot;LMachine/Software/FooCorp/&quot;}= {
+        &quot;FooWriter/&quot; =&gt; {
+            &quot;/Version&quot; =&gt; &quot;4.032&quot;,
+            &quot;Startup/&quot; =&gt; {
+                &quot;/Title&quot; =&gt; &quot;Foo Writer Deluxe ][&quot;,
+                &quot;/WindowSize&quot; =&gt; [ pack(&quot;LL&quot;,$wid,$ht), &quot;REG_BINARY&quot; ],
+                &quot;/TaskBarIcon&quot; =&gt; [ &quot;0x0001&quot;, &quot;REG_DWORD&quot; ],
+            },
+            &quot;Compatibility/&quot; =&gt; {
+                &quot;/AutoConvert&quot; =&gt; &quot;Always&quot;,
+                &quot;/Default Palette&quot; =&gt; &quot;Windows Colors&quot;,
+            },
+        },
+        &quot;/License&quot;, =&gt; &quot;0123-9C8EF1-09-FC&quot;,
+    };</PRE>
+<P>Note that all but the last Registry key used on the left-hand
+side of the assignment [that is, ``LMachine/Software/'' but not
+``FooCorp/''] must already exist for this statement to succeed.</P>
+<P>By using the leading a trailing delimiters on each subkey name and
+value name, <EM>Win32::TieRegistry</EM> will tell you if you try to assign
+subkey information to a value or visa-versa.</P>
+<P>
+<H3><A NAME="more examples">More examples</A></H3>
+<DL>
+<DT><STRONG><A NAME="item_Adding_a_new_tip">Adding a new tip</A></STRONG><BR>
+<DD>
+<PRE>
+    $tips= $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/Tips/&quot;}
+      or  die &quot;Can't find the Windows tips: $^E\n&quot;;
+    $tips{'/186'}= &quot;Be very careful when making changes to the Registry!&quot;;</PRE>
+<DT><STRONG><A NAME="item_Deleting_our_new_tip">Deleting our new tip</A></STRONG><BR>
+<DD>
+<PRE>
+    $tips= $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot;}-&gt;
+              {&quot;Windows/CurrentVersion/Explorer/Tips/&quot;}
+      or  die &quot;Can't find the Windows tips: $^E\n&quot;;
+    $tip186= delete $tips{'/186'};</PRE>
+<P>Note that Perl's <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> function returns the value that was deleted.</P>
+<DT><STRONG><A NAME="item_Adding_a_new_tip_differently">Adding a new tip differently</A></STRONG><BR>
+<DD>
+<PRE>
+    $Registry-&gt;{&quot;LMachine/Software/Microsoft/&quot; .
+                &quot;Windows/CurrentVersion/Explorer/Tips//186&quot;}=
+      &quot;Be very careful when making changes to the Registry!&quot;;</PRE>
+<DT><STRONG><A NAME="item_Deleting_differently">Deleting differently</A></STRONG><BR>
+<DD>
+<PRE>
+    $tip186= delete $Registry-&gt;{&quot;LMachine/Software/Microsoft/Windows/&quot; .
+                                &quot;CurrentVersion/Explorer/Tips//186&quot;};</PRE>
+<P>Note that this only deletes the tail of what we looked up, the
+<CODE>&quot;186&quot;</CODE> value, not any of the keys listed.</P>
+<DT><STRONG><A NAME="item_Deleting_a_key">Deleting a key</A></STRONG><BR>
+<DD>
+WARNING:  The following code will delete all information about the
+current user's tip preferences.  Actually executing this command
+would probably cause the user to see the Welcome screen the next
+time they log in and may cause more serious problems.  This
+statement is shown as an example only and should not be used when
+experimenting.
+<PRE>
+    $tips= delete $Registry-&gt;{&quot;CUser/Software/Microsoft/Windows/&quot; .
+                              &quot;CurrentVersion/Explorer/Tips/&quot;};</PRE>
+<P>This deletes the <CODE>&quot;Tips&quot;</CODE> key and the values it contains.  The
+<A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> function will return a reference to a hash [not a tied
+hash] containing the value names and value data that were deleted.</P>
+<P>The information to be returned is copied from the Registry into a
+regular Perl hash before the key is deleted.  If the key has many
+subkeys, this copying could take a significant amount of memory
+and/or processor time.  So you can disable this process by calling
+the <A HREF="#item_FastDelete"><CODE>FastDelete</CODE></A> member function:</P>
+<PRE>
+    $prevSetting= $regKey-&gt;FastDelete(1);</PRE>
+<P>which will cause all subsequent delete operations via <CODE>$regKey</CODE>
+to simply return a true value if they succeed.  This optimization
+is automatically done if you use <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> in a void context.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Technical_notes_on_deleting">Technical notes on deleting</A></STRONG><BR>
+<DD>
+If you use <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> to delete a Registry key or value and use
+the return value, then <EM>Win32::TieRegistry</EM> usually looks up the
+current contents of that key or value so they can be returned if
+the deletion is successful.  If the deletion succeeds but the
+attempt to lookup the old contents failed, then the return value
+of <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> will be <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> from the failed part of the operation.
+<P></P>
+<DT><STRONG><A NAME="item_Undeleting_a_key">Undeleting a key</A></STRONG><BR>
+<DD>
+<PRE>
+    $Registry-&gt;{&quot;LMachine/Software/Microsoft/Windows/&quot; .
+                &quot;CurrentVersion/Explorer/Tips/&quot;}= $tips;</PRE>
+<P>This adds back what we just deleted.  Note that this version of
+<EM>Win32::TieRegistry</EM> will use defaults for the key attributes
+[such as class name and security] and will not restore the
+previous attributes.</P>
+<DT><STRONG><A NAME="item_Not_deleting_a_key">Not deleting a key</A></STRONG><BR>
+<DD>
+WARNING:  Actually executing the following code could cause
+serious problems.  This statement is shown as an example only and
+should not be used when experimenting.
+<PRE>
+    $res= delete $Registry-&gt;{&quot;CUser/Software/Microsoft/Windows/&quot;}
+    defined($res)  ||  die &quot;Can't delete URL key: $^E\n&quot;;</PRE>
+<P>Since the ``Windows'' key should contain subkeys, that <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A>
+statement should make no changes to the Registry, return <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>,
+and set <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> to ``Access is denied''.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Not_deleting_again">Not deleting again</A></STRONG><BR>
+<DD>
+<PRE>
+    $tips= $Registry-&gt;{&quot;CUser/Software/Microsoft/Windows/&quot; .
+                       &quot;CurrentVersion/Explorer/Tips/&quot;};
+    delete $tips;</PRE>
+<P>The Perl <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> function requires that its argument be an
+expression that ends in a hash element lookup [or hash slice],
+which is not the case here.  The <A HREF="../../../lib/Pod/perlfunc.html#item_delete"><CODE>delete</CODE></A> function doesn't
+know which hash $tips came from and so can't delete it.</P>
+</DL>
+<P>
+<H2><A NAME="objects documentation">Objects Documentation</A></H2>
+<P>The following member functions are defined for use on
+<EM>Win32::TieRegistry</EM> objects:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new</CODE></A> method creates a new <EM>Win32::TieRegistry</EM> object.
+<A HREF="#item_new"><CODE>new</CODE></A> is mostly a synonym for <A HREF="#item_Open"><CODE>Open()</CODE></A> so see <A HREF="#item_Open"><CODE>Open()</CODE></A> below for
+information on what arguments to pass in.  Examples:
+<PRE>
+    $machKey= new Win32::TieRegistry &quot;LMachine&quot;
+      or  die &quot;Can't access HKEY_LOCAL_MACHINE key: $^E\n&quot;;
+    $userKey= Win32::TieRegistry-&gt;new(&quot;CUser&quot;)
+      or  die &quot;Can't access HKEY_CURRENT_USER key: $^E\n&quot;;</PRE>
+<P>Note that calling <A HREF="#item_new"><CODE>new</CODE></A> via a reference to a tied hash returns
+a simple object, not a reference to a tied hash.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Open">Open</A></STRONG><BR>
+<DD>
+<DT><STRONG>$subKey= $key-&gt;Open( $sSubKey, $rhOptions )</STRONG><BR>
+<DD>
+The <A HREF="#item_Open"><CODE>Open</CODE></A> method opens a Registry key and returns a new
+<EM>Win32::TieRegistry</EM> object associated with that Registry key.
+If <A HREF="#item_Open"><CODE>Open</CODE></A> is called via a reference to a tied hash, then <A HREF="#item_Open"><CODE>Open</CODE></A>
+returns another reference to a tied hash.  Otherwise <A HREF="#item_Open"><CODE>Open</CODE></A>
+returns a simple object and you should then use <A HREF="#item_TiedRef"><CODE>TiedRef</CODE></A> to get
+a reference to a tied hash.
+<P><CODE>$sSubKey</CODE> is a string specifying a subkey to be opened.
+Alternately <CODE>$sSubKey</CODE> can be a reference to an array value
+containing the list of increasingly deep subkeys specifying the
+path to the subkey to be opened.</P>
+<P><CODE>$rhOptions</CODE> is an optional reference to a hash containing extra
+options.  The <A HREF="#item_Open"><CODE>Open</CODE></A> method supports two options, <CODE>&quot;Delimiter&quot;</CODE>
+and <CODE>&quot;Access&quot;</CODE>, and <CODE>$rhOptions</CODE> should have only have zero or
+more of these strings as keys.  See the ``Examples'' section below
+for more information.</P>
+<P>The <CODE>&quot;Delimiter&quot;</CODE> option specifies what string [usually a single
+character] will be used as the delimiter to be appended to subkey
+names and prepended to value names.  If this option is not specified,
+the new key [<CODE>$subKey</CODE>] inherits the delimiter of the old key
+[<CODE>$key</CODE>].</P>
+<P>The <CODE>&quot;Access&quot;</CODE> option specifies what level of access to the
+Registry key you wish to have once it has been opened.  If this
+option is not specified, the new key [<CODE>$subKey</CODE>] is opened with
+the same access level used when the old key [<CODE>$key</CODE>] was opened.
+The virtual root of the Registry pretends it was opened with
+access <CODE>KEY_READ()|KEY_WRITE()</CODE> so this is the default access when
+opening keys directory via <CODE>$Registry</CODE>.  If you don't plan on
+modifying a key, you should open it with <CODE>KEY_READ</CODE> access as
+you may not have <CODE>KEY_WRITE</CODE> access to it or some of its subkeys.</P>
+<P>If the <CODE>&quot;Access&quot;</CODE> option value is a string that starts with
+<CODE>&quot;KEY_&quot;</CODE>, then it should match &one; of the predefined access
+levels [probably <CODE>&quot;KEY_READ&quot;</CODE>, <CODE>&quot;KEY_WRITE&quot;</CODE>, or
+<CODE>&quot;KEY_ALL_ACCESS&quot;</CODE>] exported by the <EM>Win32API::Registry</EM> module.
+Otherwise, a numeric value is expected.  For maximum flexibility,
+include <CODE>use Win32::TieRegistry qw(:KEY_);</CODE>, for example, near
+the top of your script so you can specify more complicated access
+levels such as <CODE>KEY_READ()|KEY_WRITE()</CODE>.</P>
+<P>If <CODE>$sSubKey</CODE> does not begin with the delimiter [or <CODE>$sSubKey</CODE>
+is an array reference], then the path to the subkey to be opened
+will be relative to the path of the original key [<CODE>$key</CODE>].  If
+<CODE>$sSubKey</CODE> begins with a single delimiter, then the path to the
+subkey to be opened will be relative to the virtual root of the
+Registry on whichever machine the original key resides.  If
+<CODE>$sSubKey</CODE> begins with two consectutive delimiters, then those
+must be followed by a machine name which causes the <A HREF="#item_Connect"><CODE>Connect()</CODE></A>
+method function to be called.</P>
+<P>Examples:</P>
+<PRE>
+    $machKey= $Registry-&gt;Open( &quot;LMachine&quot;, {Access=&gt;KEY_READ(),Delimiter=&gt;&quot;/&quot;} )
+      or  die &quot;Can't open HKEY_LOCAL_MACHINE key: $^E\n&quot;;
+    $swKey= $machKey-&gt;Open( &quot;Software&quot; );
+    $logonKey= $swKey-&gt;Open( &quot;Microsoft/Windows NT/CurrentVersion/Winlogon/&quot; );
+    $NTversKey= $swKey-&gt;Open( [&quot;Microsoft&quot;,&quot;Windows NT&quot;,&quot;CurrentVersion&quot;] );
+    $versKey= $swKey-&gt;Open( qw(Microsoft Windows CurrentVersion) );</PRE>
+<PRE>
+    $remoteKey= $Registry-&gt;Open( &quot;//HostA/LMachine/System/&quot;, {Delimiter=&gt;&quot;/&quot;} )
+      or  die &quot;Can't connect to HostA or can't open subkey: $^E\n&quot;;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Clone">Clone</A></STRONG><BR>
+<DD>
+<DT><STRONG>$copy= $key-&gt;Clone</STRONG><BR>
+<DD>
+Creates a new object that is associated with the same Registry key
+as the invoking object.
+<P></P>
+<DT><STRONG><A NAME="item_Connect">Connect</A></STRONG><BR>
+<DD>
+<DT><STRONG>$remoteKey= $Registry-&gt;Connect( $sMachineName, $sKeyPath, $rhOptions )</STRONG><BR>
+<DD>
+The <A HREF="#item_Connect"><CODE>Connect</CODE></A> method connects to the Registry of a remote machine,
+and opens a key within it, then returns a new <EM>Win32::TieRegistry</EM>
+object associated with that remote Registry key.  If <A HREF="#item_Connect"><CODE>Connect</CODE></A>
+was called using a reference to a tied hash, then the return value
+will also be a reference to a tied hash [or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>].  Otherwise,
+if you wish to use the returned object as a tied hash [not just as
+an object], then use the <A HREF="#item_TiedRef"><CODE>TiedRef</CODE></A> method function after <A HREF="#item_Connect"><CODE>Connect</CODE></A>.
+<P><CODE>$sMachineName</CODE> is the name of the remote machine.  You don't have
+to preceed the machine name with two delimiter characters.</P>
+<P><CODE>$sKeyPath</CODE> is a string specifying the remote key to be opened.
+Alternately <CODE>$sKeyPath</CODE> can be a reference to an array value
+containing the list of increasingly deep keys specifying the path
+to the key to be opened.</P>
+<P><CODE>$rhOptions</CODE> is an optional reference to a hash containing extra
+options.  The <A HREF="#item_Connect"><CODE>Connect</CODE></A> method supports two options, <CODE>&quot;Delimiter&quot;</CODE>
+and <CODE>&quot;Access&quot;</CODE>.  See the <A HREF="#item_Open"><CODE>Open</CODE></A> method documentation for more
+information on these options.</P>
+<P><CODE>$sKeyPath</CODE> is already relative to the virtual root of the Registry
+of the remote machine.  A single leading delimiter on <CODE>sKeyPath</CODE>
+will be ignored and is not required.</P>
+<P><CODE>$sKeyPath</CODE> can be empty in which case <A HREF="#item_Connect"><CODE>Connect</CODE></A> will return an
+object representing the virtual root key of the remote Registry.
+Each subsequent use of <A HREF="#item_Open"><CODE>Open</CODE></A> on this virtual root key will call
+the system <CODE>RegConnectRegistry</CODE> function.</P>
+<P>The <A HREF="#item_Connect"><CODE>Connect</CODE></A> method can be called via any <EM>Win32::TieRegistry</EM>
+object, not just <CODE>$Registry</CODE>.  Attributes such as the desired
+level of access and the delimiter will be inherited from the
+object used but the <CODE>$sKeyPath</CODE> will always be relative to the
+virtual root of the remote machine's registry.</P>
+<P>Examples:</P>
+<PRE>
+    $remMachKey= $Registry-&gt;Connect( &quot;HostA&quot;, &quot;LMachine&quot;, {Delimiter-&gt;&quot;/&quot;} )
+      or  die &quot;Can't connect to HostA's HKEY_LOCAL_MACHINE key: $^E\n&quot;;</PRE>
+<PRE>
+    $remVersKey= $remMachKey-&gt;Connect( &quot;www.microsoft.com&quot;,
+                   &quot;LMachine/Software/Microsoft/Inetsrv/CurrentVersion/&quot;,
+                   { Access=&gt;KEY_READ, Delimiter=&gt;&quot;/&quot; } )
+      or  die &quot;Can't check what version of IIS Microsoft is running: $^E\n&quot;;</PRE>
+<PRE>
+    $remVersKey= $remMachKey-&gt;Connect( &quot;www&quot;,
+                   qw(LMachine Software Microsoft Inetsrv CurrentVersion) )
+      or  die &quot;Can't check what version of IIS we are running: $^E\n&quot;;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ObjectRef">ObjectRef</A></STRONG><BR>
+<DD>
+<DT><STRONG>$object_ref= $obj_or_hash_ref-&gt;ObjectRef</STRONG><BR>
+<DD>
+For a simple object, just returns itself [<CODE>$obj == $obj-</CODE>ObjectRef&gt;].
+<P>For a reference to a tied hash [if it is also an object], <A HREF="#item_ObjectRef"><CODE>ObjectRef</CODE></A>
+returns the simple object that the hash is tied to.</P>
+<P>This is primarilly useful when debugging since typing <CODE>x $Registry</CODE>
+will try to display your <EM>entire</EM> registry contents to your screen.
+But the debugger command <CODE>x $Registry-</CODE>ObjectRef&gt; will just dump
+the implementation details of the underlying object to your screen.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Flush">Flush( $bFlush )</A></STRONG><BR>
+<DD>
+Flushes all cached information about the Registry key so that future
+uses will get fresh data from the Registry.
+<P>If the optional <CODE>$bFlush</CODE> is specified and a true value, then
+<CODE>RegFlushKey()</CODE> will be called, which is almost never necessary.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetValue">GetValue</A></STRONG><BR>
+<DD>
+<DT><STRONG>$ValueData= $key-&gt;GetValue( $sValueName )</STRONG><BR>
+<DD>
+<DT><STRONG>($ValueData,$ValueType)= $key-&gt;GetValue( $sValueName )</STRONG><BR>
+<DD>
+Gets a Registry value's data and data type.
+<P><CODE>$ValueData</CODE> is usually just a Perl string that contains the
+value data [packed into it].  For certain types of data, however,
+<CODE>$ValueData</CODE> may be processed as described below.</P>
+<P><CODE>$ValueType</CODE> is the <CODE>REG_*</CODE> constant describing the type of value
+data stored in <CODE>$ValueData</CODE>.  If the <A HREF="#item_DualTypes"><CODE>DualTypes()</CODE></A> option is on,
+then <CODE>$ValueType</CODE> will be a dual value.  That is, when used in a
+numeric context, <CODE>$ValueType</CODE> will give the numeric value of a
+<CODE>REG_*</CODE> constant.  However, when used in a non-numeric context,
+<CODE>$ValueType</CODE> will return the name of the <CODE>REG_*</CODE> constant, for
+example <CODE>&quot;REG_SZ&quot;</CODE> [note the quotes].  So both of the following
+can be true at the same time:</P>
+<PRE>
+    $ValueType == REG_SZ()
+    $ValueType eq &quot;REG_SZ&quot;</PRE>
+<DL>
+<DT><STRONG><A NAME="item_REG_SZ_and_REG_EXPAND_SZ">REG_SZ and REG_EXPAND_SZ</A></STRONG><BR>
+<DD>
+If the <A HREF="#item_FixSzNulls"><CODE>FixSzNulls()</CODE></A> option is on, then the trailing <CODE>'\0'</CODE> will be
+stripped [unless there isn't one] before values of type <A HREF="#item_REG_SZ"><CODE>REG_SZ</CODE></A>
+and <A HREF="#item_REG_EXPAND_SZ"><CODE>REG_EXPAND_SZ</CODE></A> are returned.  Note that <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A> will add
+a trailing <CODE>'\0'</CODE> under similar circumstances.
+<P></P>
+<DT><STRONG>REG_MULTI_SZ</STRONG><BR>
+<DD>
+If the <A HREF="#item_SplitMultis"><CODE>SplitMultis()</CODE></A> option is on, then values of this type are
+returned as a reference to an array containing the strings.  For
+example, a value that, with <A HREF="#item_SplitMultis"><CODE>SplitMultis()</CODE></A> off, would be returned as:
+<PRE>
+    &quot;Value1\000Value2\000\000&quot;</PRE>
+<P>would be returned, with <A HREF="#item_SplitMultis"><CODE>SplitMultis()</CODE></A> on, as:</P>
+<PRE>
+    [ &quot;Value1&quot;, &quot;Value2&quot; ]</PRE>
+<P></P>
+<DT><STRONG>REG_DWORD</STRONG><BR>
+<DD>
+If the <A HREF="#item_DualBinVals"><CODE>DualBinVals()</CODE></A> option is on, then the value is returned
+as a scalar containing both a string and a number [much like
+the <A HREF="../../../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> variable -- see the <EM>SetDualVar</EM> module for more
+information] where the number part is the ``unpacked'' value.
+Use the returned value in a numeric context to access this part
+of the value.  For example:
+<PRE>
+    $num= 0 + $Registry-&gt;{&quot;CUser/Console//ColorTable01&quot;};</PRE>
+<P>If the <A HREF="#item_DWordsToHex"><CODE>DWordsToHex()</CODE></A> option is off, the string part of the
+returned value is a packed, 4-byte string [use <A HREF="../../../lib/Pod/perlfunc.html#item_unpack"><CODE>unpack(&quot;L&quot;,$value)</CODE></A>
+to get the numeric value.</P>
+<P>If <A HREF="#item_DWordsToHex"><CODE>DWordsToHex()</CODE></A> is on, the string part of the returned value is
+a 10-character hex strings [with leading ``0x''].  You can use
+<A HREF="../../../lib/Pod/perlfunc.html#item_hex"><CODE>hex($value)</CODE></A> to get the numeric value.</P>
+<P>Note that <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A> will properly understand each of these
+returned value formats no matter how <A HREF="#item_DualBinVals"><CODE>DualBinVals()</CODE></A> is set.</P>
+<P></P></DL>
+<DT><STRONG><A NAME="item_ValueNames">ValueNames</A></STRONG><BR>
+<DD>
+<DT><STRONG>@names= $key-&gt;ValueNames</STRONG><BR>
+<DD>
+Returns the list of value names stored directly in a Registry key.
+Note that the names returned do <EM>not</EM> have a delimiter prepended
+to them like with <A HREF="#item_MemberNames"><CODE>MemberNames()</CODE></A> and tied hashes.
+<P>Once you request this information, it is cached in the object and
+future requests will always return the same list unless <A HREF="#item_Flush"><CODE>Flush()</CODE></A>
+has been called.</P>
+<P></P>
+<DT><STRONG><A NAME="item_SubKeyNames">SubKeyNames</A></STRONG><BR>
+<DD>
+<DT><STRONG>@key_names= $key-&gt;SubKeyNames</STRONG><BR>
+<DD>
+Returns the list of subkey names stored directly in a Registry key.
+Note that the names returned do <EM>not</EM> have a delimiter appended
+to them like with <A HREF="#item_MemberNames"><CODE>MemberNames()</CODE></A> and tied hashes.
+<P>Once you request this information, it is cached in the object and
+future requests will always return the same list unless <A HREF="#item_Flush"><CODE>Flush()</CODE></A>
+has been called.</P>
+<P></P>
+<DT><STRONG><A NAME="item_SubKeyClasses">SubKeyClasses</A></STRONG><BR>
+<DD>
+<DT><STRONG>@classes= $key-&gt;SubKeyClasses</STRONG><BR>
+<DD>
+Returns the list of classes for subkeys stored directly in a
+Registry key.  The classes are returned in the same order as
+the subkey names returned by <A HREF="#item_SubKeyNames"><CODE>SubKeyNames()</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_SubKeyTimes">SubKeyTimes</A></STRONG><BR>
+<DD>
+<DT><STRONG>@times= $key-&gt;SubKeyTimes</STRONG><BR>
+<DD>
+Returns the list of last-modified times for subkeys stored
+directly in a Registry key.  The times are returned in the same
+order as the subkey names returned by <A HREF="#item_SubKeyNames"><CODE>SubKeyNames()</CODE></A>.  Each
+time is a <CODE>FILETIME</CODE> structure packed into a Perl string.
+<P>Once you request this information, it is cached in the object and
+future requests will always return the same list unless <A HREF="#item_Flush"><CODE>Flush()</CODE></A>
+has been called.</P>
+<P></P>
+<DT><STRONG><A NAME="item_MemberNames">MemberNames</A></STRONG><BR>
+<DD>
+<DT><STRONG>@members= $key-&gt;MemberNames</STRONG><BR>
+<DD>
+Returns the list of subkey names and value names stored directly
+in a Registry key.  Subkey names have a delimiter appended to the
+end and value names have a delimiter prepended to the front.
+<P>Note that a value name could end in a delimiter [or could be <CODE>&quot;&quot;</CODE>
+so that the member name returned is just a delimiter] so the
+presence or absence of the leading delimiter is what should be
+used to determine whether a particular name is for a subkey or a
+value, not the presence or absence of a trailing delimiter.</P>
+<P>Once you request this information, it is cached in the object and
+future requests will always return the same list unless <A HREF="#item_Flush"><CODE>Flush()</CODE></A>
+has been called.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Information">Information</A></STRONG><BR>
+<DD>
+<DT><STRONG>%info= $key-&gt;Information</STRONG><BR>
+<DD>
+<DT><STRONG>@items= $key-&gt;Information( @itemNames );</STRONG><BR>
+<DD>
+Returns the following information about a Registry key:
+<DL>
+<DT><STRONG><A NAME="item_LastWrite">LastWrite</A></STRONG><BR>
+<DD>
+A <CODE>FILETIME</CODE> structure indicating when the key was last modified
+and packed into a Perl string.
+<P></P>
+<DT><STRONG><A NAME="item_CntSubKeys">CntSubKeys</A></STRONG><BR>
+<DD>
+The number of subkeys stored directly in this key.
+<P></P>
+<DT><STRONG><A NAME="item_CntValues">CntValues</A></STRONG><BR>
+<DD>
+The number of values stored directly in this key.
+<P></P>
+<DT><STRONG><A NAME="item_SecurityLen">SecurityLen</A></STRONG><BR>
+<DD>
+The length [in bytes] of the largest[?] <CODE>SECURITY_DESCRIPTOR</CODE>
+associated with the Registry key.
+<P></P>
+<DT><STRONG><A NAME="item_MaxValDataLen">MaxValDataLen</A></STRONG><BR>
+<DD>
+The length [in bytes] of the longest value data associated with
+a value stored in this key.
+<P></P>
+<DT><STRONG><A NAME="item_MaxSubKeyLen">MaxSubKeyLen</A></STRONG><BR>
+<DD>
+The length [in chars] of the longest subkey name associated with
+a subkey stored in this key.
+<P></P>
+<DT><STRONG><A NAME="item_MaxSubClassLen">MaxSubClassLen</A></STRONG><BR>
+<DD>
+The length [in chars] of the longest class name associated with
+a subkey stored directly in this key.
+<P></P>
+<DT><STRONG><A NAME="item_MaxValNameLen">MaxValNameLen</A></STRONG><BR>
+<DD>
+The length [in chars] of the longest value name associated with
+a value stored in this key.
+<P></P></DL>
+<P>With no arguments, returns a hash [not a reference to a hash] where
+the keys are the names for the items given above and the values
+are the information describe above.  For example:</P>
+<PRE>
+    %info= ( &quot;CntValues&quot; =&gt; 25,         # Key contains 25 values.
+             &quot;MaxValNameLen&quot; =&gt; 20,     # One of which has a 20-char name.
+             &quot;MaxValDataLen&quot; =&gt; 42,     # One of which has a 42-byte value.
+             &quot;CntSubKeys&quot; =&gt; 1,         # Key has 1 immediate subkey.
+             &quot;MaxSubKeyLen&quot; =&gt; 13,      # One of which has a 12-char name.
+             &quot;MaxSubClassLen&quot; =&gt; 0,     # All of which have class names of &quot;&quot;.
+             &quot;SecurityLen&quot; =&gt; 232,      # One SECURITY_DESCRIPTOR is 232 bytes.
+             &quot;LastWrite&quot; =&gt; &quot;\x90mZ\cX{\xA3\xBD\cA\c@\cA&quot;
+                           # Key was last modifed 1998/06/01 16:29:32 GMT
+           );</PRE>
+<P>With arguments, each one must be the name of a item given above.
+The return value is the information associated with the listed
+names.  In other words:</P>
+<PRE>
+    return $key-&gt;Information( @names );</PRE>
+<P>returns the same list as:</P>
+<PRE>
+    %info= $key-&gt;Information;
+    return @info{@names};</PRE>
+<DT><STRONG><A NAME="item_Delimiter">Delimiter</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldDelim= $key-&gt;Delimiter</STRONG><BR>
+<DD>
+<DT><STRONG>$oldDelim= $key-&gt;Delimiter( $newDelim )</STRONG><BR>
+<DD>
+Gets and possibly changes the delimiter used for this object.  The
+delimiter is appended to subkey names and prepended to value names
+in many return values.  It is also used when parsing keys passed
+to tied hashes.
+<P>The delimiter defaults to backslash (<CODE>'\\'</CODE>) but is inherited from
+the object used to create a new object and can be specified by an
+option when a new object is created.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Handle">Handle</A></STRONG><BR>
+<DD>
+<DT><STRONG>$handle= $key-&gt;Handle</STRONG><BR>
+<DD>
+Returns the raw <CODE>HKEY</CODE> handle for the associated Registry key as
+an integer value.  This value can then be used to Reg*() calls
+from <EM>Win32API::Registry</EM>.  However, it is usually easier to just
+call the <EM>Win32API::Registry</EM> calls directly via:
+<PRE>
+    $key-&gt;RegNotifyChangeKeyValue( ... );</PRE>
+<P>For the virtual root of the local or a remote Registry,
+<A HREF="#item_Handle"><CODE>Handle()</CODE></A> return <CODE>&quot;NONE&quot;</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Path">Path</A></STRONG><BR>
+<DD>
+<DT><STRONG>$path= $key-&gt;Path</STRONG><BR>
+<DD>
+Returns a string describing the path of key names to this
+Registry key.  The string is built so that if it were passed
+to <CODE>$Registry-</CODE>Open()&gt;, it would reopen the same Registry key
+[except in the rare case where one of the key names contains
+<CODE>$key-</CODE>Delimiter&gt;].
+<P></P>
+<DT><STRONG><A NAME="item_Machine">Machine</A></STRONG><BR>
+<DD>
+<DT><STRONG>$computerName= $key-&gt;Machine</STRONG><BR>
+<DD>
+Returns the name of the computer [or ``machine''] on which this Registry
+key resides.  Returns <CODE>&quot;&quot;</CODE> for local Registry keys.
+<P></P>
+<DT><STRONG><A NAME="item_Access">Access</A></STRONG><BR>
+<DD>
+Returns the numeric value of the bit mask used to specify the
+types of access requested when this Registry key was opened.  Can
+be compared to <CODE>KEY_*</CODE> values.
+<P></P>
+<DT><STRONG><A NAME="item_OS_Delimiter">OS_Delimiter</A></STRONG><BR>
+<DD>
+Returns the delimiter used by the operating system's <CODE>RegOpenKeyEx()</CODE>
+call.  For Win32, this is always backslash (<CODE>&quot;\\&quot;</CODE>).
+<P></P>
+<DT><STRONG><A NAME="item_Roots">Roots</A></STRONG><BR>
+<DD>
+Returns the mapping from root key names like <CODE>&quot;LMachine&quot;</CODE> to their
+associated <CODE>HKEY_*</CODE> constants.  Primarily for internal use and
+subject to change.
+<P></P>
+<DT><STRONG><A NAME="item_Tie">Tie</A></STRONG><BR>
+<DD>
+<DT><STRONG>$key-&gt;Tie( \%hash );</STRONG><BR>
+<DD>
+Ties the referenced hash to that Registry key.  Pretty much the
+same as
+<PRE>
+    tie %hash, ref($key), $key;</PRE>
+<P>Since <A HREF="../../../lib/Pod/perlfunc.html#item_ref"><CODE>ref($key)</CODE></A> is the class [package] to tie the hash to and
+<CODE>TIEHASH()</CODE> just returns its argument, <CODE>$key</CODE>, [without calling
+<A HREF="#item_new"><CODE>new()</CODE></A>] when it sees that it is already a blessed object.</P>
+<P></P>
+<DT><STRONG><A NAME="item_TiedRef">TiedRef</A></STRONG><BR>
+<DD>
+<DT><STRONG>$TiedHashRef= $hash_or_obj_ref-&gt;TiedRef</STRONG><BR>
+<DD>
+For a simple object, returns a reference to a hash tied to the
+object.  Used to promote a simple object into a combined object
+and hash ref.
+<P>If already a reference to a tied hash [that is also an object],
+it just returns itself [<CODE>$ref == $ref-</CODE>TiedRef&gt;].</P>
+<P>Mostly used internally.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ArrayValues">ArrayValues</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;ArrayValues</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;ArrayValues( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_ArrayValues"><CODE>ArrayValues</CODE></A> option and possibly
+turns it on or off.
+<P>When off, Registry values fetched via a tied hash are returned as
+just a value scalar [the same as <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> in a scalar context].
+When on, they are returned as a reference to an array containing
+the value data as the <CODE>[0]</CODE> element and the data type as the <CODE>[1]</CODE>
+element.</P>
+<P></P>
+<DT><STRONG><A NAME="item_TieValues">TieValues</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24oldBool%3D_TieValues">$oldBool= TieValues</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= TieValues( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_TieValues"><CODE>TieValues</CODE></A> option and possibly
+turns it on or off.
+<P>Turning this option on is not yet supported in this release of
+<EM>Win32::TieRegistry</EM>.  In a future release, turning this option
+on will cause Registry values returned from a tied hash to be
+a tied array that you can use to modify the value in the Registry.</P>
+<P></P>
+<DT><STRONG><A NAME="item_FastDelete">FastDelete</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;FastDelete</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;FastDelete( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_FastDelete"><CODE>FastDelete</CODE></A> option and possibly
+turns it on or off.
+<P>When on, successfully deleting a Registry key [via a tied hash]
+simply returns <CODE>1</CODE>.</P>
+<P>When off, successfully deleting a Registry key [via a tied hash
+and not in a void context] returns a reference to a hash that
+contains the values present in the key when it was deleted.  This
+hash is just like that returned when referencing the key before it
+was deleted except that it is an ordinary hash, not one tied to
+the <EM>Win32::TieRegistry</EM> package.</P>
+<P>Note that deleting either a Registry key or value via a tied hash
+<EM>in a void context</EM> prevents any overhead in trying to build an
+appropriate return value.</P>
+<P>Note that deleting a Registry <EM>value</EM> via a tied hash [not in
+a void context] returns the value data even if &lt;FastDelete&gt; is on.</P>
+<P></P>
+<DT><STRONG><A NAME="item_SplitMultis">SplitMultis</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;SplitMultis</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;SplitMultis( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_SplitMultis"><CODE>SplitMultis</CODE></A> option and possibly
+turns it on or off.
+<P>If on, Registry values of type <A HREF="#item_REG_MULTI_SZ"><CODE>REG_MULTI_SZ</CODE></A> are returned as
+a reference to an array of strings.  See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> for more
+information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_DWordsToHex">DWordsToHex</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DWordsToHex</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DWordsToHex( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_DWordsToHex"><CODE>DWordsToHex</CODE></A> option and possibly
+turns it on or off.
+<P>If on, Registry values of type <A HREF="#item_REG_DWORD"><CODE>REG_DWORD</CODE></A> are returned as a hex
+string with leading <CODE>&quot;0x&quot;</CODE> and longer than 4 characters.  See
+<A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> for more information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_FixSzNulls">FixSzNulls</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;FixSzNulls</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;FixSzNulls( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_FixSzNulls"><CODE>FixSzNulls</CODE></A> option and possibly
+turns it on or off.
+<P>If on, Registry values of type <A HREF="#item_REG_SZ"><CODE>REG_SZ</CODE></A> and <A HREF="#item_REG_EXPAND_SZ"><CODE>REG_EXPAND_SZ</CODE></A> have
+trailing <CODE>'\0'</CODE>s added before they are set and stripped before
+they are returned.  See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> and <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A> for more
+information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_DualTypes">DualTypes</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DualTypes</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DualTypes( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_DualTypes"><CODE>DualTypes</CODE></A> option and possibly
+turns it on or off.
+<P>If on, data types are returned as a combined numeric/string value
+holding both the numeric value of a <CODE>REG_*</CODE> constant and the
+string value of the constant's name.  See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> for
+more information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_DualBinVals">DualBinVals</A></STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DualBinVals</STRONG><BR>
+<DD>
+<DT><STRONG>$oldBool= $key-&gt;DualBinVals( $newBool )</STRONG><BR>
+<DD>
+Gets the current setting of the <A HREF="#item_DualBinVals"><CODE>DualBinVals</CODE></A> option and possibly
+turns it on or off.
+<P>If on, Registry value data of type <A HREF="#item_REG_BINARY"><CODE>REG_BINARY</CODE></A> and no more than
+4 bytes long and Registry values of type <A HREF="#item_REG_DWORD"><CODE>REG_DWORD</CODE></A> are returned
+as a combined numeric/string value where the numeric value is the
+``unpacked'' binary value as returned by:</P>
+<PRE>
+        hex reverse unpack( &quot;h*&quot;, $valData )</PRE>
+<P>on a ``little-endian'' computer.  [Would be <A HREF="../../../lib/Pod/perlfunc.html#item_unpack"><CODE>hex unpack(&quot;H*&quot;,$valData)</CODE></A>
+on a ``big-endian'' computer if this module is ever ported to one.]</P>
+<P>See <A HREF="#item_GetValue"><CODE>GetValue()</CODE></A> for more information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetOptions">GetOptions</A></STRONG><BR>
+<DD>
+<DT><STRONG>@oldOptValues= $key-&gt;GetOptions( @optionNames )</STRONG><BR>
+<DD>
+<DT><STRONG>$refHashOfOldOpts= $key-&gt;<CODE>GetOptions()</CODE></STRONG><BR>
+<DD>
+<DT><STRONG>$key-&gt;GetOptions( \%hashForOldOpts )</STRONG><BR>
+<DD>
+Returns the current setting of any of the following options:
+<PRE>
+    Delimiter     FixSzNulls    DWordsToHex
+    ArrayValues   SplitMultis   DualBinVals
+    TieValues     FastDelete    DualTypes</PRE>
+<P>Pass in one or more of the above names (as strings) to get back
+an array of the corresponding current settings in the same order:</P>
+<PRE>
+  my( $fastDel, $delim )= $key-&gt;GetOptions(&quot;FastDelete&quot;,&quot;Delimiter&quot;);</PRE>
+<P>Pass in no arguments to get back a reference to a hash where
+the above option names are the keys and the values are
+the corresponding current settings for each option:</P>
+<PRE>
+  my $href= $key-&gt;GetOptions();
+  my $delim= $href-&gt;{Delimiter};</PRE>
+<P>Pass in a single reference to a hash to have the above key/value
+pairs <EM>added</EM> to the referenced hash.  For this case, the
+return value is the original object so further methods can be
+chained after the call to GetOptions:</P>
+<PRE>
+  my %oldOpts;
+  $key-&gt;GetOptions( \%oldOpts )-&gt;SetOptions( Delimiter =&gt; &quot;/&quot; );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SetOptions">SetOptions</A></STRONG><BR>
+<DD>
+<DT><STRONG>@oldOpts= $key-&gt;SetOptions( optNames=&gt;$optValue,... )</STRONG><BR>
+<DD>
+Changes the current setting of any of the following options,
+returning the previous setting(s):
+<PRE>
+    Delimiter     FixSzNulls    DWordsToHex   AllowLoad
+    ArrayValues   SplitMultis   DualBinVals   AllowSave
+    TieValues     FastDelete    DualTypes</PRE>
+<P>For <A HREF="#item_AllowLoad"><CODE>AllowLoad</CODE></A> and <A HREF="#item_AllowSave"><CODE>AllowSave</CODE></A>, instead of the previous
+setting, <A HREF="#item_SetOptions"><CODE>SetOptions</CODE></A> returns whether or not the change was
+successful.</P>
+<P>In a scalar context, returns only the last item.  The last
+option can also be specified as <CODE>&quot;ref&quot;</CODE> or <CODE>&quot;r&quot;</CODE> [which doesn't
+need to be followed by a value] to allow chaining:</P>
+<PRE>
+    $key-&gt;SetOptions(AllowSave=&gt;1,&quot;ref&quot;)-&gt;RegSaveKey(...)</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SetValue">SetValue</A></STRONG><BR>
+<DD>
+<DT><STRONG>$okay= $key-&gt;SetValue( $ValueName, $ValueData );</STRONG><BR>
+<DD>
+<DT><STRONG>$okay= $key-&gt;SetValue( $ValueName, $ValueData, $ValueType );</STRONG><BR>
+<DD>
+Adds or replaces a Registry value.  Returns a true value if
+successfully, false otherwise.
+<P><CODE>$ValueName</CODE> is the name of the value to add or replace and
+should <EM>not</EM> have a delimiter prepended to it.  Case is ignored.</P>
+<P><CODE>$ValueType</CODE> is assumed to be <A HREF="#item_REG_SZ"><CODE>REG_SZ</CODE></A> if it is omitted.  Otherwise,
+it should be one the <CODE>REG_*</CODE> constants.</P>
+<P><CODE>$ValueData</CODE> is the data to be stored in the value, probably packed
+into a Perl string.  Other supported formats for value data are
+listed below for each posible <CODE>$ValueType</CODE>.</P>
+<DL>
+<DT><STRONG><A NAME="item_REG_SZ_or_REG_EXPAND_SZ">REG_SZ or REG_EXPAND_SZ</A></STRONG><BR>
+<DD>
+The only special processing for these values is the addition of
+the required trailing <CODE>'\0'</CODE> if it is missing.  This can be
+turned off by disabling the <A HREF="#item_FixSzNulls"><CODE>FixSzNulls</CODE></A> option.
+<P></P>
+<DT><STRONG>REG_MULTI_SZ</STRONG><BR>
+<DD>
+These values can also be specified as a reference to a list of
+strings.  For example, the following two lines are equivalent:
+<PRE>
+    $key-&gt;SetValue( &quot;Val1\000Value2\000LastVal\000\000&quot;, &quot;REG_MULTI_SZ&quot; );
+    $key-&gt;SetValue( [&quot;Val1&quot;,&quot;Value2&quot;,&quot;LastVal&quot;], &quot;REG_MULTI_SZ&quot; );</PRE>
+<P>Note that if the required two trailing nulls (<CODE>&quot;\000\000&quot;</CODE>) are
+missing, then this release of <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A> will <EM>not</EM> add them.</P>
+<P></P>
+<DT><STRONG>REG_DWORD</STRONG><BR>
+<DD>
+These values can also be specified as a hex value with the leading
+<CODE>&quot;0x&quot;</CODE> included and totaling <EM>more than</EM> 4 bytes.  These will be
+packed into a 4-byte string via:
+<PRE>
+    $data= pack( &quot;L&quot;, hex($data) );</PRE>
+<P></P>
+<DT><STRONG>REG_BINARY</STRONG><BR>
+<DD>
+This value type is listed just to emphasize that no alternate
+format is supported for it.  In particular, you should <EM>not</EM> pass
+in a numeric value for this type of data.  <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A> cannot
+distinguish such from a packed string that just happens to match
+a numeric value and so will treat it as a packed string.
+<P></P></DL>
+<P>An alternate calling format:</P>
+<PRE>
+    $okay= $key-&gt;SetValue( $ValueName, [ $ValueData, $ValueType ] );</PRE>
+<P>[two arguments, the second of which is a reference to an array
+containing the value data and value type] is supported to ease
+using tied hashes with <A HREF="#item_SetValue"><CODE>SetValue()</CODE></A>.</P>
+<DT><STRONG><A NAME="item_CreateKey">CreateKey</A></STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;CreateKey( $subKey );</STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;CreateKey( $subKey, { Option=&gt;OptVal,... } );</STRONG><BR>
+<DD>
+Creates a Registry key or just updates attributes of one.  Calls
+<CODE>RegCreateKeyEx()</CODE> then, if it succeeded, creates an object
+associated with the [possibly new] subkey.
+<P><CODE>$subKey</CODE> is the name of a subkey [or a path to one] to be
+created or updated.  It can also be a reference to an array
+containing a list of subkey names.</P>
+<P>The second argument, if it exists, should be a reference to a
+hash specifying options either to be passed to <CODE>RegCreateKeyEx()</CODE>
+or to be used when creating the associated object.  The following
+items are the supported keys for this options hash:</P>
+<DL>
+<DT><STRONG>Delimiter</STRONG><BR>
+<DD>
+Specifies the delimiter to be used to parse <CODE>$subKey</CODE> and to be
+used in the new object.  Defaults to <CODE>$key-</CODE>Delimiter&gt;.
+<P></P>
+<DT><STRONG>Access</STRONG><BR>
+<DD>
+Specifies the types of access requested when the subkey is opened.
+Should be a numeric bit mask that combines one or more <CODE>KEY_*</CODE>
+constant values.
+<P></P>
+<DT><STRONG><A NAME="item_Class">Class</A></STRONG><BR>
+<DD>
+The name to assign as the class of the new or updated subkey.
+Defaults to <CODE>&quot;&quot;</CODE> as we have never seen a use for this information.
+<P></P>
+<DT><STRONG><A NAME="item_Disposition">Disposition</A></STRONG><BR>
+<DD>
+Lets you specify a reference to a scalar where, upon success, will be
+stored either <CODE>REG_CREATED_NEW_KEY()</CODE> or <CODE>REG_OPENED_EXISTING_KEY()</CODE>
+depending on whether a new key was created or an existing key was
+opened.
+<P>If you, for example, did <CODE>use Win32::TieRegistry qw(REG_CREATED_NEW_KEY)</CODE>
+then you can use <CODE>REG_CREATED_NEW_KEY()</CODE> to compare against the numeric
+value stored in the referenced scalar.</P>
+<P>If the <A HREF="#item_DualTypes"><CODE>DualTypes</CODE></A> option is enabled, then in addition to the
+numeric value described above, the referenced scalar will also
+have a string value equal to either <CODE>&quot;REG_CREATED_NEW_KEY&quot;</CODE> or
+<CODE>&quot;REG_OPENED_EXISTING_KEY&quot;</CODE>, as appropriate.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Security">Security</A></STRONG><BR>
+<DD>
+Lets you specify a <CODE>SECURITY_ATTRIBUTES</CODE> structure packed into a
+Perl string.  See <CODE>Win32API::Registry::RegCreateKeyEx()</CODE> for more
+information.
+<P></P>
+<DT><STRONG><A NAME="item_Volatile">Volatile</A></STRONG><BR>
+<DD>
+If true, specifies that the new key should be volatile, that is,
+stored only in memory and not backed by a hive file [and not saved
+if the computer is rebooted].  This option is ignored under
+Windows 95.  Specifying <CODE>Volatile=1</CODE>  is the same as
+specifying <CODE>Options=REG_OPTION_VOLATILE</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Backup">Backup</A></STRONG><BR>
+<DD>
+If true, specifies that the new key should be opened for
+backup/restore access.  The <A HREF="#item_Access"><CODE>Access</CODE></A> option is ignored.  If the
+calling process has enabled <CODE>&quot;SeBackupPrivilege&quot;</CODE>, then the
+subkey is opened with <CODE>KEY_READ</CODE> access as the <CODE>&quot;LocalSystem&quot;</CODE>
+user which should have access to all subkeys.  If the calling
+process has enabled <CODE>&quot;SeRestorePrivilege&quot;</CODE>, then the subkey is
+opened with <CODE>KEY_WRITE</CODE> access as the <CODE>&quot;LocalSystem&quot;</CODE> user which
+should have access to all subkeys.
+<P>This option is ignored under Windows 95.  Specifying <CODE>Backup=1</CODE>
+is the same as specifying <CODE>Options=REG_OPTION_BACKUP_RESTORE</CODE>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Options">Options</A></STRONG><BR>
+<DD>
+Lets you specify options to the <CODE>RegOpenKeyEx()</CODE> call.  The value
+for this option should be a numeric value combining zero or more
+of the <CODE>REG_OPTION_*</CODE> bit masks.  You may with to used the
+<A HREF="#item_Volatile"><CODE>Volatile</CODE></A> and/or <A HREF="#item_Backup"><CODE>Backup</CODE></A> options instead of this one.
+<P></P></DL>
+<DT><STRONG><A NAME="item_StoreKey">StoreKey</A></STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;StoreKey( $subKey, \%Contents );</STRONG><BR>
+<DD>
+Primarily for internal use.
+<P>Used to create or update a Registry key and any number of subkeys
+or values under it or its subkeys.</P>
+<P><CODE>$subKey</CODE> is the name of a subkey to be created [or a path of
+subkey names separated by delimiters].  If that subkey already
+exists, then it is updated.</P>
+<P><CODE>\%Contents</CODE> is a reference to a hash containing pairs of
+value names with value data and/or subkey names with hash
+references similar to <CODE>\%Contents</CODE>.  Each of these cause
+a value or subkey of <CODE>$subKey</CODE> to be created or updated.</P>
+<P>If <CODE>$Contents{&quot;&quot;}</CODE> exists and is a reference to a hash, then
+it used as the options argument when <A HREF="#item_CreateKey"><CODE>CreateKey()</CODE></A> is called
+for <CODE>$subKey</CODE>.  This allows you to specify ...</P>
+<PRE>
+    if(  defined( $$data{&quot;&quot;} )  &amp;&amp;  &quot;HASH&quot; eq ref($$data{&quot;&quot;})  ) {
+        $self= $this-&gt;CreateKey( $subKey, delete $$data{&quot;&quot;} );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Load">Load</A></STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;Load( $file )</STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;Load( $file, $newSubKey )</STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;Load( $file, $newSubKey, { Option=&gt;OptVal... } )</STRONG><BR>
+<DD>
+<DT><STRONG>$newKey= $key-&gt;Load( $file, { Option=&gt;OptVal... } )</STRONG><BR>
+<DD>
+Loads a hive file into a Registry.  That is, creates a new subkey
+and associates a hive file with it.
+<P><CODE>$file</CODE> is a hive file, that is a file created by calling
+<CODE>RegSaveKey()</CODE>.  The <CODE>$file</CODE> path is interpreted relative to
+<CODE>%SystemRoot%/System32/config</CODE> on the machine where <CODE>$key</CODE>
+resides.</P>
+<P><CODE>$newSubKey</CODE> is the name to be given to the new subkey.  If
+<CODE>$newSubKey</CODE> is specified, then <CODE>$key</CODE> must be
+<CODE>HKEY_LOCAL_MACHINE</CODE> or <CODE>HKEY_USERS</CODE> of the local computer
+or a remote computer and <CODE>$newSubKey</CODE> should not contain any
+occurrences of either the delimiter or the OS delimiter.</P>
+<P>If <CODE>$newSubKey</CODE> is not specified, then it is as if <CODE>$key</CODE>
+was <CODE>$Registry-{LMachine}</CODE> and <CODE>$newSubKey</CODE> is
+<CODE>&quot;PerlTie:999&quot;</CODE> where <CODE>&quot;999&quot;</CODE> is actually a sequence number
+incremented each time this process calls <A HREF="#item_Load"><CODE>Load()</CODE></A>.</P>
+<P>You can specify as the last argument a reference to a hash
+containing options.  You can specify the same options that you
+can specify to <A HREF="#item_Open"><CODE>Open()</CODE></A>.  See <A HREF="#item_Open"><CODE>Open()</CODE></A> for more information on
+those.  In addition, you can specify the option <CODE>&quot;NewSubKey&quot;</CODE>.
+The value of this option is interpretted exactly as if it was
+specified as the <CODE>$newSubKey</CODE> parameter and overrides the
+<CODE>$newSubKey</CODE> if one was specified.</P>
+<P>The hive is automatically unloaded when the returned object
+[<CODE>$newKey</CODE>] is destroyed.  Registry key objects opened within
+the hive will keep a reference to the <CODE>$newKey</CODE> object so that
+it will not be destroyed before these keys are closed.</P>
+<P></P>
+<DT><STRONG><A NAME="item_UnLoad">UnLoad</A></STRONG><BR>
+<DD>
+<DT><STRONG>$okay= $key-&gt;UnLoad</STRONG><BR>
+<DD>
+Unloads a hive that was loaded via <A HREF="#item_Load"><CODE>Load()</CODE></A>.  Cannot unload other
+hives.  <CODE>$key</CODE> must be the return from a previous call to <A HREF="#item_Load"><CODE>Load()</CODE></A>.
+<CODE>$key</CODE> is closed and then the hive is unloaded.
+<P></P>
+<DT><STRONG><A NAME="item_AllowSave">AllowSave</A></STRONG><BR>
+<DD>
+<DT><STRONG>$okay= AllowSave( $bool )</STRONG><BR>
+<DD>
+Enables or disables the <CODE>&quot;ReBackupPrivilege&quot;</CODE> privilege for the
+current process.  You will probably have to enable this privilege
+before you can use <CODE>RegSaveKey()</CODE>.
+<P>The return value indicates whether the operation succeeded, not
+whether the privilege was previously enabled.</P>
+<P></P>
+<DT><STRONG><A NAME="item_AllowLoad">AllowLoad</A></STRONG><BR>
+<DD>
+<DT><STRONG>$okay= AllowLoad( $bool )</STRONG><BR>
+<DD>
+Enables or disables the <CODE>&quot;ReRestorePrivilege&quot;</CODE> privilege for the
+current process.  You will probably have to enable this privilege
+before you can use <CODE>RegLoadKey()</CODE>, <CODE>RegUnLoadKey()</CODE>,
+<CODE>RegReplaceKey()</CODE>, or <CODE>RegRestoreKey</CODE> and thus <A HREF="#item_Load"><CODE>Load()</CODE></A> and
+<A HREF="#item_UnLoad"><CODE>UnLoad()</CODE></A>.
+<P>The return value indicates whether the operation succeeded, not
+whether the privilege was previously enabled.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="exports [use and import()]">Exports [<A HREF="../../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> and <A HREF="../../../lib/Pod/perlfunc.html#item_import"><CODE>import()</CODE></A>]</A></H2>
+<P>To have nothing imported into your package, use something like:</P>
+<PRE>
+    use Win32::TieRegistry 0.20 ();</PRE>
+<P>which would verify that you have at least version 0.20 but wouldn't
+call <A HREF="../../../lib/Pod/perlfunc.html#item_import"><CODE>import()</CODE></A>.  The <EM>Changes</EM> file can be useful in figuring out
+which, if any, prior versions of <EM>Win32::TieRegistry</EM> you want to
+support in your script.</P>
+<P>The code</P>
+<PRE>
+    use Win32::TieRegistry;</PRE>
+<P>imports the variable <CODE>$Registry</CODE> into your package and sets it
+to be a reference to a hash tied to a copy of the master Registry
+virtual root object with the default options.  One disadvantage
+to this ``default'' usage is that Perl does not support checking
+the module version when you use it.</P>
+<P>Alternately, you can specify a list of arguments on the <A HREF="../../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>
+line that will be passed to the <CODE>Win32::TieRegistry-</CODE>import()&gt;
+method to control what items to import into your package.  These
+arguments fall into the following broad categories:</P>
+<DL>
+<DT><STRONG><A NAME="item_Import_a_reference_to_a_hash_tied_to_a_Registry_vi">Import a reference to a hash tied to a Registry virtual root</A></STRONG><BR>
+<DD>
+You can request that a scalar variable be imported (possibly)
+and set to be a reference to a hash tied to a Registry virtual root
+using any of the following types of arguments or argument pairs:
+<DL>
+<DT><STRONG><A NAME="item_%22TiedRef%22%2C_%27%24scalar%27">``TiedRef'', '$scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedRef%22%2C_%27%24pack%3A%3Ascalar%27">``TiedRef'', '$pack::scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedRef%22%2C_%27scalar%27">``TiedRef'', 'scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedRef%22%2C_%27pack%3A%3Ascalar%27">``TiedRef'', 'pack::scalar'</A></STRONG><BR>
+<DD>
+All of the above import a scalar named <CODE>$scalar</CODE> into your package
+(or the package named ``pack'') and then sets it.
+<P></P>
+<DT><STRONG><A NAME="item_%27%24scalar%27">'$scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27%24pack%3A%3Ascalar%27">'$pack::scalar'</A></STRONG><BR>
+<DD>
+These are equivalent to the previous items to support a more
+traditional appearance to the list of exports.  Note that the
+scalar name cannot be ``RegObj'' here.
+<P></P>
+<DT><STRONG><A NAME="item_%22TiedRef%22%2C_%5C%24scalar">``TiedRef'', \$scalar</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%5C%24scalar">\$scalar</A></STRONG><BR>
+<DD>
+These versions don't import anything but set the referenced <CODE>$scalar</CODE>.
+<P></P></DL>
+<DT><STRONG><A NAME="item_Import_a_hash_tied_to_the_Registry_virtual_root">Import a hash tied to the Registry virtual root</A></STRONG><BR>
+<DD>
+You can request that a hash variable be imported (possibly)
+and tied to a Registry virtual root using any of the following
+types of arguments or argument pairs:
+<DL>
+<DT><STRONG><A NAME="item_%22TiedHash%22%2C_%27%25hash%27">``TiedHash'', '%hash'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedHash%22%2C_%27%25pack%3A%3Ahash%27">``TiedHash'', '%pack::hash'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedHash%22%2C_%27hash%27">``TiedHash'', 'hash'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22TiedHash%22%2C_%27pack%3A%3Ahash%27">``TiedHash'', 'pack::hash'</A></STRONG><BR>
+<DD>
+All of the above import a hash named <CODE>%hash</CODE> into your package
+(or the package named ``pack'') and then sets it.
+<P></P>
+<DT><STRONG><A NAME="item_%27%25hash%27">'%hash'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27%25pack%3A%3Ahash%27">'%pack::hash'</A></STRONG><BR>
+<DD>
+These are equivalent to the previous items to support a more
+traditional appearance to the list of exports.
+<P></P>
+<DT><STRONG><A NAME="item_%22TiedHash%22%2C_%5C%25hash">``TiedHash'', \%hash</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%5C%25hash">\%hash</A></STRONG><BR>
+<DD>
+These versions don't import anything but set the referenced <CODE>%hash</CODE>.
+<P></P></DL>
+<DT><STRONG><A NAME="item_Import_a_Registry_virtual_root_object">Import a Registry virtual root object</A></STRONG><BR>
+<DD>
+You can request that a scalar variable be imported (possibly)
+and set to be a Registry virtual root object using any of the
+following types of arguments or argument pairs:
+<DL>
+<DT><STRONG><A NAME="item_%22ObjectRef%22%2C_%27%24scalar%27">``ObjectRef'', '$scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22ObjectRef%22%2C_%27%24pack%3A%3Ascalar%27">``ObjectRef'', '$pack::scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22ObjectRef%22%2C_%27scalar%27">``ObjectRef'', 'scalar'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%22ObjectRef%22%2C_%27pack%3A%3Ascalar%27">``ObjectRef'', 'pack::scalar'</A></STRONG><BR>
+<DD>
+All of the above import a scalar named <CODE>$scalar</CODE> into your package
+(or the package named ``pack'') and then sets it.
+<P></P>
+<DT><STRONG><A NAME="item_%27%24RegObj%27">'$RegObj'</A></STRONG><BR>
+<DD>
+This is equivalent to the previous items for backward compatibility.
+<P></P>
+<DT><STRONG><A NAME="item_%22ObjectRef%22%2C_%5C%24scalar">``ObjectRef'', \$scalar</A></STRONG><BR>
+<DD>
+This version doesn't import anything but sets the referenced <CODE>$scalar</CODE>.
+<P></P></DL>
+<DT><STRONG><A NAME="item_constant">Import <CODE>constant(s)</CODE> exported by <EM>Win32API::Registry</EM></A></STRONG><BR>
+<DD>
+You can list any constants that are exported by <EM>Win32API::Registry</EM>
+to have them imported into your package.  These constants have names
+starting with ``KEY_'' or ``REG_'' (or even ``HKEY_'').
+<P>You can also specify <CODE>&quot;:KEY_&quot;</CODE>, <CODE>&quot;:REG_&quot;</CODE>, and even <CODE>&quot;:HKEY_&quot;</CODE> to
+import a whole set of constants.</P>
+<P>See <EM>Win32API::Registry</EM> documentation for more information.</P>
+<P></P>
+<DT><STRONG>Options</STRONG><BR>
+<DD>
+You can list any option names that can be listed in the <A HREF="#item_SetOptions"><CODE>SetOptions()</CODE></A>
+method call, each folowed by the value to use for that option.
+A Registry virtual root object is created, all of these options are
+set for it, then each variable to be imported/set is associated with
+this object.
+<P>In addition, the following special options are supported:</P>
+<DL>
+<DT><STRONG><A NAME="item_ExportLevel">ExportLevel</A></STRONG><BR>
+<DD>
+Whether to import variables into your package or some
+package that uses your package.  Defaults to the value of
+<CODE>$Exporter::ExportLevel</CODE> and has the same meaning.  See
+the <A HREF="../../../lib/Exporter.html">the Exporter manpage</A> module for more information.
+<P></P>
+<DT><STRONG><A NAME="item_ExportTo">ExportTo</A></STRONG><BR>
+<DD>
+The name of the package to import variables and constants into.
+Overrides <EM>ExportLevel</EM>.
+<P></P></DL>
+</DL>
+<P>
+<H3><A NAME="specifying constants in your perl code">Specifying constants in your Perl code</A></H3>
+<P>This module was written with a strong emphasis on the convenience of
+the module user.  Therefore, most places where you can specify a
+constant like <A HREF="#item_REG_SZ"><CODE>REG_SZ()</CODE></A> also allow you to specify a string
+containing the name of the constant, <CODE>&quot;REG_SZ&quot;</CODE>.  This is convenient
+because you may not have imported that symbolic constant.</P>
+<P>Perl also emphasizes programmer convenience so the code <A HREF="#item_REG_SZ"><CODE>REG_SZ</CODE></A>
+can be used to mean <A HREF="#item_REG_SZ"><CODE>REG_SZ()</CODE></A> or <CODE>&quot;REG_SZ&quot;</CODE> or be illegal.
+Note that using <CODE>&amp;REG_SZ</CODE> (as we've seen in much Win32 Perl code)
+is not a good idea since it passes the current <A HREF="../../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> to the
+<A HREF="#item_constant"><CODE>constant()</CODE></A> routine of the module which, at the least, can give
+you a warning under <STRONG>-w</STRONG>.</P>
+<P>Although greatly a matter of style, the ``safest'' practice is probably
+to specifically list all constants in the <CODE>use Win32::TieRegistry</CODE>
+statement, specify <CODE>use strict</CODE> [or at least <CODE>use strict qw(subs)</CODE>],
+and use bare constant names when you want the numeric value.  This will
+detect mispelled constant names at compile time.</P>
+<PRE>
+    use strict;
+    my $Registry;
+    use Win32::TieRegistry 0.20 (
+        TiedRef =&gt; \$Registry,  Delimiter =&gt; &quot;/&quot;,  ArrayValues =&gt; 1,
+        SplitMultis =&gt; 1,  AllowLoad =&gt; 1,
+        qw( REG_SZ REG_EXPAND_SZ REG_DWORD REG_BINARY REG_MULTI_SZ
+            KEY_READ KEY_WRITE KEY_ALL_ACCESS ),
+    );
+    $Registry-&gt;{&quot;LMachine/Software/FooCorp/&quot;}= {
+        &quot;FooWriter/&quot; =&gt; {
+            &quot;/Fonts&quot; =&gt; [ [&quot;Times&quot;,&quot;Courier&quot;,&quot;Lucinda&quot;], REG_MULTI_SZ ],
+            &quot;/WindowSize&quot; =&gt; [ pack(&quot;LL&quot;,24,80), REG_BINARY ],
+            &quot;/TaskBarIcon&quot; =&gt; [ &quot;0x0001&quot;, REG_DWORD ],
+        },
+    }  or  die &quot;Can't create Software/FooCorp/: $^E\n&quot;;</PRE>
+<P>If you don't want to <CODE>use strict qw(subs)</CODE>, the second safest practice
+is similar to the above but use the <A HREF="#item_REG_SZ"><CODE>REG_SZ()</CODE></A> form for constants
+when possible and quoted constant names when required.  Note that
+<CODE>qw()</CODE> is a form of quoting.</P>
+<PRE>
+    use Win32::TieRegistry 0.20 qw(
+        TiedRef $Registry
+        Delimiter /  ArrayValues 1  SplitMultis 1  AllowLoad 1
+        REG_SZ REG_EXPAND_SZ REG_DWORD REG_BINARY REG_MULTI_SZ
+        KEY_READ KEY_WRITE KEY_ALL_ACCESS
+    );
+    $Registry-&gt;{&quot;LMachine/Software/FooCorp/&quot;}= {
+        &quot;FooWriter/&quot; =&gt; {
+            &quot;/Fonts&quot; =&gt; [ [&quot;Times&quot;,&quot;Courier&quot;,&quot;Lucinda&quot;], REG_MULTI_SZ() ],
+            &quot;/WindowSize&quot; =&gt; [ pack(&quot;LL&quot;,24,80), REG_BINARY() ],
+            &quot;/TaskBarIcon&quot; =&gt; [ &quot;0x0001&quot;, REG_DWORD() ],
+        },
+    }  or  die &quot;Can't create Software/FooCorp/: $^E\n&quot;;</PRE>
+<P>The examples in this document mostly use quoted constant names
+(<CODE>&quot;REG_SZ&quot;</CODE>) since that works regardless of which constants
+you imported and whether or not you have <CODE>use strict</CODE> in your
+script.  It is not the best choice for you to use for real
+scripts (vs. examples) because it is less efficient and is not
+supported by most other similar modules.</P>
+<P>
+<HR>
+<H1><A NAME="summary">SUMMARY</A></H1>
+<P>Most things can be done most easily via tied hashes.  Skip down to the
+the <A HREF="#tied hashes summary">Tied Hashes Summary</A> to get started quickly.</P>
+<P>
+<H2><A NAME="objects summary">Objects Summary</A></H2>
+<P>Here are quick examples that document the most common functionality
+of all of the method functions [except for a few almost useless ones].</P>
+<PRE>
+    # Just another way of saying Open():
+    $key= new Win32::TieRegistry &quot;LMachine\\Software\\&quot;,
+      { Access=&gt;KEY_READ()|KEY_WRITE(), Delimiter=&gt;&quot;\\&quot; };</PRE>
+<PRE>
+    # Open a Registry key:
+    $subKey= $key-&gt;Open( &quot;SubKey/SubSubKey/&quot;,
+      { Access=&gt;KEY_ALL_ACCESS, Delimiter=&gt;&quot;/&quot; } );</PRE>
+<PRE>
+    # Connect to a remote Registry key:
+    $remKey= $Registry-&gt;Connect( &quot;MachineName&quot;, &quot;LMachine/&quot;,
+      { Access=&gt;KEY_READ, Delimiter=&gt;&quot;/&quot; } );</PRE>
+<PRE>
+    # Get value data:
+    $valueString= $key-&gt;GetValue(&quot;ValueName&quot;);
+    ( $valueString, $valueType )= $key-&gt;GetValue(&quot;ValueName&quot;);</PRE>
+<PRE>
+    # Get list of value names:
+    @valueNames= $key-&gt;ValueNames;</PRE>
+<PRE>
+    # Get list of subkey names:
+    @subKeyNames= $key-&gt;SubKeyNames;</PRE>
+<PRE>
+    # Get combined list of value names (with leading delimiters)
+    # and subkey names (with trailing delimiters):
+    @memberNames= $key-&gt;MemberNames;</PRE>
+<PRE>
+    # Get all information about a key:
+    %keyInfo= $key-&gt;Information;
+    # keys(%keyInfo)= qw( Class LastWrite SecurityLen
+    #   CntSubKeys MaxSubKeyLen MaxSubClassLen
+    #   CntValues MaxValNameLen MaxValDataLen );</PRE>
+<PRE>
+    # Get selected information about a key:
+    ( $class, $cntSubKeys )= $key-&gt;Information( &quot;Class&quot;, &quot;CntSubKeys&quot; );</PRE>
+<PRE>
+    # Get and/or set delimiter:
+    $delim= $key-&gt;Delimiter;
+    $oldDelim= $key-&gt;Delimiter( $newDelim );</PRE>
+<PRE>
+    # Get &quot;path&quot; for an open key:
+    $path= $key-&gt;Path;
+    # For example, &quot;/CUser/Control Panel/Mouse/&quot;
+    # or &quot;//HostName/LMachine/System/DISK/&quot;.</PRE>
+<PRE>
+    # Get name of machine where key is from:
+    $mach= $key-&gt;Machine;
+    # Will usually be &quot;&quot; indicating key is on local machine.</PRE>
+<PRE>
+    # Control different options (see main documentation for descriptions):
+    $oldBool= $key-&gt;ArrayValues( $newBool );
+    $oldBool= $key-&gt;FastDelete( $newBool );
+    $oldBool= $key-&gt;FixSzNulls( $newBool );
+    $oldBool= $key-&gt;SplitMultis( $newBool );
+    $oldBool= $key-&gt;DWordsToHex( $newBool );
+    $oldBool= $key-&gt;DualBinVals( $newBool );
+    $oldBool= $key-&gt;DualTypes( $newBool );
+    @oldBools= $key-&gt;SetOptions( ArrayValues=&gt;1, FastDelete=&gt;1, FixSzNulls=&gt;0,
+      Delimiter=&gt;&quot;/&quot;, AllowLoad=&gt;1, AllowSave=&gt;1 );
+    @oldBools= $key-&gt;GetOptions( ArrayValues, FastDelete, FixSzNulls );</PRE>
+<PRE>
+    # Add or set a value:
+    $key-&gt;SetValue( &quot;ValueName&quot;, $valueDataString );
+    $key-&gt;SetValue( &quot;ValueName&quot;, pack($format,$valueData), &quot;REG_BINARY&quot; );</PRE>
+<PRE>
+    # Add or set a key:
+    $key-&gt;CreateKey( &quot;SubKeyName&quot; );
+    $key-&gt;CreateKey( &quot;SubKeyName&quot;,
+      { Access=&gt;&quot;KEY_ALL_ACCESS&quot;, Class=&gt;&quot;ClassName&quot;,
+        Delimiter=&gt;&quot;/&quot;, Volatile=&gt;1, Backup=&gt;1 } );</PRE>
+<PRE>
+    # Load an off-line Registry hive file into the on-line Registry:
+    $newKey= $Registry-&gt;Load( &quot;C:/Path/To/Hive/FileName&quot; );
+    $newKey= $key-&gt;Load( &quot;C:/Path/To/Hive/FileName&quot;, &quot;NewSubKeyName&quot;,
+                     { Access=&gt;&quot;KEY_READ&quot; } );
+    # Unload a Registry hive file loaded via the Load() method:
+    $newKey-&gt;UnLoad;</PRE>
+<PRE>
+    # (Dis)Allow yourself to load Registry hive files:
+    $success= $Registry-&gt;AllowLoad( $bool );</PRE>
+<PRE>
+    # (Dis)Allow yourself to save a Registry key to a hive file:
+    $success= $Registry-&gt;AllowSave( $bool );</PRE>
+<PRE>
+    # Save a Registry key to a new hive file:
+    $key-&gt;RegSaveKey( &quot;C:/Path/To/Hive/FileName&quot;, [] );</PRE>
+<P>
+<H3><A NAME="other useful methods">Other Useful Methods</A></H3>
+<P>See <EM>Win32API::Registry</EM> for more information on these methods.
+These methods are provided for coding convenience and are
+identical to the <EM>Win32API::Registry</EM> functions except that these
+don't take a handle to a Registry key, instead getting the handle
+from the invoking object [<CODE>$key</CODE>].</P>
+<PRE>
+    $key-&gt;RegGetKeySecurity( $iSecInfo, $sSecDesc, $lenSecDesc );
+    $key-&gt;RegLoadKey( $sSubKeyName, $sPathToFile );
+    $key-&gt;RegNotifyChangeKeyValue(
+      $bWatchSubtree, $iNotifyFilter, $hEvent, $bAsync );
+    $key-&gt;RegQueryMultipleValues(
+      $structValueEnts, $cntValueEnts, $Buffer, $lenBuffer );
+    $key-&gt;RegReplaceKey( $sSubKeyName, $sPathToNewFile, $sPathToBackupFile );
+    $key-&gt;RegRestoreKey( $sPathToFile, $iFlags );
+    $key-&gt;RegSetKeySecurity( $iSecInfo, $sSecDesc );
+    $key-&gt;RegUnLoadKey( $sSubKeyName );</PRE>
+<P>
+<H2><A NAME="tied hashes summary">Tied Hashes Summary</A></H2>
+<P>For fast learners, this may be the only section you need to read.
+Always append one delimiter to the end of each Registry key name
+and prepend one delimiter to the front of each Registry value name.</P>
+<P>
+<H3><A NAME="opening keys">Opening keys</A></H3>
+<PRE>
+    use Win32::TieRegistry ( Delimiter=&gt;&quot;/&quot;, ArrayValues=&gt;1 );
+    $Registry-&gt;Delimiter(&quot;/&quot;);                  # Set delimiter to &quot;/&quot;.
+    $swKey= $Registry-&gt;{&quot;LMachine/Software/&quot;};
+    $winKey= $swKey-&gt;{&quot;Microsoft/Windows/CurrentVersion/&quot;};
+    $userKey= $Registry-&gt;
+      {&quot;CUser/Software/Microsoft/Windows/CurrentVersion/&quot;};
+    $remoteKey= $Registry-&gt;{&quot;//HostName/LMachine/&quot;};</PRE>
+<P>
+<H3><A NAME="reading values">Reading values</A></H3>
+<PRE>
+    $progDir= $winKey-&gt;{&quot;/ProgramFilesDir&quot;};    # &quot;C:\\Program Files&quot;
+    $tip21= $winKey-&gt;{&quot;Explorer/Tips//21&quot;};     # Text of tip #21.</PRE>
+<PRE>
+    $winKey-&gt;ArrayValues(1);
+    ( $devPath, $type )= $winKey-&gt;{&quot;/DevicePath&quot;};
+    # $devPath eq &quot;%SystemRoot%\\inf&quot;
+    # $type eq &quot;REG_EXPAND_SZ&quot;  [if you have SetDualVar.pm installed]
+    # $type == REG_EXPAND_SZ()  [if did C&lt;use Win32::TieRegistry qw(:REG_)&gt;]</PRE>
+<P>
+<H3><A NAME="setting values">Setting values</A></H3>
+<PRE>
+    $winKey-&gt;{&quot;Setup//SourcePath&quot;}= &quot;\\\\SwServer\\SwShare\\Windows&quot;;
+    # Simple.  Assumes data type of REG_SZ.</PRE>
+<PRE>
+    $winKey-&gt;{&quot;Setup//Installation Sources&quot;}=
+      [ &quot;D:\x00\\\\SwServer\\SwShare\\Windows\0\0&quot;, &quot;REG_MULTI_SZ&quot; ];
+    # &quot;\x00&quot; and &quot;\0&quot; used to mark ends of each string and end of list.</PRE>
+<PRE>
+    $winKey-&gt;{&quot;Setup//Installation Sources&quot;}=
+      [ [&quot;D:&quot;,&quot;\\\\SwServer\\SwShare\\Windows&quot;], &quot;REG_MULTI_SZ&quot; ];
+    # Alternate method that is easier to read.</PRE>
+<PRE>
+    $userKey-&gt;{&quot;Explorer/Tips//DisplayInitialTipWindow&quot;}=
+      [ pack(&quot;L&quot;,0), &quot;REG_DWORD&quot; ];
+    $userKey-&gt;{&quot;Explorer/Tips//Next&quot;}= [ pack(&quot;S&quot;,3), &quot;REG_BINARY&quot; ];
+    $userKey-&gt;{&quot;Explorer/Tips//Show&quot;}= [ pack(&quot;L&quot;,0), &quot;REG_BINARY&quot; ];</PRE>
+<P>
+<H3><A NAME="adding keys">Adding keys</A></H3>
+<PRE>
+    $swKey-&gt;{&quot;FooCorp/&quot;}= {
+        &quot;FooWriter/&quot; =&gt; {
+            &quot;/Version&quot; =&gt; &quot;4.032&quot;,
+            &quot;Startup/&quot; =&gt; {
+                &quot;/Title&quot; =&gt; &quot;Foo Writer Deluxe ][&quot;,
+                &quot;/WindowSize&quot; =&gt; [ pack(&quot;LL&quot;,$wid,$ht), &quot;REG_BINARY&quot; ],
+                &quot;/TaskBarIcon&quot; =&gt; [ &quot;0x0001&quot;, &quot;REG_DWORD&quot; ],
+            },
+            &quot;Compatibility/&quot; =&gt; {
+                &quot;/AutoConvert&quot; =&gt; &quot;Always&quot;,
+                &quot;/Default Palette&quot; =&gt; &quot;Windows Colors&quot;,
+            },
+        },
+        &quot;/License&quot;, =&gt; &quot;0123-9C8EF1-09-FC&quot;,
+    };</PRE>
+<P>
+<H3><A NAME="listing all subkeys and values">Listing all subkeys and values</A></H3>
+<PRE>
+    @members= keys( %{$swKey} );
+    @subKeys= grep(  m#^/#,  keys( %{$swKey-&gt;{&quot;Classes/batfile/&quot;}} )  );
+    # @subKeys= ( &quot;/&quot;, &quot;/EditFlags&quot; );
+    @valueNames= grep(  ! m#^/#,  keys( %{$swKey-&gt;{&quot;Classes/batfile/&quot;}} )  );
+    # @valueNames= ( &quot;DefaultIcon/&quot;, &quot;shell/&quot;, &quot;shellex/&quot; );</PRE>
+<P>
+<H3><A NAME="deleting values or keys with no subkeys">Deleting values or keys with no subkeys</A></H3>
+<PRE>
+    $oldValue= delete $userKey-&gt;{&quot;Explorer/Tips//Next&quot;};</PRE>
+<PRE>
+    $oldValues= delete $userKey-&gt;{&quot;Explorer/Tips/&quot;};
+    # $oldValues will be reference to hash containing deleted keys values.</PRE>
+<P>
+<H3><A NAME="closing keys">Closing keys</A></H3>
+<PRE>
+    undef $swKey;               # Explicit way to close a key.
+    $winKey= &quot;Anything else&quot;;   # Implicitly closes a key.
+    exit 0;                     # Implicitly closes all keys.</PRE>
+<P>
+<H2><A NAME="tie::registry">Tie::Registry</A></H2>
+<P>This module was originally called <EM>Tie::Registry</EM>.  Changing code
+that used <EM>Tie::Registry</EM> over to <EM>Win32::TieRegistry</EM> is trivial
+as the module name should only be mentioned once, in the <A HREF="../../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>
+line.  However, finding all of the places that used <EM>Tie::Registry</EM>
+may not be completely trivial so we have included <EM>Tie/Registry.pm</EM>
+which you can install to provide backward compatibility.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tye McQueen.  See <A HREF="http://www.metronet.com/~tye/">http://www.metronet.com/~tye/</A> or e-mail
+<A HREF="mailto:tye@metronet.com">tye@metronet.com</A> with bug reports.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>Win32API::Registry</EM> - Provides access to <CODE>Reg*()</CODE>, <CODE>HKEY_*</CODE>,
+<CODE>KEY_*</CODE>, <CODE>REG_*</CODE> [required].</P>
+<P><EM>Win32::WinError</EM> - Defines <CODE>ERROR_*</CODE> values [optional].</P>
+<P><EM>SetDualVar</EM> - For returning <CODE>REG_*</CODE> values as combined
+string/integer values [optional].</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Perl5.004_02 has bugs that make <EM>Win32::TieRegistry</EM> fail in
+strange and subtle ways.</P>
+<P>Using <EM>Win32::TieRegistry</EM> with versions of Perl prior to 5.005
+can be tricky or impossible.  Most notes about this have been
+removed from the documentation (they get rather complicated
+and confusing).  This includes references to <A HREF="../../../lib/Pod/perlvar.html#item_%24%5EE"><CODE>$^E</CODE></A> perhaps not
+being meaningful.</P>
+<P>Because Perl hashes are case sensitive, certain lookups are also
+case sensistive.  In particular, the root keys (``Classes'', ``CUser'',
+``LMachine'', ``Users'', ``PerfData'', ``CConfig'', ``DynData'', and HKEY_*)
+must always be entered without changing between upper and lower
+case letters.  Also, the special rule for matching subkey names
+that contain the user-selected delimiter only works if case is
+matched.  All other key name and value name lookups should be case
+insensitive because the underlying Reg*() calls ignore case.</P>
+<P>Information about each key is cached when using a tied hash.
+This cache is not flushed nor updated when changes are made,
+<EM>even when the same tied hash is used</EM> to make the changes.</P>
+<P>Current implementations of Perl's ``global destruction'' phase can
+cause objects returned by <A HREF="#item_Load"><CODE>Load()</CODE></A> to be destroyed while keys
+within the hive are still open, if the objects still exist when
+the script starts to exit.  When this happens, the automatic
+<A HREF="#item_UnLoad"><CODE>UnLoad()</CODE></A> will report a failure and the hive will remain loaded
+in the Registry.</P>
+<P>Trying to <A HREF="#item_Load"><CODE>Load()</CODE></A> a hive file that is located on a remote network
+share may silently delete all data from the hive.  This is a bug
+in the Win32 APIs, not any Perl code or modules.  This module does
+not try to protect you from this bug.</P>
+<P>There is no test suite.</P>
+<P>
+<HR>
+<H1><A NAME="future directions">FUTURE DIRECTIONS</A></H1>
+<P>The following items are desired by the author and may appear in a
+future release of this module.</P>
+<DL>
+<DT><STRONG><A NAME="item_TieValues_option">TieValues option</A></STRONG><BR>
+<DD>
+Currently described in main documentation but no yet implemented.
+<P></P>
+<DT><STRONG><A NAME="item_AutoRefresh_option">AutoRefresh option</A></STRONG><BR>
+<DD>
+Trigger use of <CODE>RegNotifyChangeKeyValue()</CODE> to keep tied hash
+caches up-to-date even when other programs make changes.
+<P></P>
+<DT><STRONG><A NAME="item_Error_options">Error options</A></STRONG><BR>
+<DD>
+Allow the user to have unchecked calls (calls in a ``void context'')
+to automatically report errors via <A HREF="../../../lib/Pod/perlfunc.html#item_warn"><CODE>warn</CODE></A> or <A HREF="../../../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A>.
+<P>For complex operations, such a copying an entire subtree, provide
+access to detailed information about errors (and perhaps some
+warnings) that were encountered.  Let the user control whether
+the complex operation continues in spite of errors.</P>
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::TieRegistry - Powerful and easy ways to manipulate a registry
+[on Win32 for now].</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

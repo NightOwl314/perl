@@ -1,0 +1,198 @@
+
+<HTML>
+<HEAD>
+<TITLE>Test::Harness - run perl standard test scripts with statistics</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Test::Harness - run perl standard test scripts with statistics</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the test script output">The test script output</A></LI>
+	</UL>
+
+	<LI><A HREF="#export">EXPORT</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#environment">ENVIRONMENT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Test::Harness - run perl standard test scripts with statistics</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>use Test::Harness;</P>
+<P>runtests(@tests);</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>(By using the <A HREF="../../lib/Test.html">the Test manpage</A> module, you can write test scripts without
+knowing the exact output this module expects.  However, if you need to
+know the specifics, read on!)</P>
+<P>Perl test scripts print to standard output <CODE>&quot;ok N&quot;</CODE> for each single
+test, where <CODE>N</CODE> is an increasing sequence of integers. The first line
+output by a standard test script is <CODE>&quot;1..M&quot;</CODE> with <A HREF="../../lib/Pod/perlguts.html#item_M"><CODE>M</CODE></A> being the
+number of tests that should be run within the test
+script. Test::Harness::runtests(@tests) runs all the testscripts
+named as arguments and checks standard output for the expected
+<CODE>&quot;ok N&quot;</CODE> strings.</P>
+<P>After all tests have been performed, <CODE>runtests()</CODE> prints some
+performance statistics that are computed by the Benchmark module.</P>
+<P>
+<H2><A NAME="the test script output">The test script output</A></H2>
+<P>Any output from the testscript to standard error is ignored and
+bypassed, thus will be seen by the user. Lines written to standard
+output containing <CODE>/^(not\s+)?ok\b/</CODE> are interpreted as feedback for
+runtests().  All other lines are discarded.</P>
+<P>It is tolerated if the test numbers after <CODE>ok</CODE> are omitted. In this
+case Test::Harness maintains temporarily its own counter until the
+script supplies test numbers again. So the following test script</P>
+<PRE>
+    print &lt;&lt;END;
+    1..6
+    not ok
+    ok
+    not ok
+    ok
+    ok
+    END</PRE>
+<P>will generate</P>
+<PRE>
+    FAILED tests 1, 3, 6
+    Failed 3/6 tests, 50.00% okay</PRE>
+<P>The global variable $Test::Harness::verbose is exportable and can be
+used to let <CODE>runtests()</CODE> display the standard output of the script
+without altering the behavior otherwise.</P>
+<P>The global variable $Test::Harness::switches is exportable and can be
+used to set perl command line options used for running the test
+script(s). The default value is <A HREF="../../lib/Pod/perlrun.html#item_%2Dw"><CODE>-w</CODE></A>.</P>
+<P>If the standard output line contains substring <CODE> # Skip</CODE> (with
+variations in spacing and case) after <CODE>ok</CODE> or <CODE>ok NUMBER</CODE>, it is
+counted as a skipped test.  If the whole testscript succeeds, the
+count of skipped tests is included in the generated output.</P>
+<P><CODE>Test::Harness</CODE> reports the text after <CODE> # Skip(whatever)</CODE> as a
+reason for skipping.  Similarly, one can include a similar explanation
+in a <CODE>1..0</CODE> line emitted if the test is skipped completely:</P>
+<PRE>
+  1..0 # Skipped: no leverage found</PRE>
+<P>
+<HR>
+<H1><A NAME="export">EXPORT</A></H1>
+<P><CODE>&amp;runtests</CODE> is exported by Test::Harness per default.</P>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_All_tests_successful%2E%5CnFiles%3D%25d%2C_Tests%3"><CODE>All tests successful.\nFiles=%d,  Tests=%d, %s</CODE></A></STRONG><BR>
+<DD>
+If all tests are successful some statistics about the performance are
+printed.
+<P></P>
+<DT><STRONG><A NAME="item_FAILED_tests_%25s%5Cn%5CtFailed_%25d%2F%25d_tests%"><CODE>FAILED tests %s\n\tFailed %d/%d tests, %.2f%% okay.</CODE></A></STRONG><BR>
+<DD>
+For any single script that has failing subtests statistics like the
+above are printed.
+<P></P>
+<DT><STRONG><A NAME="item_d"><CODE>Test returned status %d (wstat %d)</CODE></A></STRONG><BR>
+<DD>
+Scripts that return a non-zero exit status, both <CODE>$? &gt;&gt; 8</CODE> and <A HREF="../../lib/Pod/perlvar.html#item_%24%3F"><CODE>$?</CODE></A> are
+printed in a message similar to the above.
+<P></P>
+<DT><STRONG><A NAME="item_Failed_1_test%2C_%25%2E2f%25%25_okay%2E_%25s"><CODE>Failed 1 test, %.2f%% okay. %s</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Failed_%25d%2F%25d_tests%2C_%25%2E2f%25%25_okay%2E"><CODE>Failed %d/%d tests, %.2f%% okay. %s</CODE></A></STRONG><BR>
+<DD>
+If not all tests were successful, the script dies with one of the
+above messages.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="environment">ENVIRONMENT</A></H1>
+<P>Setting <CODE>HARNESS_IGNORE_EXITCODE</CODE> makes harness ignore the exit status
+of child processes.</P>
+<P>Setting <CODE>HARNESS_NOTTY</CODE> to a true value forces it to behave as though
+STDOUT were not a console.  You may need to set this if you don't want
+harness to output more frequent progress messages using carriage returns.
+Some consoles may not handle carriage returns properly (which results
+in a somewhat messy output).</P>
+<P>Setting <CODE>HARNESS_COMPILE_TEST</CODE> to a true value will make harness attempt
+to compile the test using <CODE>perlcc</CODE> before running it.</P>
+<P>If <CODE>HARNESS_FILELEAK_IN_DIR</CODE> is set to the name of a directory, harness
+will check after each test whether new files appeared in that directory,
+and report them as</P>
+<PRE>
+  LEAKED FILES: scr.tmp 0 my.db</PRE>
+<P>If relative, directory name is with respect to the current directory at
+the moment <CODE>runtests()</CODE> was called.  Putting absolute path into 
+<CODE>HARNESS_FILELEAK_IN_DIR</CODE> may give more predicatable results.</P>
+<P>The value of <CODE>HARNESS_PERL_SWITCHES</CODE> will be prepended to the
+switches used to invoke perl on each test.  For example, setting
+<CODE>HARNESS_PERL_SWITCHES</CODE> to ``-W'' will run all tests with all
+warnings enabled.</P>
+<P>If <CODE>HARNESS_COLUMNS</CODE> is set, then this value will be used for the
+width of the terminal. If it is not set then it will default to
+<CODE>COLUMNS</CODE>. If this is not set, it will default to 80. Note that users
+of Bourne-sh based shells will need to <CODE>export COLUMNS</CODE> for this
+module to use that variable.</P>
+<P>Harness sets <CODE>HARNESS_ACTIVE</CODE> before executing the individual tests.
+This allows the tests to determine if they are being executed through the
+harness or by any other means.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Test.html">the Test manpage</A> for writing test scripts and also <A HREF="../../lib/Benchmark.html">the Benchmark manpage</A> for the
+underlying timing routines.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Either Tim Bunce or Andreas Koenig, we don't know. What we know for
+sure is, that it was inspired by Larry Wall's TEST script that came
+with perl distributions for ages. Numerous anonymous contributors
+exist. Current maintainer is Andreas Koenig.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Test::Harness uses $^X to determine the perl binary to run the tests
+with. Test scripts running via the shebang (<CODE>#!</CODE>) line may not be
+portable because $^X is not consistent for shebang scripts across
+platforms. This is no problem when Test::Harness is run with an
+absolute path to the perl binary or when $^X can be found in the path.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Test::Harness - run perl standard test scripts with statistics</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

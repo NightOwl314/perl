@@ -1,0 +1,152 @@
+
+<HTML>
+<HEAD>
+<TITLE>Tie::StdHandle  - base class definitions for tied handles</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::StdHandle  - base class definitions for tied handles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#more information">MORE INFORMATION</A></LI>
+	<LI><A HREF="#compatibility">COMPATIBILITY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tie::Handle, Tie::StdHandle  - base class definitions for tied handles</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    package NewHandle;
+    require Tie::Handle;</PRE>
+<PRE>
+    @ISA = (Tie::Handle);</PRE>
+<PRE>
+    sub READ { ... }            # Provide a needed method
+    sub TIEHANDLE { ... }       # Overrides inherited method</PRE>
+<PRE>
+    package main;</PRE>
+<PRE>
+    tie *FH, 'NewHandle';</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides some skeletal methods for handle-tying classes. See
+<A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> for a list of the functions required in tying a handle to a package.
+The basic <STRONG>Tie::Handle</STRONG> package provides a <CODE>new</CODE> method, as well as methods
+<CODE>TIEHANDLE</CODE>, <CODE>PRINT</CODE>, <CODE>PRINTF</CODE> and <CODE>GETC</CODE>.</P>
+<P>For developers wishing to write their own tied-handle classes, the methods
+are summarized below. The <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> section not only documents these, but
+has sample code as well:</P>
+<DL>
+<DT><STRONG><A NAME="item_TIEHANDLE_classname%2C_LIST">TIEHANDLE classname, LIST</A></STRONG><BR>
+<DD>
+The method invoked by the command <CODE>tie *glob, classname</CODE>. Associates a new
+glob instance with the specified class. <CODE>LIST</CODE> would represent additional
+arguments (along the lines of <A HREF="../../lib/AnyDBM_File.html">the AnyDBM_File manpage</A> and compatriots) needed to
+complete the association.
+<P></P>
+<DT><STRONG><A NAME="item_WRITE_this%2C_scalar%2C_length%2C_offset">WRITE this, scalar, length, offset</A></STRONG><BR>
+<DD>
+Write <EM>length</EM> bytes of data from <EM>scalar</EM> starting at <EM>offset</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_PRINT_this%2C_LIST">PRINT this, LIST</A></STRONG><BR>
+<DD>
+Print the values in <EM>LIST</EM>
+<P></P>
+<DT><STRONG><A NAME="item_PRINTF_this%2C_format%2C_LIST">PRINTF this, format, LIST</A></STRONG><BR>
+<DD>
+Print the values in <EM>LIST</EM> using <EM>format</EM>
+<P></P>
+<DT><STRONG><A NAME="item_READ_this%2C_scalar%2C_length%2C_offset">READ this, scalar, length, offset</A></STRONG><BR>
+<DD>
+Read <EM>length</EM> bytes of data into <EM>scalar</EM> starting at <EM>offset</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_READLINE_this">READLINE this</A></STRONG><BR>
+<DD>
+Read a single line
+<P></P>
+<DT><STRONG><A NAME="item_GETC_this">GETC this</A></STRONG><BR>
+<DD>
+Get a single character
+<P></P>
+<DT><STRONG><A NAME="item_CLOSE_this">CLOSE this</A></STRONG><BR>
+<DD>
+Close the handle
+<P></P>
+<DT><STRONG><A NAME="item_OPEN_this%2C_filename">OPEN this, filename</A></STRONG><BR>
+<DD>
+(Re-)open the handle
+<P></P>
+<DT><STRONG><A NAME="item_BINMODE_this">BINMODE this</A></STRONG><BR>
+<DD>
+Specify content is binary
+<P></P>
+<DT><STRONG><A NAME="item_EOF_this">EOF this</A></STRONG><BR>
+<DD>
+Test for end of file.
+<P></P>
+<DT><STRONG><A NAME="item_TELL_this">TELL this</A></STRONG><BR>
+<DD>
+Return position in the file.
+<P></P>
+<DT><STRONG><A NAME="item_SEEK_this%2C_offset%2C_whence">SEEK this, offset, whence</A></STRONG><BR>
+<DD>
+Position the file.
+<P>Test for end of file.</P>
+<P></P>
+<DT><STRONG><A NAME="item_DESTROY_this">DESTROY this</A></STRONG><BR>
+<DD>
+Free the storage associated with the tied handle referenced by <EM>this</EM>.
+This is rarely needed, as Perl manages its memory quite well. But the
+option exists, should a class wish to perform specific actions upon the
+destruction of an instance.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="more information">MORE INFORMATION</A></H1>
+<P>The <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> section contains an example of tying handles.</P>
+<P>
+<HR>
+<H1><A NAME="compatibility">COMPATIBILITY</A></H1>
+<P>This version of Tie::Handle is neither related to nor compatible with
+the Tie::Handle (3.0) module available on CPAN. It was due to an
+accident that two modules with the same name appeared. The namespace
+clash has been cleared in favor of this module that comes with the
+perl core in September 2000 and accordingly the version number has
+been bumped up to 4.0.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::StdHandle  - base class definitions for tied handles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

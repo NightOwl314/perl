@@ -1,0 +1,134 @@
+
+<HTML>
+<HEAD>
+<TITLE>Thread::Queue - thread-safe queues</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Queue - thread-safe queues</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#functions and methods">FUNCTIONS AND METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Thread::Queue - thread-safe queues</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Thread::Queue;
+    my $q = new Thread::Queue;
+    $q-&gt;enqueue(&quot;foo&quot;, &quot;bar&quot;);
+    my $foo = $q-&gt;dequeue;    # The &quot;bar&quot; is still in the queue.
+    my $foo = $q-&gt;dequeue_nb; # returns &quot;bar&quot;, or undef if the queue was
+                              # empty
+    my $left = $q-&gt;pending;   # returns the number of items still in the queue</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A queue, as implemented by <CODE>Thread::Queue</CODE> is a thread-safe data structure
+much like a list. Any number of threads can safely add elements to the end
+of the list, or remove elements from the head of the list. (Queues don't
+permit adding or removing elements from the middle of the list)</P>
+<P>
+<HR>
+<H1><A NAME="functions and methods">FUNCTIONS AND METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new</CODE></A> function creates a new empty queue.
+<P></P>
+<DT><STRONG><A NAME="item_enqueue">enqueue LIST</A></STRONG><BR>
+<DD>
+The <A HREF="#item_enqueue"><CODE>enqueue</CODE></A> method adds a list of scalars on to the end of the queue.
+The queue will grow as needed to accomodate the list.
+<P></P>
+<DT><STRONG><A NAME="item_dequeue">dequeue</A></STRONG><BR>
+<DD>
+The <A HREF="#item_dequeue"><CODE>dequeue</CODE></A> method removes a scalar from the head of the queue and
+returns it. If the queue is currently empty, <A HREF="#item_dequeue"><CODE>dequeue</CODE></A> will block the
+thread until another thread <A HREF="#item_enqueue"><CODE>enqueue</CODE></A>s a scalar.
+<P></P>
+<DT><STRONG><A NAME="item_dequeue_nb">dequeue_nb</A></STRONG><BR>
+<DD>
+The <A HREF="#item_dequeue_nb"><CODE>dequeue_nb</CODE></A> method, like the <A HREF="#item_dequeue"><CODE>dequeue</CODE></A> method, removes a scalar from
+the head of the queue and returns it. Unlike <A HREF="#item_dequeue"><CODE>dequeue</CODE></A>, though,
+<A HREF="#item_dequeue_nb"><CODE>dequeue_nb</CODE></A> won't block if the queue is empty, instead returning
+<A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_pending">pending</A></STRONG><BR>
+<DD>
+The <A HREF="#item_pending"><CODE>pending</CODE></A> method returns the number of items still in the queue.  (If
+there can be multiple readers on the queue it's best to lock the queue
+before checking to make sure that it stays in a consistent state)
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Thread.html">the Thread manpage</A>
+</P>
+<PRE>
+
+=cut</PRE>
+<P>sub new {
+    my $class = shift;
+    return bless [@_], $class;
+}</P>
+<P>sub dequeue : locked : method {
+    my $q = shift;
+    cond_wait $q until @$q;
+    return shift @$q;
+}</P>
+<P>sub dequeue_nb : locked : method {
+  my $q = shift;
+  if (@$q) {
+    return shift @$q;
+  } else {
+    return undef;
+  }
+}</P>
+<P>sub enqueue : locked : method {
+    my $q = shift;
+    push(@$q, @_) and cond_broadcast $q;
+}</P>
+<P>sub pending : locked : method {
+  my $q = shift;
+  return scalar(@$q);
+}</P>
+<P>1;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Thread::Queue - thread-safe queues</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

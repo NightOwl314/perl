@@ -1,0 +1,362 @@
+<HTML>
+<HEAD>
+<TITLE>Unicode::String - String of Unicode characters</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Unicode::String - String of Unicode characters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Unicode::String - String of Unicode characters (UCS2/UTF16)</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Unicode::String qw(utf8 latin1 utf16);
+ $u = utf8(&quot;The Unicode Standard is a fixed-width, uniform &quot;);
+ $u .= utf8(&quot;encoding scheme for written characters and text&quot;);</PRE>
+<PRE>
+ # convert to various external formats
+ print $u-&gt;ucs4;      # 4 byte characters
+ print $u-&gt;utf16;     # 2 byte characters + surrogates
+ print $u-&gt;utf8;      # 1-4 byte characters
+ print $u-&gt;utf7;      # 7-bit clean format
+ print $u-&gt;latin1;    # lossy
+ print $u-&gt;hex;       # a hexadecimal string</PRE>
+<PRE>
+ # all these can be used to set string value or as constructor
+ $u-&gt;latin1(&quot;Å være eller å ikke være&quot;);
+ $u = utf16(&quot;\0Å\0 \0v\0æ\0r\0e&quot;);</PRE>
+<PRE>
+ # string operations
+ $u2 = $u-&gt;copy;
+ $u-&gt;append($u2);
+ $u-&gt;repeat(2);
+ $u-&gt;chop;</PRE>
+<PRE>
+ $u-&gt;length;
+ $u-&gt;index($other);
+ $u-&gt;index($other, $pos);</PRE>
+<PRE>
+ $u-&gt;substr($offset);
+ $u-&gt;substr($offset, $length);
+ $u-&gt;substr($offset, $length, $substitute);</PRE>
+<PRE>
+ # overloading
+ $u .= &quot;more&quot;;
+ $u = $u x 100;
+ print &quot;$u\n&quot;;</PRE>
+<PRE>
+ # string &lt;--&gt; array of numbers
+ @array = $u-&gt;unpack;
+ $u-&gt;pack(@array);</PRE>
+<PRE>
+ # misc
+ $u-&gt;ord;
+ $u = uchr($num);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A <EM>Unicode::String</EM> object represents a sequence of Unicode
+characters.  The Unicode Standard is a fixed-width, uniform encoding
+scheme for written characters and text.  This encoding treats
+alphabetic characters, ideographic characters, and symbols
+identically, which means that they can be used in any mixture and with
+equal facility.  Unicode is modeled on the ASCII character set, but
+uses a 16-bit encoding to support full multilingual text.</P>
+<P>Internally a <EM>Unicode::String</EM> object is a string of 2 byte values in
+network byte order (big-endian).  The class provide various methods to
+convert from and to various external formats, and all string
+manipulations are made on strings in this the internal 16-bit format.</P>
+<P>The functions utf16(), utf8(), utf7(), ucs2(), ucs4(), latin1(),
+<CODE>uchr()</CODE> can be imported from the <EM>Unicode::String</EM> module and will
+work as constructors initializing strings of the corresponding
+encoding.  The <A HREF="#item_ucs2"><CODE>ucs2()</CODE></A> and <A HREF="#item_utf16"><CODE>utf16()</CODE></A> are really aliases for the same
+function.</P>
+<P>The <EM>Unicode::String</EM> objects overload various operators, so they
+will normally work like plain 8-bit strings in Perl.  This includes
+conversions to strings, numbers and booleans as well as assignment,
+concatenation and repetition.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_stringify_as">Unicode::String-&gt;stringify_as( [$enc] )</A></STRONG><BR>
+<DD>
+This class method specify which encoding will be used when
+<EM>Unicode::String</EM> objects are implicitly converted to and from plain
+strings.  It define which encoding to assume for the argument of the
+<EM>Unicode::String</EM> constructor new().  Without an encoding argument,
+<A HREF="#item_stringify_as"><CODE>stringify_as()</CODE></A> returns the current encoding ctor function.  The
+encoding argument ($enc) is a string with one of the following values:
+``ucs4'', ``ucs2'', ``utf16'', ``utf8'', ``utf7'', ``latin1'', ``hex''.  The default
+is ``utf8''.
+<P></P>
+<DT><STRONG><A NAME="item_new">$us = Unicode::String-&gt;new( [$initial_value] )</A></STRONG><BR>
+<DD>
+This is the customary object constructor.  Without argument, it
+creates an empty <EM>Unicode::String</EM> object.  If an $initial_value
+argument is given, it is decoded according to the specified
+<A HREF="#item_stringify_as"><CODE>stringify_as()</CODE></A> encoding and used to initialize the newly created
+object.
+<P>Normally you create <EM>Unicode::String</EM> objects by importing some of
+the encoding methods below as functions into your namespace and
+calling them with an appropriate encoded argument.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ucs4">$us-&gt;ucs4( [$newval] )</A></STRONG><BR>
+<DD>
+The UCS-4 encoding use 32 bits per character.  The main benefit of this
+encoding is that you don't have to deal with surrogate pairs.  Encoded
+as a Perl string we use 4-bytes in network byte order for each
+character.
+<P>The <A HREF="#item_ucs4"><CODE>ucs4()</CODE></A> method always return the old value of $us and if given an
+argument decodes the UCS-4 string and set this as the new value of $us.
+The characters in $newval must be in the range 0x0 .. 0x10FFFF.
+Characters outside this range is ignored.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ucs2">$us-&gt;ucs2( [$newval] )</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_utf16">$us-&gt;utf16( [$newval] )</A></STRONG><BR>
+<DD>
+The <A HREF="#item_ucs2"><CODE>ucs2()</CODE></A> and <A HREF="#item_utf16"><CODE>utf16()</CODE></A> are really just different names for the same
+method.  The UCS-2 encoding use 16 bits per character.  The UTF-16
+encoding is identical to UCS-2, but includes the use of surrogate
+pairs.  Surrogates make it possible to encode characters in the range
+0x010000 .. 0x10FFFF with the use of two consecutive 16-bit chars.
+Encoded as a Perl string we use 2-bytes in network byte order for each
+character (or surrogate code).
+<P>The <A HREF="#item_ucs2"><CODE>ucs2()</CODE></A> method always return the old value of $us and if given an
+argument set this as the new value of $us.</P>
+<P></P>
+<DT><STRONG><A NAME="item_utf8">$us-&gt;utf8( [$newval] )</A></STRONG><BR>
+<DD>
+The UTF-8 encoding use 8-bit for the encoding of characters in the
+range 0x0 .. 0x7F, 16-bit for the encoding of characters in the range
+0x80 .. 0x7FF, 24-bit for the encoding of characters in the range
+0x800 .. 0xFFFF and 32-bit for characters in the range 0x01000
+.. 0x10FFFF.  Americans like this encoding, because plain US-ASCII
+characters are still US-ASCII.  Another benefit is that the character
+'\0' only occurs as the encoding of 0x0, thus the normal
+NUL-terminated strings (popular in the C programming language) can
+still be used.
+<P>The <A HREF="#item_utf8"><CODE>utf8()</CODE></A> method always return the old value of $us encoded using
+UTF-8 and if given an argument decodes the UTF-8 string and set this as
+the new value of $us.</P>
+<P></P>
+<DT><STRONG><A NAME="item_utf7">$us-&gt;utf7( [$newval] )</A></STRONG><BR>
+<DD>
+The UTF-7 encoding only use plain US-ASCII characters for the
+encoding.  This makes it safe for transport through 8-bit stripping
+protocols.  Characters outside the US-ASCII range are base64-encoded
+and '+' is used as an escape character.  The UTF-7 encoding is
+described in RFC1642.
+<P>The <A HREF="#item_utf7"><CODE>utf7()</CODE></A> method always return the old value of $us encoded using
+UTF-7 and if given an argument decodes the UTF-7 string and set this as
+the new value of $us.</P>
+<P>If the (global) variable $Unicode::String::UTF7_OPTIONAL_DIRECT_CHARS
+is TRUE, then a wider range of characters are encoded as themselves.
+It is even TRUE by default.  The characters affected by this are:</P>
+<PRE>
+   ! &quot; # $ % &amp; * ; &lt; = &gt; @ [ ] ^ _ ` { | }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_latin1">$us-&gt;latin1( [$newval] )</A></STRONG><BR>
+<DD>
+The first 256 codes of Unicode is identical to the ISO-8859-1 8-bit
+encoding, also known as Latin-1.  The <A HREF="#item_latin1"><CODE>latin1()</CODE></A> method always return
+the old value of $us and if given an argument set this as the new
+value of $us.  Characters outside the 0x0 .. 0xFF range are ignored
+when returning a Latin-1 string.  If you want more control over the
+mapping from Unicode to Latin-1, use the <EM>Unicode::Map8</EM> class.  This
+is also the way to deal with other 8-bit character sets.
+<P></P>
+<DT><STRONG><A NAME="item_hex">$us-&gt;hex( [$newval] )</A></STRONG><BR>
+<DD>
+This <CODE>method()</CODE> return a plain ASCII string where each Unicode character
+is represented by the ``U+XXXX'' string and separated by a single space
+character.  This format can also be used to set the value of $us (in
+which case the ``U+'' is optional).
+<P></P>
+<DT><STRONG><A NAME="item_as_string">$us-&gt;as_string;</A></STRONG><BR>
+<DD>
+Converts a <EM>Unicode::String</EM> to a plain string according to the
+setting of stringify_as().  The default <A HREF="#item_stringify_as"><CODE>stringify_as()</CODE></A> method is
+``utf8''.
+<P></P>
+<DT><STRONG><A NAME="item_as_num">$us-&gt;as_num;</A></STRONG><BR>
+<DD>
+Converts a <EM>Unicode::String</EM> to a number.  Currently only the digits
+in the range 0x30 .. 0x39 are recognized.  The plan is to eventually
+support all Unicode digit characters.
+<P></P>
+<DT><STRONG><A NAME="item_as_bool">$us-&gt;as_bool;</A></STRONG><BR>
+<DD>
+Converts a <EM>Unicode::String</EM> to a boolean value.  Only the empty
+string is FALSE.  A string consisting of only the character U+0030 is
+considered TRUE, even if Perl consider ``0'' to be FALSE.
+<P></P>
+<DT><STRONG><A NAME="item_repeat">$us-&gt;repeat( $count );</A></STRONG><BR>
+<DD>
+Returns a new <EM>Unicode::String</EM> where the content of $us is repeated
+$count times.  This operation is also overloaded as:
+<PRE>
+  $us x $count</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_concat">$us-&gt;concat( $other_string );</A></STRONG><BR>
+<DD>
+Concatenates the string $us and the string $other_string.  If
+$other_string is not an <EM>Unicode::String</EM> object, then it is first
+passed to the Unicode::String-&gt;new constructor function.  This
+operation is also overloaded as:
+<PRE>
+  $us . $other_string</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_append">$us-&gt;append( $other_string );</A></STRONG><BR>
+<DD>
+Appends the string $other_string to the value of $us.  If
+$other_string is not an <EM>Unicode::String</EM> object, then it is first
+passed to the Unicode::String-&gt;new constructor function.  This
+operation is also overloaded as:
+<PRE>
+  $us .= $other_string</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_copy">$us-&gt;copy;</A></STRONG><BR>
+<DD>
+Returns a copy of the current <EM>Unicode::String</EM> object.  This
+operation is overloaded as the assignment operator.
+<P></P>
+<DT><STRONG><A NAME="item_length">$us-&gt;length;</A></STRONG><BR>
+<DD>
+Returns the length of the <EM>Unicode::String</EM>.  Surrogate pairs are
+still counted as 2.
+<P></P>
+<DT><STRONG><A NAME="item_byteswap">$us-&gt;byteswap;</A></STRONG><BR>
+<DD>
+This method will swap the bytes in the internal representation of the
+<EM>Unicode::String</EM> object.
+<P>Unicode reserve the character U+FEFF character as a byte order mark.
+This works because the swapped character, U+FFFE, is reserved to not
+be valid.  For strings that have the byte order mark as the first
+character, we can guaranty to get the byte order right with the
+following code:</P>
+<PRE>
+   $ustr-&gt;byteswap if $ustr-&gt;ord == 0xFFFE;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_unpack">$us-&gt;unpack;</A></STRONG><BR>
+<DD>
+Returns a list of integers each representing an UTF-16 character code.
+<P></P>
+<DT><STRONG><A NAME="item_pack">$us-&gt;pack( @uchr );</A></STRONG><BR>
+<DD>
+Sets the value of $us as a sequence of UTF-16 characters with the
+characters codes given as parameter.
+<P></P>
+<DT><STRONG><A NAME="item_ord">$us-&gt;ord;</A></STRONG><BR>
+<DD>
+Returns the character code of the first character in $us.  The <A HREF="#item_ord"><CODE>ord()</CODE></A>
+method deals with surrogate pairs, which gives us a result-range of
+0x0 .. 0x10FFFF.  If the $us string is empty, undef is returned.
+<P></P>
+<DT><STRONG><A NAME="item_chr">$us-&gt;chr( $code );</A></STRONG><BR>
+<DD>
+Sets the value of $us to be a string containing the character assigned
+code $code.  The argument $code must be an integer in the range 0x0
+.. 0x10FFFF.  If the code is greater than 0xFFFF then a surrogate pair
+created.
+<P></P>
+<DT><STRONG><A NAME="item_name">$us-&gt;name</A></STRONG><BR>
+<DD>
+In scalar context returns the official Unicode name of the first
+character in $us.  In array context returns the name of all characters
+in $us.  Also see <A HREF="../../lib/Unicode/CharName.html">the Unicode::CharName manpage</A>.
+<P></P>
+<DT><STRONG><A NAME="item_substr">$us-&gt;substr( $offset, [$length, [$subst]] )</A></STRONG><BR>
+<DD>
+Returns a sub-string of $us.  Works similar to the builtin substr
+function, but because we can't make LVALUE subs yet, you have to pass
+the string you want to assign to the sub-string as the 3rd parameter.
+<P></P>
+<DT><STRONG><A NAME="item_index">$us-&gt;index( $other, [$pos] );</A></STRONG><BR>
+<DD>
+Locates the position of $other within $us, possibly starting the
+search at position $pos.
+<P></P>
+<DT><STRONG><A NAME="item_chop">$us-&gt;chop;</A></STRONG><BR>
+<DD>
+Chops off the last character of $us and returns it (as a
+<EM>Unicode::String</EM> object).
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>The following utility functions are provided.  They will be exported
+on request.</P>
+<DL>
+<DT><STRONG><A NAME="item_byteswap2">byteswap2($str, ...)</A></STRONG><BR>
+<DD>
+This function will swap 2 and 2 bytes in the strings passed as
+arguments.  This can be used to fix up UTF-16 or UCS-2 strings from
+litle-endian systems.  If this function is called in void context,
+then it will modify its arguments in-place.  Otherwise, then swapped
+strings are returned.
+<P></P>
+<DT><STRONG><A NAME="item_byteswap4">byteswap4($str, ...)</A></STRONG><BR>
+<DD>
+The byteswap4 function works similar to byteswap2, but will reverse
+the order of 4 and 4 bytes.  Can be used to fix litle-endian UCS-4
+strings.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Unicode/CharName.html">the Unicode::CharName manpage</A>,
+<A HREF="../../lib/Unicode/Map8.html">the Unicode::Map8 manpage</A>,
+<A HREF="http://www.unicode.org/">http://www.unicode.org/</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1997-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Unicode::String - String of Unicode characters</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

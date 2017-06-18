@@ -1,0 +1,1139 @@
+<HTML>
+<HEAD>
+<TITLE>perlfaq - frequently asked questions about Perl</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq - frequently asked questions about Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#perlfaq: structural overview of the faq.">perlfaq: Structural overview of the FAQ.</A></LI>
+		<LI><A HREF="#perlfaq1: general questions about perl"><A HREF="../../lib/Pod/perlfaq1.html">the perlfaq1 manpage</A>: General Questions About Perl</A></LI>
+		<LI><A HREF="#perlfaq2: obtaining and learning about perl"><A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>: Obtaining and Learning about Perl</A></LI>
+		<LI><A HREF="#perlfaq3: programming tools"><A HREF="../../lib/Pod/perlfaq3.html">the perlfaq3 manpage</A>: Programming Tools</A></LI>
+		<LI><A HREF="#perlfaq4: data manipulation"><A HREF="../../lib/Pod/perlfaq4.html">the perlfaq4 manpage</A>: Data Manipulation</A></LI>
+		<LI><A HREF="#perlfaq5: files and formats"><A HREF="../../lib/Pod/perlfaq5.html">the perlfaq5 manpage</A>: Files and Formats</A></LI>
+		<LI><A HREF="#perlfaq6: regexps"><A HREF="../../lib/Pod/perlfaq6.html">the perlfaq6 manpage</A>: Regexps</A></LI>
+		<LI><A HREF="#perlfaq7: general perl language issues"><A HREF="../../lib/Pod/perlfaq7.html">the perlfaq7 manpage</A>: General Perl Language Issues</A></LI>
+		<LI><A HREF="#perlfaq8: system interaction"><A HREF="../../lib/Pod/perlfaq8.html">the perlfaq8 manpage</A>: System Interaction</A></LI>
+		<LI><A HREF="#perlfaq9: networking"><A HREF="../../lib/Pod/perlfaq9.html">the perlfaq9 manpage</A>: Networking</A></LI>
+	</UL>
+
+	<LI><A HREF="#about the perlfaq documents">About the perlfaq documents</A></LI>
+	<UL>
+
+		<LI><A HREF="#where to get the perlfaq">Where to get the perlfaq</A></LI>
+		<LI><A HREF="#how to contribute to the perlfaq">How to contribute to the perlfaq</A></LI>
+		<LI><A HREF="#what will happen if you mail your perl programming problems to the authors">What will happen if you mail your Perl programming problems to the authors</A></LI>
+	</UL>
+
+	<LI><A HREF="#credits">Credits</A></LI>
+	<LI><A HREF="#author and copyright information">Author and Copyright Information</A></LI>
+	<UL>
+
+		<LI><A HREF="#bundled distributions">Bundled Distributions</A></LI>
+		<LI><A HREF="#disclaimer">Disclaimer</A></LI>
+	</UL>
+
+	<LI><A HREF="#changes">Changes</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlfaq - frequently asked questions about Perl ($Date: 1999/05/23 20:38:02 $)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The perlfaq is structured into the following documents:</P>
+<P>
+<H2><A NAME="perlfaq: structural overview of the faq.">perlfaq: Structural overview of the FAQ.</A></H2>
+<P>This document.</P>
+<P>
+<H2><A NAME="perlfaq1: general questions about perl"><A HREF="../../lib/Pod/perlfaq1.html">the perlfaq1 manpage</A>: General Questions About Perl</A></H2>
+<P>Very general, high-level information about Perl.</P>
+<UL>
+<LI>
+What is Perl?
+<P></P>
+<LI>
+Who supports Perl?  Who develops it?  Why is it free?
+<P></P>
+<LI>
+Which version of Perl should I use?
+<P></P>
+<LI>
+What are perl4 and perl5?
+<P></P>
+<LI>
+What is perl6?
+<P></P>
+<LI>
+How stable is Perl?
+<P></P>
+<LI>
+Is Perl difficult to learn?
+<P></P>
+<LI>
+How does Perl compare with other languages like Java, Python, REXX, Scheme, or Tcl?
+<P></P>
+<LI>
+Can I do [task] in Perl?
+<P></P>
+<LI>
+When shouldn't I program in Perl?
+<P></P>
+<LI>
+What's the difference between ``perl'' and ``Perl''?
+<P></P>
+<LI>
+Is it a Perl program or a Perl script?
+<P></P>
+<LI>
+What is a JAPH?
+<P></P>
+<LI>
+Where can I get a list of Larry Wall witticisms?
+<P></P>
+<LI>
+How can I convince my sysadmin/supervisor/employees to use version 5/5.005/Perl instead of some other language?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq2: obtaining and learning about perl"><A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>: Obtaining and Learning about Perl</A></H2>
+<P>Where to find source and documentation to Perl, support,
+and related matters.</P>
+<UL>
+<LI>
+What machines support Perl?  Where do I get it?
+<P></P>
+<LI>
+How can I get a binary version of Perl?
+<P></P>
+<LI>
+I don't have a C compiler on my system.  How can I compile perl?
+<P></P>
+<LI>
+I copied the Perl binary from one machine to another, but scripts don't work.
+<P></P>
+<LI>
+I grabbed the sources and tried to compile but gdbm/dynamic loading/malloc/linking/... failed.  How do I make it work?
+<P></P>
+<LI>
+What modules and extensions are available for Perl?  What is CPAN?  What does CPAN/src/... mean?
+<P></P>
+<LI>
+Is there an ISO or ANSI certified version of Perl?
+<P></P>
+<LI>
+Where can I get information on Perl?
+<P></P>
+<LI>
+What are the Perl newsgroups on Usenet?  Where do I post questions?
+<P></P>
+<LI>
+Where should I post source code?
+<P></P>
+<LI>
+Perl Books
+<P></P>
+<LI>
+Perl in Magazines
+<P></P>
+<LI>
+Perl on the Net: FTP and WWW Access
+<P></P>
+<LI>
+What mailing lists are there for Perl?
+<P></P>
+<LI>
+Archives of comp.lang.perl.misc
+<P></P>
+<LI>
+Where can I buy a commercial version of Perl?
+<P></P>
+<LI>
+Where do I send bug reports?
+<P></P>
+<LI>
+What is perl.com? Perl Mongers? pm.org? perl.org?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq3: programming tools"><A HREF="../../lib/Pod/perlfaq3.html">the perlfaq3 manpage</A>: Programming Tools</A></H2>
+<P>Programmer tools and programming support.</P>
+<UL>
+<LI>
+How do I do (anything)?
+<P></P>
+<LI>
+How can I use Perl interactively?
+<P></P>
+<LI>
+Is there a Perl shell?
+<P></P>
+<LI>
+How do I debug my Perl programs?
+<P></P>
+<LI>
+How do I profile my Perl programs?
+<P></P>
+<LI>
+How do I cross-reference my Perl programs?
+<P></P>
+<LI>
+Is there a pretty-printer (formatter) for Perl?
+<P></P>
+<LI>
+Is there a ctags for Perl?
+<P></P>
+<LI>
+Is there an IDE or Windows Perl Editor?
+<P></P>
+<LI>
+Where can I get Perl macros for vi?
+<P></P>
+<LI>
+Where can I get perl-mode for emacs?
+<P></P>
+<LI>
+How can I use curses with Perl?
+<P></P>
+<LI>
+How can I use X or Tk with Perl?
+<P></P>
+<LI>
+How can I generate simple menus without using CGI or Tk?
+<P></P>
+<LI>
+What is undump?
+<P></P>
+<LI>
+How can I make my Perl program run faster?
+<P></P>
+<LI>
+How can I make my Perl program take less memory?
+<P></P>
+<LI>
+Is it unsafe to return a pointer to local data?
+<P></P>
+<LI>
+How can I free an array or hash so my program shrinks?
+<P></P>
+<LI>
+How can I make my CGI script more efficient?
+<P></P>
+<LI>
+How can I hide the source for my Perl program?
+<P></P>
+<LI>
+How can I compile my Perl program into byte code or C?
+<P></P>
+<LI>
+How can I compile Perl into Java?
+<P></P>
+<LI>
+How can I get <CODE>#!perl</CODE> to work on [MS-DOS,NT,...]?
+<P></P>
+<LI>
+Can I write useful Perl programs on the command line?
+<P></P>
+<LI>
+Why don't Perl one-liners work on my DOS/Mac/VMS system?
+<P></P>
+<LI>
+Where can I learn about CGI or Web programming in Perl?
+<P></P>
+<LI>
+Where can I learn about object-oriented Perl programming?
+<P></P>
+<LI>
+Where can I learn about linking C with Perl? [h2xs, xsubpp]
+<P></P>
+<LI>
+I've read perlembed, perlguts, etc., but I can't embed perl in
+my C program; what am I doing wrong?
+<P></P>
+<LI>
+When I tried to run my script, I got this message. What does it
+mean?
+<P></P>
+<LI>
+What's MakeMaker?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq4: data manipulation"><A HREF="../../lib/Pod/perlfaq4.html">the perlfaq4 manpage</A>: Data Manipulation</A></H2>
+<P>Manipulating numbers, dates, strings, arrays, hashes, and
+miscellaneous data issues.</P>
+<UL>
+<LI>
+Why am I getting long decimals (eg, 19.9499999999999) instead of the numbers I should be getting (eg, 19.95)?
+<P></P>
+<LI>
+Why isn't my octal data interpreted correctly?
+<P></P>
+<LI>
+Does Perl have a <CODE>round()</CODE> function?  What about <CODE>ceil()</CODE> and floor()?  Trig functions?
+<P></P>
+<LI>
+How do I convert bits into ints?
+<P></P>
+<LI>
+Why doesn't &amp; work the way I want it to?
+<P></P>
+<LI>
+How do I multiply matrices?
+<P></P>
+<LI>
+How do I perform an operation on a series of integers?
+<P></P>
+<LI>
+How can I output Roman numerals?
+<P></P>
+<LI>
+Why aren't my random numbers random?
+<P></P>
+<LI>
+How do I find the week-of-the-year/day-of-the-year?
+<P></P>
+<LI>
+How do I find the current century or millennium?
+<P></P>
+<LI>
+How can I compare two dates and find the difference?
+<P></P>
+<LI>
+How can I take a string and turn it into epoch seconds?
+<P></P>
+<LI>
+How can I find the Julian Day?
+<P></P>
+<LI>
+How do I find yesterday's date?
+<P></P>
+<LI>
+Does Perl have a Year 2000 problem?  Is Perl Y2K compliant?
+<P></P>
+<LI>
+How do I validate input?
+<P></P>
+<LI>
+How do I unescape a string?
+<P></P>
+<LI>
+How do I remove consecutive pairs of characters?
+<P></P>
+<LI>
+How do I expand function calls in a string?
+<P></P>
+<LI>
+How do I find matching/nesting anything?
+<P></P>
+<LI>
+How do I reverse a string?
+<P></P>
+<LI>
+How do I expand tabs in a string?
+<P></P>
+<LI>
+How do I reformat a paragraph?
+<P></P>
+<LI>
+How can I access/change the first N letters of a string?
+<P></P>
+<LI>
+How do I change the Nth occurrence of something?
+<P></P>
+<LI>
+How can I count the number of occurrences of a substring within a string?
+<P></P>
+<LI>
+How do I capitalize all the words on one line?
+<P></P>
+<LI>
+How can I split a [character] delimited string except when inside
+[character]? (Comma-separated files)
+<P></P>
+<LI>
+How do I strip blank space from the beginning/end of a string?
+<P></P>
+<LI>
+How do I pad a string with blanks or pad a number with zeroes?
+<P></P>
+<LI>
+How do I extract selected columns from a string?
+<P></P>
+<LI>
+How do I find the soundex value of a string?
+<P></P>
+<LI>
+How can I expand variables in text strings?
+<P></P>
+<LI>
+What's wrong with always quoting ``$vars''?
+<P></P>
+<LI>
+Why don't my &lt;&lt;HERE documents work?
+<P></P>
+<LI>
+What is the difference between a list and an array?
+<P></P>
+<LI>
+What is the difference between $array[1] and @array[1]?
+<P></P>
+<LI>
+How can I remove duplicate elements from a list or array?
+<P></P>
+<LI>
+How can I tell whether a list or array contains a certain element?
+<P></P>
+<LI>
+How do I compute the difference of two arrays?  How do I compute the intersection of two arrays?
+<P></P>
+<LI>
+How do I test whether two arrays or hashes are equal?
+<P></P>
+<LI>
+How do I find the first array element for which a condition is true?
+<P></P>
+<LI>
+How do I handle linked lists?
+<P></P>
+<LI>
+How do I handle circular lists?
+<P></P>
+<LI>
+How do I shuffle an array randomly?
+<P></P>
+<LI>
+How do I process/modify each element of an array?
+<P></P>
+<LI>
+How do I select a random element from an array?
+<P></P>
+<LI>
+How do I permute N elements of a list?
+<P></P>
+<LI>
+How do I sort an array by (anything)?
+<P></P>
+<LI>
+How do I manipulate arrays of bits?
+<P></P>
+<LI>
+Why does <A HREF="../../lib/Pod/perlfunc.html#item_defined"><CODE>defined()</CODE></A> return true on empty arrays and hashes?
+<P></P>
+<LI>
+How do I process an entire hash?
+<P></P>
+<LI>
+What happens if I add or remove keys from a hash while iterating over it?
+<P></P>
+<LI>
+How do I look up a hash element by value?
+<P></P>
+<LI>
+How can I know how many entries are in a hash?
+<P></P>
+<LI>
+How do I sort a hash (optionally by value instead of key)?
+<P></P>
+<LI>
+How can I always keep my hash sorted?
+<P></P>
+<LI>
+What's the difference between ``delete'' and ``undef'' with hashes?
+<P></P>
+<LI>
+Why don't my tied hashes make the defined/exists distinction?
+<P></P>
+<LI>
+How do I reset an <A HREF="../../lib/Pod/perlfunc.html#item_each"><CODE>each()</CODE></A> operation part-way through?
+<P></P>
+<LI>
+How can I get the unique keys from two hashes?
+<P></P>
+<LI>
+How can I store a multidimensional array in a DBM file?
+<P></P>
+<LI>
+How can I make my hash remember the order I put elements into it?
+<P></P>
+<LI>
+Why does passing a subroutine an undefined element in a hash create it?
+<P></P>
+<LI>
+How can I make the Perl equivalent of a C structure/C++ class/hash or array of hashes or arrays?
+<P></P>
+<LI>
+How can I use a reference as a hash key?
+<P></P>
+<LI>
+How do I handle binary data correctly?
+<P></P>
+<LI>
+How do I determine whether a scalar is a number/whole/integer/float?
+<P></P>
+<LI>
+How do I keep persistent data across program calls?
+<P></P>
+<LI>
+How do I print out or copy a recursive data structure?
+<P></P>
+<LI>
+How do I define methods for every class/object?
+<P></P>
+<LI>
+How do I verify a credit card checksum?
+<P></P>
+<LI>
+How do I pack arrays of doubles or floats for XS code?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq5: files and formats"><A HREF="../../lib/Pod/perlfaq5.html">the perlfaq5 manpage</A>: Files and Formats</A></H2>
+<P>I/O and the ``f'' issues: filehandles, flushing, formats and footers.</P>
+<UL>
+<LI>
+How do I flush/unbuffer an output filehandle?  Why must I do this?
+<P></P>
+<LI>
+How do I change one line in a file/delete a line in a file/insert a line in the middle of a file/append to the beginning of a file?
+<P></P>
+<LI>
+How do I count the number of lines in a file?
+<P></P>
+<LI>
+How do I make a temporary file name?
+<P></P>
+<LI>
+How can I manipulate fixed-record-length files?
+<P></P>
+<LI>
+How can I make a filehandle local to a subroutine?  How do I pass filehandles between subroutines?  How do I make an array of filehandles?
+<P></P>
+<LI>
+How can I use a filehandle indirectly?
+<P></P>
+<LI>
+How can I set up a footer format to be used with write()?
+<P></P>
+<LI>
+How can I <A HREF="../../lib/Pod/perlfunc.html#item_write"><CODE>write()</CODE></A> into a string?
+<P></P>
+<LI>
+How can I output my numbers with commas added?
+<P></P>
+<LI>
+How can I translate tildes (~) in a filename?
+<P></P>
+<LI>
+How come when I open a file read-write it wipes it out?
+<P></P>
+<LI>
+Why do I sometimes get an ``Argument list too long'' when I use &lt;*&gt;?
+<P></P>
+<LI>
+Is there a leak/bug in glob()?
+<P></P>
+<LI>
+How can I open a file with a leading ``&gt;'' or trailing blanks?
+<P></P>
+<LI>
+How can I reliably rename a file?
+<P></P>
+<LI>
+How can I lock a file?
+<P></P>
+<LI>
+Why can't I just open(FH, ``&gt;file.lock'')?
+<P></P>
+<LI>
+I still don't get locking.  I just want to increment the number in the file.  How can I do this?
+<P></P>
+<LI>
+How do I randomly update a binary file?
+<P></P>
+<LI>
+How do I get a file's timestamp in perl?
+<P></P>
+<LI>
+How do I set a file's timestamp in perl?
+<P></P>
+<LI>
+How do I print to more than one file at once?
+<P></P>
+<LI>
+How can I read in an entire file all at once?
+<P></P>
+<LI>
+How can I read in a file by paragraphs?
+<P></P>
+<LI>
+How can I read a single character from a file?  From the keyboard?
+<P></P>
+<LI>
+How can I tell whether there's a character waiting on a filehandle?
+<P></P>
+<LI>
+How do I do a <CODE>tail -f</CODE> in perl?
+<P></P>
+<LI>
+How do I <CODE>dup()</CODE> a filehandle in Perl?
+<P></P>
+<LI>
+How do I close a file descriptor by number?
+<P></P>
+<LI>
+Why can't I use ``C:\temp\foo'' in DOS paths?  What doesn't `C:\temp\foo.exe` work?
+<P></P>
+<LI>
+Why doesn't <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob(``*.*'')</CODE></A> get all the files?
+<P></P>
+<LI>
+Why does Perl let me delete read-only files?  Why does <CODE>-i</CODE> clobber protected files?  Isn't this a bug in Perl?
+<P></P>
+<LI>
+How do I select a random line from a file?
+<P></P>
+<LI>
+Why do I get weird spaces when I print an array of lines?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq6: regexps"><A HREF="../../lib/Pod/perlfaq6.html">the perlfaq6 manpage</A>: Regexps</A></H2>
+<P>Pattern matching and regular expressions.</P>
+<UL>
+<LI>
+How can I hope to use regular expressions without creating illegible and unmaintainable code?
+<P></P>
+<LI>
+I'm having trouble matching over more than one line.  What's wrong?
+<P></P>
+<LI>
+How can I pull out lines between two patterns that are themselves on different lines?
+<P></P>
+<LI>
+I put a regular expression into $/ but it didn't work. What's wrong?
+<P></P>
+<LI>
+How do I substitute case insensitively on the LHS while preserving case on the RHS?
+<P></P>
+<LI>
+How can I make <CODE>\w</CODE> match national character sets?
+<P></P>
+<LI>
+How can I match a locale-smart version of <CODE>/[a-zA-Z]/</CODE>?
+<P></P>
+<LI>
+How can I quote a variable to use in a regex?
+<P></P>
+<LI>
+What is <CODE>/o</CODE> really for?
+<P></P>
+<LI>
+How do I use a regular expression to strip C style comments from a file?
+<P></P>
+<LI>
+Can I use Perl regular expressions to match balanced text?
+<P></P>
+<LI>
+What does it mean that regexes are greedy?  How can I get around it?
+<P></P>
+<LI>
+How do I process each word on each line?
+<P></P>
+<LI>
+How can I print out a word-frequency or line-frequency summary?
+<P></P>
+<LI>
+How can I do approximate matching?
+<P></P>
+<LI>
+How do I efficiently match many regular expressions at once?
+<P></P>
+<LI>
+Why don't word-boundary searches with <CODE>\b</CODE> work for me?
+<P></P>
+<LI>
+Why does using $&amp;, $`, or $' slow my program down?
+<P></P>
+<LI>
+What good is <CODE>\G</CODE> in a regular expression?
+<P></P>
+<LI>
+Are Perl regexes DFAs or NFAs?  Are they POSIX compliant?
+<P></P>
+<LI>
+What's wrong with using grep or map in a void context?
+<P></P>
+<LI>
+How can I match strings with multibyte characters?
+<P></P>
+<LI>
+How do I match a pattern that is supplied by the user?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq7: general perl language issues"><A HREF="../../lib/Pod/perlfaq7.html">the perlfaq7 manpage</A>: General Perl Language Issues</A></H2>
+<P>General Perl language issues that don't clearly fit into any of the
+other sections.</P>
+<UL>
+<LI>
+Can I get a BNF/yacc/RE for the Perl language?
+<P></P>
+<LI>
+What are all these $@%&amp;* punctuation signs, and how do I know when to use them?
+<P></P>
+<LI>
+Do I always/never have to quote my strings or use semicolons and commas?
+<P></P>
+<LI>
+How do I skip some return values?
+<P></P>
+<LI>
+How do I temporarily block warnings?
+<P></P>
+<LI>
+What's an extension?
+<P></P>
+<LI>
+Why do Perl operators have different precedence than C operators?
+<P></P>
+<LI>
+How do I declare/create a structure?
+<P></P>
+<LI>
+How do I create a module?
+<P></P>
+<LI>
+How do I create a class?
+<P></P>
+<LI>
+How can I tell if a variable is tainted?
+<P></P>
+<LI>
+What's a closure?
+<P></P>
+<LI>
+What is variable suicide and how can I prevent it?
+<P></P>
+<LI>
+How can I pass/return a {Function, FileHandle, Array, Hash, Method, Regex}?
+<P></P>
+<LI>
+How do I create a static variable?
+<P></P>
+<LI>
+What's the difference between dynamic and lexical (static) scoping?  Between <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> and my()?
+<P></P>
+<LI>
+How can I access a dynamic variable while a similarly named lexical is in scope?
+<P></P>
+<LI>
+What's the difference between deep and shallow binding?
+<P></P>
+<LI>
+Why doesn't ``my($foo) = &lt;FILE&gt;;'' work right?
+<P></P>
+<LI>
+How do I redefine a builtin function, operator, or method?
+<P></P>
+<LI>
+What's the difference between calling a function as &amp;foo and foo()?
+<P></P>
+<LI>
+How do I create a switch or case statement?
+<P></P>
+<LI>
+How can I catch accesses to undefined variables/functions/methods?
+<P></P>
+<LI>
+Why can't a method included in this same file be found?
+<P></P>
+<LI>
+How can I find out my current package?
+<P></P>
+<LI>
+How can I comment out a large block of perl code?
+<P></P>
+<LI>
+How do I clear a package?
+<P></P>
+<LI>
+How can I use a variable as a variable name?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq8: system interaction"><A HREF="../../lib/Pod/perlfaq8.html">the perlfaq8 manpage</A>: System Interaction</A></H2>
+<P>Interprocess communication (IPC), control over the user-interface
+(keyboard, screen and pointing devices).</P>
+<UL>
+<LI>
+How do I find out which operating system I'm running under?
+<P></P>
+<LI>
+How come <A HREF="../../lib/Pod/perlfunc.html#item_exec"><CODE>exec()</CODE></A> doesn't return?
+<P></P>
+<LI>
+How do I do fancy stuff with the keyboard/screen/mouse?
+<P></P>
+<LI>
+How do I print something out in color?
+<P></P>
+<LI>
+How do I read just one key without waiting for a return key?
+<P></P>
+<LI>
+How do I check whether input is ready on the keyboard?
+<P></P>
+<LI>
+How do I clear the screen?
+<P></P>
+<LI>
+How do I get the screen size?
+<P></P>
+<LI>
+How do I ask the user for a password?
+<P></P>
+<LI>
+How do I read and write the serial port?
+<P></P>
+<LI>
+How do I decode encrypted password files?
+<P></P>
+<LI>
+How do I start a process in the background?
+<P></P>
+<LI>
+How do I trap control characters/signals?
+<P></P>
+<LI>
+How do I modify the shadow password file on a Unix system?
+<P></P>
+<LI>
+How do I set the time and date?
+<P></P>
+<LI>
+How can I <A HREF="../../lib/Pod/perlfunc.html#item_sleep"><CODE>sleep()</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_alarm"><CODE>alarm()</CODE></A> for under a second?
+<P></P>
+<LI>
+How can I measure time under a second?
+<P></P>
+<LI>
+How can I do an <CODE>atexit()</CODE> or setjmp()/longjmp()? (Exception handling)
+<P></P>
+<LI>
+Why doesn't my sockets program work under System V (Solaris)?  What does the error message ``Protocol not supported'' mean?
+<P></P>
+<LI>
+How can I call my system's unique C functions from Perl?
+<P></P>
+<LI>
+Where do I get the include files to do <A HREF="../../lib/Pod/perlfunc.html#item_ioctl"><CODE>ioctl()</CODE></A> or syscall()?
+<P></P>
+<LI>
+Why do setuid perl scripts complain about kernel problems?
+<P></P>
+<LI>
+How can I open a pipe both to and from a command?
+<P></P>
+<LI>
+Why can't I get the output of a command with system()?
+<P></P>
+<LI>
+How can I capture STDERR from an external command?
+<P></P>
+<LI>
+Why doesn't <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A> return an error when a pipe open fails?
+<P></P>
+<LI>
+What's wrong with using backticks in a void context?
+<P></P>
+<LI>
+How can I call backticks without shell processing?
+<P></P>
+<LI>
+Why can't my script read from STDIN after I gave it EOF (^D on Unix, ^Z on MS-DOS)?
+<P></P>
+<LI>
+How can I convert my shell script to perl?
+<P></P>
+<LI>
+Can I use perl to run a telnet or ftp session?
+<P></P>
+<LI>
+How can I write expect in Perl?
+<P></P>
+<LI>
+Is there a way to hide perl's command line from programs such as ``ps''?
+<P></P>
+<LI>
+I {changed directory, modified my environment} in a perl script.  How come the change disappeared when I exited the script?  How do I get my changes to be visible?
+<P></P>
+<LI>
+How do I close a process's filehandle without waiting for it to complete?
+<P></P>
+<LI>
+How do I fork a daemon process?
+<P></P>
+<LI>
+How do I find out if I'm running interactively or not?
+<P></P>
+<LI>
+How do I timeout a slow event?
+<P></P>
+<LI>
+How do I set CPU limits?
+<P></P>
+<LI>
+How do I avoid zombies on a Unix system?
+<P></P>
+<LI>
+How do I use an SQL database?
+<P></P>
+<LI>
+How do I make a <A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system()</CODE></A> exit on control-C?
+<P></P>
+<LI>
+How do I open a file without blocking?
+<P></P>
+<LI>
+How do I install a module from CPAN?
+<P></P>
+<LI>
+What's the difference between require and use?
+<P></P>
+<LI>
+How do I keep my own module/library directory?
+<P></P>
+<LI>
+How do I add the directory my program lives in to the module/library search path?
+<P></P>
+<LI>
+How do I add a directory to my include path at runtime?
+<P></P>
+<LI>
+What is socket.ph and where do I get it?
+<P></P></UL>
+<P>
+<H2><A NAME="perlfaq9: networking"><A HREF="../../lib/Pod/perlfaq9.html">the perlfaq9 manpage</A>: Networking</A></H2>
+<P>Networking, the Internet, and a few on the web.</P>
+<UL>
+<LI>
+My CGI script runs from the command line but not the browser.  (500 Server Error)
+<P></P>
+<LI>
+How can I get better error messages from a CGI program?
+<P></P>
+<LI>
+How do I remove HTML from a string?
+<P></P>
+<LI>
+How do I extract URLs?
+<P></P>
+<LI>
+How do I download a file from the user's machine?  How do I open a file on another machine?
+<P></P>
+<LI>
+How do I make a pop-up menu in HTML?
+<P></P>
+<LI>
+How do I fetch an HTML file?
+<P></P>
+<LI>
+How do I automate an HTML form submission?
+<P></P>
+<LI>
+How do I decode or create those %-encodings on the web?
+<P></P>
+<LI>
+How do I redirect to another page?
+<P></P>
+<LI>
+How do I put a password on my web pages?
+<P></P>
+<LI>
+How do I edit my .htpasswd and .htgroup files with Perl?
+<P></P>
+<LI>
+How do I make sure users can't enter values into a form that cause my CGI script to do bad things?
+<P></P>
+<LI>
+How do I parse a mail header?
+<P></P>
+<LI>
+How do I decode a CGI form?
+<P></P>
+<LI>
+How do I check a valid mail address?
+<P></P>
+<LI>
+How do I decode a MIME/BASE64 string?
+<P></P>
+<LI>
+How do I return the user's mail address?
+<P></P>
+<LI>
+How do I send mail?
+<P></P>
+<LI>
+How do I read mail?
+<P></P>
+<LI>
+How do I find out my hostname/domainname/IP address?
+<P></P>
+<LI>
+How do I fetch a news article or the active newsgroups?
+<P></P>
+<LI>
+How do I fetch/put an FTP file?
+<P></P>
+<LI>
+How can I do RPC in Perl?
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="about the perlfaq documents">About the perlfaq documents</A></H1>
+<P>
+<H2><A NAME="where to get the perlfaq">Where to get the perlfaq</A></H2>
+<P>This document is posted regularly to comp.lang.perl.announce and
+several other related newsgroups.  It is available in a variety of
+formats from CPAN in the /CPAN/doc/FAQs/FAQ/ directory or on the web
+at <A HREF="http://www.perl.com/perl/faq/">http://www.perl.com/perl/faq/</A> .</P>
+<P>
+<H2><A NAME="how to contribute to the perlfaq">How to contribute to the perlfaq</A></H2>
+<P>You may mail corrections, additions, and suggestions to
+<A HREF="mailto:perlfaq-suggestions@perl.com">perlfaq-suggestions@perl.com</A> .  This alias should not be 
+used to <EM>ask</EM> FAQs.  It's for fixing the current FAQ.
+Send questions to the comp.lang.perl.misc newsgroup.</P>
+<P>
+<H2><A NAME="what will happen if you mail your perl programming problems to the authors">What will happen if you mail your Perl programming problems to the authors</A></H2>
+<P>Your questions will probably go unread, unless they're suggestions of
+new questions to add to the FAQ, in which case they should have gone
+to the <A HREF="mailto:perlfaq-suggestions@perl.com">perlfaq-suggestions@perl.com</A> instead.</P>
+<P>You should have read section 2 of this faq.  There you would have
+learned that comp.lang.perl.misc is the appropriate place to go for
+free advice.  If your question is really important and you require a
+prompt and correct answer, you should hire a consultant.</P>
+<P>
+<HR>
+<H1><A NAME="credits">Credits</A></H1>
+<P>When I first began the Perl FAQ in the late 80s, I never realized it
+would have grown to over a hundred pages, nor that Perl would ever become
+so popular and widespread.  This document could not have been written
+without the tremendous help provided by Larry Wall and the rest of the
+Perl Porters.</P>
+<P>
+<HR>
+<H1><A NAME="author and copyright information">Author and Copyright Information</A></H1>
+<P>Copyright (c) 1997-1999 Tom Christiansen and Nathan Torkington.
+All rights reserved.</P>
+<P>
+<H2><A NAME="bundled distributions">Bundled Distributions</A></H2>
+<P>When included as part of the Standard Version of Perl or as part of
+its complete documentation whether printed or otherwise, this work
+may be distributed only under the terms of Perl's Artistic License.
+Any distribution of this file or derivatives thereof <EM>outside</EM>
+of that package requires that special arrangements be made with
+copyright holder.</P>
+<P>Irrespective of its distribution, all code examples in these files
+are hereby placed into the public domain.  You are permitted and
+encouraged to use this code in your own programs for fun
+or for profit as you see fit.  A simple comment in the code giving
+credit would be courteous but is not required.</P>
+<P>
+<H2><A NAME="disclaimer">Disclaimer</A></H2>
+<P>This information is offered in good faith and in the hope that it may
+be of use, but is not guaranteed to be correct, up to date, or suitable
+for any particular purpose whatsoever.  The authors accept no liability
+in respect of this information or its use.</P>
+<P>
+<HR>
+<H1><A NAME="changes">Changes</A></H1>
+<OL>
+<LI><STRONG><A NAME="item_%2FNovember%2F2000">/November/2000</A></STRONG><BR>
+
+A few grammatical fixes and updates implemented by John Borwick.
+<P></P>
+<LI><STRONG><A NAME="item_%2FMay%2F99">/May/99</A></STRONG><BR>
+
+Extensive updates from the net in preparation for 5.6 release.
+<P></P>
+<LI><STRONG><A NAME="item_%2FApril%2F99">/April/99</A></STRONG><BR>
+
+More minor touch-ups.  Added new question at the end
+of perlfaq7 on variable names within variables.
+<P></P>
+<LI><STRONG><A NAME="item_%2FJanuary%2F99">/January/99</A></STRONG><BR>
+
+Small touchups here and there.  Added all questions in this 
+document as a sort of table of contents.
+<P></P>
+<LI><STRONG><A NAME="item_%2FJune%2F98">/June/98</A></STRONG><BR>
+
+Significant changes throughout in preparation for the 5.005
+release.
+<P></P>
+<LI><STRONG><A NAME="item_%2FApril%2F97">/April/97</A></STRONG><BR>
+
+Style and whitespace changes from Chip, new question on reading one
+character at a time from a terminal using POSIX from Tom.
+<P></P>
+<LI><STRONG>/April/97</STRONG><BR>
+
+Added <A HREF="http://www.oasis.leo.org/perl/">http://www.oasis.leo.org/perl/</A> to <A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>.  Style fix to
+<A HREF="../../lib/Pod/perlfaq3.html">the perlfaq3 manpage</A>.  Added floating point precision, fixed complex number
+arithmetic, cross-references, caveat for Text::Wrap, alternative
+answer for initial capitalizing, fixed incorrect regexp, added example
+of Tie::IxHash to <A HREF="../../lib/Pod/perlfaq4.html">the perlfaq4 manpage</A>.  Added example of passing and storing
+filehandles, added commify to <A HREF="../../lib/Pod/perlfaq5.html">the perlfaq5 manpage</A>.  Restored variable suicide,
+and added mass commenting to <A HREF="../../lib/Pod/perlfaq7.html">the perlfaq7 manpage</A>.  Added Net::Telnet, fixed
+backticks, added reader/writer pair to telnet question, added FindBin,
+grouped module questions together in <A HREF="../../lib/Pod/perlfaq8.html">the perlfaq8 manpage</A>.  Expanded caveats
+for the simple URL extractor, gave LWP example, added CGI security
+question, expanded on the mail address answer in <A HREF="../../lib/Pod/perlfaq9.html">the perlfaq9 manpage</A>.
+<P></P>
+<LI><STRONG><A NAME="item_%2FMarch%2F97">/March/97</A></STRONG><BR>
+
+Added more info to the binary distribution section of <A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>.
+Added Net::Telnet to <A HREF="../../lib/Pod/perlfaq6.html">the perlfaq6 manpage</A>.  Fixed typos in <A HREF="../../lib/Pod/perlfaq8.html">the perlfaq8 manpage</A>.  Added
+mail sending example to <A HREF="../../lib/Pod/perlfaq9.html">the perlfaq9 manpage</A>.  Added Merlyn's columns to
+<A HREF="../../lib/Pod/perlfaq2.html">the perlfaq2 manpage</A>.
+<P></P>
+<LI><STRONG>/March/97</STRONG><BR>
+
+Added the DATE to the NAME section, indicating which sections have
+changed.
+<P>Mentioned SIGPIPE and <A HREF="../../lib/Pod/perlipc.html">the perlipc manpage</A> in the forking open answer in
+<A HREF="../../lib/Pod/perlfaq8.html">the perlfaq8 manpage</A>.</P>
+<P>Fixed description of a regular expression in <A HREF="../../lib/Pod/perlfaq4.html">the perlfaq4 manpage</A>.</P>
+<P></P>
+<LI><STRONG><A NAME="item_%2FMarch%2F97_Version">/March/97 Version</A></STRONG><BR>
+
+Various typos fixed throughout.
+<P>Added new question on Perl BNF on <A HREF="../../lib/Pod/perlfaq7.html">the perlfaq7 manpage</A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Initial_Release%3A_11%2FMarch%2F97">Initial Release: 11/March/97</A></STRONG><BR>
+<DD>
+This is the initial release of version 3 of the FAQ; consequently there
+have been no changes since its initial release.
+<P></P></OL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlfaq - frequently asked questions about Perl</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

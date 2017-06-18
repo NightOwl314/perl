@@ -1,0 +1,65 @@
+
+<HTML>
+<HEAD>
+<TITLE>subs - Perl pragma to predeclare sub names</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;subs - Perl pragma to predeclare sub names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>subs - Perl pragma to predeclare sub names</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use subs qw(frob);
+    frob 3..10;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This will predeclare all the subroutine whose names are 
+in the list, allowing you to use them without parentheses
+even before they're declared.</P>
+<P>Unlike pragmas that affect the <A HREF="../lib/Pod/perlvar.html#item_%24%5EH"><CODE>$^H</CODE></A> hints variable, the <CODE>use vars</CODE> and
+<CODE>use subs</CODE> declarations are not BLOCK-scoped.  They are thus effective
+for the entire file in which they appear.  You may not rescind such
+declarations with <CODE>no vars</CODE> or <CODE>no subs</CODE>.</P>
+<P>See <A HREF="../lib/Pod/perlmodlib.html#pragmatic modules">Pragmatic Modules in the perlmodlib manpage</A> and <A HREF="../lib/strict.html#strict subs">strict subs in the strict manpage</A>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;subs - Perl pragma to predeclare sub names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

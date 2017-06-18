@@ -1,0 +1,197 @@
+
+<HTML>
+<HEAD>
+<TITLE>diagnostics - Perl compiler pragma to force verbose warning diagnostics</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;diagnostics - Perl compiler pragma to force verbose warning diagnostics</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#the diagnostics pragma">The <CODE>diagnostics</CODE> Pragma</A></LI>
+		<LI><A HREF="#the splain program">The <EM>splain</EM> Program</A></LI>
+	</UL>
+
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#internals">INTERNALS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>diagnostics - Perl compiler pragma to force verbose warning diagnostics</P>
+<P>splain - standalone program to do the same thing</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>As a pragma:</P>
+<PRE>
+    use diagnostics;
+    use diagnostics -verbose;</PRE>
+<PRE>
+    enable  diagnostics;
+    disable diagnostics;</PRE>
+<P>Aa a program:</P>
+<PRE>
+    perl program 2&gt;diag.out
+    splain [-v] [-p] diag.out</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="the diagnostics pragma">The <CODE>diagnostics</CODE> Pragma</A></H2>
+<P>This module extends the terse diagnostics normally emitted by both the
+perl compiler and the perl interpreter, augmenting them with the more
+explicative and endearing descriptions found in <A HREF="../lib/Pod/perldiag.html">the perldiag manpage</A>.  Like the
+other pragmata, it affects the compilation phase of your program rather
+than merely the execution phase.</P>
+<P>To use in your program as a pragma, merely invoke</P>
+<PRE>
+    use diagnostics;</PRE>
+<P>at the start (or near the start) of your program.  (Note 
+that this <EM>does</EM> enable perl's <STRONG>-w</STRONG> flag.)  Your whole
+compilation will then be subject(ed :-) to the enhanced diagnostics.
+These still go out <STRONG>STDERR</STRONG>.</P>
+<P>Due to the interaction between runtime and compiletime issues,
+and because it's probably not a very good idea anyway,
+you may not use <CODE>no diagnostics</CODE> to turn them off at compiletime.
+However, you may control their behaviour at runtime using the 
+<CODE>disable()</CODE> and <CODE>enable()</CODE> methods to turn them off and on respectively.</P>
+<P>The <STRONG>-verbose</STRONG> flag first prints out the <A HREF="../lib/Pod/perldiag.html">the perldiag manpage</A> introduction before
+any other diagnostics.  The $diagnostics::PRETTY variable can generate nicer
+escape sequences for pagers.</P>
+<P>Warnings dispatched from perl itself (or more accurately, those that match
+descriptions found in <A HREF="../lib/Pod/perldiag.html">the perldiag manpage</A>) are only displayed once (no duplicate
+descriptions).  User code generated warnings ala <A HREF="../lib/Pod/perlfunc.html#item_warn"><CODE>warn()</CODE></A> are unaffected,
+allowing duplicate user messages to be displayed.</P>
+<P>
+<H2><A NAME="the splain program">The <EM>splain</EM> Program</A></H2>
+<P>While apparently a whole nuther program, <EM>splain</EM> is actually nothing
+more than a link to the (executable) <EM>diagnostics.pm</EM> module, as well as
+a link to the <EM>diagnostics.pod</EM> documentation.  The <STRONG>-v</STRONG> flag is like
+the <CODE>use diagnostics -verbose</CODE> directive.
+The <STRONG>-p</STRONG> flag is like the
+$diagnostics::PRETTY variable.  Since you're post-processing with 
+<EM>splain</EM>, there's no sense in being able to <CODE>enable()</CODE> or <CODE>disable()</CODE> processing.</P>
+<P>Output from <EM>splain</EM> is directed to <STRONG>STDOUT</STRONG>, unlike the pragma.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The following file is certain to trigger a few errors at both
+runtime and compiletime:</P>
+<PRE>
+    use diagnostics;
+    print NOWHERE &quot;nothing\n&quot;;
+    print STDERR &quot;\n\tThis message should be unadorned.\n&quot;;
+    warn &quot;\tThis is a user warning&quot;;
+    print &quot;\nDIAGNOSTIC TESTER: Please enter a &lt;CR&gt; here: &quot;;
+    my $a, $b = scalar &lt;STDIN&gt;;
+    print &quot;\n&quot;;
+    print $x/$y;</PRE>
+<P>If you prefer to run your program first and look at its problem
+afterwards, do this:</P>
+<PRE>
+    perl -w test.pl 2&gt;test.out
+    ./splain &lt; test.out</PRE>
+<P>Note that this is not in general possible in shells of more dubious heritage, 
+as the theoretical</P>
+<PRE>
+    (perl -w test.pl &gt;/dev/tty) &gt;&amp; test.out
+    ./splain &lt; test.out</PRE>
+<P>Because you just moved the existing <STRONG>stdout</STRONG> to somewhere else.</P>
+<P>If you don't want to modify your source code, but still have on-the-fly
+warnings, do this:</P>
+<PRE>
+    exec 3&gt;&amp;1; perl -w test.pl 2&gt;&amp;1 1&gt;&amp;3 3&gt;&amp;- | splain 1&gt;&amp;2 3&gt;&amp;-</PRE>
+<P>Nifty, eh?</P>
+<P>If you want to control warnings on the fly, do something like this.
+Make sure you do the <A HREF="../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> first, or you won't be able to get
+at the <CODE>enable()</CODE> or <CODE>disable()</CODE> methods.</P>
+<PRE>
+    use diagnostics; # checks entire compilation phase 
+        print &quot;\ntime for 1st bogus diags: SQUAWKINGS\n&quot;;
+        print BOGUS1 'nada';
+        print &quot;done with 1st bogus\n&quot;;</PRE>
+<PRE>
+    disable diagnostics; # only turns off runtime warnings
+        print &quot;\ntime for 2nd bogus: (squelched)\n&quot;;
+        print BOGUS2 'nada';
+        print &quot;done with 2nd bogus\n&quot;;</PRE>
+<PRE>
+    enable diagnostics; # turns back on runtime warnings
+        print &quot;\ntime for 3rd bogus: SQUAWKINGS\n&quot;;
+        print BOGUS3 'nada';
+        print &quot;done with 3rd bogus\n&quot;;</PRE>
+<PRE>
+    disable diagnostics;
+        print &quot;\ntime for 4th bogus: (squelched)\n&quot;;
+        print BOGUS4 'nada';
+        print &quot;done with 4th bogus\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="internals">INTERNALS</A></H1>
+<P>Diagnostic messages derive from the <EM>perldiag.pod</EM> file when available at
+runtime.  Otherwise, they may be embedded in the file itself when the
+splain package is built.   See the <EM>Makefile</EM> for details.</P>
+<P>If an extant $SIG{__WARN__} handler is discovered, it will continue
+to be honored, but only after the diagnostics::splainthis() function 
+(the module's $SIG{__WARN__} interceptor) has had its way with your
+warnings.</P>
+<P>There is a $diagnostics::DEBUG variable you may set if you're desperately
+curious what sorts of things are being intercepted.</P>
+<PRE>
+    BEGIN { $diagnostics::DEBUG = 1 }</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Not being able to say ``no diagnostics'' is annoying, but may not be
+insurmountable.</P>
+<P>The <CODE>-pretty</CODE> directive is called too late to affect matters.
+You have to do this instead, and <EM>before</EM> you load the module.</P>
+<PRE>
+    BEGIN { $diagnostics::PRETTY = 1 }</PRE>
+<P>I could start up faster by delaying compilation until it should be
+needed, but this gets a ``panic: top_level'' when using the pragma form
+in Perl 5.001e.</P>
+<P>While it's true that this documentation is somewhat subserious, if you use
+a program named <EM>splain</EM>, you should expect a bit of whimsy.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Tom Christiansen &lt;<EM><A HREF="mailto:tchrist@mox.perl.com">tchrist@mox.perl.com</A></EM>&gt;, 25 June 1995.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;diagnostics - Perl compiler pragma to force verbose warning diagnostics</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

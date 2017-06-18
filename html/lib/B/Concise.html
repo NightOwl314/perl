@@ -1,0 +1,386 @@
+
+<HTML>
+<HEAD>
+<TITLE>B::Concise - Walk Perl syntax tree, printing concise info about ops</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Concise - Walk Perl syntax tree, printing concise info about ops</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#formatting specifications">FORMATTING SPECIFICATIONS</A></LI>
+	<LI><A HREF="#abbreviations">ABBREVIATIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#op flags abbreviations">OP flags abbreviations</A></LI>
+		<LI><A HREF="#op class abbreviations">OP class abbreviations</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>B::Concise - Walk Perl syntax tree, printing concise info about ops</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    perl -MO=Concise[,OPTIONS] foo.pl</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This compiler backend prints the internal OPs of a Perl program's syntax
+tree in one of several space-efficient text formats suitable for debugging
+the inner workings of perl or other compiler backends. It can print OPs in
+the order they appear in the OP tree, in the order they will execute, or
+in a text approximation to their tree structure, and the format of the
+information displyed is customizable. Its function is similar to that of
+perl's <STRONG>-Dx</STRONG> debugging flag or the <STRONG>B::Terse</STRONG> module, but it is more
+sophisticated and flexible.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P>Arguments that don't start with a hyphen are taken to be the names of
+subroutines to print the OPs of; if no such functions are specified, the
+main body of the program (outside any subroutines, and not including use'd
+or require'd files) is printed.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dbasic"><STRONG>-basic</STRONG></A></STRONG><BR>
+<DD>
+Print OPs in the order they appear in the OP tree (a preorder
+traversal, starting at the root). The indentation of each OP shows its
+level in the tree.  This mode is the default, so the flag is included
+simply for completeness.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dexec"><STRONG>-exec</STRONG></A></STRONG><BR>
+<DD>
+Print OPs in the order they would normally execute (for the majority
+of constructs this is a postorder traversal of the tree, ending at the
+root). In most cases the OP that usually follows a given OP will
+appear directly below it; alternate paths are shown by indentation. In
+cases like loops when control jumps out of a linear path, a 'goto'
+line is generated.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dtree"><STRONG>-tree</STRONG></A></STRONG><BR>
+<DD>
+Print OPs in a text approximation of a tree, with the root of the tree
+at the left and 'left-to-right' order of children transformed into
+'top-to-bottom'. Because this mode grows both to the right and down,
+it isn't suitable for large programs (unless you have a very wide
+terminal).
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcompact"><STRONG>-compact</STRONG></A></STRONG><BR>
+<DD>
+Use a tree format in which the minimum amount of space is used for the
+lines connecting nodes (one character in most cases). This squeezes out
+a few precious columns of screen real estate.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dloose"><STRONG>-loose</STRONG></A></STRONG><BR>
+<DD>
+Use a tree format that uses longer edges to separate OP nodes. This format
+tends to look better than the compact one, especially in ASCII, and is
+the default.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dvt"><STRONG>-vt</STRONG></A></STRONG><BR>
+<DD>
+Use tree connecting characters drawn from the VT100 line-drawing set.
+This looks better if your terminal supports it.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dascii"><STRONG>-ascii</STRONG></A></STRONG><BR>
+<DD>
+Draw the tree with standard ASCII characters like <CODE>+</CODE> and <CODE>|</CODE>. These don't
+look as clean as the VT100 characters, but they'll work with almost any
+terminal (or the horizontal scrolling mode of <CODE>less(1))</CODE> and are suitable
+for text documentation or email. This is the default.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dmain"><STRONG>-main</STRONG></A></STRONG><BR>
+<DD>
+Include the main program in the output, even if subroutines were also
+specified.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dbasen"><STRONG>-base</STRONG><EM>n</EM></A></STRONG><BR>
+<DD>
+Print OP sequence numbers in base <EM>n</EM>. If <EM>n</EM> is greater than 10, the
+digit for 11 will be 'a', and so on. If <EM>n</EM> is greater than 36, the digit
+for 37 will be 'A', and so on until 62. Values greater than 62 are not
+currently supported. The default is 36.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dbigendian"><STRONG>-bigendian</STRONG></A></STRONG><BR>
+<DD>
+Print sequence numbers with the most significant digit first. This is the
+usual convention for Arabic numerals, and the default.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dlittleendian"><STRONG>-littleendian</STRONG></A></STRONG><BR>
+<DD>
+Print seqence numbers with the least significant digit first.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dconcise"><STRONG>-concise</STRONG></A></STRONG><BR>
+<DD>
+Use the author's favorite set of formatting conventions. This is the
+default, of course.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dterse"><STRONG>-terse</STRONG></A></STRONG><BR>
+<DD>
+Use formatting conventions that emulate the ouput of <STRONG>B::Terse</STRONG>. The
+basic mode is almost indistinguishable from the real <STRONG>B::Terse</STRONG>, and the
+exec mode looks very similar, but is in a more logical order and lacks
+curly brackets. <STRONG>B::Terse</STRONG> doesn't have a tree mode, so the tree mode
+is only vaguely reminiscient of <STRONG>B::Terse</STRONG>.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dlinenoise"><STRONG>-linenoise</STRONG></A></STRONG><BR>
+<DD>
+Use formatting conventions in which the name of each OP, rather than being
+written out in full, is represented by a one- or two-character abbreviation.
+This is mainly a joke.
+<P></P>
+<DT><STRONG><A NAME="item_%2Ddebug"><STRONG>-debug</STRONG></A></STRONG><BR>
+<DD>
+Use formatting conventions reminiscient of <STRONG>B::Debug</STRONG>; these aren't
+very concise at all.
+<P></P>
+<DT><STRONG><A NAME="item_%2Denv"><STRONG>-env</STRONG></A></STRONG><BR>
+<DD>
+Use formatting conventions read from the environment variables
+<CODE>B_CONCISE_FORMAT</CODE>, <CODE>B_CONCISE_GOTO_FORMAT</CODE>, and <CODE>B_CONCISE_TREE_FORMAT</CODE>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="formatting specifications">FORMATTING SPECIFICATIONS</A></H1>
+<P>For each general style ('concise', 'terse', 'linenoise', etc.) there are
+three specifications: one of how OPs should appear in the basic or exec
+modes, one of how 'goto' lines should appear (these occur in the exec
+mode only), and one of how nodes should appear in tree mode. Each has the
+same format, described below. Any text that doesn't match a special
+pattern is copied verbatim.</P>
+<DL>
+<DT><STRONG><A NAME="item_x"><STRONG>(x(</STRONG><EM>exec_text</EM><STRONG>;</STRONG><EM>basic_text</EM><STRONG>)x)</STRONG></A></STRONG><BR>
+<DD>
+Generates <EM>exec_text</EM> in exec mode, or <EM>basic_text</EM> in basic mode.
+<P></P>
+<DT><STRONG><A NAME="item_%28%2A%28text%29%2A%29"><STRONG>(*(</STRONG><EM>text</EM><STRONG>)*)</STRONG></A></STRONG><BR>
+<DD>
+Generates one copy of <EM>text</EM> for each indentation level.
+<P></P>
+<DT><STRONG><A NAME="item_%28%2A%28text1%3Btext2%29%2A%29"><STRONG>(*(</STRONG><EM>text1</EM><STRONG>;</STRONG><EM>text2</EM><STRONG>)*)</STRONG></A></STRONG><BR>
+<DD>
+Generates one fewer copies of <EM>text1</EM> than the indentation level, followed
+by one copy of <EM>text2</EM> if the indentation level is more than 0.
+<P></P>
+<DT><STRONG><A NAME="item_%28%3F%28text1%23varText2%29%3F%29"><STRONG>(?(</STRONG><EM>text1</EM><STRONG>#</STRONG><EM>var</EM><EM>Text2</EM><STRONG>)?)</STRONG></A></STRONG><BR>
+<DD>
+If the value of <EM>var</EM> is true (not empty or zero), generates the
+value of <EM>var</EM> surrounded by <EM>text1</EM> and <EM>Text2</EM>, otherwise
+nothing.
+<P></P>
+<DT><STRONG><A NAME="item_%23var"><STRONG>#</STRONG><EM>var</EM></A></STRONG><BR>
+<DD>
+Generates the value of the variable <EM>var</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_%23varN"><STRONG>#</STRONG><EM>var</EM><EM>N</EM></A></STRONG><BR>
+<DD>
+Generates the value of <EM>var</EM>, left jutified to fill <EM>N</EM> spaces.
+<P></P>
+<DT><STRONG><A NAME="item_%7E"><STRONG>~</STRONG></A></STRONG><BR>
+<DD>
+Any number of tildes and surrounding whitespace will be collapsed to
+a single space.
+<P></P></DL>
+<P>The following variables are recognized:</P>
+<DL>
+<DT><STRONG><A NAME="item_%23addr"><STRONG>#addr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23arg"><STRONG>#arg</STRONG></A></STRONG><BR>
+<DD>
+The OP-specific information of the OP (such as the SV for an SVOP, the
+non-local exit pointers for a LOOP, etc.) enclosed in paretheses.
+<P></P>
+<DT><STRONG><A NAME="item_%23class"><STRONG>#class</STRONG></A></STRONG><BR>
+<DD>
+The B-determined class of the OP, in all caps.
+<P></P>
+<DT><STRONG><A NAME="item_%23classym"><STRONG>#classym</STRONG></A></STRONG><BR>
+<DD>
+A single symbol abbreviating the class of the OP.
+<P></P>
+<DT><STRONG><A NAME="item_%23coplabel"><STRONG>#coplabel</STRONG></A></STRONG><BR>
+<DD>
+The label of the statement or block the OP is the start of, if any.
+<P></P>
+<DT><STRONG><A NAME="item_%23exname"><STRONG>#exname</STRONG></A></STRONG><BR>
+<DD>
+The name of the OP, or 'ex-foo' if the OP is a null that used to be a foo.
+<P></P>
+<DT><STRONG><A NAME="item_%23extarg"><STRONG>#extarg</STRONG></A></STRONG><BR>
+<DD>
+The target of the OP, or nothing for a nulled OP.
+<P></P>
+<DT><STRONG><A NAME="item_%23firstaddr"><STRONG>#firstaddr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP's first child, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23flags"><STRONG>#flags</STRONG></A></STRONG><BR>
+<DD>
+The OP's flags, abbreviated as a series of symbols.
+<P></P>
+<DT><STRONG><A NAME="item_%23flagval"><STRONG>#flagval</STRONG></A></STRONG><BR>
+<DD>
+The numeric value of the OP's flags.
+<P></P>
+<DT><STRONG><A NAME="item_%23hyphenseq"><STRONG>#hyphenseq</STRONG></A></STRONG><BR>
+<DD>
+The sequence number of the OP, or a hyphen if it doesn't have one.
+<P></P>
+<DT><STRONG><A NAME="item_%23label"><STRONG>#label</STRONG></A></STRONG><BR>
+<DD>
+'NEXT', 'LAST', or 'REDO' if the OP is a target of one of those in exec
+mode, or empty otherwise.
+<P></P>
+<DT><STRONG><A NAME="item_%23lastaddr"><STRONG>#lastaddr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP's last child, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23name"><STRONG>#name</STRONG></A></STRONG><BR>
+<DD>
+The OP's name.
+<P></P>
+<DT><STRONG><A NAME="item_%23NAME"><STRONG>#NAME</STRONG></A></STRONG><BR>
+<DD>
+The OP's name, in all caps.
+<P></P>
+<DT><STRONG><A NAME="item_%23next"><STRONG>#next</STRONG></A></STRONG><BR>
+<DD>
+The sequence number of the OP's next OP.
+<P></P>
+<DT><STRONG><A NAME="item_%23nextaddr"><STRONG>#nextaddr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP's next OP, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23noise"><STRONG>#noise</STRONG></A></STRONG><BR>
+<DD>
+The two-character abbreviation for the OP's name.
+<P></P>
+<DT><STRONG><A NAME="item_%23private"><STRONG>#private</STRONG></A></STRONG><BR>
+<DD>
+The OP's private flags, rendered with abbreviated names if possible.
+<P></P>
+<DT><STRONG><A NAME="item_%23privval"><STRONG>#privval</STRONG></A></STRONG><BR>
+<DD>
+The numeric value of the OP's private flags.
+<P></P>
+<DT><STRONG><A NAME="item_%23seq"><STRONG>#seq</STRONG></A></STRONG><BR>
+<DD>
+The sequence number of the OP.
+<P></P>
+<DT><STRONG><A NAME="item_%23seqnum"><STRONG>#seqnum</STRONG></A></STRONG><BR>
+<DD>
+The real sequence number of the OP, as a regular number and not adjusted
+to be relative to the start of the real program. (This will generally be
+a fairly large number because all of <STRONG>B::Concise</STRONG> is compiled before
+your program is).
+<P></P>
+<DT><STRONG><A NAME="item_%23sibaddr"><STRONG>#sibaddr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP's next youngest sibling, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23svaddr"><STRONG>#svaddr</STRONG></A></STRONG><BR>
+<DD>
+The address of the OP's SV, if it has an SV, in hexidecimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23svclass"><STRONG>#svclass</STRONG></A></STRONG><BR>
+<DD>
+The class of the OP's SV, if it has one, in all caps (e.g., 'IV').
+<P></P>
+<DT><STRONG><A NAME="item_%23svval"><STRONG>#svval</STRONG></A></STRONG><BR>
+<DD>
+The value of the OP's SV, if it has one, in a short human-readable format.
+<P></P>
+<DT><STRONG><A NAME="item_%23targ"><STRONG>#targ</STRONG></A></STRONG><BR>
+<DD>
+The numeric value of the OP's targ.
+<P></P>
+<DT><STRONG><A NAME="item_%23targarg"><STRONG>#targarg</STRONG></A></STRONG><BR>
+<DD>
+The name of the variable the OP's targ refers to, if any, otherwise the
+letter t followed by the OP's targ in decimal.
+<P></P>
+<DT><STRONG><A NAME="item_%23targarglife"><STRONG>#targarglife</STRONG></A></STRONG><BR>
+<DD>
+Same as <STRONG>#targarg</STRONG>, but followed by the COP sequence numbers that delimit
+the variable's lifetime (or 'end' for a variable in an open scope) for a
+variable.
+<P></P>
+<DT><STRONG><A NAME="item_%23typenum"><STRONG>#typenum</STRONG></A></STRONG><BR>
+<DD>
+The numeric value of the OP's type, in decimal.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="abbreviations">ABBREVIATIONS</A></H1>
+<P>
+<H2><A NAME="op flags abbreviations">OP flags abbreviations</A></H2>
+<PRE>
+    v      OPf_WANT_VOID    Want nothing (void context)
+    s      OPf_WANT_SCALAR  Want single value (scalar context)
+    l      OPf_WANT_LIST    Want list of any length (list context)
+    K      OPf_KIDS         There is a firstborn child.
+    P      OPf_PARENS       This operator was parenthesized.
+                             (Or block needs explicit scope entry.)
+    R      OPf_REF          Certified reference.
+                             (Return container, not containee).
+    M      OPf_MOD          Will modify (lvalue).
+    S      OPf_STACKED      Some arg is arriving on the stack.
+    *      OPf_SPECIAL      Do something weird for this op (see op.h)</PRE>
+<P>
+<H2><A NAME="op class abbreviations">OP class abbreviations</A></H2>
+<PRE>
+    0      OP (aka BASEOP)  An OP with no children
+    1      UNOP             An OP with one child
+    2      BINOP            An OP with two children
+    |      LOGOP            A control branch OP
+    @      LISTOP           An OP that could have lots of children
+    /      PMOP             An OP with a regular expression
+    $      SVOP             An OP with an SV
+    &quot;      PVOP             An OP with a string
+    {      LOOP             An OP that holds pointers for a loop
+    ;      COP              An OP that marks the start of a statement</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Stephen McCamant, <CODE>smcc@CSUA.Berkeley.EDU</CODE></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;B::Concise - Walk Perl syntax tree, printing concise info about ops</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

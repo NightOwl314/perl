@@ -1,0 +1,420 @@
+<HTML>
+<HEAD>
+<TITLE>perlmodinstall - Installing CPAN Modules</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlmodinstall - Installing CPAN Modules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#preamble">PREAMBLE</A></LI>
+	</UL>
+
+	<LI><A HREF="#portability">PORTABILITY</A></LI>
+	<LI><A HREF="#hey">HEY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlmodinstall - Installing CPAN Modules</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>You can think of a module as the fundamental unit of reusable Perl
+code; See <A HREF="../../lib/Pod/perlmod.html">the perlmod manpage</A> for details.  Whenever anyone creates a chunk
+of Perl code that they think will be useful to the world, they
+register as a Perl developer at
+<A HREF="http://www.perl.com/CPAN/modules/04pause.html">http://www.perl.com/CPAN/modules/04pause.html</A> so that they can then
+upload their code to CPAN.  CPAN is the Comprehensive Perl Archive
+Network and can be accessed at <A HREF="http://www.perl.com/CPAN/,">http://www.perl.com/CPAN/,</A> or searched
+via <A HREF="http://cpan.perl.com/">http://cpan.perl.com/</A> and
+<A HREF="http://theory.uwinnipeg.ca/mod_perl/cpan-search.pl">http://theory.uwinnipeg.ca/mod_perl/cpan-search.pl</A> .</P>
+<P>This documentation is for people who want to download CPAN modules
+and install them on their own computer.</P>
+<P>
+<H2><A NAME="preamble">PREAMBLE</A></H2>
+<P>You have a file ending in <EM>.tar.gz</EM> (or, less often, <EM>.zip</EM>).
+You know there's a tasty module inside.  You must now take four
+steps:</P>
+<DL>
+<DT><STRONG><A NAME="item_DECOMPRESS_the_file"><STRONG>DECOMPRESS</STRONG> the file</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_UNPACK_the_file_into_a_directory"><STRONG>UNPACK</STRONG> the file into a directory</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_module"><STRONG>BUILD</STRONG> the module (sometimes unnecessary)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_INSTALL_the_module%2E"><STRONG>INSTALL</STRONG> the module.</A></STRONG><BR>
+<DD>
+</DL>
+<P>Here's how to perform each step for each operating system.  This is
+<EM>not</EM> a substitute for reading the README and INSTALL files that
+might have come with your module!</P>
+<P>Also note that these instructions are tailored for installing the
+module into your system's repository of Perl modules.  But you can
+install modules into any directory you wish.  For instance, where I
+say <CODE>perl Makefile.PL</CODE>, you can substitute <CODE>perl
+Makefile.PL PREFIX=/my/perl_directory</CODE> to install the modules
+into <CODE>/my/perl_directory</CODE>.  Then you can use the modules
+from your Perl programs with <CODE>use lib
+&quot;/my/perl_directory/lib/site_perl&quot;</CODE> or sometimes just <CODE>use
+&quot;/my/perl_directory&quot;</CODE>.</P>
+<UL>
+<LI>
+<STRONG>If you're on Unix,</STRONG>
+<P>You can use Andreas Koenig's CPAN module
+(which comes standard with Perl, or can itself be downloaded
+from <A HREF="http://www.perl.com/CPAN/modules/by-module/CPAN)">http://www.perl.com/CPAN/modules/by-module/CPAN)</A>
+to automate the following steps, from DECOMPRESS through INSTALL.</P>
+<P>A. DECOMPRESS</P>
+<P>Decompress the file with <CODE>gzip -d yourmodule.tar.gz</CODE></P>
+<P>You can get gzip from <A HREF="ftp://prep.ai.mit.edu/pub/gnu.">ftp://prep.ai.mit.edu/pub/gnu.</A></P>
+<P>Or, you can combine this step with the next to save disk space:</P>
+<PRE>
+     gzip -dc yourmodule.tar.gz | tar -xof -</PRE>
+<P>B. UNPACK</P>
+<P>Unpack the result with <CODE>tar -xof yourmodule.tar</CODE></P>
+<P>C. BUILD</P>
+<P>Go into the newly-created directory and type:</P>
+<PRE>
+      perl Makefile.PL
+      make
+      make test</PRE>
+<P>D. INSTALL</P>
+<P>While still in that directory, type:</P>
+<PRE>
+      make install</PRE>
+<P>Make sure you have appropriate permissions to install the module
+in your Perl 5 library directory.  Often, you'll need to be root.</P>
+<P>Perl maintains a record of all module installations.  To look at
+this list, simply type:</P>
+<PRE>
+      perldoc <A HREF="../../lib/perllocal.html">perllocal</A></PRE>
+<P>That's all you need to do on Unix systems with dynamic linking.
+Most Unix systems have dynamic linking--if yours doesn't, or if for
+another reason you have a statically-linked perl, <EM>and</EM> the
+module requires compilation, you'll need to build a new Perl binary
+that includes the module.  Again, you'll probably need to be root.</P>
+<P></P>
+<LI>
+<STRONG>If you're running Windows 95 or NT with the ActiveState port of Perl</STRONG>
+<PRE>
+   A. DECOMPRESS</PRE>
+<P>You can use the shareware <STRONG>Winzip</STRONG> program ( <A HREF="http://www.winzip.com">http://www.winzip.com</A> ) to
+decompress and unpack modules.</P>
+<PRE>
+   B. UNPACK</PRE>
+<P>If you used WinZip, this was already done for you.</P>
+<PRE>
+   C. BUILD</PRE>
+<P>Does the module require compilation (i.e. does it have files
+that end in .xs, .c, .h, .y, .cc, .cxx, or .C)?  If it does, you're on
+your own.  You can try compiling it yourself if you have a C compiler.
+If you're successful, consider uploading the resulting binary to
+CPAN for others to use.  If it doesn't, go to INSTALL.</P>
+<PRE>
+   D. INSTALL</PRE>
+<P>Copy the module into your Perl's <EM>lib</EM> directory.  That'll be one
+of the directories you see when you type</P>
+<PRE>
+   perl -e 'print &quot;@INC&quot;'</PRE>
+<P></P>
+<LI>
+<STRONG>If you're running Windows 95 or NT with the core Windows distribution of
+Perl,</STRONG>
+<PRE>
+   A. DECOMPRESS</PRE>
+<P>When you download the module, make sure it ends in either
+<EM>.tar.gz</EM> or <EM>.zip</EM>.  Windows browsers sometimes
+download <CODE>.tar.gz</CODE> files as <CODE>_tar.tar</CODE>, because
+early versions of Windows prohibited more than one dot in a filename.</P>
+<P>You can use the shareware <STRONG>WinZip</STRONG> program ( <A HREF="http://www.winzip.com">http://www.winzip.com</A> ) to
+decompress and unpack modules.</P>
+<P>Or, you can use InfoZip's <CODE>unzip</CODE> utility (
+<A HREF="http://www.cdrom.com/pub/infozip/">http://www.cdrom.com/pub/infozip/</A> ) to uncompress <CODE>.zip</CODE> files; type
+<CODE>unzip yourmodule.zip</CODE> in your shell.</P>
+<P>Or, if you have a working <CODE>tar</CODE> and <CODE>gzip</CODE>, you can
+type</P>
+<PRE>
+   gzip -cd yourmodule.tar.gz | tar xvf -</PRE>
+<P>in the shell to decompress <CODE>yourmodule.tar.gz</CODE>.  This will
+UNPACK your module as well.</P>
+<PRE>
+   B. UNPACK</PRE>
+<P>The methods in DECOMPRESS will have done this for you.</P>
+<PRE>
+   C. BUILD</PRE>
+<P>Go into the newly-created directory and type:</P>
+<PRE>
+      perl Makefile.PL
+      dmake
+      dmake test</PRE>
+<P>Depending on your perl configuration, <CODE>dmake</CODE> might not be
+available.  You might have to substitute whatever <CODE>perl
+-V:make</CODE> says. (Usually, that will be <CODE>nmake</CODE> or
+<CODE>make</CODE>.)</P>
+<PRE>
+   D. INSTALL</PRE>
+<P>While still in that directory, type:</P>
+<PRE>
+      dmake install</PRE>
+<P></P>
+<LI>
+<STRONG>If you're using a Macintosh,</STRONG>
+<P>A. DECOMPRESS</P>
+<P>First thing you should do is make sure you have the latest <STRONG>cpan-mac</STRONG>
+distribution ( <A HREF="http://www.cpan.org/authors/id/CNANDOR/">http://www.cpan.org/authors/id/CNANDOR/</A> ), which has
+utilities for doing all of the steps.  Read the cpan-mac directions
+carefully and install it.  If you choose not to use cpan-mac
+for some reason, there are alternatives listed here.</P>
+<P>After installing cpan-mac, drop the module archive on the
+<STRONG>untarzipme</STRONG> droplet, which will decompress and unpack for you.</P>
+<P><STRONG>Or</STRONG>, you can either use the shareware <STRONG>StuffIt Expander</STRONG> program
+( <A HREF="http://www.aladdinsys.com/expander/">http://www.aladdinsys.com/expander/</A> )
+in combination with <STRONG>DropStuff with Expander Enhancer</STRONG>
+( <A HREF="http://www.aladdinsys.com/dropstuff/">http://www.aladdinsys.com/dropstuff/</A> )
+or the freeware <STRONG>MacGzip</STRONG> program (
+<A HREF="http://persephone.cps.unizar.es/general/gente/spd/gzip/gzip.html">http://persephone.cps.unizar.es/general/gente/spd/gzip/gzip.html</A> ).</P>
+<P>B. UNPACK</P>
+<P>If you're using untarzipme or StuffIt, the archive should be extracted
+now.  <STRONG>Or</STRONG>, you can use the freeware <STRONG>suntar</STRONG> or <EM>Tar</EM> (
+<A HREF="http://hyperarchive.lcs.mit.edu/HyperArchive/Archive/cmp/">http://hyperarchive.lcs.mit.edu/HyperArchive/Archive/cmp/</A> ).</P>
+<P>C. BUILD</P>
+<P>Check the contents of the distribution.
+Read the module's documentation, looking for
+reasons why you might have trouble using it with MacPerl.  Look for
+<EM>.xs</EM> and <EM>.c</EM> files, which normally denote that the distribution
+must be compiled, and you cannot install it ``out of the box.''
+(See <A HREF="#portability">PORTABILITY</A>.)</P>
+<P>If a module does not work on MacPerl but should, or needs to be
+compiled, see if the module exists already as a port on the
+MacPerl Module Porters site (http://pudge.net/mmp/).
+For more information on doing XS with MacPerl yourself, see
+Arved Sandstrom's XS tutorial (http://macperl.com/depts/Tutorials/),
+and then consider uploading your binary to the CPAN and
+registering it on the MMP site.</P>
+<P>D. INSTALL</P>
+<P>If you are using cpan-mac, just drop the folder on the
+<STRONG>installme</STRONG> droplet, and use the module.</P>
+<P><STRONG>Or</STRONG>, if you aren't using cpan-mac, do some manual labor.</P>
+<P>Make sure the newlines for the modules are in Mac format, not Unix format.
+If they are not then you might have decompressed them incorrectly.  Check
+your decompression and unpacking utilities settings to make sure they are
+translating text files properly.</P>
+<P>As a last resort, you can use the perl one-liner:</P>
+<PRE>
+    perl -i.bak -pe 's/(?:\015)?\012/\015/g' &lt;filenames&gt;</PRE>
+<P>on the source files.</P>
+<P>Then move the files (probably just the <EM>.pm</EM> files, though there
+may be some additional ones, too; check the module documentation)
+to their final destination: This will
+most likely be in <CODE>$ENV{MACPERL}site_lib:</CODE> (i.e.,
+<CODE>HD:MacPerl folder:site_lib:</CODE>).  You can add new paths to
+the default <A HREF="../../lib/Pod/perlvar.html#item_%40INC"><CODE>@INC</CODE></A> in the Preferences menu item in the
+MacPerl application (<CODE>$ENV{MACPERL}site_lib:</CODE> is added
+automagically).  Create whatever directory structures are required
+(i.e., for <CODE>Some::Module</CODE>, create
+<CODE>$ENV{MACPERL}site_lib:Some:</CODE> and put
+<CODE>Module.pm</CODE> in that directory).</P>
+<P>Then run the following script (or something like it):</P>
+<PRE>
+     #!perl -w
+     use AutoSplit;
+     my $dir = &quot;${MACPERL}site_perl&quot;;
+     autosplit(&quot;$dir:Some:Module.pm&quot;, &quot;$dir:auto&quot;, 0, 1, 1);</PRE>
+<P></P>
+<LI>
+<STRONG>If you're on the DJGPP port of DOS,</STRONG>
+<PRE>
+   A. DECOMPRESS</PRE>
+<P>djtarx ( <A HREF="ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/">ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/</A> )
+will both uncompress and unpack.</P>
+<PRE>
+   B. UNPACK</PRE>
+<P>See above.</P>
+<PRE>
+   C. BUILD</PRE>
+<P>Go into the newly-created directory and type:</P>
+<PRE>
+      perl Makefile.PL
+      make
+      make test</PRE>
+<P>You will need the packages mentioned in <EM>README.dos</EM>
+in the Perl distribution.</P>
+<PRE>
+   D. INSTALL</PRE>
+<P>While still in that directory, type:</P>
+<PRE>
+     make install</PRE>
+<P>You will need the packages mentioned in <EM>README.dos</EM> in the Perl distribution.</P>
+<P></P>
+<LI>
+<STRONG>If you're on OS/2,</STRONG>
+<P>Get the EMX development suite and gzip/tar, from either Hobbes (
+<A HREF="http://hobbes.nmsu.edu">http://hobbes.nmsu.edu</A> ) or Leo ( <A HREF="http://www.leo.org">http://www.leo.org</A> ), and then follow
+the instructions for Unix.</P>
+<P></P>
+<LI>
+<STRONG>If you're on VMS,</STRONG>
+<P>When downloading from CPAN, save your file with a <EM>.tgz</EM>
+extension instead of <EM>.tar.gz</EM>.  All other periods in the
+filename should be replaced with underscores.  For example,
+<CODE>Your-Module-1.33.tar.gz</CODE> should be downloaded as
+<CODE>Your-Module-1_33.tgz</CODE>.</P>
+<P>A. DECOMPRESS</P>
+<P>Type</P>
+<PRE>
+    gzip -d Your-Module.tgz</PRE>
+<P>or, for zipped modules, type</P>
+<PRE>
+    unzip Your-Module.zip</PRE>
+<P>Executables for gzip, zip, and VMStar ( Alphas:
+<A HREF="http://www.openvms.digital.com/freeware/000TOOLS/ALPHA/">http://www.openvms.digital.com/freeware/000TOOLS/ALPHA/</A> and Vaxen:
+<A HREF="http://www.openvms.digital.com/freeware/000TOOLS/VAX/">http://www.openvms.digital.com/freeware/000TOOLS/VAX/</A> ).</P>
+<P>gzip and tar
+are also available at <A HREF="ftp://ftp.digital.com/pub/VMS.">ftp://ftp.digital.com/pub/VMS.</A></P>
+<P>Note that GNU's gzip/gunzip is not the same as Info-ZIP's zip/unzip
+package.  The former is a simple compression tool; the latter permits
+creation of multi-file archives.</P>
+<P>B. UNPACK</P>
+<P>If you're using VMStar:</P>
+<PRE>
+     VMStar xf Your-Module.tar</PRE>
+<P>Or, if you're fond of VMS command syntax:</P>
+<PRE>
+     tar/extract/verbose Your_Module.tar</PRE>
+<P>C. BUILD</P>
+<P>Make sure you have MMS (from Digital) or the freeware MMK ( available from
+MadGoat at  <A HREF="http://www.madgoat.com">http://www.madgoat.com</A> ).  Then type this to create the
+DESCRIP.MMS for the module:</P>
+<PRE>
+    perl Makefile.PL</PRE>
+<P>Now you're ready to build:</P>
+<PRE>
+    mms
+    mms test</PRE>
+<P>Substitute <CODE>mmk</CODE> for <CODE>mms</CODE> above if you're using MMK.</P>
+<P>D. INSTALL</P>
+<P>Type</P>
+<PRE>
+    mms install</PRE>
+<P>Substitute <CODE>mmk</CODE> for <CODE>mms</CODE> above if you're using MMK.</P>
+<P></P>
+<LI>
+<STRONG>If you're on MVS</STRONG>,
+<P>Introduce the <EM>.tar.gz</EM> file into an HFS as binary; don't translate from
+ASCII to EBCDIC.</P>
+<P>A. DECOMPRESS</P>
+<PRE>
+      Decompress the file with C&lt;gzip -d yourmodule.tar.gz&gt;</PRE>
+<PRE>
+      You can get gzip from
+      <A HREF="http://www.s390.ibm.com/products/oe/bpxqp1.html.">http://www.s390.ibm.com/products/oe/bpxqp1.html.</A></PRE>
+<P>B. UNPACK</P>
+<P>Unpack the result with</P>
+<PRE>
+     pax -o to=IBM-1047,from=ISO8859-1 -r &lt; yourmodule.tar</PRE>
+<P>The BUILD and INSTALL steps are identical to those for Unix.  Some
+modules generate Makefiles that work better with GNU make, which is
+available from <A HREF="http://www.mks.com/s390/gnu/index.htm.">http://www.mks.com/s390/gnu/index.htm.</A></P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="portability">PORTABILITY</A></H1>
+<P>Note that not all modules will work with on all platforms.
+See <A HREF="../../lib/Pod/perlport.html">the perlport manpage</A> for more information on portability issues.
+Read the documentation to see if the module will work on your
+system.  There are basically three categories
+of modules that will not work ``out of the box'' with all
+platforms (with some possibility of overlap):</P>
+<UL>
+<LI>
+<STRONG>Those that should, but don't.</STRONG>  These need to be fixed; consider
+contacting the author and possibly writing a patch.
+<P></P>
+<LI>
+<STRONG>Those that need to be compiled, where the target platform
+doesn't have compilers readily available.</STRONG>  (These modules contain
+<EM>.xs</EM> or <EM>.c</EM> files, usually.)  You might be able to find
+existing binaries on the CPAN or elsewhere, or you might
+want to try getting compilers and building it yourself, and then
+release the binary for other poor souls to use.
+<P></P>
+<LI>
+<STRONG>Those that are targeted at a specific platform.</STRONG>
+(Such as the Win32:: modules.)  If the module is targeted
+specifically at a platform other than yours, you're out
+of luck, most likely.
+<P></P></UL>
+<P>Check the CPAN Testers if a module should work with your platform
+but it doesn't behave as you'd expect, or you aren't sure whether or
+not a module will work under your platform.  If the module you want
+isn't listed there, you can test it yourself and let CPAN Testers know,
+you can join CPAN Testers, or you can request it be tested.</P>
+<PRE>
+    <A HREF="http://testers.cpan.org/">http://testers.cpan.org/</A></PRE>
+<P>
+<HR>
+<H1><A NAME="hey">HEY</A></H1>
+<P>If you have any suggested changes for this page, let me know.  Please
+don't send me mail asking for help on how to install your modules.
+There are too many modules, and too few Orwants, for me to be able to
+answer or even acknowledge all your questions.  Contact the module
+author instead, or post to comp.lang.perl.modules, or ask someone
+familiar with Perl on your operating system.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Jon Orwant</P>
+<P><A HREF="mailto:orwant@tpj.com">orwant@tpj.com</A></P>
+<P>The Perl Journal, <A HREF="http://tpj.com">http://tpj.com</A></P>
+<P>with invaluable help from Brandon Allbery, Charles Bailey, Graham
+Barr, Dominic Dunlop, Jarkko Hietaniemi, Ben Holzman, Tom Horsley,
+Nick Ing-Simmons, Tuomas J. Lukka, Laszlo Molnar, Chris Nandor, Alan
+Olsen, Peter Prymmer, Gurusamy Sarathy, Christoph Spalinger, Dan
+Sugalski, Larry Virden, and Ilya Zakharevich.</P>
+<P>First version July 22, 1998</P>
+<P>Last Modified August 22, 2000</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 1998, 2000 Jon Orwant.  All Rights Reserved.</P>
+<P>Permission is granted to make and distribute verbatim copies of this
+documentation provided the copyright notice and this permission notice are
+preserved on all copies.</P>
+<P>Permission is granted to copy and distribute modified versions of this
+documentation under the conditions for verbatim copying, provided also
+that they are marked clearly as modified versions, that the authors'
+names and title are unchanged (though subtitles and additional
+authors' names may be added), and that the entire resulting derived
+work is distributed under the terms of a permission notice identical
+to this one.</P>
+<P>Permission is granted to copy and distribute translations of this
+documentation into another language, under the above conditions for
+modified versions.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlmodinstall - Installing CPAN Modules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

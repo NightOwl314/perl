@@ -1,0 +1,1845 @@
+<HTML>
+<HEAD>
+<TITLE>perlmodlib - constructing new Perl modules and finding existing ones</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlmodlib - constructing new Perl modules and finding existing ones</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#the perl module library">THE PERL MODULE LIBRARY</A></LI>
+	<UL>
+
+		<LI><A HREF="#pragmatic modules">Pragmatic Modules</A></LI>
+		<LI><A HREF="#standard modules">Standard Modules</A></LI>
+		<LI><A HREF="#extension modules">Extension Modules</A></LI>
+	</UL>
+
+	<LI><A HREF="#cpan">CPAN</A></LI>
+	<UL>
+
+		<LI><A HREF="#africa">Africa</A></LI>
+		<LI><A HREF="#asia">Asia</A></LI>
+		<LI><A HREF="#central america">Central America</A></LI>
+		<LI><A HREF="#europe">Europe</A></LI>
+		<LI><A HREF="#north america">North America</A></LI>
+		<LI><A HREF="#oceania">Oceania</A></LI>
+		<LI><A HREF="#south america">South America</A></LI>
+	</UL>
+
+	<LI><A HREF="#modules: creation, use, and abuse">Modules: Creation, Use, and Abuse</A></LI>
+	<UL>
+
+		<LI><A HREF="#guidelines for module creation">Guidelines for Module Creation</A></LI>
+		<LI><A HREF="#guidelines for converting perl 4 library scripts into modules">Guidelines for Converting Perl 4 Library Scripts into Modules</A></LI>
+		<LI><A HREF="#guidelines for reusing application code">Guidelines for Reusing Application Code</A></LI>
+	</UL>
+
+	<LI><A HREF="#note">NOTE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlmodlib - constructing new Perl modules and finding existing ones</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<HR>
+<H1><A NAME="the perl module library">THE PERL MODULE LIBRARY</A></H1>
+<P>Many modules are included the Perl distribution.  These are described
+below, and all end in <EM>.pm</EM>.  You may discover compiled library
+file (usually ending in <EM>.so</EM>) or small pieces of modules to be
+autoloaded (ending in <EM>.al</EM>); these were automatically generated
+by the installation process.  You may also discover files in the
+library directory that end in either <EM>.pl</EM> or <EM>.ph</EM>.  These are
+old libraries supplied so that old programs that use them still
+run.  The <EM>.pl</EM> files will all eventually be converted into standard
+modules, and the <EM>.ph</EM> files made by <STRONG>h2ph</STRONG> will probably end up
+as extension modules made by <STRONG>h2xs</STRONG>.  (Some <EM>.ph</EM> values may
+already be available through the POSIX, Errno, or Fcntl modules.)
+The <STRONG>pl2pm</STRONG> file in the distribution may help in your conversion,
+but it's just a mechanical process and therefore far from bulletproof.</P>
+<P>
+<H2><A NAME="pragmatic modules">Pragmatic Modules</A></H2>
+<P>They work somewhat like compiler directives (pragmata) in that they
+tend to affect the compilation of your program, and thus will usually
+work well only when used within a <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_no"><CODE>no</CODE></A>.  Most of these
+are lexically scoped, so an inner BLOCK may countermand them
+by saying:</P>
+<PRE>
+    no integer;
+    no strict 'refs';
+    no warnings;</PRE>
+<P>which lasts until the end of that BLOCK.</P>
+<P>Some pragmas are lexically scoped--typically those that affect the
+<A HREF="../../lib/Pod/perlvar.html#item_%24%5EH"><CODE>$^H</CODE></A> hints variable.  Others affect the current package instead,
+like <CODE>use vars</CODE> and <CODE>use subs</CODE>, which allow you to predeclare a
+variables or subroutines within a particular <EM>file</EM> rather than
+just a block.  Such declarations are effective for the entire file
+for which they were declared.  You cannot rescind them with <CODE>no
+vars</CODE> or <CODE>no subs</CODE>.</P>
+<P>The following pragmas are defined (and have their own documentation).</P>
+<DL>
+<DT><STRONG><A NAME="item_attributes">attributes</A></STRONG><BR>
+<DD>
+Get/set subroutine or variable attributes
+<P></P>
+<DT><STRONG><A NAME="item_attrs">attrs</A></STRONG><BR>
+<DD>
+Set/get attributes of a subroutine (deprecated)
+<P></P>
+<DT><STRONG><A NAME="item_autouse">autouse</A></STRONG><BR>
+<DD>
+Postpone load of modules until a function is used
+<P></P>
+<DT><STRONG><A NAME="item_base">base</A></STRONG><BR>
+<DD>
+Establish IS-A relationship with base class at compile time
+<P></P>
+<DT><STRONG><A NAME="item_blib">blib</A></STRONG><BR>
+<DD>
+Use MakeMaker's uninstalled version of a package
+<P></P>
+<DT><STRONG><A NAME="item_bytes">bytes</A></STRONG><BR>
+<DD>
+Force byte semantics rather than character semantics
+<P></P>
+<DT><STRONG><A NAME="item_charnames">charnames</A></STRONG><BR>
+<DD>
+Define character names for <CODE>\N{named}</CODE> string literal escape.
+<P></P>
+<DT><STRONG><A NAME="item_constant">constant</A></STRONG><BR>
+<DD>
+Declare constants
+<P></P>
+<DT><STRONG><A NAME="item_diagnostics">diagnostics</A></STRONG><BR>
+<DD>
+Perl compiler pragma to force verbose warning diagnostics
+<P></P>
+<DT><STRONG><A NAME="item_fields">fields</A></STRONG><BR>
+<DD>
+Compile-time class fields
+<P></P>
+<DT><STRONG><A NAME="item_filetest">filetest</A></STRONG><BR>
+<DD>
+Control the filetest permission operators
+<P></P>
+<DT><STRONG><A NAME="item_integer">integer</A></STRONG><BR>
+<DD>
+Use integer arithmetic instead of floating point
+<P></P>
+<DT><STRONG><A NAME="item_less">less</A></STRONG><BR>
+<DD>
+Request less of something from the compiler
+<P></P>
+<DT><STRONG><A NAME="item_lib">lib</A></STRONG><BR>
+<DD>
+Manipulate @INC at compile time
+<P></P>
+<DT><STRONG><A NAME="item_locale">locale</A></STRONG><BR>
+<DD>
+Use and avoid POSIX locales for built-in operations
+<P></P>
+<DT><STRONG><A NAME="item_open">open</A></STRONG><BR>
+<DD>
+Set default disciplines for input and output
+<P></P>
+<DT><STRONG><A NAME="item_ops">ops</A></STRONG><BR>
+<DD>
+Restrict unsafe operations when compiling
+<P></P>
+<DT><STRONG><A NAME="item_overload">overload</A></STRONG><BR>
+<DD>
+Package for overloading perl operations
+<P></P>
+<DT><STRONG><A NAME="item_re">re</A></STRONG><BR>
+<DD>
+Alter regular expression behaviour
+<P></P>
+<DT><STRONG><A NAME="item_sigtrap">sigtrap</A></STRONG><BR>
+<DD>
+Enable simple signal handling
+<P></P>
+<DT><STRONG><A NAME="item_strict">strict</A></STRONG><BR>
+<DD>
+Restrict unsafe constructs
+<P></P>
+<DT><STRONG><A NAME="item_subs">subs</A></STRONG><BR>
+<DD>
+Predeclare sub names
+<P></P>
+<DT><STRONG><A NAME="item_utf8">utf8</A></STRONG><BR>
+<DD>
+Enable/disable UTF-8 in source code
+<P></P>
+<DT><STRONG><A NAME="item_vars">vars</A></STRONG><BR>
+<DD>
+Predeclare global variable names (obsolete)
+<P></P>
+<DT><STRONG><A NAME="item_warnings">warnings</A></STRONG><BR>
+<DD>
+Control optional warnings
+<P></P>
+<DT><STRONG><A NAME="item_warnings%3A%3Aregister">warnings::register</A></STRONG><BR>
+<DD>
+Warnings import function
+<P></P></DL>
+<P>
+<H2><A NAME="standard modules">Standard Modules</A></H2>
+<P>Standard, bundled modules are all expected to behave in a well-defined
+manner with respect to namespace pollution because they use the
+Exporter module.  See their own documentation for details.</P>
+<DL>
+<DT><STRONG><A NAME="item_AnyDBM_File">AnyDBM_File</A></STRONG><BR>
+<DD>
+Provide framework for multiple DBMs
+<P></P>
+<DT><STRONG><A NAME="item_AutoLoader">AutoLoader</A></STRONG><BR>
+<DD>
+Load subroutines only on demand
+<P></P>
+<DT><STRONG><A NAME="item_AutoSplit">AutoSplit</A></STRONG><BR>
+<DD>
+Split a package for autoloading
+<P></P>
+<DT><STRONG><A NAME="item_B">B</A></STRONG><BR>
+<DD>
+The Perl Compiler
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AAsmdata">B::Asmdata</A></STRONG><BR>
+<DD>
+Autogenerated data about Perl ops, used to generate bytecode
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AAssembler">B::Assembler</A></STRONG><BR>
+<DD>
+Assemble Perl bytecode
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ABblock">B::Bblock</A></STRONG><BR>
+<DD>
+Walk basic blocks
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ABytecode">B::Bytecode</A></STRONG><BR>
+<DD>
+Perl compiler's bytecode backend
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AC">B::C</A></STRONG><BR>
+<DD>
+Perl compiler's C backend
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ACC">B::CC</A></STRONG><BR>
+<DD>
+Perl compiler's optimized C translation backend
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AConcise">B::Concise</A></STRONG><BR>
+<DD>
+Walk Perl syntax tree, printing concise info about ops
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ADebug">B::Debug</A></STRONG><BR>
+<DD>
+Walk Perl syntax tree, printing debug info about ops
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ADeparse">B::Deparse</A></STRONG><BR>
+<DD>
+Perl compiler backend to produce perl code
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ADisassembler">B::Disassembler</A></STRONG><BR>
+<DD>
+Disassemble Perl bytecode
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ALint">B::Lint</A></STRONG><BR>
+<DD>
+Perl lint
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AShowlex">B::Showlex</A></STRONG><BR>
+<DD>
+Show lexical variables used in functions or files
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AStackobj">B::Stackobj</A></STRONG><BR>
+<DD>
+Helper module for CC backend
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AStash">B::Stash</A></STRONG><BR>
+<DD>
+Show what stashes are loaded
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3ATerse">B::Terse</A></STRONG><BR>
+<DD>
+Walk Perl syntax tree, printing terse info about ops
+<P></P>
+<DT><STRONG><A NAME="item_B%3A%3AXref">B::Xref</A></STRONG><BR>
+<DD>
+Generates cross reference reports for Perl programs
+<P></P>
+<DT><STRONG><A NAME="item_Benchmark">Benchmark</A></STRONG><BR>
+<DD>
+Benchmark running times of Perl code
+<P></P>
+<DT><STRONG><A NAME="item_ByteLoader">ByteLoader</A></STRONG><BR>
+<DD>
+Load byte compiled perl code
+<P></P>
+<DT><STRONG><A NAME="item_CGI">CGI</A></STRONG><BR>
+<DD>
+Simple Common Gateway Interface Class
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3AApache">CGI::Apache</A></STRONG><BR>
+<DD>
+Backward compatibility module for CGI.pm
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3ACarp">CGI::Carp</A></STRONG><BR>
+<DD>
+CGI routines for writing to the HTTPD (or other) error log
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3ACookie">CGI::Cookie</A></STRONG><BR>
+<DD>
+Interface to Netscape Cookies
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3AFast">CGI::Fast</A></STRONG><BR>
+<DD>
+CGI Interface for Fast CGI
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3APretty">CGI::Pretty</A></STRONG><BR>
+<DD>
+Module to produce nicely formatted HTML code
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3APush">CGI::Push</A></STRONG><BR>
+<DD>
+Simple Interface to Server Push
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3ASwitch">CGI::Switch</A></STRONG><BR>
+<DD>
+Backward compatibility module for defunct CGI::Switch
+<P></P>
+<DT><STRONG><A NAME="item_CGI%3A%3AUtil">CGI::Util</A></STRONG><BR>
+<DD>
+Internal utilities used by CGI module
+<P></P>
+<DT><STRONG><A NAME="item_CPAN">CPAN</A></STRONG><BR>
+<DD>
+Query, download and build perl modules from CPAN sites
+<P></P>
+<DT><STRONG><A NAME="item_CPAN%3A%3AFirstTime">CPAN::FirstTime</A></STRONG><BR>
+<DD>
+Utility for CPAN::Config file Initialization
+<P></P>
+<DT><STRONG><A NAME="item_CPAN%3A%3ANox">CPAN::Nox</A></STRONG><BR>
+<DD>
+Wrapper around CPAN.pm without using any XS module
+<P></P>
+<DT><STRONG><A NAME="item_Carp">Carp</A></STRONG><BR>
+<DD>
+Warn of errors (from perspective of caller)
+<P></P>
+<DT><STRONG><A NAME="item_Carp%3A%3AHeavy">Carp::Heavy</A></STRONG><BR>
+<DD>
+Carp guts
+<P></P>
+<DT><STRONG><A NAME="item_Class%3A%3AStruct">Class::Struct</A></STRONG><BR>
+<DD>
+Declare struct-like datatypes as Perl classes
+<P></P>
+<DT><STRONG><A NAME="item_Cwd">Cwd</A></STRONG><BR>
+<DD>
+Get pathname of current working directory
+<P></P>
+<DT><STRONG><A NAME="item_DB">DB</A></STRONG><BR>
+<DD>
+Programmatic interface to the Perl debugging API (draft, subject to
+<P></P>
+<DT><STRONG><A NAME="item_DB_File">DB_File</A></STRONG><BR>
+<DD>
+Perl5 access to Berkeley DB version 1.x
+<P></P>
+<DT><STRONG><A NAME="item_Devel%3A%3ASelfStubber">Devel::SelfStubber</A></STRONG><BR>
+<DD>
+Generate stubs for a SelfLoading module
+<P></P>
+<DT><STRONG><A NAME="item_DirHandle">DirHandle</A></STRONG><BR>
+<DD>
+Supply object methods for directory handles
+<P></P>
+<DT><STRONG><A NAME="item_Dumpvalue">Dumpvalue</A></STRONG><BR>
+<DD>
+Provides screen dump of Perl data.
+<P></P>
+<DT><STRONG><A NAME="item_English">English</A></STRONG><BR>
+<DD>
+Use nice English (or awk) names for ugly punctuation variables
+<P></P>
+<DT><STRONG><A NAME="item_Env">Env</A></STRONG><BR>
+<DD>
+Perl module that imports environment variables as scalars or arrays
+<P></P>
+<DT><STRONG><A NAME="item_Exporter">Exporter</A></STRONG><BR>
+<DD>
+Implements default import method for modules
+<P></P>
+<DT><STRONG><A NAME="item_Exporter%3A%3AHeavy">Exporter::Heavy</A></STRONG><BR>
+<DD>
+Exporter guts
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3ACommand">ExtUtils::Command</A></STRONG><BR>
+<DD>
+Utilities to replace common UNIX commands in Makefiles etc.
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AEmbed">ExtUtils::Embed</A></STRONG><BR>
+<DD>
+Utilities for embedding Perl in C/C++ applications
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AInstall">ExtUtils::Install</A></STRONG><BR>
+<DD>
+Install files from here to there
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AInstalled">ExtUtils::Installed</A></STRONG><BR>
+<DD>
+Inventory management of installed modules
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3ALiblist">ExtUtils::Liblist</A></STRONG><BR>
+<DD>
+Determine libraries to use and how to use them
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMM_Cygwin">ExtUtils::MM_Cygwin</A></STRONG><BR>
+<DD>
+Methods to override UN*X behaviour in ExtUtils::MakeMaker
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMM_OS2">ExtUtils::MM_OS2</A></STRONG><BR>
+<DD>
+Methods to override UN*X behaviour in ExtUtils::MakeMaker
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMM_Unix">ExtUtils::MM_Unix</A></STRONG><BR>
+<DD>
+Methods used by ExtUtils::MakeMaker
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMM_VMS">ExtUtils::MM_VMS</A></STRONG><BR>
+<DD>
+Methods to override UN*X behaviour in ExtUtils::MakeMaker
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMM_Win32">ExtUtils::MM_Win32</A></STRONG><BR>
+<DD>
+Methods to override UN*X behaviour in ExtUtils::MakeMaker
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMakeMaker">ExtUtils::MakeMaker</A></STRONG><BR>
+<DD>
+Create an extension Makefile
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AManifest">ExtUtils::Manifest</A></STRONG><BR>
+<DD>
+Utilities to write and check a MANIFEST file
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMkbootstrap">ExtUtils::Mkbootstrap</A></STRONG><BR>
+<DD>
+Make a bootstrap file for use by DynaLoader
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3AMksymlists">ExtUtils::Mksymlists</A></STRONG><BR>
+<DD>
+Write linker options files for dynamic extension
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3APacklist">ExtUtils::Packlist</A></STRONG><BR>
+<DD>
+Manage .packlist files
+<P></P>
+<DT><STRONG><A NAME="item_ExtUtils%3A%3Atestlib">ExtUtils::testlib</A></STRONG><BR>
+<DD>
+Add blib/* directories to @INC
+<P></P>
+<DT><STRONG><A NAME="item_Fatal">Fatal</A></STRONG><BR>
+<DD>
+Replace functions with equivalents which succeed or die
+<P></P>
+<DT><STRONG><A NAME="item_Fcntl">Fcntl</A></STRONG><BR>
+<DD>
+Load the C Fcntl.h defines
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ABasename">File::Basename</A></STRONG><BR>
+<DD>
+Split a pathname into pieces
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ACheckTree">File::CheckTree</A></STRONG><BR>
+<DD>
+Run many filetest checks on a tree
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ACompare">File::Compare</A></STRONG><BR>
+<DD>
+Compare files or filehandles
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ACopy">File::Copy</A></STRONG><BR>
+<DD>
+Copy files or filehandles
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ADosGlob">File::DosGlob</A></STRONG><BR>
+<DD>
+DOS like globbing and then some
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3AFind">File::Find</A></STRONG><BR>
+<DD>
+Traverse a file tree
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3APath">File::Path</A></STRONG><BR>
+<DD>
+Create or remove directory trees
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec">File::Spec</A></STRONG><BR>
+<DD>
+Portably perform operations on file names
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AEpoc">File::Spec::Epoc</A></STRONG><BR>
+<DD>
+Methods for Epoc file specs
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AFunctions">File::Spec::Functions</A></STRONG><BR>
+<DD>
+Portably perform operations on file names
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AMac">File::Spec::Mac</A></STRONG><BR>
+<DD>
+File::Spec for MacOS
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AOS2">File::Spec::OS2</A></STRONG><BR>
+<DD>
+Methods for OS/2 file specs
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AUnix">File::Spec::Unix</A></STRONG><BR>
+<DD>
+Methods used by File::Spec
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AVMS">File::Spec::VMS</A></STRONG><BR>
+<DD>
+Methods for VMS file specs
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ASpec%3A%3AWin32">File::Spec::Win32</A></STRONG><BR>
+<DD>
+Methods for Win32 file specs
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3ATemp">File::Temp</A></STRONG><BR>
+<DD>
+Return name and handle of a temporary file safely
+<P></P>
+<DT><STRONG><A NAME="item_File%3A%3Astat">File::stat</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in <A HREF="../../lib/Pod/perlfunc.html#item_stat"><CODE>stat()</CODE></A> functions
+<P></P>
+<DT><STRONG><A NAME="item_FileCache">FileCache</A></STRONG><BR>
+<DD>
+Keep more files open than the system permits
+<P></P>
+<DT><STRONG><A NAME="item_FileHandle">FileHandle</A></STRONG><BR>
+<DD>
+Supply object methods for filehandles
+<P></P>
+<DT><STRONG><A NAME="item_FindBin">FindBin</A></STRONG><BR>
+<DD>
+Locate directory of original perl script
+<P></P>
+<DT><STRONG><A NAME="item_GDBM_File">GDBM_File</A></STRONG><BR>
+<DD>
+Perl5 access to the gdbm library.
+<P></P>
+<DT><STRONG><A NAME="item_Getopt%3A%3ALong">Getopt::Long</A></STRONG><BR>
+<DD>
+Extended processing of command line options
+<P></P>
+<DT><STRONG><A NAME="item_Getopt%3A%3AStd">Getopt::Std</A></STRONG><BR>
+<DD>
+Process single-character switches with switch clustering
+<P></P>
+<DT><STRONG><A NAME="item_I18N%3A%3ACollate">I18N::Collate</A></STRONG><BR>
+<DD>
+Compare 8-bit scalar data according to the current locale
+<P></P>
+<DT><STRONG><A NAME="item_IO">IO</A></STRONG><BR>
+<DD>
+Load various IO modules
+<P></P>
+<DT><STRONG><A NAME="item_IPC%3A%3AOpen2">IPC::Open2</A></STRONG><BR>
+<DD>
+Open a process for both reading and writing
+<P></P>
+<DT><STRONG><A NAME="item_IPC%3A%3AOpen3">IPC::Open3</A></STRONG><BR>
+<DD>
+Open a process for reading, writing, and error handling
+<P></P>
+<DT><STRONG><A NAME="item_Math%3A%3ABigFloat">Math::BigFloat</A></STRONG><BR>
+<DD>
+Arbitrary length float math package
+<P></P>
+<DT><STRONG><A NAME="item_Math%3A%3ABigInt">Math::BigInt</A></STRONG><BR>
+<DD>
+Arbitrary size integer math package
+<P></P>
+<DT><STRONG><A NAME="item_Math%3A%3AComplex">Math::Complex</A></STRONG><BR>
+<DD>
+Complex numbers and associated mathematical functions
+<P></P>
+<DT><STRONG><A NAME="item_Math%3A%3ATrig">Math::Trig</A></STRONG><BR>
+<DD>
+Trigonometric functions
+<P></P>
+<DT><STRONG><A NAME="item_Net%3A%3APing">Net::Ping</A></STRONG><BR>
+<DD>
+Check a remote host for reachability
+<P></P>
+<DT><STRONG><A NAME="item_Net%3A%3Ahostent">Net::hostent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in gethost*() functions
+<P></P>
+<DT><STRONG><A NAME="item_Net%3A%3Anetent">Net::netent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in getnet*() functions
+<P></P>
+<DT><STRONG><A NAME="item_Net%3A%3Aprotoent">Net::protoent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in getproto*() functions
+<P></P>
+<DT><STRONG><A NAME="item_Net%3A%3Aservent">Net::servent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in getserv*() functions
+<P></P>
+<DT><STRONG><A NAME="item_O">O</A></STRONG><BR>
+<DD>
+Generic interface to Perl Compiler backends
+<P></P>
+<DT><STRONG><A NAME="item_Opcode">Opcode</A></STRONG><BR>
+<DD>
+Disable named opcodes when compiling perl code
+<P></P>
+<DT><STRONG><A NAME="item_POSIX">POSIX</A></STRONG><BR>
+<DD>
+Perl interface to IEEE Std 1003.1
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AChecker">Pod::Checker</A></STRONG><BR>
+<DD>
+Check pod documents for syntax errors
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AFind">Pod::Find</A></STRONG><BR>
+<DD>
+Find POD documents in directory trees
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AHtml">Pod::Html</A></STRONG><BR>
+<DD>
+Module to convert pod files to HTML
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AInputObjects">Pod::InputObjects</A></STRONG><BR>
+<DD>
+Objects representing POD input paragraphs, commands, etc.
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3ALaTeX">Pod::LaTeX</A></STRONG><BR>
+<DD>
+Convert Pod data to formatted Latex
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AMan">Pod::Man</A></STRONG><BR>
+<DD>
+Convert POD data to formatted *roff input
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AParseUtils">Pod::ParseUtils</A></STRONG><BR>
+<DD>
+Helpers for POD parsing and conversion
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AParser">Pod::Parser</A></STRONG><BR>
+<DD>
+Base class for creating POD filters and translators
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3APlainer">Pod::Plainer</A></STRONG><BR>
+<DD>
+Perl extension for converting Pod to old style Pod.
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3ASelect">Pod::Select</A></STRONG><BR>
+<DD>
+Extract selected sections of POD from input
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AText">Pod::Text</A></STRONG><BR>
+<DD>
+Convert POD data to formatted ASCII text
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AText%3A%3AColor">Pod::Text::Color</A></STRONG><BR>
+<DD>
+Convert POD data to formatted color ASCII text
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AText%3A%3AOverstrike">Pod::Text::Overstrike</A></STRONG><BR>
+<DD>
+Convert POD data to formatted overstrike text
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AText%3A%3ATermcap">Pod::Text::Termcap</A></STRONG><BR>
+<DD>
+Convert POD data to ASCII text with format escapes
+<P></P>
+<DT><STRONG><A NAME="item_Pod%3A%3AUsage">Pod::Usage</A></STRONG><BR>
+<DD>
+Print a usage message from embedded pod documentation
+<P></P>
+<DT><STRONG><A NAME="item_SDBM_File">SDBM_File</A></STRONG><BR>
+<DD>
+Tied access to sdbm files
+<P></P>
+<DT><STRONG><A NAME="item_Safe">Safe</A></STRONG><BR>
+<DD>
+Compile and execute code in restricted compartments
+<P></P>
+<DT><STRONG><A NAME="item_Search%3A%3ADict">Search::Dict</A></STRONG><BR>
+<DD>
+Search for key in dictionary file
+<P></P>
+<DT><STRONG><A NAME="item_SelectSaver">SelectSaver</A></STRONG><BR>
+<DD>
+Save and restore selected file handle
+<P></P>
+<DT><STRONG><A NAME="item_SelfLoader">SelfLoader</A></STRONG><BR>
+<DD>
+Load functions only on demand
+<P></P>
+<DT><STRONG><A NAME="item_Shell">Shell</A></STRONG><BR>
+<DD>
+Run shell commands transparently within perl
+<P></P>
+<DT><STRONG><A NAME="item_Socket">Socket</A></STRONG><BR>
+<DD>
+Load the C socket.h defines and structure manipulators
+<P></P>
+<DT><STRONG><A NAME="item_Symbol">Symbol</A></STRONG><BR>
+<DD>
+Manipulate Perl symbols and their names
+<P></P>
+<DT><STRONG><A NAME="item_Term%3A%3AANSIColor">Term::ANSIColor</A></STRONG><BR>
+<DD>
+Color screen output using ANSI escape sequences
+<P></P>
+<DT><STRONG><A NAME="item_Term%3A%3ACap">Term::Cap</A></STRONG><BR>
+<DD>
+Perl termcap interface
+<P></P>
+<DT><STRONG><A NAME="item_Term%3A%3AComplete">Term::Complete</A></STRONG><BR>
+<DD>
+Perl word completion module
+<P></P>
+<DT><STRONG><A NAME="item_Term%3A%3AReadLine">Term::ReadLine</A></STRONG><BR>
+<DD>
+Perl interface to various <A HREF="../../lib/Pod/perlfunc.html#item_readline"><CODE>readline</CODE></A> packages. If
+<P></P>
+<DT><STRONG><A NAME="item_Test">Test</A></STRONG><BR>
+<DD>
+Provides a simple framework for writing test scripts
+<P></P>
+<DT><STRONG><A NAME="item_Test%3A%3AHarness">Test::Harness</A></STRONG><BR>
+<DD>
+Run perl standard test scripts with statistics
+<P></P>
+<DT><STRONG><A NAME="item_Text%3A%3AAbbrev">Text::Abbrev</A></STRONG><BR>
+<DD>
+Create an abbreviation table from a list
+<P></P>
+<DT><STRONG><A NAME="item_Text%3A%3AParseWords">Text::ParseWords</A></STRONG><BR>
+<DD>
+Parse text into an array of tokens or array of arrays
+<P></P>
+<DT><STRONG><A NAME="item_Text%3A%3ASoundex">Text::Soundex</A></STRONG><BR>
+<DD>
+Implementation of the Soundex Algorithm as Described by Knuth
+<P></P>
+<DT><STRONG><A NAME="item_Text%3A%3ATabs">Text::Tabs</A></STRONG><BR>
+<DD>
+Expand and unexpand tabs per the unix <CODE>expand(1)</CODE> and <CODE>unexpand(1)</CODE>
+<P></P>
+<DT><STRONG><A NAME="item_Text%3A%3AWrap">Text::Wrap</A></STRONG><BR>
+<DD>
+Line wrapping to form simple paragraphs
+<P></P>
+<DT><STRONG><A NAME="item_Thread">Thread</A></STRONG><BR>
+<DD>
+Manipulate threads in Perl (EXPERIMENTAL, subject to change)
+<P></P>
+<DT><STRONG><A NAME="item_Thread%3A%3AQueue">Thread::Queue</A></STRONG><BR>
+<DD>
+Thread-safe queues
+<P></P>
+<DT><STRONG><A NAME="item_Thread%3A%3ASemaphore">Thread::Semaphore</A></STRONG><BR>
+<DD>
+Thread-safe semaphores
+<P></P>
+<DT><STRONG><A NAME="item_Thread%3A%3ASignal">Thread::Signal</A></STRONG><BR>
+<DD>
+Start a thread which runs signal handlers reliably
+<P></P>
+<DT><STRONG><A NAME="item_Thread%3A%3ASpecific">Thread::Specific</A></STRONG><BR>
+<DD>
+Thread-specific keys
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3AArray">Tie::Array</A></STRONG><BR>
+<DD>
+Base class for tied arrays
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3AHandle">Tie::Handle</A></STRONG><BR>
+<DD>
+Base class definitions for tied handles
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3AHash">Tie::Hash</A></STRONG><BR>
+<DD>
+Base class definitions for tied hashes
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3ARefHash">Tie::RefHash</A></STRONG><BR>
+<DD>
+Use references as hash keys
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3AScalar">Tie::Scalar</A></STRONG><BR>
+<DD>
+Base class definitions for tied scalars
+<P></P>
+<DT><STRONG><A NAME="item_Tie%3A%3ASubstrHash">Tie::SubstrHash</A></STRONG><BR>
+<DD>
+Fixed-table-size, fixed-key-length hashing
+<P></P>
+<DT><STRONG><A NAME="item_Time%3A%3ALocal">Time::Local</A></STRONG><BR>
+<DD>
+Efficiently compute time from local and GMT time
+<P></P>
+<DT><STRONG><A NAME="item_Time%3A%3Agmtime">Time::gmtime</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in <A HREF="../../lib/Pod/perlfunc.html#item_gmtime"><CODE>gmtime()</CODE></A> function
+<P></P>
+<DT><STRONG><A NAME="item_Time%3A%3Alocaltime">Time::localtime</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in <A HREF="../../lib/Pod/perlfunc.html#item_localtime"><CODE>localtime()</CODE></A> function
+<P></P>
+<DT><STRONG><A NAME="item_Time%3A%3Atm">Time::tm</A></STRONG><BR>
+<DD>
+Internal object used by Time::gmtime and Time::localtime
+<P></P>
+<DT><STRONG><A NAME="item_UNIVERSAL">UNIVERSAL</A></STRONG><BR>
+<DD>
+Base class for ALL classes (blessed references)
+<P></P>
+<DT><STRONG><A NAME="item_User%3A%3Agrent">User::grent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in getgr*() functions
+<P></P>
+<DT><STRONG><A NAME="item_User%3A%3Apwent">User::pwent</A></STRONG><BR>
+<DD>
+By-name interface to Perl's built-in getpw*() functions
+<P></P>
+<DT><STRONG><A NAME="item_Win32">Win32</A></STRONG><BR>
+<DD>
+Interfaces to some Win32 API Functions
+<P></P></DL>
+<P>To find out <EM>all</EM> modules installed on your system, including
+those without documentation or outside the standard release,
+just do this:</P>
+<PRE>
+    % find `perl -e 'print &quot;@INC&quot;'` -name '*.pm' -print</PRE>
+<P>They should all have their own documentation installed and accessible
+via your system <CODE>man(1)</CODE> command.  If you do not have a <STRONG>find</STRONG>
+program, you can use the Perl <STRONG>find2perl</STRONG> program instead, which
+generates Perl code as output you can run through perl.  If you
+have a <STRONG>man</STRONG> program but it doesn't find your modules, you'll have
+to fix your manpath.  See <A HREF="../../lib/Pod/perl.html">the perl manpage</A> for details.  If you have no
+system <STRONG>man</STRONG> command, you might try the <STRONG>perldoc</STRONG> program.</P>
+<P>
+<H2><A NAME="extension modules">Extension Modules</A></H2>
+<P>Extension modules are written in C (or a mix of Perl and C).  They
+are usually dynamically loaded into Perl if and when you need them,
+but may also be be linked in statically.  Supported extension modules
+include Socket, Fcntl, and POSIX.</P>
+<P>Many popular C extension modules do not come bundled (at least, not
+completely) due to their sizes, volatility, or simply lack of time
+for adequate testing and configuration across the multitude of
+platforms on which Perl was beta-tested.  You are encouraged to
+look for them on CPAN (described below), or using web search engines
+like Alta Vista or Deja News.</P>
+<P>
+<HR>
+<H1><A NAME="cpan">CPAN</A></H1>
+<P>CPAN stands for Comprehensive Perl Archive Network; it's a globally
+replicated trove of Perl materials, including documentation, style
+guides, tricks and traps, alternate ports to non-Unix systems and
+occasional binary distributions for these.   Search engines for
+CPAN can be found at <A HREF="http://cpan.perl.com/">http://cpan.perl.com/</A> and at
+<A HREF="http://theory.uwinnipeg.ca/mod_perl/cpan-search.pl">http://theory.uwinnipeg.ca/mod_perl/cpan-search.pl</A> .</P>
+<P>Most importantly, CPAN includes around a thousand unbundled modules,
+some of which require a C compiler to build.  Major categories of
+modules are:</P>
+<UL>
+<LI>
+Language Extensions and Documentation Tools
+<P></P>
+<LI>
+Development Support
+<P></P>
+<LI>
+Operating System Interfaces
+<P></P>
+<LI>
+Networking, Device Control (modems) and InterProcess Communication
+<P></P>
+<LI>
+Data Types and Data Type Utilities
+<P></P>
+<LI>
+Database Interfaces
+<P></P>
+<LI>
+User Interfaces
+<P></P>
+<LI>
+Interfaces to / Emulations of Other Programming Languages
+<P></P>
+<LI>
+File Names, File Systems and File Locking (see also File Handles)
+<P></P>
+<LI>
+String Processing, Language Text Processing, Parsing, and Searching
+<P></P>
+<LI>
+Option, Argument, Parameter, and Configuration File Processing
+<P></P>
+<LI>
+Internationalization and Locale
+<P></P>
+<LI>
+Authentication, Security, and Encryption
+<P></P>
+<LI>
+World Wide Web, HTML, HTTP, CGI, MIME
+<P></P>
+<LI>
+Server and Daemon Utilities
+<P></P>
+<LI>
+Archiving and Compression
+<P></P>
+<LI>
+Images, Pixmap and Bitmap Manipulation, Drawing, and Graphing
+<P></P>
+<LI>
+Mail and Usenet News
+<P></P>
+<LI>
+Control Flow Utilities (callbacks and exceptions etc)
+<P></P>
+<LI>
+File Handle and Input/Output Stream Utilities
+<P></P>
+<LI>
+Miscellaneous Modules
+<P></P></UL>
+<P>Registered CPAN sites as of this writing include the following.
+You should try to choose one close to you:</P>
+<P>
+<H2><A NAME="africa">Africa</A></H2>
+<UL>
+<LI>
+South Africa
+<PRE>
+    <A HREF="ftp://ftp.is.co.za/programming/perl/CPAN/">ftp://ftp.is.co.za/programming/perl/CPAN/</A>
+    <A HREF="ftp://ftp.saix.net/pub/CPAN/">ftp://ftp.saix.net/pub/CPAN/</A>
+    <A HREF="ftp://ftpza.co.za/pub/mirrors/cpan/">ftp://ftpza.co.za/pub/mirrors/cpan/</A>
+    <A HREF="ftp://ftp.sun.ac.za/CPAN/">ftp://ftp.sun.ac.za/CPAN/</A></PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="asia">Asia</A></H2>
+<UL>
+<LI>
+China
+<PRE>
+    <A HREF="ftp://freesoft.cei.gov.cn/pub/languages/perl/CPAN/">ftp://freesoft.cei.gov.cn/pub/languages/perl/CPAN/</A>
+    <A HREF="http://www2.linuxforum.net/mirror/CPAN/">http://www2.linuxforum.net/mirror/CPAN/</A>
+    <A HREF="http://cpan.shellhung.org/">http://cpan.shellhung.org/</A>
+    <A HREF="ftp://ftp.shellhung.org/pub/CPAN">ftp://ftp.shellhung.org/pub/CPAN</A></PRE>
+<P></P>
+<LI>
+Hong Kong
+<PRE>
+    <A HREF="http://CPAN.pacific.net.hk/">http://CPAN.pacific.net.hk/</A>
+    <A HREF="ftp://ftp.pacific.net.hk/pub/mirror/CPAN/">ftp://ftp.pacific.net.hk/pub/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Indonesia
+<PRE>
+    <A HREF="http://piksi.itb.ac.id/CPAN/">http://piksi.itb.ac.id/CPAN/</A>
+    <A HREF="ftp://mirrors.piksi.itb.ac.id/CPAN/">ftp://mirrors.piksi.itb.ac.id/CPAN/</A>
+    <A HREF="http://CPAN.mweb.co.id/">http://CPAN.mweb.co.id/</A>
+    <A HREF="ftp://ftp.mweb.co.id/pub/languages/perl/CPAN/">ftp://ftp.mweb.co.id/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Israel
+<PRE>
+    <A HREF="http://www.iglu.org.il:/pub/CPAN/">http://www.iglu.org.il:/pub/CPAN/</A>
+    <A HREF="ftp://ftp.iglu.org.il/pub/CPAN/">ftp://ftp.iglu.org.il/pub/CPAN/</A>
+    <A HREF="http://bioinfo.weizmann.ac.il/pub/software/perl/CPAN/">http://bioinfo.weizmann.ac.il/pub/software/perl/CPAN/</A>
+    <A HREF="ftp://bioinfo.weizmann.ac.il/pub/software/perl/CPAN/">ftp://bioinfo.weizmann.ac.il/pub/software/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Japan
+<PRE>
+    <A HREF="ftp://ftp.u-aizu.ac.jp/pub/lang/perl/CPAN/">ftp://ftp.u-aizu.ac.jp/pub/lang/perl/CPAN/</A>
+    <A HREF="ftp://ftp.kddlabs.co.jp/CPAN/">ftp://ftp.kddlabs.co.jp/CPAN/</A>
+    <A HREF="http://mirror.nucba.ac.jp/mirror/Perl/">http://mirror.nucba.ac.jp/mirror/Perl/</A>
+    <A HREF="ftp://mirror.nucba.ac.jp/mirror/Perl/">ftp://mirror.nucba.ac.jp/mirror/Perl/</A>
+    <A HREF="ftp://ftp.meisei-u.ac.jp/pub/CPAN/">ftp://ftp.meisei-u.ac.jp/pub/CPAN/</A>
+    <A HREF="ftp://ftp.jaist.ac.jp/pub/lang/perl/CPAN/">ftp://ftp.jaist.ac.jp/pub/lang/perl/CPAN/</A>
+    <A HREF="ftp://ftp.dti.ad.jp/pub/lang/CPAN/">ftp://ftp.dti.ad.jp/pub/lang/CPAN/</A>
+    <A HREF="ftp://ftp.ring.gr.jp/pub/lang/perl/CPAN/">ftp://ftp.ring.gr.jp/pub/lang/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Saudi Arabia
+<PRE>
+    <A HREF="ftp://ftp.isu.net.sa/pub/CPAN/">ftp://ftp.isu.net.sa/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Singapore
+<PRE>
+    <A HREF="http://cpan.hjc.edu.sg">http://cpan.hjc.edu.sg</A>
+    <A HREF="http://ftp.nus.edu.sg/unix/perl/CPAN/">http://ftp.nus.edu.sg/unix/perl/CPAN/</A>
+    <A HREF="ftp://ftp.nus.edu.sg/pub/unix/perl/CPAN/">ftp://ftp.nus.edu.sg/pub/unix/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+South Korea
+<PRE>
+    <A HREF="http://CPAN.bora.net/">http://CPAN.bora.net/</A>
+    <A HREF="ftp://ftp.bora.net/pub/CPAN/">ftp://ftp.bora.net/pub/CPAN/</A>
+    <A HREF="http://ftp.kornet.net/CPAN/">http://ftp.kornet.net/CPAN/</A>
+    <A HREF="ftp://ftp.kornet.net/pub/CPAN/">ftp://ftp.kornet.net/pub/CPAN/</A>
+    <A HREF="ftp://ftp.nuri.net/pub/CPAN/">ftp://ftp.nuri.net/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Taiwan
+<PRE>
+    <A HREF="ftp://coda.nctu.edu.tw/UNIX/perl/CPAN">ftp://coda.nctu.edu.tw/UNIX/perl/CPAN</A>
+    <A HREF="ftp://ftp.ee.ncku.edu.tw/pub/perl/CPAN/">ftp://ftp.ee.ncku.edu.tw/pub/perl/CPAN/</A>
+    <A HREF="ftp://ftp1.sinica.edu.tw/pub1/perl/CPAN/">ftp://ftp1.sinica.edu.tw/pub1/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Thailand
+<PRE>
+    <A HREF="http://download.nectec.or.th/CPAN/">http://download.nectec.or.th/CPAN/</A>
+    <A HREF="ftp://ftp.nectec.or.th/pub/languages/CPAN/">ftp://ftp.nectec.or.th/pub/languages/CPAN/</A>
+    <A HREF="ftp://ftp.cs.riubon.ac.th/pub/mirrors/CPAN/">ftp://ftp.cs.riubon.ac.th/pub/mirrors/CPAN/</A></PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="central america">Central America</A></H2>
+<UL>
+<LI>
+Costa Rica
+<PRE>
+    <A HREF="ftp://ftp.linux.co.cr/mirrors/CPAN/">ftp://ftp.linux.co.cr/mirrors/CPAN/</A>
+    <A HREF="http://ftp.ucr.ac.cr/Unix/CPAN/">http://ftp.ucr.ac.cr/Unix/CPAN/</A>
+    <A HREF="ftp://ftp.ucr.ac.cr/pub/Unix/CPAN/">ftp://ftp.ucr.ac.cr/pub/Unix/CPAN/</A></PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="europe">Europe</A></H2>
+<UL>
+<LI>
+Austria
+<PRE>
+    <A HREF="ftp://ftp.tuwien.ac.at/pub/languages/perl/CPAN/">ftp://ftp.tuwien.ac.at/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Belgium
+<PRE>
+    <A HREF="http://ftp.easynet.be/CPAN/">http://ftp.easynet.be/CPAN/</A>
+    <A HREF="ftp://ftp.easynet.be/CPAN/">ftp://ftp.easynet.be/CPAN/</A>
+    <A HREF="ftp://ftp.kulnet.kuleuven.ac.be/pub/mirror/CPAN/">ftp://ftp.kulnet.kuleuven.ac.be/pub/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Bulgaria
+<PRE>
+    <A HREF="ftp://ftp.ntrl.net/pub/mirrors/CPAN/">ftp://ftp.ntrl.net/pub/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Croatia
+<PRE>
+    <A HREF="ftp://ftp.linux.hr/pub/CPAN/">ftp://ftp.linux.hr/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Czech Republic
+<PRE>
+    <A HREF="http://www.fi.muni.cz/pub/perl/">http://www.fi.muni.cz/pub/perl/</A>
+    <A HREF="ftp://ftp.fi.muni.cz/pub/perl/">ftp://ftp.fi.muni.cz/pub/perl/</A>
+    <A HREF="ftp://sunsite.mff.cuni.cz/MIRRORS/ftp.funet.fi/pub/languages/perl/CPAN/">ftp://sunsite.mff.cuni.cz/MIRRORS/ftp.funet.fi/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Denmark
+<PRE>
+    <A HREF="ftp://sunsite.auc.dk/pub/languages/perl/CPAN/">ftp://sunsite.auc.dk/pub/languages/perl/CPAN/</A>
+    <A HREF="http://www.cpan.dk/CPAN/">http://www.cpan.dk/CPAN/</A>
+    <A HREF="ftp://www.cpan.dk/ftp.cpan.org/CPAN/">ftp://www.cpan.dk/ftp.cpan.org/CPAN/</A></PRE>
+<P></P>
+<LI>
+England
+<PRE>
+    <A HREF="http://www.mirror.ac.uk/sites/ftp.funet.fi/pub/languages/perl/CPAN">http://www.mirror.ac.uk/sites/ftp.funet.fi/pub/languages/perl/CPAN</A>
+    <A HREF="ftp://ftp.mirror.ac.uk/sites/ftp.funet.fi/pub/languages/perl/CPAN/">ftp://ftp.mirror.ac.uk/sites/ftp.funet.fi/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/">ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/</A>
+    <A HREF="ftp://ftp.flirble.org/pub/languages/perl/CPAN/">ftp://ftp.flirble.org/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.plig.org/pub/CPAN/">ftp://ftp.plig.org/pub/CPAN/</A>
+    <A HREF="ftp://sunsite.doc.ic.ac.uk/packages/CPAN/">ftp://sunsite.doc.ic.ac.uk/packages/CPAN/</A>
+    <A HREF="http://mirror.uklinux.net/CPAN/">http://mirror.uklinux.net/CPAN/</A>
+    <A HREF="ftp://mirror.uklinux.net/pub/CPAN/">ftp://mirror.uklinux.net/pub/CPAN/</A>
+    <A HREF="ftp://usit.shef.ac.uk/pub/packages/CPAN/">ftp://usit.shef.ac.uk/pub/packages/CPAN/</A></PRE>
+<P></P>
+<LI>
+Estonia
+<PRE>
+    <A HREF="ftp://ftp.ut.ee/pub/languages/perl/CPAN/">ftp://ftp.ut.ee/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Finland
+<PRE>
+    <A HREF="ftp://ftp.funet.fi/pub/languages/perl/CPAN/">ftp://ftp.funet.fi/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+France
+<PRE>
+    <A HREF="ftp://cpan.ftp.worldonline.fr/pub/CPAN/">ftp://cpan.ftp.worldonline.fr/pub/CPAN/</A>
+    <A HREF="ftp://ftp.club-internet.fr/pub/perl/CPAN/">ftp://ftp.club-internet.fr/pub/perl/CPAN/</A>
+    <A HREF="ftp://ftp.lip6.fr/pub/perl/CPAN/">ftp://ftp.lip6.fr/pub/perl/CPAN/</A>
+    <A HREF="ftp://ftp.oleane.net/pub/mirrors/CPAN/">ftp://ftp.oleane.net/pub/mirrors/CPAN/</A>
+    <A HREF="ftp://ftp.pasteur.fr/pub/computing/CPAN/">ftp://ftp.pasteur.fr/pub/computing/CPAN/</A>
+    <A HREF="ftp://cpan.cict.fr/pub/CPAN/">ftp://cpan.cict.fr/pub/CPAN/</A>
+    <A HREF="ftp://ftp.uvsq.fr/pub/perl/CPAN/">ftp://ftp.uvsq.fr/pub/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Germany
+<PRE>
+    <A HREF="ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/">ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/</A>
+    <A HREF="ftp://ftp.freenet.de/pub/ftp.cpan.org/pub/CPAN/">ftp://ftp.freenet.de/pub/ftp.cpan.org/pub/CPAN/</A>
+    <A HREF="ftp://ftp.uni-erlangen.de/pub/source/CPAN/">ftp://ftp.uni-erlangen.de/pub/source/CPAN/</A>
+    <A HREF="ftp://ftp-stud.fht-esslingen.de/pub/Mirrors/CPAN">ftp://ftp-stud.fht-esslingen.de/pub/Mirrors/CPAN</A>
+    <A HREF="ftp://ftp.gigabell.net/pub/CPAN/">ftp://ftp.gigabell.net/pub/CPAN/</A>
+    <A HREF="http://ftp.gwdg.de/pub/languages/perl/CPAN/">http://ftp.gwdg.de/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.gwdg.de/pub/languages/perl/CPAN/">ftp://ftp.gwdg.de/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.uni-hamburg.de/pub/soft/lang/perl/CPAN/">ftp://ftp.uni-hamburg.de/pub/soft/lang/perl/CPAN/</A>
+    <A HREF="ftp://ftp.leo.org/pub/comp/general/programming/languages/script/perl/CPAN/">ftp://ftp.leo.org/pub/comp/general/programming/languages/script/perl/CPAN/</A>
+    <A HREF="ftp://ftp.mpi-sb.mpg.de/pub/perl/CPAN/">ftp://ftp.mpi-sb.mpg.de/pub/perl/CPAN/</A>
+    <A HREF="ftp://ftp.gmd.de/mirrors/CPAN/">ftp://ftp.gmd.de/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Greece
+<PRE>
+    <A HREF="ftp://ftp.forthnet.gr/pub/languages/perl/CPAN">ftp://ftp.forthnet.gr/pub/languages/perl/CPAN</A>
+    <A HREF="ftp://ftp.ntua.gr/pub/lang/perl/">ftp://ftp.ntua.gr/pub/lang/perl/</A></PRE>
+<P></P>
+<LI>
+Hungary
+<PRE>
+    <A HREF="http://cpan.artifact.hu/">http://cpan.artifact.hu/</A>
+    <A HREF="ftp://cpan.artifact.hu/CPAN/">ftp://cpan.artifact.hu/CPAN/</A>
+    <A HREF="ftp://ftp.kfki.hu/pub/packages/perl/CPAN/">ftp://ftp.kfki.hu/pub/packages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Iceland
+<PRE>
+    <A HREF="http://cpan.gm.is/">http://cpan.gm.is/</A>
+    <A HREF="ftp://ftp.gm.is/pub/CPAN/">ftp://ftp.gm.is/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Ireland
+<PRE>
+    <A HREF="http://cpan.indigo.ie/">http://cpan.indigo.ie/</A>
+    <A HREF="ftp://cpan.indigo.ie/pub/CPAN/">ftp://cpan.indigo.ie/pub/CPAN/</A>
+    <A HREF="http://sunsite.compapp.dcu.ie/pub/perl/">http://sunsite.compapp.dcu.ie/pub/perl/</A>
+    <A HREF="ftp://sunsite.compapp.dcu.ie/pub/perl/">ftp://sunsite.compapp.dcu.ie/pub/perl/</A></PRE>
+<P></P>
+<LI>
+Italy
+<PRE>
+    <A HREF="http://cpan.nettuno.it/">http://cpan.nettuno.it/</A>
+    <A HREF="http://gusp.dyndns.org/CPAN/">http://gusp.dyndns.org/CPAN/</A>
+    <A HREF="ftp://gusp.dyndns.org/pub/CPAN">ftp://gusp.dyndns.org/pub/CPAN</A>
+    <A HREF="http://softcity.iol.it/cpan">http://softcity.iol.it/cpan</A>
+    <A HREF="ftp://softcity.iol.it/pub/cpan">ftp://softcity.iol.it/pub/cpan</A>
+    <A HREF="ftp://ftp.unina.it/pub/Other/CPAN/">ftp://ftp.unina.it/pub/Other/CPAN/</A>
+    <A HREF="ftp://ftp.unipi.it/pub/mirror/perl/CPAN/">ftp://ftp.unipi.it/pub/mirror/perl/CPAN/</A>
+    <A HREF="ftp://cis.uniRoma2.it/CPAN/">ftp://cis.uniRoma2.it/CPAN/</A>
+    <A HREF="ftp://ftp.edisontel.it/pub/CPAN_Mirror/">ftp://ftp.edisontel.it/pub/CPAN_Mirror/</A>
+    <A HREF="ftp://ftp.flashnet.it/pub/CPAN/">ftp://ftp.flashnet.it/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Latvia
+<PRE>
+    <A HREF="http://kvin.lv/pub/CPAN/">http://kvin.lv/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Netherlands
+<PRE>
+    <A HREF="ftp://download.xs4all.nl/pub/mirror/CPAN/">ftp://download.xs4all.nl/pub/mirror/CPAN/</A>
+    <A HREF="ftp://ftp.nl.uu.net/pub/CPAN/">ftp://ftp.nl.uu.net/pub/CPAN/</A>
+    <A HREF="ftp://ftp.nluug.nl/pub/languages/perl/CPAN/">ftp://ftp.nluug.nl/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.cpan.nl/pub/CPAN/">ftp://ftp.cpan.nl/pub/CPAN/</A>
+    <A HREF="http://www.cs.uu.nl/mirror/CPAN/">http://www.cs.uu.nl/mirror/CPAN/</A>
+    <A HREF="ftp://ftp.cs.uu.nl/mirror/CPAN/">ftp://ftp.cs.uu.nl/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Norway
+<PRE>
+    <A HREF="ftp://sunsite.uio.no/pub/languages/perl/CPAN/">ftp://sunsite.uio.no/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.uit.no/pub/languages/perl/cpan/">ftp://ftp.uit.no/pub/languages/perl/cpan/</A></PRE>
+<P></P>
+<LI>
+Poland
+<PRE>
+    <A HREF="ftp://ftp.pk.edu.pl/pub/lang/perl/CPAN/">ftp://ftp.pk.edu.pl/pub/lang/perl/CPAN/</A>
+    <A HREF="ftp://ftp.mega.net.pl/pub/mirrors/ftp.perl.com/">ftp://ftp.mega.net.pl/pub/mirrors/ftp.perl.com/</A>
+    <A HREF="ftp://ftp.man.torun.pl/pub/doc/CPAN/">ftp://ftp.man.torun.pl/pub/doc/CPAN/</A>
+    <A HREF="ftp://sunsite.icm.edu.pl/pub/CPAN/">ftp://sunsite.icm.edu.pl/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Portugal
+<PRE>
+    <A HREF="ftp://ftp.ua.pt/pub/CPAN/">ftp://ftp.ua.pt/pub/CPAN/</A>
+    <A HREF="ftp://perl.di.uminho.pt/pub/CPAN/">ftp://perl.di.uminho.pt/pub/CPAN/</A>
+    <A HREF="ftp://ftp.ist.utl.pt/pub/CPAN/">ftp://ftp.ist.utl.pt/pub/CPAN/</A>
+    <A HREF="ftp://ftp.netc.pt/pub/CPAN/">ftp://ftp.netc.pt/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Romania
+<PRE>
+    <A HREF="ftp://archive.logicnet.ro/mirrors/ftp.cpan.org/CPAN/">ftp://archive.logicnet.ro/mirrors/ftp.cpan.org/CPAN/</A>
+    <A HREF="ftp://ftp.kappa.ro/pub/mirrors/ftp.perl.org/pub/CPAN/">ftp://ftp.kappa.ro/pub/mirrors/ftp.perl.org/pub/CPAN/</A>
+    <A HREF="ftp://ftp.dntis.ro/pub/cpan/">ftp://ftp.dntis.ro/pub/cpan/</A>
+    <A HREF="ftp://ftp.opsynet.com/cpan/">ftp://ftp.opsynet.com/cpan/</A>
+    <A HREF="ftp://ftp.dnttm.ro/pub/CPAN/">ftp://ftp.dnttm.ro/pub/CPAN/</A>
+    <A HREF="ftp://ftp.timisoara.roedu.net/mirrors/CPAN/">ftp://ftp.timisoara.roedu.net/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Russia
+<PRE>
+    <A HREF="ftp://ftp.chg.ru/pub/lang/perl/CPAN/">ftp://ftp.chg.ru/pub/lang/perl/CPAN/</A>
+    <A HREF="http://cpan.rinet.ru/">http://cpan.rinet.ru/</A>
+    <A HREF="ftp://cpan.rinet.ru/pub/mirror/CPAN/">ftp://cpan.rinet.ru/pub/mirror/CPAN/</A>
+    <A HREF="ftp://ftp.aha.ru/pub/CPAN/">ftp://ftp.aha.ru/pub/CPAN/</A>
+    <A HREF="ftp://ftp.sai.msu.su/pub/lang/perl/CPAN/">ftp://ftp.sai.msu.su/pub/lang/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Slovakia
+<PRE>
+    <A HREF="ftp://ftp.entry.sk/pub/languages/perl/CPAN/">ftp://ftp.entry.sk/pub/languages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Slovenia
+<PRE>
+    <A HREF="ftp://ftp.arnes.si/software/perl/CPAN/">ftp://ftp.arnes.si/software/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Spain
+<PRE>
+    <A HREF="ftp://ftp.rediris.es/mirror/CPAN/">ftp://ftp.rediris.es/mirror/CPAN/</A>
+    <A HREF="ftp://ftp.etse.urv.es/pub/perl/">ftp://ftp.etse.urv.es/pub/perl/</A></PRE>
+<P></P>
+<LI>
+Sweden
+<PRE>
+    <A HREF="http://ftp.du.se/CPAN/">http://ftp.du.se/CPAN/</A>
+    <A HREF="ftp://ftp.du.se/pub/CPAN/">ftp://ftp.du.se/pub/CPAN/</A>
+    <A HREF="ftp://ftp.sunet.se/pub/lang/perl/CPAN/">ftp://ftp.sunet.se/pub/lang/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Switzerland
+<PRE>
+    <A HREF="ftp://ftp.danyk.ch/CPAN/">ftp://ftp.danyk.ch/CPAN/</A>
+    <A HREF="ftp://sunsite.cnlab-switch.ch/mirror/CPAN/">ftp://sunsite.cnlab-switch.ch/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Turkey
+<PRE>
+    <A HREF="ftp://sunsite.bilkent.edu.tr/pub/languages/CPAN/">ftp://sunsite.bilkent.edu.tr/pub/languages/CPAN/</A></PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="north america">North America</A></H2>
+<UL>
+<LI>
+Canada
+<UL>
+<LI>
+Alberta
+<PRE>
+    <A HREF="http://sunsite.ualberta.ca/pub/Mirror/CPAN/">http://sunsite.ualberta.ca/pub/Mirror/CPAN/</A>
+    <A HREF="ftp://sunsite.ualberta.ca/pub/Mirror/CPAN/">ftp://sunsite.ualberta.ca/pub/Mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Manitoba
+<PRE>
+    <A HREF="http://theoryx5.uwinnipeg.ca/pub/CPAN/">http://theoryx5.uwinnipeg.ca/pub/CPAN/</A>
+    <A HREF="ftp://theoryx5.uwinnipeg.ca/pub/CPAN/">ftp://theoryx5.uwinnipeg.ca/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Nova Scotia
+<PRE>
+    <A HREF="ftp://cpan.chebucto.ns.ca/pub/CPAN/">ftp://cpan.chebucto.ns.ca/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Ontario
+<PRE>
+    <A HREF="ftp://ftp.crc.ca/pub/packages/lang/perl/CPAN/">ftp://ftp.crc.ca/pub/packages/lang/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Mexico
+<PRE>
+    <A HREF="http://www.msg.com.mx/CPAN/">http://www.msg.com.mx/CPAN/</A>
+    <A HREF="ftp://ftp.msg.com.mx/pub/CPAN/">ftp://ftp.msg.com.mx/pub/CPAN/</A></PRE>
+<P></P></UL>
+<LI>
+United States
+<UL>
+<LI>
+Alabama
+<PRE>
+    <A HREF="http://mirror.hiwaay.net/CPAN/">http://mirror.hiwaay.net/CPAN/</A>
+    <A HREF="ftp://mirror.hiwaay.net/CPAN/">ftp://mirror.hiwaay.net/CPAN/</A></PRE>
+<P></P>
+<LI>
+California
+<PRE>
+    <A HREF="http://www.cpan.org/">http://www.cpan.org/</A>
+    <A HREF="ftp://ftp.cpan.org/CPAN/">ftp://ftp.cpan.org/CPAN/</A>
+    <A HREF="ftp://cpan.nas.nasa.gov/pub/perl/CPAN/">ftp://cpan.nas.nasa.gov/pub/perl/CPAN/</A>
+    <A HREF="ftp://ftp.digital.com/pub/plan/perl/CPAN/">ftp://ftp.digital.com/pub/plan/perl/CPAN/</A>
+    <A HREF="http://www.kernel.org/pub/mirrors/cpan/">http://www.kernel.org/pub/mirrors/cpan/</A>
+    <A HREF="ftp://ftp.kernel.org/pub/mirrors/cpan/">ftp://ftp.kernel.org/pub/mirrors/cpan/</A>
+    <A HREF="http://www.perl.com/CPAN/">http://www.perl.com/CPAN/</A>
+    <A HREF="http://download.sourceforge.net/mirrors/CPAN/">http://download.sourceforge.net/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Colorado
+<PRE>
+    <A HREF="ftp://ftp.cs.colorado.edu/pub/perl/CPAN/">ftp://ftp.cs.colorado.edu/pub/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Florida
+<PRE>
+    <A HREF="ftp://ftp.cise.ufl.edu/pub/perl/CPAN/">ftp://ftp.cise.ufl.edu/pub/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+Georgia
+<PRE>
+    <A HREF="ftp://ftp.twoguys.org/CPAN/">ftp://ftp.twoguys.org/CPAN/</A></PRE>
+<P></P>
+<LI>
+Illinois
+<PRE>
+    <A HREF="http://www.neurogames.com/mirrors/CPAN">http://www.neurogames.com/mirrors/CPAN</A>
+    <A HREF="http://uiarchive.uiuc.edu/mirrors/ftp/ftp.cpan.org/pub/CPAN/">http://uiarchive.uiuc.edu/mirrors/ftp/ftp.cpan.org/pub/CPAN/</A>
+    <A HREF="ftp://uiarchive.uiuc.edu/mirrors/ftp/ftp.cpan.org/pub/CPAN/">ftp://uiarchive.uiuc.edu/mirrors/ftp/ftp.cpan.org/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Indiana
+<PRE>
+    <A HREF="ftp://ftp.uwsg.indiana.edu/pub/perl/CPAN/">ftp://ftp.uwsg.indiana.edu/pub/perl/CPAN/</A>
+    <A HREF="http://cpan.nitco.com/">http://cpan.nitco.com/</A>
+    <A HREF="ftp://cpan.nitco.com/pub/CPAN/">ftp://cpan.nitco.com/pub/CPAN/</A>
+    <A HREF="ftp://cpan.in-span.net/">ftp://cpan.in-span.net/</A>
+    <A HREF="http://csociety-ftp.ecn.purdue.edu/pub/CPAN">http://csociety-ftp.ecn.purdue.edu/pub/CPAN</A>
+    <A HREF="ftp://csociety-ftp.ecn.purdue.edu/pub/CPAN">ftp://csociety-ftp.ecn.purdue.edu/pub/CPAN</A></PRE>
+<P></P>
+<LI>
+Kentucky
+<PRE>
+    <A HREF="http://cpan.uky.edu/">http://cpan.uky.edu/</A>
+    <A HREF="ftp://cpan.uky.edu/pub/CPAN/">ftp://cpan.uky.edu/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Massachusetts
+<PRE>
+    <A HREF="ftp://ftp.ccs.neu.edu/net/mirrors/ftp.funet.fi/pub/languages/perl/CPAN/">ftp://ftp.ccs.neu.edu/net/mirrors/ftp.funet.fi/pub/languages/perl/CPAN/</A>
+    <A HREF="ftp://ftp.iguide.com/pub/mirrors/packages/perl/CPAN/">ftp://ftp.iguide.com/pub/mirrors/packages/perl/CPAN/</A></PRE>
+<P></P>
+<LI>
+New Jersey
+<PRE>
+    <A HREF="ftp://ftp.cpanel.net/pub/CPAN/">ftp://ftp.cpanel.net/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+New York
+<PRE>
+    <A HREF="ftp://ftp.freesoftware.com/pub/perl/CPAN/">ftp://ftp.freesoftware.com/pub/perl/CPAN/</A>
+    <A HREF="http://www.deao.net/mirrors/CPAN/">http://www.deao.net/mirrors/CPAN/</A>
+    <A HREF="ftp://ftp.deao.net/pub/CPAN/">ftp://ftp.deao.net/pub/CPAN/</A>
+    <A HREF="ftp://ftp.stealth.net/pub/mirrors/ftp.cpan.org/pub/CPAN/">ftp://ftp.stealth.net/pub/mirrors/ftp.cpan.org/pub/CPAN/</A>
+    <A HREF="http://mirror.nyc.anidea.com/CPAN/">http://mirror.nyc.anidea.com/CPAN/</A>
+    <A HREF="ftp://mirror.nyc.anidea.com/pub/CPAN/">ftp://mirror.nyc.anidea.com/pub/CPAN/</A>
+    <A HREF="http://www.rge.com/pub/languages/perl/">http://www.rge.com/pub/languages/perl/</A>
+    <A HREF="ftp://ftp.rge.com/pub/languages/perl/">ftp://ftp.rge.com/pub/languages/perl/</A>
+    <A HREF="ftp://mirrors.cloud9.net/pub/mirrors/CPAN/">ftp://mirrors.cloud9.net/pub/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+North Carolina
+<PRE>
+    <A HREF="ftp://ftp.duke.edu/pub/perl/">ftp://ftp.duke.edu/pub/perl/</A></PRE>
+<P></P>
+<LI>
+Ohio
+<PRE>
+    <A HREF="ftp://ftp.loaded.net/pub/CPAN/">ftp://ftp.loaded.net/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Oklahoma
+<PRE>
+    <A HREF="ftp://ftp.ou.edu/mirrors/CPAN/">ftp://ftp.ou.edu/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Oregon
+<PRE>
+    <A HREF="ftp://ftp.orst.edu/pub/packages/CPAN/">ftp://ftp.orst.edu/pub/packages/CPAN/</A></PRE>
+<P></P>
+<LI>
+Pennsylvania
+<PRE>
+    <A HREF="http://ftp.epix.net/CPAN/">http://ftp.epix.net/CPAN/</A>
+    <A HREF="ftp://ftp.epix.net/pub/languages/perl/">ftp://ftp.epix.net/pub/languages/perl/</A>
+    <A HREF="ftp://carroll.cac.psu.edu/pub/CPAN/">ftp://carroll.cac.psu.edu/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Tennessee
+<PRE>
+    <A HREF="ftp://ftp.sunsite.utk.edu/pub/CPAN/">ftp://ftp.sunsite.utk.edu/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+Texas
+<PRE>
+    <A HREF="http://ftp.sedl.org/pub/mirrors/CPAN/">http://ftp.sedl.org/pub/mirrors/CPAN/</A>
+    <A HREF="http://jhcloos.com/pub/mirror/CPAN/">http://jhcloos.com/pub/mirror/CPAN/</A>
+    <A HREF="ftp://jhcloos.com/pub/mirror/CPAN/">ftp://jhcloos.com/pub/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Utah
+<PRE>
+    <A HREF="ftp://mirror.xmission.com/CPAN/">ftp://mirror.xmission.com/CPAN/</A></PRE>
+<P></P>
+<LI>
+Virginia
+<PRE>
+    <A HREF="http://mirrors.rcn.net/pub/lang/CPAN/">http://mirrors.rcn.net/pub/lang/CPAN/</A>
+    <A HREF="ftp://mirrors.rcn.net/pub/lang/CPAN/">ftp://mirrors.rcn.net/pub/lang/CPAN/</A>
+    <A HREF="ftp://ruff.cs.jmu.edu/pub/CPAN/">ftp://ruff.cs.jmu.edu/pub/CPAN/</A>
+    <A HREF="http://perl.Liquidation.com/CPAN/">http://perl.Liquidation.com/CPAN/</A></PRE>
+<P></P>
+<LI>
+Washington
+<PRE>
+    <A HREF="http://cpan.llarian.net/">http://cpan.llarian.net/</A>
+    <A HREF="ftp://cpan.llarian.net/pub/CPAN/">ftp://cpan.llarian.net/pub/CPAN/</A>
+    <A HREF="ftp://ftp-mirror.internap.com/pub/CPAN/">ftp://ftp-mirror.internap.com/pub/CPAN/</A>
+    <A HREF="ftp://ftp.spu.edu/pub/CPAN/">ftp://ftp.spu.edu/pub/CPAN/</A></PRE>
+<P></P></UL>
+</UL>
+<P>
+<H2><A NAME="oceania">Oceania</A></H2>
+<UL>
+<LI>
+Australia
+<PRE>
+    <A HREF="http://ftp.planetmirror.com/pub/CPAN/">http://ftp.planetmirror.com/pub/CPAN/</A>
+    <A HREF="ftp://ftp.planetmirror.com/pub/CPAN/">ftp://ftp.planetmirror.com/pub/CPAN/</A>
+    <A HREF="ftp://mirror.aarnet.edu.au/pub/perl/CPAN/">ftp://mirror.aarnet.edu.au/pub/perl/CPAN/</A>
+    <A HREF="ftp://cpan.topend.com.au/pub/CPAN/">ftp://cpan.topend.com.au/pub/CPAN/</A></PRE>
+<P></P>
+<LI>
+New Zealand
+<PRE>
+    <A HREF="ftp://ftp.auckland.ac.nz/pub/perl/CPAN/">ftp://ftp.auckland.ac.nz/pub/perl/CPAN/</A></PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="south america">South America</A></H2>
+<UL>
+<LI>
+Argentina
+<PRE>
+    <A HREF="ftp://mirrors.bannerlandia.com.ar/mirrors/CPAN/">ftp://mirrors.bannerlandia.com.ar/mirrors/CPAN/</A></PRE>
+<P></P>
+<LI>
+Brazil
+<PRE>
+    <A HREF="ftp://cpan.pop-mg.com.br/pub/CPAN/">ftp://cpan.pop-mg.com.br/pub/CPAN/</A>
+    <A HREF="ftp://ftp.matrix.com.br/pub/perl/">ftp://ftp.matrix.com.br/pub/perl/</A>
+    <A HREF="ftp://cpan.if.usp.br/pub/mirror/CPAN/">ftp://cpan.if.usp.br/pub/mirror/CPAN/</A></PRE>
+<P></P>
+<LI>
+Chile
+<PRE>
+    <A HREF="ftp://ftp.psinet.cl/pub/programming/perl/CPAN/">ftp://ftp.psinet.cl/pub/programming/perl/CPAN/</A>
+    <A HREF="ftp://sunsite.dcc.uchile.cl/pub/lang/perl/">ftp://sunsite.dcc.uchile.cl/pub/lang/perl/</A></PRE>
+<P></P></UL>
+<P>For an up-to-date listing of CPAN sites,
+see <A HREF="http://www.cpan.org/SITES">http://www.cpan.org/SITES</A> or <A HREF="ftp://www.cpan.org/SITES">ftp://www.cpan.org/SITES</A> .</P>
+<P>
+<HR>
+<H1><A NAME="modules: creation, use, and abuse">Modules: Creation, Use, and Abuse</A></H1>
+<P>(The following section is borrowed directly from Tim Bunce's modules
+file, available at your nearest CPAN site.)</P>
+<P>Perl implements a class using a package, but the presence of a
+package doesn't imply the presence of a class.  A package is just a
+namespace.  A class is a package that provides subroutines that can be
+used as methods.  A method is just a subroutine that expects, as its
+first argument, either the name of a package (for ``static'' methods),
+or a reference to something (for ``virtual'' methods).</P>
+<P>A module is a file that (by convention) provides a class of the same
+name (sans the .pm), plus an import method in that class that can be
+called to fetch exported symbols.  This module may implement some of
+its methods by loading dynamic C or C++ objects, but that should be
+totally transparent to the user of the module.  Likewise, the module
+might set up an AUTOLOAD function to slurp in subroutine definitions on
+demand, but this is also transparent.  Only the <EM>.pm</EM> file is required to
+exist.  See <A HREF="../../lib/Pod/perlsub.html">the perlsub manpage</A>, <A HREF="../../lib/Pod/perltoot.html">the perltoot manpage</A>, and <A HREF="../../lib/AutoLoader.html">the AutoLoader manpage</A> for details about
+the AUTOLOAD mechanism.</P>
+<P>
+<H2><A NAME="guidelines for module creation">Guidelines for Module Creation</A></H2>
+<UL>
+<LI>
+Do similar modules already exist in some form?
+<P>If so, please try to reuse the existing modules either in whole or
+by inheriting useful features into a new class.  If this is not
+practical try to get together with the module authors to work on
+extending or enhancing the functionality of the existing modules.
+A perfect example is the plethora of packages in perl4 for dealing
+with command line options.</P>
+<P>If you are writing a module to expand an already existing set of
+modules, please coordinate with the author of the package.  It
+helps if you follow the same naming scheme and module interaction
+scheme as the original author.</P>
+<P></P>
+<LI>
+Try to design the new module to be easy to extend and reuse.
+<P>Try to <CODE>use warnings;</CODE> (or <CODE>use warnings qw(...);</CODE>).
+Remember that you can add <CODE>no warnings qw(...);</CODE> to individual blocks
+of code that need less warnings.</P>
+<P>Use blessed references.  Use the two argument form of bless to bless
+into the class name given as the first parameter of the constructor,
+e.g.,:</P>
+<PRE>
+ sub new {
+     my $class = shift;
+     return bless {}, $class;
+ }</PRE>
+<P>or even this if you'd like it to be used as either a static
+or a virtual method.</P>
+<PRE>
+ sub new {
+     my $self  = shift;
+     my $class = ref($self) || $self;
+     return bless {}, $class;
+ }</PRE>
+<P>Pass arrays as references so more parameters can be added later
+(it's also faster).  Convert functions into methods where
+appropriate.  Split large methods into smaller more flexible ones.
+Inherit methods from other modules if appropriate.</P>
+<P>Avoid class name tests like: <CODE>die &quot;Invalid&quot; unless ref $ref eq 'FOO'</CODE>.
+Generally you can delete the <CODE>eq 'FOO'</CODE> part with no harm at all.
+Let the objects look after themselves! Generally, avoid hard-wired
+class names as far as possible.</P>
+<P>Avoid <CODE>$r-&gt;Class::func()</CODE> where using <CODE>@ISA=qw(... Class ...)</CODE> and
+<CODE>$r-&gt;func()</CODE> would work (see <A HREF="../../lib/Pod/perlbot.html">the perlbot manpage</A> for more details).</P>
+<P>Use autosplit so little used or newly added functions won't be a
+burden to programs that don't use them. Add test functions to
+the module after __END__ either using AutoSplit or by saying:</P>
+<PRE>
+ eval join('',&lt;main::DATA&gt;) || die $@ unless caller();</PRE>
+<P>Does your module pass the 'empty subclass' test? If you say
+<CODE>@SUBCLASS::ISA = qw(YOURCLASS);</CODE> your applications should be able
+to use SUBCLASS in exactly the same way as YOURCLASS.  For example,
+does your application still work if you change:  <CODE>$obj = new YOURCLASS;</CODE>
+into: <CODE>$obj = new SUBCLASS;</CODE> ?</P>
+<P>Avoid keeping any state information in your packages. It makes it
+difficult for multiple other packages to use yours. Keep state
+information in objects.</P>
+<P>Always use <STRONG>-w</STRONG>.</P>
+<P>Try to <CODE>use strict;</CODE> (or <CODE>use strict qw(...);</CODE>).
+Remember that you can add <CODE>no strict qw(...);</CODE> to individual blocks
+of code that need less strictness.</P>
+<P>Always use <STRONG>-w</STRONG>.</P>
+<P>Follow the guidelines in the <CODE>perlstyle(1)</CODE> manual.</P>
+<P>Always use <STRONG>-w</STRONG>.</P>
+<P></P>
+<LI>
+Some simple style guidelines
+<P>The perlstyle manual supplied with Perl has many helpful points.</P>
+<P>Coding style is a matter of personal taste. Many people evolve their
+style over several years as they learn what helps them write and
+maintain good code.  Here's one set of assorted suggestions that
+seem to be widely used by experienced developers:</P>
+<P>Use underscores to separate words.  It is generally easier to read
+$var_names_like_this than $VarNamesLikeThis, especially for
+non-native speakers of English. It's also a simple rule that works
+consistently with VAR_NAMES_LIKE_THIS.</P>
+<P>Package/Module names are an exception to this rule. Perl informally
+reserves lowercase module names for 'pragma' modules like integer
+and strict. Other modules normally begin with a capital letter and
+use mixed case with no underscores (need to be short and portable).</P>
+<P>You may find it helpful to use letter case to indicate the scope
+or nature of a variable. For example:</P>
+<PRE>
+ $ALL_CAPS_HERE   constants only (beware clashes with Perl vars)
+ $Some_Caps_Here  package-wide global/static
+ $no_caps_here    function scope my() or local() variables</PRE>
+<P>Function and method names seem to work best as all lowercase.
+e.g., <CODE>$obj-&gt;as_string()</CODE>.</P>
+<P>You can use a leading underscore to indicate that a variable or
+function should not be used outside the package that defined it.</P>
+<P></P>
+<LI>
+Select what to export.
+<P>Do NOT export method names!</P>
+<P>Do NOT export anything else by default without a good reason!</P>
+<P>Exports pollute the namespace of the module user.  If you must
+export try to use @EXPORT_OK in preference to @EXPORT and avoid
+short or common names to reduce the risk of name clashes.</P>
+<P>Generally anything not exported is still accessible from outside the
+module using the ModuleName::item_name (or <CODE>$blessed_ref-&gt;method</CODE>)
+syntax.  By convention you can use a leading underscore on names to
+indicate informally that they are 'internal' and not for public use.</P>
+<P>(It is actually possible to get private functions by saying:
+<CODE>my $subref = sub { ... };  &amp;$subref;</CODE>.  But there's no way to call that
+directly as a method, because a method must have a name in the symbol
+table.)</P>
+<P>As a general rule, if the module is trying to be object oriented
+then export nothing. If it's just a collection of functions then
+@EXPORT_OK anything but use @EXPORT with caution.</P>
+<P></P>
+<LI>
+Select a name for the module.
+<P>This name should be as descriptive, accurate, and complete as
+possible.  Avoid any risk of ambiguity. Always try to use two or
+more whole words.  Generally the name should reflect what is special
+about what the module does rather than how it does it.  Please use
+nested module names to group informally or categorize a module.
+There should be a very good reason for a module not to have a nested name.
+Module names should begin with a capital letter.</P>
+<P>Having 57 modules all called Sort will not make life easy for anyone
+(though having 23 called Sort::Quick is only marginally better :-).
+Imagine someone trying to install your module alongside many others.
+If in any doubt ask for suggestions in comp.lang.perl.misc.</P>
+<P>If you are developing a suite of related modules/classes it's good
+practice to use nested classes with a common prefix as this will
+avoid namespace clashes. For example: Xyz::Control, Xyz::View,
+Xyz::Model etc. Use the modules in this list as a naming guide.</P>
+<P>If adding a new module to a set, follow the original author's
+standards for naming modules and the interface to methods in
+those modules.</P>
+<P>If developing modules for private internal or project specific use,
+that will never be released to the public, then you should ensure
+that their names will not clash with any future public module. You
+can do this either by using the reserved Local::* category or by
+using a category name that includes an underscore like Foo_Corp::*.</P>
+<P>To be portable each component of a module name should be limited to
+11 characters. If it might be used on MS-DOS then try to ensure each is
+unique in the first 8 characters. Nested modules make this easier.</P>
+<P></P>
+<LI>
+Have you got it right?
+<P>How do you know that you've made the right decisions? Have you
+picked an interface design that will cause problems later? Have
+you picked the most appropriate name? Do you have any questions?</P>
+<P>The best way to know for sure, and pick up many helpful suggestions,
+is to ask someone who knows. Comp.lang.perl.misc is read by just about
+all the people who develop modules and it's the best place to ask.</P>
+<P>All you need to do is post a short summary of the module, its
+purpose and interfaces. A few lines on each of the main methods is
+probably enough. (If you post the whole module it might be ignored
+by busy people - generally the very people you want to read it!)</P>
+<P>Don't worry about posting if you can't say when the module will be
+ready - just say so in the message. It might be worth inviting
+others to help you, they may be able to complete it for you!</P>
+<P></P>
+<LI>
+README and other Additional Files.
+<P>It's well known that software developers usually fully document the
+software they write. If, however, the world is in urgent need of
+your software and there is not enough time to write the full
+documentation please at least provide a README file containing:</P>
+<UL>
+<LI>
+A description of the module/package/extension etc.
+<P></P>
+<LI>
+A copyright notice - see below.
+<P></P>
+<LI>
+Prerequisites - what else you may need to have.
+<P></P>
+<LI>
+How to build it - possible changes to Makefile.PL etc.
+<P></P>
+<LI>
+How to install it.
+<P></P>
+<LI>
+Recent changes in this release, especially incompatibilities
+<P></P>
+<LI>
+Changes / enhancements you plan to make in the future.
+<P></P></UL>
+<P>If the README file seems to be getting too large you may wish to
+split out some of the sections into separate files: INSTALL,
+Copying, ToDo etc.</P>
+<DL>
+<DT><STRONG><A NAME="item_Adding_a_Copyright_Notice%2E">Adding a Copyright Notice.</A></STRONG><BR>
+<DD>
+How you choose to license your work is a personal decision.
+The general mechanism is to assert your Copyright and then make
+a declaration of how others may copy/use/modify your work.
+<P>Perl, for example, is supplied with two types of licence: The GNU
+GPL and The Artistic Licence (see the files README, Copying, and
+Artistic).  Larry has good reasons for NOT just using the GNU GPL.</P>
+<P>My personal recommendation, out of respect for Larry, Perl, and the
+Perl community at large is to state something simply like:</P>
+<PRE>
+ Copyright (c) 1995 Your Name. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.</PRE>
+<P>This statement should at least appear in the README file. You may
+also wish to include it in a Copying file and your source files.
+Remember to include the other words in addition to the Copyright.</P>
+<P></P>
+<LI>
+Give the module a version/issue/release number.
+<P>To be fully compatible with the Exporter and MakeMaker modules you
+should store your module's version number in a non-my package
+variable called $VERSION.  This should be a floating point
+number with at least two digits after the decimal (i.e., hundredths,
+e.g, <CODE>$VERSION = &quot;0.01&quot;</CODE>).  Don't use a ``1.3.2'' style version.
+See <A HREF="../../lib/Exporter.html">the Exporter manpage</A> for details.</P>
+<P>It may be handy to add a function or method to retrieve the number.
+Use the number in announcements and archive file names when
+releasing the module (ModuleName-1.02.tar.Z).
+See perldoc ExtUtils::MakeMaker.pm for details.</P>
+<P></P>
+<LI>
+How to release and distribute a module.
+<P>It's good idea to post an announcement of the availability of your
+module (or the module itself if small) to the comp.lang.perl.announce
+Usenet newsgroup.  This will at least ensure very wide once-off
+distribution.</P>
+<P>If possible, register the module with CPAN.  You should
+include details of its location in your announcement.</P>
+<P>Some notes about ftp archives: Please use a long descriptive file
+name that includes the version number. Most incoming directories
+will not be readable/listable, i.e., you won't be able to see your
+file after uploading it. Remember to send your email notification
+message as soon as possible after uploading else your file may get
+deleted automatically. Allow time for the file to be processed
+and/or check the file has been processed before announcing its
+location.</P>
+<P>FTP Archives for Perl Modules:</P>
+<P>Follow the instructions and links on:</P>
+<PRE>
+   <A HREF="http://www.cpan.org/modules/00modlist.long.html">http://www.cpan.org/modules/00modlist.long.html</A>
+   <A HREF="http://www.cpan.org/modules/04pause.html">http://www.cpan.org/modules/04pause.html</A></PRE>
+<P>or upload to one of these sites:</P>
+<PRE>
+   https://pause.kbx.de/pause/
+   <A HREF="http://pause.perl.org/pause/">http://pause.perl.org/pause/</A></PRE>
+<P>and notify &lt;<A HREF="mailto:modules@perl.org">modules@perl.org</A>&gt;.</P>
+<P>By using the WWW interface you can ask the Upload Server to mirror
+your modules from your ftp or WWW site into your own directory on
+CPAN!</P>
+<P>Please remember to send me an updated entry for the Module list!</P>
+<P></P>
+<LI>
+Take care when changing a released module.
+<P>Always strive to remain compatible with previous released versions.
+Otherwise try to add a mechanism to revert to the
+old behavior if people rely on it.  Document incompatible changes.</P>
+<P></P></DL>
+</UL>
+<P>
+<H2><A NAME="guidelines for converting perl 4 library scripts into modules">Guidelines for Converting Perl 4 Library Scripts into Modules</A></H2>
+<UL>
+<LI>
+There is no requirement to convert anything.
+<P>If it ain't broke, don't fix it! Perl 4 library scripts should
+continue to work with no problems. You may need to make some minor
+changes (like escaping non-array @'s in double quoted strings) but
+there is no need to convert a .pl file into a Module for just that.</P>
+<P></P>
+<LI>
+Consider the implications.
+<P>All Perl applications that make use of the script will need to
+be changed (slightly) if the script is converted into a module.  Is
+it worth it unless you plan to make other changes at the same time?</P>
+<P></P>
+<LI>
+Make the most of the opportunity.
+<P>If you are going to convert the script to a module you can use the
+opportunity to redesign the interface.  The guidelines for module
+creation above include many of the issues you should consider.</P>
+<P></P>
+<LI>
+The pl2pm utility will get you started.
+<P>This utility will read *.pl files (given as parameters) and write
+corresponding *.pm files. The pl2pm utilities does the following:</P>
+<UL>
+<LI>
+Adds the standard Module prologue lines
+<P></P>
+<LI>
+Converts package specifiers from ' to ::
+<P></P>
+<LI>
+Converts <A HREF="../../lib/Pod/perlfunc.html#item_die"><CODE>die(...)</CODE></A> to <CODE>croak(...)</CODE>
+<P></P>
+<LI>
+Several other minor changes
+<P></P></UL>
+<P>Being a mechanical process pl2pm is not bullet proof. The converted
+code will need careful checking, especially any package statements.
+Don't delete the original .pl file till the new .pm one works!</P>
+</UL>
+<P>
+<H2><A NAME="guidelines for reusing application code">Guidelines for Reusing Application Code</A></H2>
+<UL>
+<LI>
+Complete applications rarely belong in the Perl Module Library.
+<P></P>
+<LI>
+Many applications contain some Perl code that could be reused.
+<P>Help save the world! Share your code in a form that makes it easy
+to reuse.</P>
+<P></P>
+<LI>
+Break-out the reusable code into one or more separate module files.
+<P></P>
+<LI>
+Take the opportunity to reconsider and redesign the interfaces.
+<P></P>
+<LI>
+In some cases the 'application' can then be reduced to a small
+<P>fragment of code built on top of the reusable modules. In these cases
+the application could invoked as:</P>
+<PRE>
+     % perl -e 'use Module::Name; method(@ARGV)' ...
+or
+     % perl -mModule::Name ...    (in perl5.002 or higher)</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="note">NOTE</A></H1>
+<P>Perl does not enforce private and public parts of its modules as you may
+have been used to in other languages like C++, Ada, or Modula-17.  Perl
+doesn't have an infatuation with enforced privacy.  It would prefer
+that you stayed out of its living room because you weren't invited, not
+because it has a shotgun.</P>
+<P>The module and its user have a contract, part of which is common law,
+and part of which is ``written''.  Part of the common law contract is
+that a module doesn't pollute any namespace it wasn't asked to.  The
+written contract for the module (A.K.A. documentation) may make other
+provisions.  But then you know when you <CODE>use RedefineTheWorld</CODE> that
+you're redefining the world and willing to take the consequences.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlmodlib - constructing new Perl modules and finding existing ones</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

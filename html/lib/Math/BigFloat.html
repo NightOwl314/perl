@@ -1,0 +1,125 @@
+
+<HTML>
+<HEAD>
+<TITLE>Math::BigFloat - Arbitrary length float math package</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::BigFloat - Arbitrary length float math package</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Math::BigFloat - Arbitrary length float math package</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Math::BigFloat;
+  $f = Math::BigFloat-&gt;new($string);</PRE>
+<PRE>
+  $f-&gt;fadd(NSTR) return NSTR            addition
+  $f-&gt;fsub(NSTR) return NSTR            subtraction
+  $f-&gt;fmul(NSTR) return NSTR            multiplication
+  $f-&gt;fdiv(NSTR[,SCALE]) returns NSTR   division to SCALE places
+  $f-&gt;fmod(NSTR) returns NSTR           modular remainder
+  $f-&gt;fneg() return NSTR                negation
+  $f-&gt;fabs() return NSTR                absolute value
+  $f-&gt;fcmp(NSTR) return CODE            compare undef,&lt;0,=0,&gt;0
+  $f-&gt;fround(SCALE) return NSTR         round to SCALE digits
+  $f-&gt;ffround(SCALE) return NSTR        round at SCALEth place
+  $f-&gt;fnorm() return (NSTR)             normalize
+  $f-&gt;fsqrt([SCALE]) return NSTR        sqrt to SCALE places</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>All basic math operations are overloaded if you declare your big
+floats as</P>
+<PRE>
+    $float = new Math::BigFloat &quot;2.123123123123123123123123123123123&quot;;</PRE>
+<DL>
+<DT><STRONG><A NAME="item_number_format">number format</A></STRONG><BR>
+<DD>
+canonical strings have the form /[+-]\d+E[+-]\d+/ .  Input values can
+have embedded whitespace.
+<P></P>
+<DT><STRONG><A NAME="item_Error_returns_%27NaN%27">Error returns 'NaN'</A></STRONG><BR>
+<DD>
+An input parameter was ``Not a Number'' or divide by zero or sqrt of
+negative number.
+<P></P>
+<DT><STRONG><A NAME="item_Division_is_computed_to">Division is computed to</A></STRONG><BR>
+<DD>
+<CODE>max($Math::BigFloat::div_scale,length(dividend)+length(divisor))</CODE>
+digits by default.
+Also used for default sqrt scale.
+<P></P>
+<DT><STRONG><A NAME="item_Rounding_is_performed">Rounding is performed</A></STRONG><BR>
+<DD>
+according to the value of
+<CODE>$Math::BigFloat::rnd_mode</CODE>:
+<PRE>
+  trunc     truncate the value
+  zero      round towards 0
+  +inf      round towards +infinity (round up)
+  -inf      round towards -infinity (round down)
+  even      round to the nearest, .5 to the even digit
+  odd       round to the nearest, .5 to the odd digit</PRE>
+<P>The default is <CODE>even</CODE> rounding.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The current version of this module is a preliminary version of the
+real thing that is currently (as of perl5.002) under development.</P>
+<P>The printf subroutine does not use the value of
+<CODE>$Math::BigFloat::rnd_mode</CODE> when rounding values for printing.
+Consequently, the way to print rounded values is
+to specify the number of digits both as an
+argument to <CODE>ffround</CODE> and in the <CODE>%f</CODE> printf string,
+as follows:</P>
+<PRE>
+  printf &quot;%.3f\n&quot;, $bigfloat-&gt;ffround(-3);</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Mark Biggar
+Patches by John Peacock Apr 2001
+=cut</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::BigFloat - Arbitrary length float math package</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

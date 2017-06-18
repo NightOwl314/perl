@@ -1,0 +1,262 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTTP::Daemon - a simple http server class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Daemon - a simple http server class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTTP::Daemon - a simple http server class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use HTTP::Daemon;
+  use HTTP::Status;</PRE>
+<PRE>
+  my $d = HTTP::Daemon-&gt;new || die;
+  print &quot;Please contact me at: &lt;URL:&quot;, $d-&gt;url, &quot;&gt;\n&quot;;
+  while (my $c = $d-&gt;accept) {
+      while (my $r = $c-&gt;get_request) {
+          if ($r-&gt;method eq 'GET' and $r-&gt;url-&gt;path eq &quot;/xyzzy&quot;) {
+              # remember, this is *not* recommened practice :-)
+              $c-&gt;send_file_response(&quot;/etc/passwd&quot;);
+          } else {
+              $c-&gt;send_error(RC_FORBIDDEN)
+          }
+      }
+      $c-&gt;close;
+      undef($c);
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Instances of the <EM>HTTP::Daemon</EM> class are HTTP/1.1 servers that
+listen on a socket for incoming requests. The <EM>HTTP::Daemon</EM> is a
+sub-class of <EM>IO::Socket::INET</EM>, so you can perform socket operations
+directly on it too.</P>
+<P>The <A HREF="#item_accept"><CODE>accept()</CODE></A> method will return when a connection from a client is
+available. The returned value will be a reference to a object of the
+<EM>HTTP::Daemon::ClientConn</EM> class which is another <EM>IO::Socket::INET</EM>
+subclass. Calling the <A HREF="#item_get_request"><CODE>get_request()</CODE></A> method on this object will read
+data from the client and return an <EM>HTTP::Request</EM> object reference.</P>
+<P>This HTTP daemon does not <A HREF="../../../lib/Pod/perlfunc.html#item_fork"><CODE>fork(2)</CODE></A> for you.  Your application, i.e. the
+user of the <EM>HTTP::Daemon</EM> is reponsible for forking if that is
+desirable.  Also note that the user is responsible for generating
+responses that conform to the HTTP/1.1 protocol.  The
+<EM>HTTP::Daemon::ClientConn</EM> class provides some methods that make this easier.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following is a list of methods that are new (or enhanced) relative
+to the <EM>IO::Socket::INET</EM> base class.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24d_%3D_new_HTTP%3A%3ADaemon">$d = new HTTP::Daemon</A></STRONG><BR>
+<DD>
+The constructor takes the same parameters as the
+<EM>IO::Socket::INET</EM> constructor.  It can also be called without specifying
+any parameters. The daemon will then set up a listen queue of 5
+connections and allocate some random port number.  A server that wants
+to bind to some specific address on the standard HTTP port will be
+constructed like this:
+<PRE>
+  $d = new HTTP::Daemon
+        LocalAddr =&gt; 'www.someplace.com',
+        LocalPort =&gt; 80;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_accept">$c = $d-&gt;<CODE>accept([$pkg])</CODE></A></STRONG><BR>
+<DD>
+This method is the same as <EM>IO::Socket::accept</EM> but returns an
+<EM>HTTP::Daemon::ClientConn</EM> reference by default.  It returns
+undef if you specify a timeout and no connection is made within
+that time.
+<P></P>
+<DT><STRONG><A NAME="item_url">$d-&gt;url</A></STRONG><BR>
+<DD>
+Returns a URL string that can be used to access the server root.
+<P></P>
+<DT><STRONG><A NAME="item_product_tokens">$d-&gt;product_tokens</A></STRONG><BR>
+<DD>
+Returns the name that this server will use to identify itself.  This
+is the string that is sent with the <EM>Server</EM> response header.  The
+main reason to have this method is that subclasses can override it if
+they want to use another product name.
+<P></P></DL>
+<P>The <EM>HTTP::Daemon::ClientConn</EM> is also a <EM>IO::Socket::INET</EM>
+subclass. Instances of this class are returned by the <A HREF="#item_accept"><CODE>accept()</CODE></A> method
+of <EM>HTTP::Daemon</EM>.  The following additional methods are
+provided:</P>
+<DL>
+<DT><STRONG><A NAME="item_get_request">$c-&gt;<CODE>get_request([$headers_only])</CODE></A></STRONG><BR>
+<DD>
+Read data from the client and turn it into an
+<EM>HTTP::Request</EM> object which is then returned.  It returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>
+if reading of the request fails.  If it fails, then the
+<EM>HTTP::Daemon::ClientConn</EM> object ($c) should be discarded, and you
+should not call this method again.  The $c-&gt;reason method might give
+you some information about why $c-&gt;get_request returned <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>.
+<P>The $c-&gt;get_request method supports HTTP/1.1 request content bodies,
+including <EM>chunked</EM> transfer encoding with footer and self delimiting
+<EM>multipart/*</EM> content types.</P>
+<P>The $c-&gt;get_request method will normally not return until the whole
+request has been received from the client.  This might not be what you
+want if the request is an upload of a multi-mega-byte file (and with
+chunked transfer encoding HTTP can even support infinite request
+messages - uploading live audio for instance).  If you pass a TRUE
+value as the $headers_only argument, then $c-&gt;get_request will return
+immediately after parsing the request headers and you are responsible
+for reading the rest of the request content.  If you are going to
+call $c-&gt;get_request again on the same connection you better read the
+correct number of bytes.</P>
+<P></P>
+<DT><STRONG><A NAME="item_read_buffer">$c-&gt;<CODE>read_buffer([$new_value])</CODE></A></STRONG><BR>
+<DD>
+Bytes read by $c-&gt;get_request, but not used are placed in the <EM>read
+buffer</EM>.  The next time $c-&gt;get_request is called it will consume the
+bytes in this buffer before reading more data from the network
+connection itself.  The read buffer is invalid after $c-&gt;get_request
+has returned an undefined value.
+<P>If you handle the reading of the request content yourself you need to
+empty this buffer before you read more and you need to place
+unconsumed bytes here.  You also need this buffer if you implement
+services like <EM>101 Switching Protocols</EM>.</P>
+<P>This method always return the old buffer content and can optionally
+replace the buffer content if you pass it an argument.</P>
+<P></P>
+<DT><STRONG><A NAME="item_reason">$c-&gt;reason</A></STRONG><BR>
+<DD>
+When $c-&gt;get_request returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> you can obtain a short string
+describing why it happened by calling $c-&gt;reason.
+<P></P>
+<DT><STRONG><A NAME="item_proto_ge">$c-&gt;<CODE>proto_ge($proto)</CODE></A></STRONG><BR>
+<DD>
+Return TRUE if the client announced a protocol with version number
+greater or equal to the given argument.  The $proto argument can be a
+string like ``HTTP/1.1'' or just ``1.1''.
+<P></P>
+<DT><STRONG><A NAME="item_antique_client">$c-&gt;antique_client</A></STRONG><BR>
+<DD>
+Return TRUE if the client speaks the HTTP/0.9 protocol.  No status
+code and no headers should be returned to such a client.  This should
+be the same as !$c-&gt;proto_ge(``HTTP/1.0'').
+<P></P>
+<DT><STRONG><A NAME="item_force_last_request">$c-&gt;force_last_request</A></STRONG><BR>
+<DD>
+Make sure that $c-&gt;get_request will not try to read more requests off
+this connection.  If you generate a response that is not self
+delimiting, then you should signal this fact by calling this method.
+<P>This attribute is turned on automatically if the client announces
+protocol HTTP/1.0 or worse and does not include a ``Connection:
+Keep-Alive'' header.  It is also turned on automatically when HTTP/1.1
+or better clients send the ``Connection: close'' request header.</P>
+<P></P>
+<DT><STRONG><A NAME="item_send_status_line">$c-&gt;send_status_line( [$code, [$mess, [$proto]]] )</A></STRONG><BR>
+<DD>
+Send the status line back to the client.  If $code is omitted 200 is
+assumed.  If $mess is omitted, then a message corresponding to $code
+is inserted.  If $proto is missing the content of the
+$HTTP::Daemon::PROTO variable is used.
+<P></P>
+<DT><STRONG><A NAME="item_send_crlf">$c-&gt;send_crlf</A></STRONG><BR>
+<DD>
+Send the CRLF sequence to the client.
+<P></P>
+<DT><STRONG><A NAME="item_send_basic_header">$c-&gt;send_basic_header( [$code, [$mess, [$proto]]] )</A></STRONG><BR>
+<DD>
+Send the status line and the ``Date:'' and ``Server:'' headers back to
+the client.  This header is assumed to be continued and does not end
+with an empty CRLF line.
+<P></P>
+<DT><STRONG><A NAME="item_send_response">$c-&gt;send_response( [$res] )</A></STRONG><BR>
+<DD>
+Write a <EM>HTTP::Response</EM> object to the
+client as a response.  We try hard to make sure that the response is
+self delimiting so that the connection can stay persistent for further
+request/response exchanges.
+<P>The content attribute of the <EM>HTTP::Response</EM> object can be a normal
+string or a subroutine reference.  If it is a subroutine, then
+whatever this callback routine returns is written back to the
+client as the response content.  The routine will be called until it
+return an undefined or empty value.  If the client is HTTP/1.1 aware
+then we will use chunked transfer encoding for the response.</P>
+<P></P>
+<DT><STRONG><A NAME="item_send_redirect">$c-&gt;send_redirect( $loc, [$code, [$entity_body]] )</A></STRONG><BR>
+<DD>
+Send a redirect response back to the client.  The location ($loc) can
+be an absolute or relative URL. The $code must be one the redirect
+status codes, and defaults to ``301 Moved Permanently''
+<P></P>
+<DT><STRONG><A NAME="item_send_error">$c-&gt;send_error( [$code, [$error_message]] )</A></STRONG><BR>
+<DD>
+Send an error response back to the client.  If the $code is missing a
+``Bad Request'' error is reported.  The $error_message is a string that
+is incorporated in the body of the HTML entity body.
+<P></P>
+<DT><STRONG><A NAME="item_send_file_response">$c-&gt;<CODE>send_file_response($filename)</CODE></A></STRONG><BR>
+<DD>
+Send back a response with the specified $filename as content.  If the
+file is a directory we try to generate an HTML index of it.
+<P></P>
+<DT><STRONG><A NAME="item_send_file">$c-&gt;send_file($fd);</A></STRONG><BR>
+<DD>
+Copy the file to the client.  The file can be a string (which
+will be interpreted as a filename) or a reference to an <EM>IO::Handle</EM>
+or glob.
+<P></P>
+<DT><STRONG><A NAME="item_daemon">$c-&gt;daemon</A></STRONG><BR>
+<DD>
+Return a reference to the corresponding <EM>HTTP::Daemon</EM> object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>RFC 2068</P>
+<P><A HREF="../../../lib/IO/Socket/INET.html">the IO::Socket::INET manpage</A>, <A HREF="../../../lib/CGI/Apache.html">the Apache manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1996-2001, Gisle Aas</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTTP::Daemon - a simple http server class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

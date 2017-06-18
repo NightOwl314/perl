@@ -1,0 +1,186 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::Select - OO interface to the select system call</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Select - OO interface to the select system call</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#example">EXAMPLE</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::Select - OO interface to the select system call</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::Select;</PRE>
+<PRE>
+    $s = IO::Select-&gt;new();</PRE>
+<PRE>
+    $s-&gt;add(\*STDIN);
+    $s-&gt;add($some_handle);</PRE>
+<PRE>
+    @ready = $s-&gt;can_read($timeout);</PRE>
+<PRE>
+    @ready = IO::Select-&gt;new(@handles)-&gt;read(0);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>IO::Select</CODE> package implements an object approach to the system <A HREF="#item_select"><CODE>select</CODE></A>
+function call. It allows the user to see what IO handles, see <A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>,
+are ready for reading, writing or have an error condition pending.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [ HANDLES ] )</A></STRONG><BR>
+<DD>
+The constructor creates a new object and optionally initialises it with a set
+of handles.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_add">add ( HANDLES )</A></STRONG><BR>
+<DD>
+Add the list of handles to the <CODE>IO::Select</CODE> object. It is these values that
+will be returned when an event occurs. <CODE>IO::Select</CODE> keeps these values in a
+cache which is indexed by the <A HREF="../../lib/Pod/perlfunc.html#item_fileno"><CODE>fileno</CODE></A> of the handle, so if more than one
+handle with the same <A HREF="../../lib/Pod/perlfunc.html#item_fileno"><CODE>fileno</CODE></A> is specified then only the last one is cached.
+<P>Each handle can be an <CODE>IO::Handle</CODE> object, an integer or an array
+reference where the first element is a <CODE>IO::Handle</CODE> or an integer.</P>
+<P></P>
+<DT><STRONG><A NAME="item_remove">remove ( HANDLES )</A></STRONG><BR>
+<DD>
+Remove all the given handles from the object. This method also works
+by the <A HREF="../../lib/Pod/perlfunc.html#item_fileno"><CODE>fileno</CODE></A> of the handles. So the exact handles that were added
+need not be passed, just handles that have an equivalent <A HREF="../../lib/Pod/perlfunc.html#item_fileno"><CODE>fileno</CODE></A>
+<P></P>
+<DT><STRONG><A NAME="item_exists">exists ( HANDLE )</A></STRONG><BR>
+<DD>
+Returns a true value (actually the handle itself) if it is present.
+Returns undef otherwise.
+<P></P>
+<DT><STRONG><A NAME="item_handles">handles</A></STRONG><BR>
+<DD>
+Return an array of all registered handles.
+<P></P>
+<DT><STRONG><A NAME="item_can_read">can_read ( [ TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Return an array of handles that are ready for reading. <CODE>TIMEOUT</CODE> is
+the maximum amount of time to wait before returning an empty list, in
+seconds, possibly fractional. If <CODE>TIMEOUT</CODE> is not given and any
+handles are registered then the call will block.
+<P></P>
+<DT><STRONG><A NAME="item_can_write">can_write ( [ TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_can_read"><CODE>can_read</CODE></A> except check for handles that can be written to.
+<P></P>
+<DT><STRONG><A NAME="item_has_exception">has_exception ( [ TIMEOUT ] )</A></STRONG><BR>
+<DD>
+Same as <A HREF="#item_can_read"><CODE>can_read</CODE></A> except check for handles that have an exception
+condition, for example pending out-of-band data.
+<P></P>
+<DT><STRONG><A NAME="item_count">count ()</A></STRONG><BR>
+<DD>
+Returns the number of handles that the object will check for when
+one of the <CODE>can_</CODE> methods is called or the object is passed to
+the <A HREF="#item_select"><CODE>select</CODE></A> static method.
+<P></P>
+<DT><STRONG><A NAME="item_bits"><CODE>bits()</CODE></A></STRONG><BR>
+<DD>
+Return the bit string suitable as argument to the core <A HREF="#item_select"><CODE>select()</CODE></A> call.
+<P></P>
+<DT><STRONG><A NAME="item_select">select ( READ, WRITE, ERROR [, TIMEOUT ] )</A></STRONG><BR>
+<DD>
+<A HREF="#item_select"><CODE>select</CODE></A> is a static method, that is you call it with the package
+name like <A HREF="#item_new"><CODE>new</CODE></A>. <CODE>READ</CODE>, <CODE>WRITE</CODE> and <CODE>ERROR</CODE> are either <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>
+or <CODE>IO::Select</CODE> objects. <CODE>TIMEOUT</CODE> is optional and has the same
+effect as for the core select call.
+<P>The result will be an array of 3 elements, each a reference to an array
+which will hold the handles that are ready for reading, writing and have
+error conditions respectively. Upon error an empty array is returned.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="example">EXAMPLE</A></H1>
+<P>Here is a short example which shows how <CODE>IO::Select</CODE> could be used
+to write a server which communicates with several sockets while also
+listening for more connections on a listen socket</P>
+<PRE>
+    use IO::Select;
+    use IO::Socket;</PRE>
+<PRE>
+    $lsn = new IO::Socket::INET(Listen =&gt; 1, LocalPort =&gt; 8080);
+    $sel = new IO::Select( $lsn );</PRE>
+<PRE>
+    while(@ready = $sel-&gt;can_read) {
+        foreach $fh (@ready) {
+            if($fh == $lsn) {
+                # Create a new socket
+                $new = $lsn-&gt;accept;
+                $sel-&gt;add($new);
+            }
+            else {
+                # Process socket</PRE>
+<PRE>
+                # Maybe we have finished with the socket
+                $sel-&gt;remove($fh);
+                $fh-&gt;close;
+            }
+        }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr. Currently maintained by the Perl Porters.  Please report all
+bugs to &lt;<A HREF="mailto:perl5-porters@perl.org">perl5-porters@perl.org</A>&gt;.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-8 Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::Select - OO interface to the select system call</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

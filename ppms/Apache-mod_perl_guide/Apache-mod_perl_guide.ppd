@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-mod_perl_guide" VERSION="1,31,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="MSWin32-x86-multi-thread/Apache-mod_perl_guide.tar.gz" />
+    <DEPENDENCY NAME="Pod-HtmlPsPdf" VERSION="0,0,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>mod_perl Guide</ABSTRACT>
+  <AUTHOR>Stas Bekman (stas@stason.org)</AUTHOR>
+  <TITLE>Apache-mod_perl_guide</TITLE>
+</SOFTPKG>

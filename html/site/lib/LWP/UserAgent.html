@@ -1,0 +1,279 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP::UserAgent - A WWW UserAgent class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::UserAgent - A WWW UserAgent class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP::UserAgent - A WWW UserAgent class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require LWP::UserAgent;
+ $ua = LWP::UserAgent-&gt;new;</PRE>
+<PRE>
+ $request = HTTP::Request-&gt;new('GET', '<A HREF="file://localhost/etc/motd">file://localhost/etc/motd</A>');</PRE>
+<PRE>
+ $response = $ua-&gt;request($request); # or
+ $response = $ua-&gt;request($request, '/tmp/sss'); # or
+ $response = $ua-&gt;request($request, \&amp;callback, 4096);</PRE>
+<PRE>
+ sub callback { my($data, $response, $protocol) = @_; .... }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>LWP::UserAgent</CODE> is a class implementing a simple World-Wide Web
+user agent in Perl. It brings together the HTTP::Request,
+HTTP::Response and the LWP::Protocol classes that form the rest of the
+core of libwww-perl library. For simple uses this class can be used
+directly to dispatch WWW requests, alternatively it can be subclassed
+for application-specific behaviour.</P>
+<P>In normal use the application creates a UserAgent object, and then
+configures it with values for timeouts, proxies, name, etc. It next
+creates an instance of <CODE>HTTP::Request</CODE> for the request that
+needs to be performed. This request is then passed to the UserAgent
+<A HREF="#item_request"><CODE>request()</CODE></A> method, which dispatches it using the relevant protocol,
+and returns a <CODE>HTTP::Response</CODE> object.</P>
+<P>The basic approach of the library is to use HTTP style communication
+for all protocol schemes, i.e. you also receive an <CODE>HTTP::Response</CODE>
+object for gopher or ftp requests.  In order to achieve even more
+similarity to HTTP style communications, gopher menus and file
+directories are converted to HTML documents.</P>
+<P>The <A HREF="#item_request"><CODE>request()</CODE></A> method can process the content of the response in one of
+three ways: in core, into a file, or into repeated calls to a
+subroutine.  You choose which one by the kind of value passed as the
+second argument to request().</P>
+<P>The in core variant simply stores the content in a scalar 'content' attribute
+of the response object and is suitable for small
+HTML replies that might need further parsing.  This variant is used if
+the second argument is missing (or is undef).</P>
+<P>The filename variant requires a scalar containing a filename as the
+second argument to <A HREF="#item_request"><CODE>request()</CODE></A> and is suitable for large WWW objects
+which need to be written directly to the file without requiring large
+amounts of memory. In this case the response object returned from
+<A HREF="#item_request"><CODE>request()</CODE></A> will have an empty content attribute.  If the request fails, then the
+content might not be empty, and the file will be untouched.</P>
+<P>The subroutine variant requires a reference to callback routine as the
+second argument to <A HREF="#item_request"><CODE>request()</CODE></A> and it can also take an optional chuck
+size as the third argument.  This variant can be used to construct
+``pipe-lined'' processing, where processing of received chuncks can
+begin before the complete data has arrived.  The callback function is
+called with 3 arguments: the data received this time, a reference to
+the response object and a reference to the protocol object.  The
+response object returned from <A HREF="#item_request"><CODE>request()</CODE></A> will have empty content.  If
+the request fails, then the the callback routine is not
+called, and the response-&gt;content might not be empty.</P>
+<P>The request can be aborted by calling <A HREF="../../../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> in the callback
+routine.  The die message will be available as the ``X-Died'' special
+response header field.</P>
+<P>The library also allows you to use a subroutine reference as
+content in the request object.  This subroutine should return the
+content (possibly in pieces) when called.  It should return an empty
+string when there is no more content.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The following methods are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$ua = LWP::UserAgent-&gt;new;</A></STRONG><BR>
+<DD>
+Constructor for the UserAgent.  Returns a reference to a
+LWP::UserAgent object.
+<P></P>
+<DT><STRONG><A NAME="item_simple_request">$ua-&gt;simple_request($request, [$arg [, $size]])</A></STRONG><BR>
+<DD>
+This method dispatches a single WWW request on behalf of a user, and
+returns the response received.  The <CODE>$request</CODE> should be a reference
+to a <CODE>HTTP::Request</CODE> object with values defined for at least the
+<CODE>method()</CODE> and <CODE>uri()</CODE> attributes.
+<P>If <CODE>$arg</CODE> is a scalar it is taken as a filename where the content of
+the response is stored.</P>
+<P>If <CODE>$arg</CODE> is a reference to a subroutine, then this routine is called
+as chunks of the content is received.  An optional <CODE>$size</CODE> argument
+is taken as a hint for an appropriate chunk size.</P>
+<P>If <CODE>$arg</CODE> is omitted, then the content is stored in the response
+object itself.</P>
+<P></P>
+<DT><STRONG><A NAME="item_request">$ua-&gt;request($request, $arg [, $size])</A></STRONG><BR>
+<DD>
+Process a request, including redirects and security.  This method may
+actually send several different simple requests.
+<P>The arguments are the same as for <A HREF="#item_simple_request"><CODE>simple_request()</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_redirect_ok">$ua-&gt;redirect_ok</A></STRONG><BR>
+<DD>
+This method is called by <A HREF="#item_request"><CODE>request()</CODE></A> before it tries to do any
+redirects.  It should return a true value if a redirect is allowed
+to be performed. Subclasses might want to override this.
+<P>The default implementation will return FALSE for POST request and TRUE
+for all others.</P>
+<P></P>
+<DT><STRONG><A NAME="item_credentials">$ua-&gt;credentials($netloc, $realm, $uname, $pass)</A></STRONG><BR>
+<DD>
+Set the user name and password to be used for a realm.  It is often more
+useful to specialize the <A HREF="#item_get_basic_credentials"><CODE>get_basic_credentials()</CODE></A> method instead.
+<P></P>
+<DT><STRONG><A NAME="item_get_basic_credentials">$ua-&gt;get_basic_credentials($realm, $uri, [$proxy])</A></STRONG><BR>
+<DD>
+This is called by <A HREF="#item_request"><CODE>request()</CODE></A> to retrieve credentials for a Realm
+protected by Basic Authentication or Digest Authentication.
+<P>Should return username and password in a list.  Return undef to abort
+the authentication resolution atempts.</P>
+<P>This implementation simply checks a set of pre-stored member
+variables. Subclasses can override this method to e.g. ask the user
+for a username/password.  An example of this can be found in
+<CODE>lwp-request</CODE> program distributed with this library.</P>
+<P></P>
+<DT><STRONG><A NAME="item_agent">$ua-&gt;<CODE>agent([$product_id])</CODE></A></STRONG><BR>
+<DD>
+Get/set the product token that is used to identify the user agent on
+the network.  The agent value is sent as the ``User-Agent'' header in
+the requests. The default agent name is ``libwww-perl/#.##'', where
+``#.##'' is substitued with the version numer of this library.
+<P>The user agent string should be one or more simple product identifiers
+with an optional version number separated by the ``/'' character.
+Examples are:</P>
+<PRE>
+  $ua-&gt;agent('Checkbot/0.4 ' . $ua-&gt;agent);
+  $ua-&gt;agent('Mozilla/5.0');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_from">$ua-&gt;<CODE>from([$email_address])</CODE></A></STRONG><BR>
+<DD>
+Get/set the Internet e-mail address for the human user who controls
+the requesting user agent.  The address should be machine-usable, as
+defined in RFC 822.  The from value is send as the ``From'' header in
+the requests.  There is no default.  Example:
+<PRE>
+  $ua-&gt;from('gaas@cpan.org');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_timeout">$ua-&gt;<CODE>timeout([$secs])</CODE></A></STRONG><BR>
+<DD>
+Get/set the timeout value in seconds. The default <A HREF="#item_timeout"><CODE>timeout()</CODE></A> value is
+180 seconds, i.e. 3 minutes.
+<P></P>
+<DT><STRONG><A NAME="item_cookie_jar">$ua-&gt;<CODE>cookie_jar([$cookies])</CODE></A></STRONG><BR>
+<DD>
+Get/set the <EM>HTTP::Cookies</EM> object to use.  The default is to have no
+cookie_jar, i.e. never automatically add ``Cookie'' headers to the
+requests.
+<P></P>
+<DT><STRONG><A NAME="item_parse_head">$ua-&gt;<CODE>parse_head([$boolean])</CODE></A></STRONG><BR>
+<DD>
+Get/set a value indicating wether we should initialize response
+headers from the &lt;head&gt; section of HTML documents. The default is
+TRUE.  Do not turn this off, unless you know what you are doing.
+<P></P>
+<DT><STRONG><A NAME="item_max_size">$ua-&gt;<CODE>max_size([$bytes])</CODE></A></STRONG><BR>
+<DD>
+Get/set the size limit for response content.  The default is undef,
+which means that there is no limit.  If the returned response content
+is only partial, because the size limit was exceeded, then a
+``X-Content-Range'' header will be added to the response.
+<P></P>
+<DT><STRONG><A NAME="item_clone">$ua-&gt;clone;</A></STRONG><BR>
+<DD>
+Returns a copy of the LWP::UserAgent object
+<P></P>
+<DT><STRONG><A NAME="item_is_protocol_supported">$ua-&gt;<CODE>is_protocol_supported($scheme)</CODE></A></STRONG><BR>
+<DD>
+You can use this method to query if the library currently support the
+specified <CODE>scheme</CODE>.  The <CODE>scheme</CODE> might be a string (like 'http' or
+'ftp') or it might be an URI object reference.
+<P></P>
+<DT><STRONG><A NAME="item_mirror">$ua-&gt;mirror($url, $file)</A></STRONG><BR>
+<DD>
+Get and store a document identified by a URL, using If-Modified-Since,
+and checking of the Content-Length.  Returns a reference to the
+response object.
+<P></P>
+<DT><STRONG><A NAME="item_proxy">$ua-&gt;<CODE>proxy(...)</CODE></A></STRONG><BR>
+<DD>
+Set/retrieve proxy URL for a scheme:
+<PRE>
+ $ua-&gt;proxy(['http', 'ftp'], '<A HREF="http://proxy.sn.no:8001/">http://proxy.sn.no:8001/</A>');
+ $ua-&gt;proxy('gopher', '<A HREF="http://proxy.sn.no:8001/">http://proxy.sn.no:8001/</A>');</PRE>
+<P>The first form specifies that the URL is to be used for proxying of
+access methods listed in the list in the first method argument,
+i.e. 'http' and 'ftp'.</P>
+<P>The second form shows a shorthand form for specifying
+proxy URL for a single access scheme.</P>
+<P></P>
+<DT><STRONG><A NAME="item_env_proxy">$ua-&gt;<CODE>env_proxy()</CODE></A></STRONG><BR>
+<DD>
+Load proxy settings from *_proxy environment variables.  You might
+specify proxies like this (sh-syntax):
+<PRE>
+  gopher_proxy=<A HREF="http://proxy.my.place/">http://proxy.my.place/</A>
+  wais_proxy=<A HREF="http://proxy.my.place/">http://proxy.my.place/</A>
+  no_proxy=&quot;localhost,my.domain&quot;
+  export gopher_proxy wais_proxy no_proxy</PRE>
+<P>Csh or tcsh users should use the <CODE>setenv</CODE> command to define these
+environment variables.</P>
+<P>On systems with case-insensitive environment variables there exists a
+name clash between the CGI environment variables and the <CODE>HTTP_PROXY</CODE>
+environment variable normally picked up by env_proxy().  Because of
+this <CODE>HTTP_PROXY</CODE> is not honored for CGI scripts.  The
+<CODE>CGI_HTTP_PROXY</CODE> environment variable can be used instead.</P>
+<P></P>
+<DT><STRONG><A NAME="item_no_proxy">$ua-&gt;<CODE>no_proxy($domain,...)</CODE></A></STRONG><BR>
+<DD>
+Do not proxy requests to the given domains.  Calling no_proxy without
+any domains clears the list of domains. Eg:
+<PRE>
+ $ua-&gt;no_proxy('localhost', 'no', ...);</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>See <A HREF="../../../site/lib/LWP.html">the LWP manpage</A> for a complete overview of libwww-perl5.  See <EM>lwp-request</EM> and
+<EM>lwp-mirror</EM> for examples of usage.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::UserAgent - A WWW UserAgent class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

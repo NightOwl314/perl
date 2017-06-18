@@ -1,0 +1,218 @@
+
+<HTML>
+<HEAD>
+<TITLE>HTML::Tagset - data tables useful in parsing HTML</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Tagset - data tables useful in parsing HTML</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#caveats">CAVEATS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Tagset - data tables useful in parsing HTML</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use HTML::Tagset;
+  # Then use any of the items in the HTML::Tagset package
+  #  as need arises</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module contains several data tables useful in various kinds of
+HTML parsing operations.</P>
+<P>Note that all tag names used are lowercase.</P>
+<P>In the following documentation, a ``hashset'' is a hash being used as a
+set -- the hash conveys that its keys are there, and the actual values
+associated with the keys are not significant.  (But what values are
+there, are always true.)</P>
+<DL>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AemptyElement">hashset %HTML::Tagset::emptyElement</A></STRONG><BR>
+<DD>
+This hashset has as values the tag-names (GIs) of elements that cannot
+have content.  (For example, ``base'', ``br'', ``hr''.)  So
+<CODE>$HTML::Tagset::emptyElement{'hr'}</CODE> exists and is true.
+<CODE>$HTML::Tagset::emptyElement{'dl'}</CODE> does not exist, and so is not true.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AoptionalEndTag">hashset %HTML::Tagset::optionalEndTag</A></STRONG><BR>
+<DD>
+This hashset lists tag-names for elements that can have content, but whose
+end-tags are generally, ``safely'', omissible.  Example:
+<CODE>$HTML::Tagset::emptyElement{'li'}</CODE> exists and is true.
+<P></P>
+<DT><STRONG><A NAME="item_hash_%25HTML%3A%3ATagset%3A%3AlinkElements">hash %HTML::Tagset::linkElements</A></STRONG><BR>
+<DD>
+Values in this hash are tagnames for elements that might contain
+links, and the value for each is a reference to an array of the names
+of attributes whose values can be links.
+<P></P>
+<DT><STRONG><A NAME="item_hash_%25HTML%3A%3ATagset%3A%3Aboolean_attr">hash %HTML::Tagset::boolean_attr</A></STRONG><BR>
+<DD>
+This hash (not hashset) lists what attributes of what elements can be
+printed without showing the value (for example, the ``noshade'' attribute
+of ``hr'' elements).  For elements with only one such attribute, its value
+is simply that attribute name.  For elements with many such attributes,
+the value is a reference to a hashset containing all such attributes.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisPhraseMarkup">hashset %HTML::Tagset::isPhraseMarkup</A></STRONG><BR>
+<DD>
+This hashset contains all phrasal-level elements.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3Ais_Possible_Stric">hashset %HTML::Tagset::is_Possible_Strict_P_Content</A></STRONG><BR>
+<DD>
+This hashset contains all phrasal-level elements that be content of a
+P element, for a strict model of HTML.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisHeadElement">hashset %HTML::Tagset::isHeadElement</A></STRONG><BR>
+<DD>
+This hashset contains all elements that elements that should be
+present only in the 'head' element of an HTML document.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisList">hashset %HTML::Tagset::isList</A></STRONG><BR>
+<DD>
+This hashset contains all elements that can contain ``li'' elements.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisTableElement">hashset %HTML::Tagset::isTableElement</A></STRONG><BR>
+<DD>
+This hashset contains all elements that are to be found only in/under
+a ``table'' element.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisFormElement">hashset %HTML::Tagset::isFormElement</A></STRONG><BR>
+<DD>
+This hashset contains all elements that are to be found only in/under
+a ``form'' element.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisBodyMarkup">hashset %HTML::Tagset::isBodyMarkup</A></STRONG><BR>
+<DD>
+This hashset contains all elements that are to be found only in/under
+the ``body'' element of an HTML document.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisHeadOrBodyEleme">hashset %HTML::Tagset::isHeadOrBodyElement</A></STRONG><BR>
+<DD>
+This hashset includes all elements that I notice can fall either in
+the head or in the body.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AisKnown">hashset %HTML::Tagset::isKnown</A></STRONG><BR>
+<DD>
+This hashset lists all known HTML elements.
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25HTML%3A%3ATagset%3A%3AcanTighten">hashset %HTML::Tagset::canTighten</A></STRONG><BR>
+<DD>
+This hashset lists elements that might have ignorable whitespace as
+children or siblings.
+<P></P>
+<DT><STRONG><A NAME="item_array_%40HTML%3A%3ATagset%3A%3Ap_closure_barriers">array @HTML::Tagset::p_closure_barriers</A></STRONG><BR>
+<DD>
+This array has a meaning that I have only seen a need for in
+<CODE>HTML::TreeBuilder</CODE>, but I include it here on the off chance that someone
+might find it of use:
+<P>When we see a ``&lt;p&gt;'' token, we go lookup up the lineage for a p
+element we might have to minimize.  At first sight, we might say that
+if there's a p anywhere in the lineage of this new p, it should be
+closed.  But that's wrong.  Consider this document:</P>
+<PRE>
+  &lt;html&gt;
+    &lt;head&gt;
+      &lt;title&gt;foo&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;p&gt;foo
+        &lt;table&gt;
+          &lt;tr&gt;
+            &lt;td&gt;
+               foo
+               &lt;p&gt;bar
+            &lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/table&gt;
+      &lt;/p&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;</PRE>
+<P>The second p is quite legally inside a much higher p.</P>
+<P>My formalization of the reason why this is legal, but this:</P>
+<PRE>
+  &lt;p&gt;foo&lt;p&gt;bar&lt;/p&gt;&lt;/p&gt;</PRE>
+<P>isn't, is that something about the table constitutes a ``barrier'' to
+the application of the rule about what p must minimize.</P>
+<P>So <CODE>@HTML::Tagset::p_closure_barriers</CODE> is the list of all such
+barrier-tags.</P>
+<P></P>
+<DT><STRONG><A NAME="item_hashset_%25isCDATA_Parent">hashset %isCDATA_Parent</A></STRONG><BR>
+<DD>
+This hashset includes all elements whose content is CDATA.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="caveats">CAVEATS</A></H1>
+<P>You may find it useful to alter the behavior of modules (like
+<CODE>HTML::Element</CODE> or <CODE>HTML::TreeBuilder</CODE>) that use <CODE>HTML::Tagset</CODE>'s
+data tables by altering the data tables themselves.  You are welcome
+to try, but be careful; and be aware that different modules may or may
+react differently to the data tables being changed.</P>
+<P>Note that it may be inappropriate to use these tables for <EM>producing</EM>
+HTML -- for example, <CODE>%isHeadOrBodyElement</CODE> lists the tagnames
+for all elements that can appear either in the head or in the body,
+such as ``script''.  That doesn't mean that I am saying your code that
+produces HTML should feel free to put script elements in either place!
+If you are producing programs that spit out HTML, you should be
+<EM>intimately</EM> familiar with the DTDs for HTML or XHTML (available at
+<CODE>http://www.w3.org/</CODE>), and you should slavishly obey them, not
+the data tables in this document.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/HTML/Element.html">the HTML::Element manpage</A>, <A HREF="../../../site/lib/HTML/TreeBuilder.html">the HTML::TreeBuilder manpage</A>, <A HREF="../../../site/lib/HTML/LinkExtor.html">the HTML::LinkExtor manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-2000 Gisle Aas; copyright 2000 Sean M. Burke.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Current maintainer: Sean M. Burke, &lt;<A HREF="mailto:sburke@cpan.org">sburke@cpan.org</A>&gt;</P>
+<P>Most of the code/data in this module was adapted from code written by
+Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt; for <CODE>HTML::Element</CODE>,
+<CODE>HTML::TreeBuilder</CODE>, and <CODE>HTML::LinkExtor</CODE>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Tagset - data tables useful in parsing HTML</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

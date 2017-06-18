@@ -1,0 +1,134 @@
+
+<HTML>
+<HEAD>
+<TITLE>CGI::Pretty - module to produce nicely formatted HTML code</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;CGI::Pretty - module to produce nicely formatted HTML code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#tags that won't be formatted">Tags that won't be formatted</A></LI>
+		<LI><A HREF="#customizing the indenting">Customizing the Indenting</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>CGI::Pretty - module to produce nicely formatted HTML code</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use CGI::Pretty qw( :html3 );</PRE>
+<PRE>
+    # Print a table with a single data element
+    print table( TR( td( &quot;foo&quot; ) ) );</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>CGI::Pretty is a module that derives from CGI.  It's sole function is to
+allow users of CGI to output nicely formatted HTML code.</P>
+<P>When using the CGI module, the following code:
+    print table( TR( td( ``foo'' ) ) );</P>
+<P>produces the following output:
+    &lt;TABLE&gt;&lt;TR&gt;&lt;TD&gt;foo&lt;/TD&gt;&lt;/TR&gt;&lt;/TABLE&gt;</P>
+<P>If a user were to create a table consisting of many rows and many columns,
+the resultant HTML code would be quite difficult to read since it has no
+carriage returns or indentation.</P>
+<P>CGI::Pretty fixes this problem.  What it does is add a carriage
+return and indentation to the HTML code so that one can easily read
+it.</P>
+<PRE>
+    print table( TR( td( &quot;foo&quot; ) ) );</PRE>
+<P>now produces the following output:
+    &lt;TABLE&gt;
+       &lt;TR&gt;
+          &lt;TD&gt;
+             foo
+          &lt;/TD&gt;
+       &lt;/TR&gt;
+    &lt;/TABLE&gt;</P>
+<P>
+<H2><A NAME="tags that won't be formatted">Tags that won't be formatted</A></H2>
+<P>The &lt;A&gt; and &lt;PRE&gt; tags are not formatted.  If these tags were formatted, the
+user would see the extra indentation on the web browser causing the page to
+look different than what would be expected.  If you wish to add more tags to
+the list of tags that are not to be touched, push them onto the <CODE>@AS_IS</CODE> array:</P>
+<PRE>
+    push @CGI::Pretty::AS_IS,qw(CODE XMP);</PRE>
+<P>
+<H2><A NAME="customizing the indenting">Customizing the Indenting</A></H2>
+<P>If you wish to have your own personal style of indenting, you can change the
+<CODE>$INDENT</CODE> variable:</P>
+<PRE>
+    $CGI::Pretty::INDENT = &quot;\t\t&quot;;</PRE>
+<P>would cause the indents to be two tabs.</P>
+<P>Similarly, if you wish to have more space between lines, you may change the
+<CODE>$LINEBREAK</CODE> variable:</P>
+<PRE>
+    $CGI::Pretty::LINEBREAK = &quot;\n\n&quot;;</PRE>
+<P>would create two carriage returns between lines.</P>
+<P>If you decide you want to use the regular CGI indenting, you can easily do 
+the following:</P>
+<PRE>
+    $CGI::Pretty::INDENT = $CGI::Pretty::LINEBREAK = &quot;&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This section intentionally left blank.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Paulsen &lt;<A HREF="mailto:Brian@ThePaulsens.com">Brian@ThePaulsens.com</A>&gt;, with minor modifications by
+Lincoln Stein &lt;<A HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>&gt; for incorporation into the CGI.pm
+distribution.</P>
+<P>Copyright 1999, Brian Paulsen.  All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>Bug reports and comments to <A HREF="mailto:Brian@ThePaulsens.com.">Brian@ThePaulsens.com.</A>  You can also write
+to <A HREF="mailto:lstein@cshl.org,">lstein@cshl.org,</A> but this code looks pretty hairy to me and I'm not
+sure I understand it!</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/CGI.html">the CGI manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;CGI::Pretty - module to produce nicely formatted HTML code</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

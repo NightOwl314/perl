@@ -1,0 +1,70 @@
+
+<HTML>
+<HEAD>
+<TITLE>Sys::Hostname - Try every conceivable way to get hostname</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Sys::Hostname - Try every conceivable way to get hostname</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Sys::Hostname - Try every conceivable way to get hostname</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Sys::Hostname;
+    $host = hostname;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Attempts several methods of getting the system hostname and
+then caches the result.  It tries the first available of the C
+library's gethostname(), <CODE>`$Config{aphostname}`</CODE>, uname(2),
+<A HREF="../../lib/Pod/perlfunc.html#item_syscall"><CODE>syscall(SYS_gethostname)</CODE></A>, <CODE>`hostname`</CODE>, <CODE>`uname -n`</CODE>,
+and the file <EM>/com/host</EM>.  If all that fails it <CODE>croak</CODE>s.</P>
+<P>All NULs, returns, and newlines are removed from the result.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>David Sundstrom &lt;<EM><A HREF="mailto:sunds@asictest.sc.ti.com">sunds@asictest.sc.ti.com</A></EM>&gt;</P>
+<P>Texas Instruments</P>
+<P>XS code added by Greg Bacon &lt;<EM><A HREF="mailto:gbacon@cs.uah.edu">gbacon@cs.uah.edu</A></EM>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Sys::Hostname - Try every conceivable way to get hostname</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

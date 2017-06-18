@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+<title>ActivePerl faq1 - Availability and Installation</title>
+<link rev="made" href="mailto:support@ActiveState.com">
+<meta name="GENERATOR" charset="iso-8859-1" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<link rel="STYLESHEET" href="../Active.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl FAQ</p>
+      </strong></td>
+  </tr>
+</table>
+<ul>
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#What_is_Perl_">What is Perl?</a></li>
+      <li><a href="#Where_can_I_get_tons_of_informat">Where can I get tons of
+        information about Perl?</a></li>
+      <li><a href="#Where_is_the_Perl_for_Win32_inte">Where can I get the
+        ActivePerl interpreter?</a></li>
+      <li><a href="#What_do_I_get_with_ActiveState_s">What do I get with
+        ActivePerl?</a></li>
+      <li><a href="#How_do_I_install_the_Perl_for_Wi">How do I install
+        ActivePerl?</a></li>
+      <li><a href="#Environment_variables">Should I unset any Perl related
+	environment variables before installing ActivePerl?  </a></li>
+      <li><a href="#How_can_I_customize_my_installat">How can I customize my
+        installation of ActivePerl?</a></li>
+      <li><a href="#How_do_I_uninstall_Perl_for_Win3">How do I uninstall
+        ActivePerl?</a></li>
+      <li><a href="#What_is_ActiveX_Scripting_">What is ActiveX Scripting?</a></li>
+      <li><a href="#Is_there_an_ActiveX_Scripting_ve">Is there an ActiveX
+        Scripting version of Perl available?</a></li>
+      <li><a href="#When_I_double_click_the_perl_exe">When I double-click the
+        perl.exe icon in Explorer, I get</a></li>
+      <li><a href="#How_can_I_get_Perl_to_run_a_Perl">How can I get Perl to run
+        a Perl script at the 4DOS command line by</a></li>
+      <li><a href="#Can_I_build_perl_from_the_source">Can I build perl from the
+        source code?</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR_AND_COPYRIGHT">AUTHOR AND COPYRIGHT</a></li>
+</ul>
+<hr>
+<h1><a name="NAME">NAME</a></h1>
+<p>ActivePerl faq1 - Availability and Installation</p>
+<hr>
+<h1><a name="DESCRIPTION">DESCRIPTION</a></h1>
+<p>Getting, installing, and using Perl.</p>
+<hr>
+<h2><a name="What_is_Perl_">What is Perl?</a></h2>
+<p>Perl is a scripting language widely used for system administration and
+programming on the World Wide Web. It originated in the UNIX community and has a
+strong UNIX slant, but usage on Windows is growing rapidly. ActivePerl is a port
+of core Perl to Windows.</p>
+<p>perl (small 'p') is the program used to interpret the Perl language.</p>
+<hr>
+<h2><a name="Where_can_I_get_tons_of_informat">Where can I get tons of
+information about Perl?</a></h2>
+<p>Extensive online documentation is included with Perl itself. You can read the
+documentation with the <code>perldoc</code> command, as in <code>perldoc
+document_name</code>. You should start with the perl document and the perlfaq
+document. For information on other ways of accessing the Perl documentation
+(including HTML versions of this documentation), see <a href="ActivePerl-faq3.html#Where_can_I_get_documentation_on">Where
+can I get documentation on ActivePerl?</a>.</p>
+<p>To get more information about Perl, check out these URLs:</p>
+<ul>
+  <li>
+    <p><a href="http://www.ActiveState.com">http://www.ActiveState.com</a> - The
+    ActivePerl Home Page.</p>
+  </li>
+  <li>
+    <p><a href="http://www.perl.com">http://www.perl.com</a> - The Perl home
+    page.</p>
+  </li>
+  <li>
+    <p><a href="http://language.perl.com">http://language.perl.com</a> - The
+    Perl language home page.</p>
+  </li>
+  <li>
+    <p><a href="http://www.yahoo.com/Computers_and_Internet/Programming_Languages/Perl/">http://www.yahoo.com/Computers_and_Internet/Programming_Languages/Perl/</a>
+    - The Yahoo Perl page.</p>
+  </li>
+</ul>
+<p>There are several good books about Perl. The premier book on ActivePerl is <em>Learning
+Perl On Win32 Systems</em> By Schwartz, Olson, and Christiansen (O'Reilly &amp;
+Associates, 1997). This is the Gecko book, and has a picture of a gecko (little
+chubby lizard with big toes and a smile) on the front cover.</p>
+<p>For general perl, two books to consider are <em>Programming Perl</em>, 2nd
+Edition, by Larry Wall, Tom Christiansen and Randal L. Schwartz (O'Reilly &amp;
+Associates, 1996) and <em>Learning Perl</em>, by Randal L. Schwartz (O'Reilly
+&amp; Associates, 1993). These are referred to by Perl enthusiasts as the Camel
+book and the Llama book, respectively.</p>
+<p>If you are new to Perl and there are any terms mentioned in this FAQ that you
+don't get, try one of the above resources. See the <em>perlbook</em> document
+that comes with Perl for more information.</p>
+<hr>
+<h2><a name="Where_is_the_Perl_for_Win32_inte">Where can I get the ActivePerl
+interpreter?</a></h2>
+<p>ActivePerl is available from the ActiveState home page.</p>
+<p>To download ActivePerl from ActiveState, look in this directory:</p>
+<pre>
+  <a href="http://www.ActiveState.com/ActivePerl">http://www.ActiveState.com/ActivePerl</a>
+</pre>
+<hr>
+<h2><a name="What_do_I_get_with_ActiveState_s">What do I get with ActivePerl?</a></h2>
+<p>ActivePerl is a complete, self-installing distribution of Perl based on the
+standard Perl sources. It is distributed online at the ActiveState site.</p>
+<p>&quot;Perl for Win32&quot; generally refers to ActivePerl for Windows.</p>
+<hr>
+<h2><a name="How_do_I_install_the_Perl_for_Wi">How do I install ActivePerl?</a></h2>
+<p>&nbsp;</p>
+<hr>
+<h2><a name="Environment_variables">Should I unset any Perl related environment variables before installing ActivePerl?</a></h2>
+<p>
+The short answer is yes!! If you have environment variables such as
+<em>PERLLIB, PERL5LIB </em> or <em>PERL5OPT</em> set, incompatible versions of
+modules may be used during the installation process and this may cause the 
+installation to fail. If you have any of these environment variables set, you
+should temporarily unset the variables, reboot the system and then attempt the
+installation of ActivePerl. These environment variables are checked by all
+installed versions of Perl, if you have multiple versions of Perl installed it
+is not a good idea to set these environment variables globally.
+</p>
+<hr>
+<h2><a name="Can_I_build_perl_from_the_source">Can I build perl from the source
+code?</a></h2>
+<p>The Perl source code includes complete instructions on building Perl. You can
+obtain the latest Perl source from:</p>
+<pre>
+    <a href="http://www.perl.com/CPAN/src/latest.tar.gz">http://www.perl.com/CPAN/src/latest.tar.gz</a>
+</pre>
+<p>Once you extract the source, read the <em>README</em> file for instructions
+on compiling Perl.</p>
+<hr>
+<h1><a name="AUTHOR_AND_COPYRIGHT">AUTHOR AND COPYRIGHT</a></h1>
+<p>This FAQ was originally assembled and maintained by Evangelo Prodromou. It
+has been revised and updated by Brian Jepson of O'Reilly &amp; Associates, David
+Grove, David Dmytryshyn, David Sparks and Michael Smith of ActiveState.</p>
+<p>This FAQ is in the public domain. If you use it, however, please ensure that
+you give credit to the original authors.</p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;ActivePerl FAQ</p>
+      </strong></td>
+  </tr>
+</table>
+
+</body>
+
+</html>

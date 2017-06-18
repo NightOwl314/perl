@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::Entities - Encode or decode strings with HTML entities</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Entities - Encode or decode strings with HTML entities</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Entities - Encode or decode strings with HTML entities</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use HTML::Entities;</PRE>
+<PRE>
+ $a = &quot;V&amp;aring;re norske tegn b&amp;oslash;r &amp;#230res&quot;;
+ decode_entities($a);
+ encode_entities($a, &quot;\200-\377&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module deals with encoding and decoding of strings with HTML
+character entities.  The module provides the following functions:</P>
+<DL>
+<DT><STRONG><A NAME="item_decode_entities"><CODE>decode_entities($string)</CODE></A></STRONG><BR>
+<DD>
+This routine replaces HTML entities found in the $string with the
+corresponding ISO-8859/1 (or with perl-5.6 Unicode) character.
+Unrecognized entities are left alone.
+<P></P>
+<DT><STRONG><A NAME="item_encode_entities">encode_entities($string, [$unsafe_chars])</A></STRONG><BR>
+<DD>
+This routine replaces unsafe characters in $string with their entity
+representation.  A second argument can be given to specify which
+characters to concider as unsafe.  The default set of characters to
+expand are control chars, high-bit chars and the '&lt;', '&amp;', '&gt;' and '``'
+characters.
+<P></P></DL>
+<P>Both routines modify the string passed as the first argument if
+called in a void context.  In scalar and array contexts the encoded or
+decoded string is returned (and the argument string is left
+unchanged).</P>
+<P>If you prefer not to import these routines into your namespace you can
+call them as:</P>
+<PRE>
+  use HTML::Entities ();
+  $encoded = HTML::Entities::encode($a);
+  $decoded = HTML::Entities::decode($a);</PRE>
+<P>The module can also export the %char2entity and the %entity2char
+hashes which contain the mapping from all characters to the
+corresponding entities.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-2000 Gisle Aas. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Entities - Encode or decode strings with HTML entities</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

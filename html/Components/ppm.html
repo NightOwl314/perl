@@ -1,0 +1,132 @@
+<html>
+
+<head>
+<title>Perl Package Manager</title>
+<meta name="GENERATOR" charset="iso-8859-1" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<link rel="STYLESHEET" href="../Active.css" type="text/css">
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;PPM</p>
+      </strong></td>
+  </tr>
+</table>
+<ul>
+  <li><a href="#what_is_ppm">What is the Perl Package Manager (PPM)?</a>
+  <li><a href="#how_do_i_install_ppm">How do I install PPM?</a>
+  <li><a href="#running_ppm">How do I run PPM?</a>
+  <li><a href="#using_ppm">How do I use PPM?</a>
+</ul>
+<hr>
+<h1><a name="what_is_ppm">What is the Perl Package Manager (PPM)?</a></h1>
+<p>The Perl Package Manager (PPM) provides a command line interface for managing
+Perl modules and extensions (packages). PPM allows you to access package
+repositories, install and remove packages from your system, and update packages
+you previously installed using PPM with the latest versions.</p>
+<hr>
+<h1><a name="how_do_i_install_ppm">How do I install PPM?</a></h1>
+<p>PPM is installed when you install ActivePerl.</p>
+<hr>
+<h1><a name="running_ppm">How do I run PPM?</a></h1>
+<p>Before you run PPM, you should be connected to the Internet. If your Internet
+connection is via a firewall or proxy, you should set the environment variable
+'HTTP_proxy' to the name of this proxy server. If your proxy server requires a
+username and password, the environment variables 'HTTP_proxy_user' and
+'HTTP_proxy_pass' should be set to these values.</p>
+<p>PPM can then be run by typing 'ppm' in a command prompt window.</p>
+<hr>
+<h1><a name="using_ppm">How do I use PPM?</a></h1>
+<p>Quick start: at the PPM command prompt, type '<code>search</code>' to get a
+listing of all available packages, then type '<code>install &lt;packagename&gt;</code>',
+where <code>&lt;packagename&gt;</code> is the name of a package displayed by the
+'<code>search</code>' command. To list the packages you have previously
+installed using PPM, use the '<code>query</code>' command.</p>
+<p>If you find the listing of packages scrolls by too quickly, you may want to
+use the command '<code>set more &lt;number&gt;</code>' to pause the listing
+after &lt;number&gt; packages have been displayed. Use the '<code>set save</code>'
+command to save this configuration for future PPM sessions.</p>
+<p>By default, PPM will use the ActiveState package repository, but this too can
+be configured using the '<code>set</code>' command.</p>
+<p>Below is a listing of key PPM commands (you can type '<code>help
+&lt;command&gt;</code>' at the PPM prompt for usage details for a particular
+&lt;command&gt;). Items in [brackets] are optional.</p>
+<table cellpadding="5">
+  <tr>
+    <td bgcolor="#454545"><font color="#FFFFFF"><b>Command</b></font></td>
+    <td bgcolor="#454545"><font color="#FFFFFF"><b>Function</b></font></td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>genconfig</b></td>
+    <td bgcolor="#E5E4F0">prints a minimal PPM configuration file to STDOUT</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>help [command]</b></td>
+    <td bgcolor="#E5E4F0">lists available commands, or help on 'command'.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>info [package1...]</b></td>
+    <td bgcolor="#E5E4F0">prints a summary of installed packages.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>install package1 [package2...]</b></td>
+    <td bgcolor="#E5E4F0">installs specified packages.</td>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>quit</b></td>
+    <td bgcolor="#E5E4F0">exits the program.</td>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>query [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists installed packages, or packages containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>query /abstract [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists descriptions of installed packages, or package
+      descriptions containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>remove package1 [package2...]</b></td>
+    <td bgcolor="#E5E4F0">removes the specified packages from the system.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>search [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists available packages, or packages containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>search /abstract [pattern]</b></td>
+    <td bgcolor="#E5E4F0">lists descriptions of available packages, or package
+      descriptions containing <code>pattern</code>.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>set</b></td>
+    <td bgcolor="#E5E4F0">set/display current options.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>set save</b></td>
+    <td bgcolor="#E5E4F0">save current options.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>summary [package1...]</b></td>
+    <td bgcolor="#E5E4F0">prints a summary of available packages.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>verify [package1...]</b></td>
+    <td bgcolor="#E5E4F0">verifies currently installed packages are up to date.</td>
+  </tr>
+  <tr>
+    <td bgcolor="#D4F4A0"><b>verify /upgrade [package1...]</b></td>
+    <td bgcolor="#E5E4F0">installs available package upgrades.</td>
+</table>
+<p>&nbsp;</p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td class="block" valign="MIDDLE" width="100%" bgcolor="#cccccc"><strong>
+      <p class="block">&nbsp;PPM</p>
+      </strong></td>
+  </tr>
+</table>
+
+</body>

@@ -1,0 +1,197 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Cmd - Network Command class</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Cmd - Network Command class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#user methods">USER METHODS</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Cmd - Network Command class (as used by FTP, SMTP etc)</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::Cmd;
+</PRE>
+<PRE>
+
+    @ISA = qw(Net::Cmd);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::Cmd</CODE> is a collection of methods that can be inherited by a sub class
+of <CODE>IO::Handle</CODE>. These methods implement the functionality required for a
+command based protocol, for example FTP and SMTP.</P>
+<P>
+<HR>
+<H1><A NAME="user methods">USER METHODS</A></H1>
+<P>These methods provide a user interface to the <CODE>Net::Cmd</CODE> object.</P>
+<DL>
+<DT><STRONG><A NAME="item_debug">debug ( VALUE )</A></STRONG><BR>
+<DD>
+Set the level of debug information for this object. If <CODE>VALUE</CODE> is not given
+then the current state is returned. Otherwise the state is changed to 
+<CODE>VALUE</CODE> and the previous state returned.
+<P>Set the level of debug information for this object. If no argument is
+given then the current state is returned. Otherwise the state is
+changed to <CODE>$value</CODE>and the previous state returned.  Different packages
+may implement different levels of debug but, a  non-zero value result in
+copies of all commands and responses also being sent to STDERR.</P>
+<P>If <CODE>VALUE</CODE> is <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> then the debug level will be set to the default
+debug level for the class.</P>
+<P>This method can also be called as a <EM>static</EM> method to set/get the default
+debug level for a given class.</P>
+<P></P>
+<DT><STRONG><A NAME="item_message">message ()</A></STRONG><BR>
+<DD>
+Returns the text message returned from the last command
+<P></P>
+<DT><STRONG><A NAME="item_code">code ()</A></STRONG><BR>
+<DD>
+Returns the 3-digit code from the last command. If a command is pending
+then the value 0 is returned
+<P></P>
+<DT><STRONG><A NAME="item_ok">ok ()</A></STRONG><BR>
+<DD>
+Returns non-zero if the last code value was greater than zero and
+less than 400. This holds true for most command servers. Servers
+where this does not hold may override this method.
+<P></P>
+<DT><STRONG><A NAME="item_status">status ()</A></STRONG><BR>
+<DD>
+Returns the most significant digit of the current status code. If a command
+is pending then <CODE>CMD_PENDING</CODE> is returned.
+<P></P>
+<DT><STRONG><A NAME="item_datasend">datasend ( DATA )</A></STRONG><BR>
+<DD>
+Send data to the remote server, converting LF to CRLF. Any line starting
+with a '.' will be prefixed with another '.'.
+<CODE>DATA</CODE> may be an array or a reference to an array.
+<P></P>
+<DT><STRONG><A NAME="item_dataend">dataend ()</A></STRONG><BR>
+<DD>
+End the sending of data to the remote server. This is done by ensuring that
+the data already sent ends with CRLF then sending '.CRLF' to end the
+transmission. Once this data has been sent <A HREF="#item_dataend"><CODE>dataend</CODE></A> calls <A HREF="#item_response"><CODE>response</CODE></A> and
+returns true if <A HREF="#item_response"><CODE>response</CODE></A> returns CMD_OK.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<P>These methods are not intended to be called by the user, but used or 
+over-ridden by a sub-class of <CODE>Net::Cmd</CODE></P>
+<DL>
+<DT><STRONG><A NAME="item_debug_print">debug_print ( DIR, TEXT )</A></STRONG><BR>
+<DD>
+Print debugging information. <CODE>DIR</CODE> denotes the direction <EM>true</EM> being
+data being sent to the server. Calls <A HREF="#item_debug_text"><CODE>debug_text</CODE></A> before printing to
+STDERR.
+<P></P>
+<DT><STRONG><A NAME="item_debug_text">debug_text ( TEXT )</A></STRONG><BR>
+<DD>
+This method is called to print debugging information. TEXT is
+the text being sent. The method should return the text to be printed
+<P>This is primarily meant for the use of modules such as FTP where passwords
+are sent, but we do not want to display them in the debugging information.</P>
+<P></P>
+<DT><STRONG><A NAME="item_command">command ( CMD [, ARGS, ... ])</A></STRONG><BR>
+<DD>
+Send a command to the command server. All arguments a first joined with
+a space character and CRLF is appended, this string is then sent to the
+command server.
+<P>Returns undef upon failure</P>
+<P></P>
+<DT><STRONG><A NAME="item_unsupported">unsupported ()</A></STRONG><BR>
+<DD>
+Sets the status code to 580 and the response text to 'Unsupported command'.
+Returns zero.
+<P></P>
+<DT><STRONG><A NAME="item_response">response ()</A></STRONG><BR>
+<DD>
+Obtain a response from the server. Upon success the most significant digit
+of the status code is returned. Upon failure, timeout etc., <EM>undef</EM> is
+returned.
+<P></P>
+<DT><STRONG><A NAME="item_parse_response">parse_response ( TEXT )</A></STRONG><BR>
+<DD>
+This method is called by <A HREF="#item_response"><CODE>response</CODE></A> as a method with one argument. It should
+return an array of 2 values, the 3-digit status code and a flag which is true
+when this is part of a multi-line response and this line is not the list.
+<P></P>
+<DT><STRONG><A NAME="item_getline">getline ()</A></STRONG><BR>
+<DD>
+Retrieve one line, delimited by CRLF, from the remote server. Returns <EM>undef</EM>
+upon failure.
+<P><STRONG>NOTE</STRONG>: If you do use this method for any reason, please remember to add
+some <A HREF="#item_debug_print"><CODE>debug_print</CODE></A> calls into your method.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ungetline">ungetline ( TEXT )</A></STRONG><BR>
+<DD>
+Unget a line of text from the server.
+<P></P>
+<DT><STRONG><A NAME="item_read_until_dot">read_until_dot ()</A></STRONG><BR>
+<DD>
+Read data from the remote server until a line consisting of a single '.'.
+Any lines starting with '..' will have one of the '.'s removed.
+<P>Returns a reference to a list containing the lines, or <EM>undef</EM> upon failure.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P><CODE>Net::Cmd</CODE> exports six subroutines, five of these, <CODE>CMD_INFO</CODE>, <CODE>CMD_OK</CODE>,
+<CODE>CMD_MORE</CODE>, <CODE>CMD_REJECT</CODE> and <CODE>CMD_ERROR</CODE> ,correspond to possible results
+of <A HREF="#item_response"><CODE>response</CODE></A> and <A HREF="#item_status"><CODE>status</CODE></A>. The sixth is <CODE>CMD_PENDING</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Cmd - Network Command class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

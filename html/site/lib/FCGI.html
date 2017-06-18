@@ -1,0 +1,183 @@
+<HTML>
+<HEAD>
+<TITLE>FCGI - Fast CGI module</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;FCGI - Fast CGI module</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>FCGI - Fast CGI module</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use FCGI;</PRE>
+<PRE>
+    my $count = 0;
+    my $request = FCGI::Request();</PRE>
+<PRE>
+    while($request-&gt;Accept() &gt;= 0) {
+        print(&quot;Content-type: text/html\r\n\r\n&quot;, ++$count);
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Functions:</P>
+<DL>
+<DT><STRONG><A NAME="item_FCGI%3A%3ARequest">FCGI::Request</A></STRONG><BR>
+<DD>
+Creates a request handle. It has the following optional parameters:
+<DL>
+<DT><STRONG><A NAME="item_handle">input perl file handle (default: \*STDIN)</A></STRONG><BR>
+<DD>
+<DT><STRONG>output perl file handle (default: \*STDOUT)</STRONG><BR>
+<DD>
+<DT><STRONG>error perl file handle (default: \*STDERR)</STRONG><BR>
+<DD>
+These filehandles will be setup to act as input/output/error
+on succesful Accept.
+<P></P>
+<DT><STRONG><A NAME="item_reference">environment hash reference (default: \%ENV)</A></STRONG><BR>
+<DD>
+The hash will be populated with the environment.
+<P></P>
+<DT><STRONG><A NAME="item_socket">socket (default: 0)</A></STRONG><BR>
+<DD>
+Socket to communicate with the server.
+Can be the result of the OpenSocket function.
+For the moment, it's the file descriptor of the socket
+that should be passed. This may change in the future.
+<P>You should only use your own socket if your program
+is not started by a process manager such as mod_fastcgi
+(except for the FastCgiExternalServer case) or cgi-fcgi.
+If you use the option, you have to let your FastCGI
+server know which port (and possibly server) your program
+is listening on.
+See remote.pl for an example.</P>
+<P></P>
+<DT><STRONG><A NAME="item_flags">flags (default: 0)</A></STRONG><BR>
+<DD>
+Possible values:
+<DL>
+<DT><STRONG><A NAME="item_FCGI%3A%3AFAIL_ACCEPT_ON_INTR">FCGI::FAIL_ACCEPT_ON_INTR</A></STRONG><BR>
+<DD>
+If set, Accept will fail if interrupted.
+It not set, it will just keep on waiting.
+<P></P></DL>
+</DL>
+<P>Example usage:
+    my $req = FCGI::Request;</P>
+<P>or:
+    my %env;
+    my $in = new IO::Handle;
+    my $out = new IO::Handle;
+    my $err = new IO::Handle;
+    my $req = FCGI::Request($in, $out, $err, \%env);</P>
+<DT><STRONG><A NAME="item_OpenSocket">FCGI::OpenSocket(path, backlog)</A></STRONG><BR>
+<DD>
+Creates a socket suitable to use as an argument to Request.
+<DL>
+<DT><STRONG><A NAME="item_path">path</A></STRONG><BR>
+<DD>
+Pathname of socket or colon followed by local tcp port.
+Note that some systems take file permissions into account
+on Unix domain sockets, so you'll have to make sure that
+the server can write to the created file, by changing
+the umask before the call and/or changing permissions and/or
+group of the file afterwards.
+<P></P>
+<DT><STRONG><A NAME="item_backlog">backlog</A></STRONG><BR>
+<DD>
+Maximum length of the queue of pending connections.
+If a connection
+request arrives with the queue full the client may receive
+an  error  with  an  indication of ECONNREFUSED.
+<P></P></DL>
+<DT><STRONG><A NAME="item_CloseSocket">FCGI::CloseSocket(socket)</A></STRONG><BR>
+<DD>
+Close a socket opened with OpenSocket.
+<P></P>
+<DT><STRONG><A NAME="item_Accept">$req-&gt;<CODE>Accept()</CODE></A></STRONG><BR>
+<DD>
+Accepts a connection on $req, attaching the filehandles and
+populating the environment hash.
+Returns 0 on success.
+If a connection has been accepted before, the old
+one will be finished first.
+<P>Note that unlike with the old interface, no die and warn
+handlers are installed by default. This means that if
+you are not running an sfio enabled perl, any warn or
+die message will not end up in the server's log by default.
+It is advised you set up die and warn handlers yourself.
+FCGI.pm contains an example of die and warn handlers.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Finish">$req-&gt;<CODE>Finish()</CODE></A></STRONG><BR>
+<DD>
+Finishes accepted connection.
+Also detaches filehandles.
+<P></P>
+<DT><STRONG><A NAME="item_Flush">$req-&gt;<CODE>Flush()</CODE></A></STRONG><BR>
+<DD>
+Flushes accepted connection.
+<P></P>
+<DT><STRONG><A NAME="item_Detach">$req-&gt;<CODE>Detach()</CODE></A></STRONG><BR>
+<DD>
+Temporarily detaches filehandles on an accepted connection.
+<P></P>
+<DT><STRONG><A NAME="item_Attach">$req-&gt;<CODE>Attach()</CODE></A></STRONG><BR>
+<DD>
+Re-attaches filehandles on an accepted connection.
+<P></P>
+<DT><STRONG><A NAME="item_LastCall">$req-&gt;<CODE>LastCall()</CODE></A></STRONG><BR>
+<DD>
+Tells the library not to accept any more requests on this handle.
+It should be safe to call this method from signal handlers.
+<P>Note that this method is still experimental and everything
+about it, including its name, is subject to change.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetEnvironment">$env = $req-&gt;<CODE>GetEnvironment()</CODE></A></STRONG><BR>
+<DD>
+Returns the environment parameter passed to FCGI::Request.
+<P></P>
+<DT><STRONG><A NAME="item_GetHandles">($in, $out, $err) = $req-&gt;<CODE>GetHandles()</CODE></A></STRONG><BR>
+<DD>
+Returns the file handle parameters passed to FCGI::Request.
+<P></P>
+<DT><STRONG><A NAME="item_IsFastCGI">$isfcgi = $req-&gt;<CODE>IsFastCGI()</CODE></A></STRONG><BR>
+<DD>
+Returns whether or not the program was run as a FastCGI.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Sven Verdoolaege &lt;<A HREF="mailto:skimo@kotnet.org">skimo@kotnet.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;FCGI - Fast CGI module</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Test::Harness::Straps - detailed analysis of test results</title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Test::Harness::Straps - detailed analysis of test results</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#construction">Construction</a></li>
+		<li><a href="#analysis">Analysis</a></li>
+		<li><a href="#parsing">Parsing</a></li>
+		<li><a href="#results">Results</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Test::Harness::Straps - detailed analysis of test results</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Test::Harness::Straps;</pre>
+<pre>
+  my $strap = Test::Harness::Straps-&gt;new;</pre>
+<pre>
+  # Various ways to interpret a test
+  my %results = $strap-&gt;analyze($name, \@test_output);
+  my %results = $strap-&gt;analyze_fh($name, $test_filehandle);
+  my %results = $strap-&gt;analyze_file($test_file);</pre>
+<pre>
+  # UNIMPLEMENTED
+  my %total = $strap-&gt;total_results;</pre>
+<pre>
+  # Altering the behavior of the strap  UNIMPLEMENTED
+  my $verbose_output = $strap-&gt;dump_verbose();
+  $strap-&gt;dump_verbose_fh($output_filehandle);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>THIS IS ALPHA SOFTWARE</strong> in that the interface is subject to change
+in incompatible ways.  It is otherwise stable.</p>
+<p>Test::Harness is limited to printing out its results.  This makes
+analysis of the test results difficult for anything but a human.  To
+make it easier for programs to work with test results, we provide
+Test::Harness::Straps.  Instead of printing the results, straps
+provide them as raw data.  You can also configure how the tests are to
+be run.</p>
+<p>The interface is currently incomplete.  <em>Please</em> contact the author
+if you'd like a feature added or something change or just have
+comments.</p>
+<p>
+</p>
+<h2><a name="construction">Construction</a></h2>
+<dl>
+<dt><strong><a name="item_new"><strong>new</strong></a></strong><br />
+</dt>
+<dd>
+<pre>
+  my $strap = Test::Harness::Straps-&gt;new;</pre>
+</dd>
+<dd>
+<p>Initialize a new strap.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="analysis">Analysis</a></h2>
+<dl>
+<dt><strong><a name="item_analyze"><strong>analyze</strong></a></strong><br />
+</dt>
+<dd>
+<pre>
+  my %results = $strap-&gt;analyze($name, \@test_output);</pre>
+</dd>
+<dd>
+<p>Analyzes the output of a single test, assigning it the given $name for
+use in the total report.  Returns the %results of the test.  See
+<em>Results</em>.</p>
+</dd>
+<dd>
+<p>@test_output should be the raw output from the test, including newlines.</p>
+</dd>
+<dt><strong><a name="item_analyze_fh"><strong>analyze_fh</strong></a></strong><br />
+</dt>
+<dd>
+<pre>
+  my %results = $strap-&gt;analyze_fh($name, $test_filehandle);</pre>
+</dd>
+<dd>
+<p>Like <a href="#item_analyze"><code>analyze</code></a>, but it reads from the given filehandle.</p>
+</dd>
+<dt><strong><a name="item_analyze_file"><strong>analyze_file</strong></a></strong><br />
+</dt>
+<dd>
+<pre>
+  my %results = $strap-&gt;analyze_file($test_file);</pre>
+</dd>
+<dd>
+<p>Like <a href="#item_analyze"><code>analyze</code></a>, but it runs the given $test_file and parses it's
+results.  It will also use that name for the total report.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="results">Results</a></h2>
+<p>The %results returned from <a href="#item_analyze"><code>analyze()</code></a> contain the following information:</p>
+<pre>
+  passing           true if the whole test is considered a pass 
+                    (or skipped), false if its a failure</pre>
+<pre>
+  exit              the exit code of the test run, if from a file
+  wait              the wait code of the test run, if from a file</pre>
+<pre>
+  max               total tests which should have been run
+  seen              total tests actually seen
+  skip_all          if the whole test was skipped, this will 
+                      contain the reason.</pre>
+<pre>
+  ok                number of tests which passed 
+                      (including todo and skips)</pre>
+<pre>
+  todo              number of todo tests seen
+  bonus             number of todo tests which 
+                      unexpectedly passed</pre>
+<pre>
+  skip              number of tests skipped</pre>
+<p>So a successful test should have max == seen == ok.</p>
+<p>There is one final item, the details.</p>
+<pre>
+  details           an array ref reporting the result of 
+                    each test looks like this:</pre>
+<pre>
+    $results{details}[$test_num - 1] = 
+            { ok        =&gt; is the test considered ok?
+              actual_ok =&gt; did it literally say 'ok'?
+              name      =&gt; name of the test (if any)
+              type      =&gt; 'skip' or 'todo' (if any)
+              reason    =&gt; reason for the above (if any)
+            };</pre>
+<p>Element 0 of the details is test #1.  I tried it with element 1 being
+#1 and 0 being empty, this is less awkward.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>See <em>examples/mini_harness.plx</em> for an example of use.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Michael G Schwern &lt;<a href="mailto:schwern@pobox.com">schwern@pobox.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../lib/Test/Harness.html">the Test::Harness manpage</a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Test::Harness::Straps - detailed analysis of test results</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Domain - Attempt to evaluate the current host's internet name and domain</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Domain - Attempt to evaluate the current host's internet name and domain</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Domain - Attempt to evaluate the current host's internet name and domain</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::Domain qw(hostname hostfqdn hostdomain);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Using various methods <STRONG>attempt</STRONG> to find the Fully Qualified Domain Name (FQDN)
+of the current host. From this determine the host-name and the host-domain.</P>
+<P>Each of the functions will return <EM>undef</EM> if the FQDN cannot be determined.</P>
+<DL>
+<DT><STRONG><A NAME="item_hostfqdn">hostfqdn ()</A></STRONG><BR>
+<DD>
+Identify and return the FQDN of the current host.
+<P></P>
+<DT><STRONG><A NAME="item_hostname">hostname ()</A></STRONG><BR>
+<DD>
+Returns the smallest part of the FQDN which can be used to identify the host.
+<P></P>
+<DT><STRONG><A NAME="item_hostdomain">hostdomain ()</A></STRONG><BR>
+<DD>
+Returns the remainder of the FQDN after the <EM>hostname</EM> has been removed.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;.
+Adapted from Sys::Hostname by David Sundstrom &lt;<A HREF="mailto:sunds@asictest.sc.ti.com">sunds@asictest.sc.ti.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Domain - Attempt to evaluate the current host's internet name and domain</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

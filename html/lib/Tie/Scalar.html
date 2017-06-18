@@ -1,0 +1,116 @@
+
+<HTML>
+<HEAD>
+<TITLE>Tie::StdScalar - base class definitions for tied scalars</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::StdScalar - base class definitions for tied scalars</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#more information">MORE INFORMATION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Tie::Scalar, Tie::StdScalar - base class definitions for tied scalars</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    package NewScalar;
+    require Tie::Scalar;</PRE>
+<PRE>
+    @ISA = (Tie::Scalar);</PRE>
+<PRE>
+    sub FETCH { ... }           # Provide a needed method
+    sub TIESCALAR { ... }       # Overrides inherited method</PRE>
+<PRE>
+    package NewStdScalar;
+    require Tie::Scalar;</PRE>
+<PRE>
+    @ISA = (Tie::StdScalar);</PRE>
+<PRE>
+    # All methods provided by default, so define only what needs be overridden
+    sub FETCH { ... }</PRE>
+<PRE>
+    package main;</PRE>
+<PRE>
+    tie $new_scalar, 'NewScalar';
+    tie $new_std_scalar, 'NewStdScalar';</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides some skeletal methods for scalar-tying classes. See
+<A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> for a list of the functions required in tying a scalar to a
+package. The basic <STRONG>Tie::Scalar</STRONG> package provides a <CODE>new</CODE> method, as well
+as methods <CODE>TIESCALAR</CODE>, <CODE>FETCH</CODE> and <CODE>STORE</CODE>. The <STRONG>Tie::StdScalar</STRONG>
+package provides all the methods specified in  <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A>. It inherits from
+<STRONG>Tie::Scalar</STRONG> and causes scalars tied to it to behave exactly like the
+built-in scalars, allowing for selective overloading of methods. The <CODE>new</CODE>
+method is provided as a means of grandfathering, for classes that forget to
+provide their own <CODE>TIESCALAR</CODE> method.</P>
+<P>For developers wishing to write their own tied-scalar classes, the methods
+are summarized below. The <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> section not only documents these, but
+has sample code as well:</P>
+<DL>
+<DT><STRONG><A NAME="item_TIESCALAR_classname%2C_LIST">TIESCALAR classname, LIST</A></STRONG><BR>
+<DD>
+The method invoked by the command <CODE>tie $scalar, classname</CODE>. Associates a new
+scalar instance with the specified class. <CODE>LIST</CODE> would represent additional
+arguments (along the lines of <A HREF="../../lib/AnyDBM_File.html">the AnyDBM_File manpage</A> and compatriots) needed to
+complete the association.
+<P></P>
+<DT><STRONG><A NAME="item_FETCH_this">FETCH this</A></STRONG><BR>
+<DD>
+Retrieve the value of the tied scalar referenced by <EM>this</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_STORE_this%2C_value">STORE this, value</A></STRONG><BR>
+<DD>
+Store data <EM>value</EM> in the tied scalar referenced by <EM>this</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_DESTROY_this">DESTROY this</A></STRONG><BR>
+<DD>
+Free the storage associated with the tied scalar referenced by <EM>this</EM>.
+This is rarely needed, as Perl manages its memory quite well. But the
+option exists, should a class wish to perform specific actions upon the
+destruction of an instance.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="more information">MORE INFORMATION</A></H1>
+<P>The <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A> section uses a good example of tying scalars by associating
+process IDs with priority.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Tie::StdScalar - base class definitions for tied scalars</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

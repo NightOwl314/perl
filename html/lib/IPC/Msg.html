@@ -1,0 +1,153 @@
+
+<HTML>
+<HEAD>
+<TITLE>IPC::Msg - SysV Msg IPC object class</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IPC::Msg - SysV Msg IPC object class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IPC::Msg - SysV Msg IPC object class</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IPC::SysV qw(IPC_PRIVATE S_IRWXU);
+    use IPC::Msg;</PRE>
+<PRE>
+    $msg = new IPC::Msg(IPC_PRIVATE, S_IRWXU);</PRE>
+<PRE>
+    $msg-&gt;snd(pack(&quot;l! a*&quot;,$msgtype,$msg));</PRE>
+<PRE>
+    $msg-&gt;rcv($buf,256);</PRE>
+<PRE>
+    $ds = $msg-&gt;stat;</PRE>
+<PRE>
+    $msg-&gt;remove;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( KEY , FLAGS )</A></STRONG><BR>
+<DD>
+Creates a new message queue associated with <CODE>KEY</CODE>. A new queue is
+created if
+<UL>
+<LI>
+<CODE>KEY</CODE> is equal to <CODE>IPC_PRIVATE</CODE>
+<P></P>
+<LI>
+<CODE>KEY</CODE> does not already  have  a  message queue
+associated with it, and <CODE>FLAGS &amp; IPC_CREAT</CODE> is true.
+<P></P></UL>
+<P>On creation of a new message queue <CODE>FLAGS</CODE> is used to set the
+permissions.</P>
+<DT><STRONG><A NAME="item_id">id</A></STRONG><BR>
+<DD>
+Returns the system message queue identifier.
+<P></P>
+<DT><STRONG><A NAME="item_rcv">rcv ( BUF, LEN [, TYPE [, FLAGS ]] )</A></STRONG><BR>
+<DD>
+Read a message from the queue. Returns the type of the message read.
+See <A HREF="../../lib/Pod/perlfunc.html#item_msgrcv">msgrcv</A>.  The  BUF becomes tainted.
+<P></P>
+<DT><STRONG><A NAME="item_remove">remove</A></STRONG><BR>
+<DD>
+Remove and destroy the message queue from the system.
+<P></P>
+<DT><STRONG><A NAME="item_set">set ( STAT )</A></STRONG><BR>
+<DD>
+<DT><STRONG>set ( NAME =&gt; VALUE [, NAME =&gt; VALUE ...] )</STRONG><BR>
+<DD>
+<A HREF="#item_set"><CODE>set</CODE></A> will set the following values of the <A HREF="#item_stat"><CODE>stat</CODE></A> structure associated
+with the message queue.
+<PRE>
+    uid
+    gid
+    mode (oly the permission bits)
+    qbytes</PRE>
+<P><A HREF="#item_set"><CODE>set</CODE></A> accepts either a stat object, as returned by the <A HREF="#item_stat"><CODE>stat</CODE></A> method,
+or a list of <EM>name</EM>-<EM>value</EM> pairs.</P>
+<P></P>
+<DT><STRONG><A NAME="item_snd">snd ( TYPE, MSG [, FLAGS ] )</A></STRONG><BR>
+<DD>
+Place a message on the queue with the data from <CODE>MSG</CODE> and with type <CODE>TYPE</CODE>.
+See <A HREF="../../lib/Pod/perlfunc.html#item_msgsnd">msgsnd</A>.
+<P></P>
+<DT><STRONG><A NAME="item_stat">stat</A></STRONG><BR>
+<DD>
+Returns an object of type <CODE>IPC::Msg::stat</CODE> which is a sub-class of
+<CODE>Class::Struct</CODE>. It provides the following fields. For a description
+of these fields see you system documentation.
+<PRE>
+    uid
+    gid
+    cuid
+    cgid
+    mode
+    qnum
+    qbytes
+    lspid
+    lrpid
+    stime
+    rtime
+    ctime</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/IPC/SysV.html">the IPC::SysV manpage</A> <A HREF="../../lib/Class/Struct.html">the Class::Struct manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IPC::Msg - SysV Msg IPC object class</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Encode::Alias - alias definitions to encodings</title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Encode::Alias - alias definitions to encodings</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#alias_overloading">Alias overloading</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Encode::Alias - alias definitions to encodings</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Encode;
+  use Encode::Alias;
+  define_alias( newName =&gt; ENCODING);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Allows newName to be used as an alias for ENCODING. ENCODING may be
+either the name of an encoding or an encoding object (as described 
+in <a href="../../lib/Encode.html">the Encode manpage</a>).</p>
+<p>Currently <em>newName</em> can be specified in the following ways:</p>
+<dl>
+<dt><strong><a name="item_as_a_simple_string%2e">As a simple string.</a></strong><br />
+</dt>
+<dt><strong><a name="item_as_a_qr%2f%2f_compiled_regular_expression%2c_e%2eg">As a qr// compiled regular expression, e.g.:</a></strong><br />
+</dt>
+<dd>
+<pre>
+  define_alias( qr/^iso8859-(\d+)$/i =&gt; '&quot;iso-8859-$1&quot;' );</pre>
+</dd>
+<dd>
+<p>In this case, if <em>ENCODING</em> is not a reference, it is <a href="../../lib/Pod/perlfunc.html#item_eval"><code>eval</code></a>-ed
+in order to allow <code>$1</code> etc. to be substituted.  The example is one
+way to alias names as used in X11 fonts to the MIME names for the
+iso-8859-* family.  Note the double quotes inside the single quotes.</p>
+</dd>
+<dd>
+<p>If you are using a regex here, you have to use the quotes as shown or
+it won't work.  Also note that regex handling is tricky even for the
+experienced.  Use it with caution.</p>
+</dd>
+<dt><strong><a name="item_as_a_code_reference%2c_e%2eg%2e%3a">As a code reference, e.g.:</a></strong><br />
+</dt>
+<dd>
+<pre>
+  define_alias( sub { return /^iso8859-(\d+)$/i ? &quot;iso-8859-$1&quot; : undef } , '');</pre>
+</dd>
+<dd>
+<p>In this case, <a href="../../lib/Pod/perlvar.html#item_%24_"><code>$_</code></a> will be set to the name that is being looked up and
+<em>ENCODING</em> is passed to the sub as its first argument.  The example
+is another way to alias names as used in X11 fonts to the MIME names
+for the iso-8859-* family.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="alias_overloading">Alias overloading</a></h2>
+<p>You can override predefined aliases by simply applying define_alias().
+The new alias is always evaluated first, and when neccessary,
+<code>define_alias()</code> flushes the internal cache to make the new definition
+available.</p>
+<pre>
+  # redirect SHIFT_JIS to MS/IBM Code Page 932, which is a
+  # superset of SHIFT_JIS</pre>
+<pre>
+  define_alias( qr/shift.*jis$/i  =&gt; '&quot;cp932&quot;' );
+  define_alias( qr/sjis$/i        =&gt; '&quot;cp932&quot;' );</pre>
+<p>If you want to zap all predefined aliases, you can use</p>
+<pre>
+  Encode::Alias-&gt;undef_aliases;</pre>
+<p>to do so.  And</p>
+<pre>
+  Encode::Alias-&gt;init_aliases;</pre>
+<p>gets the factory settings back.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../lib/Encode.html">the Encode manpage</a>, <a href="../../lib/Encode/Supported.html">the Encode::Supported manpage</a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Encode::Alias - alias definitions to encodings</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

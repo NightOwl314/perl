@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ExtUtils::MM_Any - Platform agnostic MM methods</title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ExtUtils::MM_Any - Platform agnostic MM methods</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#inherently_crossplatform_methods">Inherently Cross-Platform Methods</a></li>
+	<ul>
+
+		<li><a href="#file::spec_wrappers_deprecated">File::Spec wrappers  <strong>DEPRECATED</strong></a></li>
+	</ul>
+
+	<li><a href="#thought_to_be_crossplatform_methods">Thought To Be Cross-Platform Methods</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>ExtUtils::MM_Any - Platform agnostic MM methods</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  FOR INTERNAL USE ONLY!</pre>
+<pre>
+  package ExtUtils::MM_SomeOS;</pre>
+<pre>
+  # Temporarily, you have to subclass both.  Put MM_Any first.
+  require ExtUtils::MM_Any;
+  require ExtUtils::MM_Unix;
+  @ISA = qw(ExtUtils::MM_Any ExtUtils::Unix);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>FOR INTERNAL USE ONLY!</strong></p>
+<p>ExtUtils::MM_Any is a superclass for the ExtUtils::MM_* set of
+modules.  It contains methods which are either inherently
+cross-platform or are written in a cross-platform manner.</p>
+<p>Subclass off of ExtUtils::MM_Any <em>and</em> ExtUtils::MM_Unix.  This is a
+temporary solution.</p>
+<p><strong>THIS MAY BE TEMPORARY!</strong></p>
+<p>
+</p>
+<hr />
+<h1><a name="inherently_crossplatform_methods">Inherently Cross-Platform Methods</a></h1>
+<p>These are methods which are by their nature cross-platform and should
+always be cross-platform.</p>
+<p>
+</p>
+<h2><a name="file::spec_wrappers_deprecated">File::Spec wrappers  <strong>DEPRECATED</strong></a></h2>
+<p>The following methods are deprecated wrappers around File::Spec
+functions.  They exist from before File::Spec did and in fact are from
+which File::Spec sprang.</p>
+<p>They are all deprecated.  Please use File::Spec directly.</p>
+<dl>
+<dt><strong><a name="item_canonpath">canonpath</a></strong><br />
+</dt>
+<dt><strong><a name="item_catdir">catdir</a></strong><br />
+</dt>
+<dt><strong><a name="item_catfile">catfile</a></strong><br />
+</dt>
+<dt><strong><a name="item_curdir">curdir</a></strong><br />
+</dt>
+<dt><strong><a name="item_file_name_is_absolute">file_name_is_absolute</a></strong><br />
+</dt>
+<dt><strong><a name="item_path">path</a></strong><br />
+</dt>
+<dt><strong><a name="item_rootdir">rootdir</a></strong><br />
+</dt>
+<dt><strong><a name="item_updir">updir</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="thought_to_be_crossplatform_methods">Thought To Be Cross-Platform Methods</a></h1>
+<p>These are methods which are thought to be cross-platform by virtue of
+having been written in a way to avoid incompatibilities.</p>
+<dl>
+<dt><strong><a name="item_test_via_harness">test_via_harness</a></strong><br />
+</dt>
+<dd>
+<pre>
+  my $command = $mm-&gt;test_via_harness($perl, $tests);</pre>
+</dd>
+<dd>
+<p>Returns a $command line which runs the given set of $tests with
+Test::Harness and the given $perl.</p>
+</dd>
+<dd>
+<p>Used on the t/*.t files.</p>
+</dd>
+<dt><strong><a name="item_test_via_script">test_via_script</a></strong><br />
+</dt>
+<dd>
+<pre>
+  my $command = $mm-&gt;test_via_script($perl, $script);</pre>
+</dd>
+<dd>
+<p>Returns a $command line which just runs a single test without
+Test::Harness.  No checks are done on the results, they're just
+printed.</p>
+</dd>
+<dd>
+<p>Used for test.pl, since they don't always follow Test::Harness
+formatting.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Michael G Schwern &lt;<a href="mailto:schwern@pobox.com">schwern@pobox.com</a>&gt; with code from ExtUtils::MM_Unix
+and ExtUtils::MM_Win32.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ExtUtils::MM_Any - Platform agnostic MM methods</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

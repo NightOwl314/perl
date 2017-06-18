@@ -1,0 +1,102 @@
+
+<HTML>
+<HEAD>
+<TITLE>URI::data - URI that contain immediate data</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::data - URI that contain immediate data</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>URI::data - URI that contain immediate data</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use URI;</PRE>
+<PRE>
+ $u = URI-&gt;new(&quot;data:&quot;);
+ $u-&gt;media_type(&quot;image/gif&quot;);
+ $u-&gt;data(scalar(`cat camel.gif`));
+ print &quot;$u\n&quot;;
+ open(XV, &quot;|xv -&quot;) and print XV $u-&gt;data;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>URI::data</CODE> class supports <CODE>URI</CODE> objects belonging to the <EM>data</EM>
+URI scheme.  The <EM>data</EM> URI scheme is specified in RFC 2397.  It
+allows inclusion of small data items as ``immediate'' data, as if it had
+been included externally.  Examples:</P>
+<PRE>
+  data:,Perl%20is%20good</PRE>
+<PRE>
+  data:image/gif;base64,R0lGODdhIAAgAIAAAAAAAPj8+CwAAAAAI
+    AAgAAAClYyPqcu9AJyCjtIKc5w5xP14xgeO2tlY3nWcajmZZdeJcG
+    Kxrmimms1KMTa1Wg8UROx4MNUq1HrycMjHT9b6xKxaFLM6VRKzI+p
+    KS9XtXpcbdun6uWVxJXA8pNPkdkkxhxc21LZHFOgD2KMoQXa2KMWI
+    JtnE2KizVUkYJVZZ1nczBxXlFopZBtoJ2diXGdNUymmJdFMAADs=</PRE>
+<P><CODE>URI</CODE> objects belonging to the data scheme support the common methods
+(described in <A HREF="../../../site/lib/URI.html">the URI manpage</A>) and the following two scheme specific methods:</P>
+<DL>
+<DT><STRONG><A NAME="item_media_type">$uri-&gt;media_type( [$new_media_type] )</A></STRONG><BR>
+<DD>
+This method can be used to get or set the media type specified in the
+URI.  If no media type is specified, then the default
+<CODE>&quot;text/plain;charset=US-ASCII&quot;</CODE> is returned.
+<P></P>
+<DT><STRONG><A NAME="item_data">$uri-&gt;data( [$new_data] )</A></STRONG><BR>
+<DD>
+This method can be used to get or set the data contained in the URI.
+The data is passed unescaped (in binary form).  The decision about
+whether to base64 encode the data in the URI is taken automatically
+based on what encoding produces the shortest URI string.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/URI.html">the URI manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;URI::data - URI that contain immediate data</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

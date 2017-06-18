@@ -1,0 +1,95 @@
+
+<HTML>
+<HEAD>
+<TITLE>MIME::QuotedPrint - Encoding and decoding of quoted-printable strings</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;MIME::QuotedPrint - Encoding and decoding of quoted-printable strings</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>MIME::QuotedPrint - Encoding and decoding of quoted-printable strings</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use MIME::QuotedPrint;</PRE>
+<PRE>
+ $encoded = encode_qp($decoded);
+ $decoded = decode_qp($encoded);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides functions to encode and decode strings into the
+Quoted-Printable encoding specified in RFC 2045 - <EM>MIME (Multipurpose
+Internet Mail Extensions)</EM>.  The Quoted-Printable encoding is intended
+to represent data that largely consists of bytes that correspond to
+printable characters in the ASCII character set.  Non-printable
+characters (as defined by english americans) are represented by a
+triplet consisting of the character ``='' followed by two hexadecimal
+digits.</P>
+<P>The following functions are provided:</P>
+<DL>
+<DT><STRONG><A NAME="item_encode_qp"><CODE>encode_qp($str)</CODE></A></STRONG><BR>
+<DD>
+This function will return an encoded version of the string given as
+argument.
+<P>Note that <A HREF="#item_encode_qp"><CODE>encode_qp()</CODE></A> does not change newlines <CODE>&quot;\n&quot;</CODE> to the CRLF
+sequence even though this might be considered the right thing to do
+(RFC 2045 (Q-P Rule #4)).</P>
+<P></P>
+<DT><STRONG><A NAME="item_decode_qp">decode_qp($str);</A></STRONG><BR>
+<DD>
+This function will return the plain text version of the string given
+as argument.
+<P></P></DL>
+<P>If you prefer not to import these routines into your namespace you can
+call them as:</P>
+<PRE>
+  use MIME::QuotedPrint ();
+  $encoded = MIME::QuotedPrint::encode($decoded);
+  $decoded = MIME::QuotedPrint::decode($encoded);</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1997 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;MIME::QuotedPrint - Encoding and decoding of quoted-printable strings</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,178 @@
+
+<HTML>
+<HEAD>
+<TITLE>File::Spec::Mac - File::Spec for MacOS</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Mac - File::Spec for MacOS</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>File::Spec::Mac - File::Spec for MacOS</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require File::Spec::Mac; # Done internally by File::Spec if needed</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Methods for manipulating file specifications.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_canonpath">canonpath</A></STRONG><BR>
+<DD>
+On MacOS, there's nothing to be done.  Returns what it's given.
+<P></P>
+<DT><STRONG><A NAME="item_catdir">catdir</A></STRONG><BR>
+<DD>
+Concatenate two or more directory names to form a complete path ending with 
+a directory.  Put a trailing : on the end of the complete path if there 
+isn't one, because that's what's done in MacPerl's environment.
+<P>The fundamental requirement of this routine is that</P>
+<PRE>
+          File::Spec-&gt;catdir(split(&quot;:&quot;,$path)) eq $path</PRE>
+<P>But because of the nature of Macintosh paths, some additional 
+possibilities are allowed to make using this routine give reasonable results 
+for some common situations.  Here are the rules that are used.  Each 
+argument has its trailing ``:'' removed.  Each argument, except the first,
+has its leading ``:'' removed.  They are then joined together by a ``:''.</P>
+<P>So</P>
+<PRE>
+          File::Spec-&gt;catdir(&quot;a&quot;,&quot;b&quot;) = &quot;a:b:&quot;
+          File::Spec-&gt;catdir(&quot;a:&quot;,&quot;:b&quot;) = &quot;a:b:&quot;
+          File::Spec-&gt;catdir(&quot;a:&quot;,&quot;b&quot;) = &quot;a:b:&quot;
+          File::Spec-&gt;catdir(&quot;a&quot;,&quot;:b&quot;) = &quot;a:b&quot;
+          File::Spec-&gt;catdir(&quot;a&quot;,&quot;&quot;,&quot;b&quot;) = &quot;a::b&quot;</PRE>
+<P>etc.</P>
+<P>To get a relative path (one beginning with :), begin the first argument with :
+or put a ``'' as the first argument.</P>
+<P>If you don't want to worry about these rules, never allow a ``:'' on the ends 
+of any of the arguments except at the beginning of the first.</P>
+<P>Under MacPerl, there is an additional ambiguity.  Does the user intend that</P>
+<PRE>
+          File::Spec-&gt;catfile(&quot;LWP&quot;,&quot;Protocol&quot;,&quot;http.pm&quot;)</PRE>
+<P>be relative or absolute?  There's no way of telling except by checking for the
+existence of LWP: or :LWP, and even there he may mean a dismounted volume or
+a relative path in a different directory (like in @INC).   So those checks
+aren't done here. This routine will treat this as absolute.</P>
+<P></P>
+<DT><STRONG><A NAME="item_catfile">catfile</A></STRONG><BR>
+<DD>
+Concatenate one or more directory names and a filename to form a
+complete path ending with a filename.  Since this uses catdir, the
+same caveats apply.  Note that the leading : is removed from the filename,
+so that
+<PRE>
+          File::Spec-&gt;catfile($ENV{HOME},&quot;file&quot;);</PRE>
+<P>and</P>
+<PRE>
+          File::Spec-&gt;catfile($ENV{HOME},&quot;:file&quot;);</PRE>
+<P>give the same answer, as one might expect.</P>
+<P></P>
+<DT><STRONG><A NAME="item_curdir">curdir</A></STRONG><BR>
+<DD>
+Returns a string representing the current directory.
+<P></P>
+<DT><STRONG><A NAME="item_devnull">devnull</A></STRONG><BR>
+<DD>
+Returns a string representing the null device.
+<P></P>
+<DT><STRONG><A NAME="item_rootdir">rootdir</A></STRONG><BR>
+<DD>
+Returns a string representing the root directory.  Under MacPerl,
+returns the name of the startup volume, since that's the closest in
+concept, although other volumes aren't rooted there.
+<P></P>
+<DT><STRONG><A NAME="item_tmpdir">tmpdir</A></STRONG><BR>
+<DD>
+Returns a string representation of the first existing directory
+from the following list or '' if none exist:
+<PRE>
+    $ENV{TMPDIR}</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_updir">updir</A></STRONG><BR>
+<DD>
+Returns a string representing the parent directory.
+<P></P>
+<DT><STRONG><A NAME="item_file_name_is_absolute">file_name_is_absolute</A></STRONG><BR>
+<DD>
+Takes as argument a path and returns true, if it is an absolute path.  In 
+the case where a name can be either relative or absolute (for example, a 
+folder named ``HD'' in the current working directory on a drive named ``HD''), 
+relative wins.  Use ``:'' in the appropriate place in the path if you want to
+distinguish unambiguously.
+<P>As a special case, the file name '' is always considered to be absolute.</P>
+<P></P>
+<DT><STRONG><A NAME="item_path">path</A></STRONG><BR>
+<DD>
+Returns the null list for the MacPerl application, since the concept is 
+usually meaningless under MacOS. But if you're using the MacPerl tool under 
+MPW, it gives back $ENV{Commands} suitably split, as is done in 
+:lib:ExtUtils:MM_Mac.pm.
+<P></P>
+<DT><STRONG><A NAME="item_splitpath">splitpath</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_splitdir">splitdir</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_catpath">catpath</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_abs2rel">abs2rel</A></STRONG><BR>
+<DD>
+See <A HREF="../../../lib/File/Spec/Unix.html#abs2rel">abs2rel in the File::Spec::Unix manpage</A> for general documentation.
+<P>Unlike <CODE>File::Spec::Unix-</CODE>abs2rel()&gt;, this function will make
+checks against the local filesystem if necessary.  See
+<A HREF="#file_name_is_absolute">file_name_is_absolute</A> for details.</P>
+<P></P>
+<DT><STRONG><A NAME="item_rel2abs">rel2abs</A></STRONG><BR>
+<DD>
+See <A HREF="../../../lib/File/Spec/Unix.html#rel2abs">rel2abs in the File::Spec::Unix manpage</A> for general documentation.
+<P>Unlike <CODE>File::Spec::Unix-</CODE>rel2abs()&gt;, this function will make
+checks against the local filesystem if necessary.  See
+<A HREF="#file_name_is_absolute">file_name_is_absolute</A> for details.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/File/Spec.html">the File::Spec manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;File::Spec::Mac - File::Spec for MacOS</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

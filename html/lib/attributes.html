@@ -1,0 +1,324 @@
+
+<HTML>
+<HEAD>
+<TITLE>attributes - get/set subroutine or variable attributes</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;attributes - get/set subroutine or variable attributes</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#builtin attributes">Built-in Attributes</A></LI>
+		<LI><A HREF="#available subroutines">Available Subroutines</A></LI>
+		<LI><A HREF="#packagespecific attribute handling">Package-specific Attribute Handling</A></LI>
+		<LI><A HREF="#syntax of attribute lists">Syntax of Attribute Lists</A></LI>
+	</UL>
+
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<UL>
+
+		<LI><A HREF="#default exports">Default exports</A></LI>
+		<LI><A HREF="#available exports">Available exports</A></LI>
+		<LI><A HREF="#export tags defined">Export tags defined</A></LI>
+	</UL>
+
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>attributes - get/set subroutine or variable attributes</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  sub foo : method ;
+  my ($x,@y,%z) : Bent ;
+  my $s = sub : method { ... };</PRE>
+<PRE>
+  use attributes ();    # optional, to get subroutine declarations
+  my @attrlist = attributes::get(\&amp;foo);</PRE>
+<PRE>
+  use attributes 'get'; # import the attributes::get subroutine
+  my @attrlist = get \&amp;foo;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Subroutine declarations and definitions may optionally have attribute lists
+associated with them.  (Variable <A HREF="../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> declarations also may, but see the
+warning below.)  Perl handles these declarations by passing some information
+about the call site and the thing being declared along with the attribute
+list to this module.  In particular, the first example above is equivalent to
+the following:</P>
+<PRE>
+    use attributes __PACKAGE__, \&amp;foo, 'method';</PRE>
+<P>The second example in the synopsis does something equivalent to this:</P>
+<PRE>
+    use attributes __PACKAGE__, \$x, 'Bent';
+    use attributes __PACKAGE__, \@y, 'Bent';
+    use attributes __PACKAGE__, \%z, 'Bent';</PRE>
+<P>Yes, that's three invocations.</P>
+<P><STRONG>WARNING</STRONG>: attribute declarations for variables are an <EM>experimental</EM>
+feature.  The semantics of such declarations could change or be removed
+in future versions.  They are present for purposes of experimentation
+with what the semantics ought to be.  Do not rely on the current
+implementation of this feature.</P>
+<P>There are only a few attributes currently handled by Perl itself (or
+directly by this module, depending on how you look at it.)  However,
+package-specific attributes are allowed by an extension mechanism.
+(See <A HREF="#packagespecific attribute handling">Package-specific Attribute Handling</A> below.)</P>
+<P>The setting of attributes happens at compile time.  An attempt to set
+an unrecognized attribute is a fatal error.  (The error is trappable, but
+it still stops the compilation within that <A HREF="../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>.)  Setting an attribute
+with a name that's all lowercase letters that's not a built-in attribute
+(such as ``foo'')
+will result in a warning with <STRONG>-w</STRONG> or <CODE>use warnings 'reserved'</CODE>.</P>
+<P>
+<H2><A NAME="builtin attributes">Built-in Attributes</A></H2>
+<P>The following are the built-in attributes for subroutines:</P>
+<DL>
+<DT><STRONG><A NAME="item_locked">locked</A></STRONG><BR>
+<DD>
+Setting this attribute is only meaningful when the subroutine or
+method is to be called by multiple threads.  When set on a method
+subroutine (i.e., one marked with the <STRONG>method</STRONG> attribute below),
+Perl ensures that any invocation of it implicitly locks its first
+argument before execution.  When set on a non-method subroutine,
+Perl ensures that a lock is taken on the subroutine itself before
+execution.  The semantics of the lock are exactly those of one
+explicitly taken with the <A HREF="../lib/Pod/perlfunc.html#item_lock"><CODE>lock</CODE></A> operator immediately after the
+subroutine is entered.
+<P></P>
+<DT><STRONG><A NAME="item_method">method</A></STRONG><BR>
+<DD>
+Indicates that the referenced subroutine is a method.
+This has a meaning when taken together with the <STRONG>locked</STRONG> attribute,
+as described there.  It also means that a subroutine so marked
+will not trigger the ``Ambiguous call resolved as CORE::%s'' warning.
+<P></P>
+<DT><STRONG><A NAME="item_lvalue">lvalue</A></STRONG><BR>
+<DD>
+Indicates that the referenced subroutine is a valid lvalue and can
+be assigned to. The subroutine must return a modifiable value such
+as a scalar variable, as described in <A HREF="../lib/Pod/perlsub.html">the perlsub manpage</A>.
+<P></P></DL>
+<P>There are no built-in attributes for anything other than subroutines.</P>
+<P>
+<H2><A NAME="available subroutines">Available Subroutines</A></H2>
+<P>The following subroutines are available for general use once this module
+has been loaded:</P>
+<DL>
+<DT><STRONG><A NAME="item_get">get</A></STRONG><BR>
+<DD>
+This routine expects a single parameter--a reference to a
+subroutine or variable.  It returns a list of attributes, which may be
+empty.  If passed invalid arguments, it uses <A HREF="../lib/Pod/perlfunc.html#item_die"><CODE>die()</CODE></A> (via <A HREF="../lib/Carp.html">Carp::croak</A>)
+to raise a fatal exception.  If it can find an appropriate package name
+for a class method lookup, it will include the results from a
+<A HREF="#item_FETCH_type_ATTRIBUTES"><CODE>FETCH_type_ATTRIBUTES</CODE></A> call in its return list, as described in
+<A HREF="#packagespecific attribute handling">Package-specific Attribute Handling</A> below.
+Otherwise, only <A HREF="#builtin attributes">built-in attributes</A> will be returned.
+<P></P>
+<DT><STRONG><A NAME="item_reftype">reftype</A></STRONG><BR>
+<DD>
+This routine expects a single parameter--a reference to a subroutine or
+variable.  It returns the built-in type of the referenced variable,
+ignoring any package into which it might have been blessed.
+This can be useful for determining the <EM>type</EM> value which forms part of
+the method names described in <A HREF="#packagespecific attribute handling">Package-specific Attribute Handling</A> below.
+<P></P></DL>
+<P>Note that these routines are <EM>not</EM> exported by default.</P>
+<P>
+<H2><A NAME="packagespecific attribute handling">Package-specific Attribute Handling</A></H2>
+<P><STRONG>WARNING</STRONG>: the mechanisms described here are still experimental.  Do not
+rely on the current implementation.  In particular, there is no provision
+for applying package attributes to 'cloned' copies of subroutines used as
+closures.  (See <A HREF="../lib/Pod/perlref.html#making references">Making References in the perlref manpage</A> for information on closures.)
+Package-specific attribute handling may change incompatibly in a future
+release.</P>
+<P>When an attribute list is present in a declaration, a check is made to see
+whether an attribute 'modify' handler is present in the appropriate package
+(or its @ISA inheritance tree).  Similarly, when <CODE>attributes::get</CODE> is
+called on a valid reference, a check is made for an appropriate attribute
+'fetch' handler.  See <A HREF="#examples">EXAMPLES</A> to see how the ``appropriate package''
+determination works.</P>
+<P>The handler names are based on the underlying type of the variable being
+declared or of the reference passed.  Because these attributes are
+associated with subroutine or variable declarations, this deliberately
+ignores any possibility of being blessed into some package.  Thus, a
+subroutine declaration uses ``CODE'' as its <EM>type</EM>, and even a blessed
+hash reference uses ``HASH'' as its <EM>type</EM>.</P>
+<P>The class methods invoked for modifying and fetching are these:</P>
+<DL>
+<DT><STRONG><A NAME="item_FETCH_type_ATTRIBUTES">FETCH_<EM>type</EM>_ATTRIBUTES</A></STRONG><BR>
+<DD>
+This method receives a single argument, which is a reference to the
+variable or subroutine for which package-defined attributes are desired.
+The expected return value is a list of associated attributes.
+This list may be empty.
+<P></P>
+<DT><STRONG><A NAME="item_MODIFY_type_ATTRIBUTES">MODIFY_<EM>type</EM>_ATTRIBUTES</A></STRONG><BR>
+<DD>
+This method is called with two fixed arguments, followed by the list of
+attributes from the relevant declaration.  The two fixed arguments are
+the relevant package name and a reference to the declared subroutine or
+variable.  The expected return value as a list of attributes which were
+not recognized by this handler.  Note that this allows for a derived class
+to delegate a call to its base class, and then only examine the attributes
+which the base class didn't already handle for it.
+<P>The call to this method is currently made <EM>during</EM> the processing of the
+declaration.  In particular, this means that a subroutine reference will
+probably be for an undefined subroutine, even if this declaration is
+actually part of the definition.</P>
+<P></P></DL>
+<P>Calling <A HREF="#item_get"><CODE>attributes::get()</CODE></A> from within the scope of a null package
+declaration <CODE>package ;</CODE> for an unblessed variable reference will
+not provide any starting package name for the 'fetch' method lookup.
+Thus, this circumstance will not result in a method call for package-defined
+attributes.  A named subroutine knows to which symbol table entry it belongs
+(or originally belonged), and it will use the corresponding package.
+An anonymous subroutine knows the package name into which it was compiled
+(unless it was also compiled with a null package declaration), and so it
+will use that package name.</P>
+<P>
+<H2><A NAME="syntax of attribute lists">Syntax of Attribute Lists</A></H2>
+<P>An attribute list is a sequence of attribute specifications, separated by
+whitespace or a colon (with optional whitespace).
+Each attribute specification is a simple
+name, optionally followed by a parenthesised parameter list.
+If such a parameter list is present, it is scanned past as for the rules
+for the <CODE>q()</CODE> operator.  (See <A HREF="../lib/Pod/perlop.html#quote and quotelike operators">Quote and Quote-like Operators in the perlop manpage</A>.)
+The parameter list is passed as it was found, however, and not as per <CODE>q()</CODE>.</P>
+<P>Some examples of syntactically valid attribute lists:</P>
+<PRE>
+    switch(10,foo(7,3))  :  expensive
+    Ugly('\(&quot;) :Bad
+    _5x5
+    locked method</PRE>
+<P>Some examples of syntactically invalid attribute lists (with annotation):</P>
+<PRE>
+    switch(10,foo()             # ()-string not balanced
+    Ugly('(')                   # ()-string not balanced
+    5x5                         # &quot;5x5&quot; not a valid identifier
+    Y2::north                   # &quot;Y2::north&quot; not a simple identifier
+    foo + bar                   # &quot;+&quot; neither a colon nor whitespace</PRE>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>
+<H2><A NAME="default exports">Default exports</A></H2>
+<P>None.</P>
+<P>
+<H2><A NAME="available exports">Available exports</A></H2>
+<P>The routines <A HREF="#item_get"><CODE>get</CODE></A> and <A HREF="#item_reftype"><CODE>reftype</CODE></A> are exportable.</P>
+<P>
+<H2><A NAME="export tags defined">Export tags defined</A></H2>
+<P>The <CODE>:ALL</CODE> tag will get all of the above exports.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Here are some samples of syntactically valid declarations, with annotation
+as to how they resolve internally into <CODE>use attributes</CODE> invocations by
+perl.  These examples are primarily useful to see how the ``appropriate
+package'' is found for the possible method lookups for package-defined
+attributes.</P>
+<OL>
+<LI>
+Code:
+<PRE>
+    package Canine;
+    package Dog;
+    my Canine $spot : Watchful ;</PRE>
+<P>Effect:</P>
+<PRE>
+    use attributes Canine =&gt; \$spot, &quot;Watchful&quot;;</PRE>
+<P></P>
+<LI>
+Code:
+<PRE>
+    package Felis;
+    my $cat : Nervous;</PRE>
+<P>Effect:</P>
+<PRE>
+    use attributes Felis =&gt; \$cat, &quot;Nervous&quot;;</PRE>
+<P></P>
+<LI>
+Code:
+<PRE>
+    package X;
+    sub foo : locked ;</PRE>
+<P>Effect:</P>
+<PRE>
+    use attributes X =&gt; \&amp;foo, &quot;locked&quot;;</PRE>
+<P></P>
+<LI>
+Code:
+<PRE>
+    package X;
+    sub Y::x : locked { 1 }</PRE>
+<P>Effect:</P>
+<PRE>
+    use attributes Y =&gt; \&amp;Y::x, &quot;locked&quot;;</PRE>
+<P></P>
+<LI>
+Code:
+<PRE>
+    package X;
+    sub foo { 1 }</PRE>
+<PRE>
+    package Y;
+    BEGIN { *bar = \&amp;X::foo; }</PRE>
+<PRE>
+    package Z;
+    sub Y::bar : locked ;</PRE>
+<P>Effect:</P>
+<PRE>
+    use attributes X =&gt; \&amp;X::foo, &quot;locked&quot;;</PRE>
+<P></P></OL>
+<P>This last example is purely for purposes of completeness.  You should not
+be trying to mess with the attributes of something in a package that's
+not your own.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../lib/Pod/perlsub.html#private variables via my()">Private Variables via my() in the perlsub manpage</A> and
+<A HREF="../lib/Pod/perlsub.html#subroutine attributes">Subroutine Attributes in the perlsub manpage</A> for details on the basic declarations;
+<A HREF="../lib/attrs.html">the attrs manpage</A> for the obsolescent form of subroutine attribute specification
+which this module replaces;
+<A HREF="../lib/Pod/perlfunc.html#use">use in the perlfunc manpage</A> for details on the normal invocation mechanism.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;attributes - get/set subroutine or variable attributes</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

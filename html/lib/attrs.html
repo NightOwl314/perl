@@ -1,0 +1,88 @@
+
+<HTML>
+<HEAD>
+<TITLE>attrs - set/get attributes of a subroutine</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;attrs - set/get attributes of a subroutine</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>attrs - set/get attributes of a subroutine (deprecated)</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    sub foo {
+        use attrs qw(locked method);
+        ...
+    }</PRE>
+<PRE>
+    @a = attrs::get(\&amp;foo);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>NOTE: Use of this pragma is deprecated.  Use the syntax</P>
+<PRE>
+    sub foo : locked method { }</PRE>
+<P>to declare attributes instead.  See also <A HREF="../lib/attributes.html">the attributes manpage</A>.</P>
+<P>This pragma lets you set and get attributes for subroutines.
+Setting attributes takes place at compile time; trying to set
+invalid attribute names causes a compile-time error. Calling
+<CODE>attrs::get</CODE> on a subroutine reference or name returns its list
+of attribute names. Notice that <CODE>attrs::get</CODE> is not exported.
+Valid attributes are as follows.</P>
+<DL>
+<DT><STRONG><A NAME="item_method">method</A></STRONG><BR>
+<DD>
+Indicates that the invoking subroutine is a method.
+<P></P>
+<DT><STRONG><A NAME="item_locked">locked</A></STRONG><BR>
+<DD>
+Setting this attribute is only meaningful when the subroutine or
+method is to be called by multiple threads. When set on a method
+subroutine (i.e. one marked with the <STRONG>method</STRONG> attribute above),
+perl ensures that any invocation of it implicitly locks its first
+argument before execution. When set on a non-method subroutine,
+perl ensures that a lock is taken on the subroutine itself before
+execution. The semantics of the lock are exactly those of one
+explicitly taken with the <A HREF="../lib/Pod/perlfunc.html#item_lock"><CODE>lock</CODE></A> operator immediately after the
+subroutine is entered.
+<P></P></DL>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;attrs - set/get attributes of a subroutine</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

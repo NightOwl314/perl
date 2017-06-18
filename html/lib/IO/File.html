@@ -1,0 +1,141 @@
+
+<HTML>
+<HEAD>
+<TITLE>IO::File - supply object methods for filehandles</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::File - supply object methods for filehandles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>IO::File - supply object methods for filehandles</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use IO::File;</PRE>
+<PRE>
+    $fh = new IO::File;
+    if ($fh-&gt;open(&quot;&lt; file&quot;)) {
+        print &lt;$fh&gt;;
+        $fh-&gt;close;
+    }</PRE>
+<PRE>
+    $fh = new IO::File &quot;&gt; file&quot;;
+    if (defined $fh) {
+        print $fh &quot;bar\n&quot;;
+        $fh-&gt;close;
+    }</PRE>
+<PRE>
+    $fh = new IO::File &quot;file&quot;, &quot;r&quot;;
+    if (defined $fh) {
+        print &lt;$fh&gt;;
+        undef $fh;       # automatically closes the file
+    }</PRE>
+<PRE>
+    $fh = new IO::File &quot;file&quot;, O_WRONLY|O_APPEND;
+    if (defined $fh) {
+        print $fh &quot;corge\n&quot;;</PRE>
+<PRE>
+        $pos = $fh-&gt;getpos;
+        $fh-&gt;setpos($pos);</PRE>
+<PRE>
+        undef $fh;       # automatically closes the file
+    }</PRE>
+<PRE>
+    autoflush STDOUT 1;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>IO::File</CODE> inherits from <CODE>IO::Handle</CODE> and <CODE>IO::Seekable</CODE>. It extends
+these classes with methods that are specific to file handles.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( FILENAME [,MODE [,PERMS]] )</A></STRONG><BR>
+<DD>
+Creates a <CODE>IO::File</CODE>.  If it receives any parameters, they are passed to
+the method <A HREF="#item_open"><CODE>open</CODE></A>; if the open fails, the object is destroyed.  Otherwise,
+it is returned to the caller.
+<P></P>
+<DT><STRONG><A NAME="item_new_tmpfile">new_tmpfile</A></STRONG><BR>
+<DD>
+Creates an <CODE>IO::File</CODE> opened for read/write on a newly created temporary
+file.  On systems where this is possible, the temporary file is anonymous
+(i.e. it is unlinked after creation, but held open).  If the temporary
+file cannot be created or opened, the <CODE>IO::File</CODE> object is destroyed.
+Otherwise, it is returned to the caller.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_open">open( FILENAME [,MODE [,PERMS]] )</A></STRONG><BR>
+<DD>
+<A HREF="#item_open"><CODE>open</CODE></A> accepts one, two or three parameters.  With one parameter,
+it is just a front end for the built-in <A HREF="#item_open"><CODE>open</CODE></A> function.  With two or three
+parameters, the first parameter is a filename that may include
+whitespace or other special characters, and the second parameter is
+the open mode, optionally followed by a file permission value.
+<P>If <CODE>IO::File::open</CODE> receives a Perl mode string (``&gt;'', ``+&lt;'', etc.)
+or a ANSI C <CODE>fopen()</CODE> mode string (``w'', ``r+'', etc.), it uses the basic
+Perl <A HREF="#item_open"><CODE>open</CODE></A> operator (but protects any special characters).</P>
+<P>If <CODE>IO::File::open</CODE> is given a numeric mode, it passes that mode
+and the optional permissions value to the Perl <A HREF="../../lib/Pod/perlfunc.html#item_sysopen"><CODE>sysopen</CODE></A> operator.
+The permissions default to 0666.</P>
+<P>For convenience, <CODE>IO::File</CODE> exports the O_XXX constants from the
+Fcntl module, if this module is available.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Pod/perlfunc.html">the perlfunc manpage</A>, 
+<A HREF="../../lib/Pod/perlop.html#i/o operators">I/O Operators in the perlop manpage</A>,
+<A HREF="../../lib/IO/Handle.html">the IO::Handle manpage</A>
+<A HREF="../../lib/IO/Seekable.html">the IO::Seekable manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>Derived from FileHandle.pm by Graham Barr &lt;<EM><A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;IO::File - supply object methods for filehandles</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

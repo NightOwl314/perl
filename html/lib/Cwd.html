@@ -1,0 +1,110 @@
+
+<HTML>
+<HEAD>
+<TITLE>Cwd - get pathname of current working directory</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Cwd - get pathname of current working directory</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Cwd - get pathname of current working directory</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Cwd;
+    $dir = cwd;</PRE>
+<PRE>
+    use Cwd;
+    $dir = getcwd;</PRE>
+<PRE>
+    use Cwd;
+    $dir = fastcwd;</PRE>
+<PRE>
+    use Cwd;
+    $dir = fastgetcwd;</PRE>
+<PRE>
+    use Cwd 'chdir';
+    chdir &quot;/tmp&quot;;
+    print $ENV{'PWD'};</PRE>
+<PRE>
+    use Cwd 'abs_path';     # aka realpath()
+    print abs_path($ENV{'PWD'});</PRE>
+<PRE>
+    use Cwd 'fast_abs_path';
+    print fast_abs_path($ENV{'PWD'});</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides functions for determining the pathname of the
+current working directory.  By default, it exports the functions
+cwd(), getcwd(), fastcwd(), and <CODE>fastgetcwd()</CODE> into the caller's
+namespace.  Each of these functions are called without arguments and
+return the absolute path of the current working directory.  It is
+recommended that cwd (or another *cwd() function) be used in <EM>all</EM>
+code to ensure portability.</P>
+<P>The <CODE>cwd()</CODE> is the most natural and safe form for the current
+architecture. For most systems it is identical to `pwd` (but without
+the trailing line terminator).</P>
+<P>The <CODE>getcwd()</CODE> function re-implements the <CODE>getcwd(3)</CODE> (or <CODE>getwd(3))</CODE> functions
+in Perl.</P>
+<P>The <CODE>fastcwd()</CODE> function looks the same as getcwd(), but runs faster.
+It's also more dangerous because it might conceivably <A HREF="../lib/Pod/perlfunc.html#item_chdir"><CODE>chdir()</CODE></A> you out
+of a directory that it can't <A HREF="../lib/Pod/perlfunc.html#item_chdir"><CODE>chdir()</CODE></A> you back into.  If fastcwd
+encounters a problem it will return undef but will probably leave you
+in a different directory.  For a measure of extra security, if
+everything appears to have worked, the <CODE>fastcwd()</CODE> function will check
+that it leaves you in the same directory that it started in. If it has
+changed it will <A HREF="../lib/Pod/perlfunc.html#item_die"><CODE>die</CODE></A> with the message ``Unstable directory path,
+current directory changed unexpectedly''. That should never happen.</P>
+<P>The <CODE>fastgetcwd()</CODE> function is provided as a synonym for cwd().</P>
+<P>The <CODE>abs_path()</CODE> function takes a single argument and returns the
+absolute pathname for that argument.  It uses the same algorithm as
+getcwd().  (Actually, <CODE>getcwd()</CODE> is <CODE>abs_path(``.''))</CODE>  Symbolic links and
+relative-path components (``.'' and ``..'') are resolved to return the
+canonical pathname, just like realpath(3).  This function is also
+callable as realpath().</P>
+<P>The <CODE>fast_abs_path()</CODE> function looks the same as <CODE>abs_path()</CODE> but runs
+faster and, like fastcwd(), is more dangerous.</P>
+<P>If you ask to override your <A HREF="../lib/Pod/perlfunc.html#item_chdir"><CODE>chdir()</CODE></A> built-in function, then your PWD
+environment variable will be kept up to date.  (See
+<A HREF="../lib/Pod/perlsub.html#overriding builtin functions">Overriding Builtin Functions in the perlsub manpage</A>.) Note that it will only be
+kept up to date if all packages which use chdir import it from Cwd.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Cwd - get pathname of current working directory</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

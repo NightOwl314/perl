@@ -1,0 +1,133 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::ChangeNotify - Monitor events related to files and directories</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::ChangeNotify - Monitor events related to files and directories</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+		<LI><A HREF="#deprecated functions and methods">Deprecated Functions and Methods</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::ChangeNotify - Monitor events related to files and directories</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+        require Win32::ChangeNotify;</PRE>
+<PRE>
+        $notify = Win32::ChangeNotify-&gt;new($Path,$WatchSubTree,$Events);
+        $notify-&gt;wait or warn &quot;Something failed: $!\n&quot;;
+        # There has been a change.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module allows the user to use a Win32 change notification event
+object from Perl.  This allows the Perl program to monitor events
+relating to files and directory trees.</P>
+<P>The <A HREF="#item_wait"><CODE>wait</CODE></A> method and <CODE>wait_all</CODE> &amp; <CODE>wait_any</CODE> functions are
+inherited from the <A HREF="#win32::ipc">Win32::IPC</A> module.</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">$notify = Win32::ChangeNotify-&gt;new($path, $subtree, $filter)</A></STRONG><BR>
+<DD>
+Constructor for a new ChangeNotification object.  <CODE>$path</CODE> is the
+directory to monitor.  If <CODE>$subtree</CODE> is true, then all directories
+under <CODE>$path</CODE> will be monitored.  <CODE>$filter</CODE> indicates what events
+should trigger a notification.  It should be a string containing any
+of the following flags (separated by whitespace and/or <CODE>|</CODE>).
+<PRE>
+   ATTRIBUTES   Any attribute change
+   DIR_NAME     Any directory name change
+   FILE_NAME    Any file name change (creating/deleting/renaming)
+   LAST_WRITE   Any change to a file's last write time
+   SECURITY     Any security descriptor change
+   SIZE         Any change in a file's size</PRE>
+<P>(<CODE>$filter</CODE> can also be an integer composed from the
+<CODE>FILE_NOTIFY_CHANGE_*</CODE> constants.)</P>
+<P></P>
+<DT><STRONG><A NAME="item_close">$notify-&gt;close</A></STRONG><BR>
+<DD>
+Shut down monitoring.  You could just <CODE>undef $notify</CODE> instead (but
+<A HREF="#item_close"><CODE>close</CODE></A> works even if there are other copies of the object).  This
+happens automatically when your program exits.
+<P></P>
+<DT><STRONG><A NAME="item_reset">$notify-&gt;reset</A></STRONG><BR>
+<DD>
+Resets the ChangeNotification object after a change has been detected.
+The object will become signalled again after the next change.  (It is
+OK to call this immediately after <A HREF="#item_new"><CODE>new</CODE></A>, but it is not required.)
+<P></P>
+<DT><STRONG><A NAME="item_wait">$notify-&gt;wait</A></STRONG><BR>
+<DD>
+See <A HREF="#win32::ipc">Win32::IPC</A>.  Remember to call <A HREF="#item_reset"><CODE>reset</CODE></A> afterwards if you want
+to continue monitoring.
+<P></P></DL>
+<P>
+<H2><A NAME="deprecated functions and methods">Deprecated Functions and Methods</A></H2>
+<P><STRONG>Win32::ChangeNotify</STRONG> still supports the ActiveWare syntax, but its
+use is deprecated.</P>
+<DL>
+<DT><STRONG><A NAME="item_FindFirst"><CODE>FindFirst($Obj,$PathName,$WatchSubTree,$Filter)</CODE></A></STRONG><BR>
+<DD>
+Use
+<PRE>
+  $Obj = Win32::ChangeNotify-&gt;new($PathName,$WatchSubTree,$Filter)</PRE>
+<P>instead.</P>
+<P></P>
+<DT><STRONG><A NAME="item_FindNext">$obj-&gt;<CODE>FindNext()</CODE></A></STRONG><BR>
+<DD>
+Use <A HREF="#item_reset"><CODE>$obj-&gt;reset</CODE></A> instead.
+<P></P>
+<DT><STRONG><A NAME="item_Close">$obj-&gt;<CODE>Close()</CODE></A></STRONG><BR>
+<DD>
+Use <A HREF="#item_close"><CODE>$obj-&gt;close</CODE></A> instead.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Christopher J. Madsen &lt;<EM><A HREF="mailto:chris_madsen@geocities.com">chris_madsen@geocities.com</A></EM>&gt;</P>
+<P>Loosely based on the original module by ActiveWare Internet Corp.,
+<EM><A HREF="http://www.ActiveWare.com">http://www.ActiveWare.com</A></EM></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::ChangeNotify - Monitor events related to files and directories</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

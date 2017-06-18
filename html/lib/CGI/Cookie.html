@@ -1,0 +1,270 @@
+
+<HTML>
+<HEAD>
+<TITLE>CGI::Cookie - Interface to Netscape Cookies</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;CGI::Cookie - Interface to Netscape Cookies</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#using cgi::cookie">USING CGI::Cookie</A></LI>
+	<UL>
+
+		<LI><A HREF="#creating new cookies">Creating New Cookies</A></LI>
+		<LI><A HREF="#sending the cookie to the browser">Sending the Cookie to the Browser</A></LI>
+		<LI><A HREF="#recovering previous cookies">Recovering Previous Cookies</A></LI>
+		<LI><A HREF="#manipulating cookies">Manipulating Cookies</A></LI>
+	</UL>
+
+	<LI><A HREF="#author information">AUTHOR INFORMATION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>CGI::Cookie - Interface to Netscape Cookies</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use CGI qw/:standard/;
+    use CGI::Cookie;</PRE>
+<PRE>
+    # Create new cookies and send them
+    $cookie1 = new CGI::Cookie(-name=&gt;'ID',-value=&gt;123456);
+    $cookie2 = new CGI::Cookie(-name=&gt;'preferences',
+                               -value=&gt;{ font =&gt; Helvetica,
+                                         size =&gt; 12 } 
+                               );
+    print header(-cookie=&gt;[$cookie1,$cookie2]);</PRE>
+<PRE>
+    # fetch existing cookies
+    %cookies = fetch CGI::Cookie;
+    $id = $cookies{'ID'}-&gt;value;</PRE>
+<PRE>
+    # create cookies returned from an external source
+    %cookies = parse CGI::Cookie($ENV{COOKIE});</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>CGI::Cookie is an interface to Netscape (HTTP/1.1) cookies, an
+innovation that allows Web servers to store persistent information on
+the browser's side of the connection.  Although CGI::Cookie is
+intended to be used in conjunction with CGI.pm (and is in fact used by
+it internally), you can use this module independently.</P>
+<P>For full information on cookies see</P>
+<PRE>
+        <A HREF="http://www.ics.uci.edu/pub/ietf/http/rfc2109.txt">http://www.ics.uci.edu/pub/ietf/http/rfc2109.txt</A></PRE>
+<P>
+<HR>
+<H1><A NAME="using cgi::cookie">USING CGI::Cookie</A></H1>
+<P>CGI::Cookie is object oriented.  Each cookie object has a name and a
+value.  The name is any scalar value.  The value is any scalar or
+array value (associative arrays are also allowed).  Cookies also have
+several optional attributes, including:</P>
+<OL>
+<LI><STRONG><A NAME="item_expiration_date"><STRONG>1. expiration date</STRONG></A></STRONG><BR>
+
+The expiration date tells the browser how long to hang on to the
+cookie.  If the cookie specifies an expiration date in the future, the
+browser will store the cookie information in a disk file and return it
+to the server every time the user reconnects (until the expiration
+date is reached).  If the cookie species an expiration date in the
+past, the browser will remove the cookie from the disk file.  If the
+expiration date is not specified, the cookie will persist only until
+the user quits the browser.
+<P></P>
+<LI><STRONG><A NAME="item_domain"><STRONG>2. domain</STRONG></A></STRONG><BR>
+
+This is a partial or complete domain name for which the cookie is 
+valid.  The browser will return the cookie to any host that matches
+the partial domain name.  For example, if you specify a domain name
+of ``.capricorn.com'', then Netscape will return the cookie to
+Web servers running on any of the machines ``www.capricorn.com'', 
+``ftp.capricorn.com'', ``feckless.capricorn.com'', etc.  Domain names
+must contain at least two periods to prevent attempts to match
+on top level domains like ``.edu''.  If no domain is specified, then
+the browser will only return the cookie to servers on the host the
+cookie originated from.
+<P></P>
+<LI><STRONG><A NAME="item_path"><STRONG>3. path</STRONG></A></STRONG><BR>
+
+If you provide a cookie path attribute, the browser will check it
+against your script's URL before returning the cookie.  For example,
+if you specify the path ``/cgi-bin'', then the cookie will be returned
+to each of the scripts ``/cgi-bin/tally.pl'', ``/cgi-bin/order.pl'', and
+``/cgi-bin/customer_service/complain.pl'', but not to the script
+``/cgi-private/site_admin.pl''.  By default, the path is set to ``/'', so
+that all scripts at your site will receive the cookie.
+<P></P>
+<LI><STRONG><A NAME="item_secure_flag"><STRONG>4. secure flag</STRONG></A></STRONG><BR>
+
+If the ``secure'' attribute is set, the cookie will only be sent to your
+script if the CGI request is occurring on a secure channel, such as SSL.
+<P></P></OL>
+<P>
+<H2><A NAME="creating new cookies">Creating New Cookies</A></H2>
+<PRE>
+        $c = new CGI::Cookie(-name    =&gt;  'foo',
+                             -value   =&gt;  'bar',
+                             -expires =&gt;  '+3M',
+                             -domain  =&gt;  '.capricorn.com',
+                             -path    =&gt;  '/cgi-bin/database'
+                             -secure  =&gt;  1
+                            );</PRE>
+<P>Create cookies from scratch with the <STRONG>new</STRONG> method.  The <STRONG>-name</STRONG> and
+<STRONG>-value</STRONG> parameters are required.  The name must be a scalar value.
+The value can be a scalar, an array reference, or a hash reference.
+(At some point in the future cookies will support one of the Perl
+object serialization protocols for full generality).</P>
+<P><STRONG>-expires</STRONG> accepts any of the relative or absolute date formats
+recognized by CGI.pm, for example ``+3M'' for three months in the
+future.  See CGI.pm's documentation for details.</P>
+<P><STRONG>-domain</STRONG> points to a domain name or to a fully qualified host name.
+If not specified, the cookie will be returned only to the Web server
+that created it.</P>
+<P><STRONG>-path</STRONG> points to a partial URL on the current server.  The cookie
+will be returned to all URLs beginning with the specified path.  If
+not specified, it defaults to '/', which returns the cookie to all
+pages at your site.</P>
+<P><STRONG>-secure</STRONG> if set to a true value instructs the browser to return the
+cookie only when a cryptographic protocol is in use.</P>
+<P>
+<H2><A NAME="sending the cookie to the browser">Sending the Cookie to the Browser</A></H2>
+<P>Within a CGI script you can send a cookie to the browser by creating
+one or more Set-Cookie: fields in the HTTP header.  Here is a typical
+sequence:</P>
+<PRE>
+  my $c = new CGI::Cookie(-name    =&gt;  'foo',
+                          -value   =&gt;  ['bar','baz'],
+                          -expires =&gt;  '+3M');</PRE>
+<PRE>
+  print &quot;Set-Cookie: $c\n&quot;;
+  print &quot;Content-Type: text/html\n\n&quot;;</PRE>
+<P>To send more than one cookie, create several Set-Cookie: fields.
+Alternatively, you may concatenate the cookies together with ``; '' and
+send them in one field.</P>
+<P>If you are using CGI.pm, you send cookies by providing a -cookie
+argument to the <CODE>header()</CODE> method:</P>
+<PRE>
+  print header(-cookie=&gt;$c);</PRE>
+<P>Mod_perl users can set cookies using the request object's <CODE>header_out()</CODE>
+method:</P>
+<PRE>
+  $r-&gt;header_out('Set-Cookie',$c);</PRE>
+<P>Internally, Cookie overloads the ``'' operator to call its <CODE>as_string()</CODE>
+method when incorporated into the HTTP header.  <CODE>as_string()</CODE> turns the
+Cookie's internal representation into an RFC-compliant text
+representation.  You may call <CODE>as_string()</CODE> yourself if you prefer:</P>
+<PRE>
+  print &quot;Set-Cookie: &quot;,$c-&gt;as_string,&quot;\n&quot;;</PRE>
+<P>
+<H2><A NAME="recovering previous cookies">Recovering Previous Cookies</A></H2>
+<PRE>
+        %cookies = fetch CGI::Cookie;</PRE>
+<P><STRONG>fetch</STRONG> returns an associative array consisting of all cookies
+returned by the browser.  The keys of the array are the cookie names.  You
+can iterate through the cookies this way:</P>
+<PRE>
+        %cookies = fetch CGI::Cookie;
+        foreach (keys %cookies) {
+           do_something($cookies{$_});
+        }</PRE>
+<P>In a scalar context, <CODE>fetch()</CODE> returns a hash reference, which may be more
+efficient if you are manipulating multiple cookies.</P>
+<P>CGI.pm uses the URL escaping methods to save and restore reserved characters
+in its cookies.  If you are trying to retrieve a cookie set by a foreign server,
+this escaping method may trip you up.  Use <CODE>raw_fetch()</CODE> instead, which has the
+same semantics as fetch(), but performs no unescaping.</P>
+<P>You may also retrieve cookies that were stored in some external
+form using the <CODE>parse()</CODE> class method:</P>
+<PRE>
+       $COOKIES = `cat /usr/tmp/Cookie_stash`;
+       %cookies = parse CGI::Cookie($COOKIES);</PRE>
+<P>
+<H2><A NAME="manipulating cookies">Manipulating Cookies</A></H2>
+<P>Cookie objects have a series of accessor methods to get and set cookie
+attributes.  Each accessor has a similar syntax.  Called without
+arguments, the accessor returns the current value of the attribute.
+Called with an argument, the accessor changes the attribute and
+returns its new value.</P>
+<DL>
+<DT><STRONG><A NAME="item_name"><STRONG>name()</STRONG></A></STRONG><BR>
+<DD>
+Get or set the cookie's name.  Example:
+<PRE>
+        $name = $c-&gt;name;
+        $new_name = $c-&gt;name('fred');</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_value"><STRONG>value()</STRONG></A></STRONG><BR>
+<DD>
+Get or set the cookie's value.  Example:
+<PRE>
+        $value = $c-&gt;value;
+        @new_value = $c-&gt;value(['a','b','c','d']);</PRE>
+<P><STRONG>value()</STRONG> is context sensitive.  In a list context it will return
+the current value of the cookie as an array.  In a scalar context it
+will return the <STRONG>first</STRONG> value of a multivalued cookie.</P>
+<P></P>
+<DT><STRONG><STRONG>domain()</STRONG></STRONG><BR>
+<DD>
+Get or set the cookie's domain.
+<P></P>
+<DT><STRONG><STRONG>path()</STRONG></STRONG><BR>
+<DD>
+Get or set the cookie's path.
+<P></P>
+<DT><STRONG><A NAME="item_expires"><STRONG>expires()</STRONG></A></STRONG><BR>
+<DD>
+Get or set the cookie's expiration time.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author information">AUTHOR INFORMATION</A></H1>
+<P>Copyright 1997-1998, Lincoln D. Stein.  All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<P>Address bug reports and comments to: <A HREF="mailto:lstein@cshl.org">lstein@cshl.org</A></P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This section intentionally left blank.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/CGI/Carp.html">the CGI::Carp manpage</A>, <A HREF="../../lib/CGI.html">the CGI manpage</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;CGI::Cookie - Interface to Netscape Cookies</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

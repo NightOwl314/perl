@@ -1,0 +1,173 @@
+
+<HTML>
+<HEAD>
+<TITLE>Net::Netrc - OO interface to users netrc file</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Netrc - OO interface to users netrc file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#the .netrc file">THE .netrc FILE</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Net::Netrc - OO interface to users netrc file</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Net::Netrc;
+</PRE>
+<PRE>
+
+    $mach = Net::Netrc-&gt;lookup('some.machine');
+    $login = $mach-&gt;login;
+    ($login, $password, $account) = $mach-&gt;lpa;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Net::Netrc</CODE> is a class implementing a simple interface to the .netrc file
+used as by the ftp program.</P>
+<P><CODE>Net::Netrc</CODE> also implements security checks just like the ftp program,
+these checks are, first that the .netrc file must be owned by the user and 
+second the ownership permissions should be such that only the owner has
+read and write access. If these conditions are not met then a warning is
+output and the .netrc file is not read.</P>
+<P>
+<HR>
+<H1><A NAME="the .netrc file">THE .netrc FILE</A></H1>
+<P>The .netrc file contains login and initialization information used by the
+auto-login process.  It resides in the user's home directory.  The following
+tokens are recognized; they may be separated by spaces, tabs, or new-lines:</P>
+<DL>
+<DT><STRONG><A NAME="item_machine_name">machine name</A></STRONG><BR>
+<DD>
+Identify a remote machine name. The auto-login process searches
+the .netrc file for a machine token that matches the remote machine
+specified.  Once a match is made, the subsequent .netrc tokens
+are processed, stopping when the end of file is reached or an-
+other machine or a default token is encountered.
+<P></P>
+<DT><STRONG><A NAME="item_default">default</A></STRONG><BR>
+<DD>
+This is the same as machine name except that default matches
+any name.  There can be only one default token, and it must be
+after all machine tokens.  This is normally used as:
+<PRE>
+    default login anonymous password user@site</PRE>
+<P>thereby giving the user automatic anonymous login to machines
+not specified in .netrc.</P>
+<P></P>
+<DT><STRONG><A NAME="item_login_name">login name</A></STRONG><BR>
+<DD>
+Identify a user on the remote machine.  If this token is present,
+the auto-login process will initiate a login using the
+specified name.
+<P></P>
+<DT><STRONG><A NAME="item_password_string">password string</A></STRONG><BR>
+<DD>
+Supply a password.  If this token is present, the auto-login
+process will supply the specified string if the remote server
+requires a password as part of the login process.
+<P></P>
+<DT><STRONG><A NAME="item_account_string">account string</A></STRONG><BR>
+<DD>
+Supply an additional account password.  If this token is present,
+the auto-login process will supply the specified string
+if the remote server requires an additional account password.
+<P></P>
+<DT><STRONG><A NAME="item_macdef_name">macdef name</A></STRONG><BR>
+<DD>
+Define a macro. <CODE>Net::Netrc</CODE> only parses this field to be compatible
+with <EM>ftp</EM>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<P>The constructor for a <CODE>Net::Netrc</CODE> object is not called new as it does not
+really create a new object. But instead is called <A HREF="#item_lookup"><CODE>lookup</CODE></A> as this is
+essentially what it does.</P>
+<DL>
+<DT><STRONG><A NAME="item_lookup">lookup ( MACHINE [, LOGIN ])</A></STRONG><BR>
+<DD>
+Lookup and return a reference to the entry for <CODE>MACHINE</CODE>. If <A HREF="../../../lib/Pod/perlrun.html#item_LOGIN"><CODE>LOGIN</CODE></A> is given
+then the entry returned will have the given login. If <A HREF="../../../lib/Pod/perlrun.html#item_LOGIN"><CODE>LOGIN</CODE></A> is not given then
+the first entry in the .netrc file for <CODE>MACHINE</CODE> will be returned.
+<P>If a matching entry cannot be found, and a default entry exists, then a
+reference to the default entry is returned.</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_login">login ()</A></STRONG><BR>
+<DD>
+Return the login id for the netrc entry
+<P></P>
+<DT><STRONG><A NAME="item_password">password ()</A></STRONG><BR>
+<DD>
+Return the password for the netrc entry
+<P></P>
+<DT><STRONG><A NAME="item_account">account ()</A></STRONG><BR>
+<DD>
+Return the account information for the netrc entry
+<P></P>
+<DT><STRONG><A NAME="item_lpa">lpa ()</A></STRONG><BR>
+<DD>
+Return a list of login, password and account information fir the netrc entry
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Graham Barr &lt;<A HREF="mailto:gbarr@pobox.com">gbarr@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/Net/Netrc.html">the Net::Netrc manpage</A>
+<A HREF="../../../site/lib/Net/Cmd.html">the Net::Cmd manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Net::Netrc - OO interface to users netrc file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

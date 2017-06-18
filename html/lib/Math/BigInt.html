@@ -1,0 +1,129 @@
+
+<HTML>
+<HEAD>
+<TITLE>Math::BigInt - Arbitrary size integer math package</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::BigInt - Arbitrary size integer math package</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#autocreating constants">Autocreating constants</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Math::BigInt - Arbitrary size integer math package</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Math::BigInt;
+  $i = Math::BigInt-&gt;new($string);</PRE>
+<PRE>
+  $i-&gt;bneg return BINT               negation
+  $i-&gt;babs return BINT               absolute value
+  $i-&gt;bcmp(BINT) return CODE         compare numbers (undef,&lt;0,=0,&gt;0)
+  $i-&gt;badd(BINT) return BINT         addition
+  $i-&gt;bsub(BINT) return BINT         subtraction
+  $i-&gt;bmul(BINT) return BINT         multiplication
+  $i-&gt;bdiv(BINT) return (BINT,BINT)  division (quo,rem) just quo if scalar
+  $i-&gt;bmod(BINT) return BINT         modulus
+  $i-&gt;bgcd(BINT) return BINT         greatest common divisor
+  $i-&gt;bnorm return BINT              normalization
+  $i-&gt;blsft(BINT) return BINT        left shift
+  $i-&gt;brsft(BINT) return (BINT,BINT) right shift (quo,rem) just quo if scalar
+  $i-&gt;band(BINT) return BINT         bit-wise and
+  $i-&gt;bior(BINT) return BINT         bit-wise inclusive or
+  $i-&gt;bxor(BINT) return BINT         bit-wise exclusive or
+  $i-&gt;bnot return BINT               bit-wise not</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>All basic math operations are overloaded if you declare your big
+integers as</P>
+<PRE>
+  $i = new Math::BigInt '123 456 789 123 456 789';</PRE>
+<DL>
+<DT><STRONG><A NAME="item_Canonical_notation">Canonical notation</A></STRONG><BR>
+<DD>
+Big integer value are strings of the form <CODE>/^[+-]\d+$/</CODE> with leading
+zeros suppressed.
+<P></P>
+<DT><STRONG><A NAME="item_Input">Input</A></STRONG><BR>
+<DD>
+Input values to these routines may be strings of the form
+<CODE>/^\s*[+-]?[\d\s]+$/</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Output">Output</A></STRONG><BR>
+<DD>
+Output values always always in canonical form
+<P></P></DL>
+<P>Actual math is done in an internal format consisting of an array
+whose first element is the sign (/^[+-]$/) and whose remaining 
+elements are base 100000 digits with the least significant digit first.
+The string 'NaN' is used to represent the result when input arguments 
+are not numbers, as well as the result of dividing by zero.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+   '+0'                            canonical zero value
+   '   -123 123 123'               canonical value '-123123123'
+   '1 23 456 7890'                 canonical value '+1234567890'</PRE>
+<P>
+<HR>
+<H1><A NAME="autocreating constants">Autocreating constants</A></H1>
+<P>After <CODE>use Math::BigInt ':constant'</CODE> all the integer decimal constants
+in the given scope are converted to <CODE>Math::BigInt</CODE>.  This conversion
+happens at compile time.</P>
+<P>In particular</P>
+<PRE>
+  perl -MMath::BigInt=:constant -e 'print 2**100'</PRE>
+<P>print the integer value of <CODE>2**100</CODE>.  Note that without conversion of 
+constants the expression 2**100 will be calculated as floating point number.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The current version of this module is a preliminary version of the
+real thing that is currently (as of perl5.002) under development.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Mark Biggar, overloaded interface by Ilya Zakharevich.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Math::BigInt - Arbitrary size integer math package</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

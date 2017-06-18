@@ -1,0 +1,166 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::Process - Create and manipulate processes.</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Process - Create and manipulate processes.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::Process - Create and manipulate processes.</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis use win32::process; use win32;">SYNOPSIS
+	use Win32::Process;
+	use Win32;</A></H1>
+<PRE>
+        sub ErrorReport{
+                print Win32::FormatMessage( Win32::GetLastError() );
+        }</PRE>
+<PRE>
+        Win32::Process::Create($ProcessObj,
+                                &quot;D:\\winnt35\\system32\\notepad.exe&quot;,
+                                &quot;notepad temp.txt&quot;,
+                                0,
+                                NORMAL_PRIORITY_CLASS,
+                                &quot;.&quot;)|| die ErrorReport();</PRE>
+<PRE>
+        $ProcessObj-&gt;Suspend();
+        $ProcessObj-&gt;Resume();
+        $ProcessObj-&gt;Wait(INFINITE);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides access to the process control functions in the
+Win32 API.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Create">Win32::Process::Create($obj,$appname,$cmdline,$iflags,$cflags,$curdir)</A></STRONG><BR>
+<DD>
+Creates a new process.
+<PRE>
+    Args:</PRE>
+<PRE>
+        $obj            container for process object
+        $appname        full path name of executable module
+        $cmdline        command line args
+        $iflags         flag: inherit calling processes handles or not
+        $cflags         flags for creation (see exported vars below)
+        $curdir         working dir of new process</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_KillProcess">Win32::Process::KillProcess($pid, $exitcode)</A></STRONG><BR>
+<DD>
+Terminates any process identified by $pid.  $exitcode will be set to
+the exit code of the process.
+<P></P>
+<DT><STRONG><A NAME="item_Suspend">$ProcessObj-&gt;<CODE>Suspend()</CODE></A></STRONG><BR>
+<DD>
+Suspend the process associated with the $ProcessObj.
+<P></P>
+<DT><STRONG><A NAME="item_Resume">$ProcessObj-&gt;<CODE>Resume()</CODE></A></STRONG><BR>
+<DD>
+Resume a suspended process.
+<P></P>
+<DT><STRONG><A NAME="item_Kill">$ProcessObj-&gt;Kill( $exitcode )</A></STRONG><BR>
+<DD>
+Kill the associated process, have it terminate with exit code $ExitCode.
+<P></P>
+<DT><STRONG><A NAME="item_GetPriorityClass">$ProcessObj-&gt;<CODE>GetPriorityClass($class)</CODE></A></STRONG><BR>
+<DD>
+Get the priority class of the process.
+<P></P>
+<DT><STRONG><A NAME="item_SetPriorityClass">$ProcessObj-&gt;SetPriorityClass( $class )</A></STRONG><BR>
+<DD>
+Set the priority class of the process (see exported values below for
+options).
+<P></P>
+<DT><STRONG><A NAME="item_GetProcessAffinitymask">$ProcessObj-&gt;GetProcessAffinitymask( $processAffinityMask, $systemAffinitymask)</A></STRONG><BR>
+<DD>
+Get the process affinity mask.  This is a bitvector in which each bit
+represents the processors that a process is allowed to run on.
+<P></P>
+<DT><STRONG><A NAME="item_SetProcessAffinitymask">$ProcessObj-&gt;SetProcessAffinitymask( $processAffinityMask )</A></STRONG><BR>
+<DD>
+Set the process affinity mask.  Only available on Windows NT.
+<P></P>
+<DT><STRONG><A NAME="item_GetExitCode">$ProcessObj-&gt;GetExitCode( $exitcode )</A></STRONG><BR>
+<DD>
+Retrieve the exitcode of the process.
+<P></P>
+<DT><STRONG><A NAME="item_Wait">$ProcessObj-&gt;<CODE>Wait($timeout)</CODE></A></STRONG><BR>
+<DD>
+Wait for the process to die.  $timeout should be specified in milliseconds.
+To wait forever, specify the constant <CODE>INFINITE</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_GetProcessID">$ProcessObj-&gt;<CODE>GetProcessID()</CODE></A></STRONG><BR>
+<DD>
+Returns the Process ID.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>The following constants are exported by default.</P>
+<PRE>
+        CREATE_DEFAULT_ERROR_MODE
+        CREATE_NEW_CONSOLE
+        CREATE_NEW_PROCESS_GROUP
+        CREATE_NO_WINDOW
+        CREATE_SEPARATE_WOW_VDM
+        CREATE_SUSPENDED
+        CREATE_UNICODE_ENVIRONMENT
+        DEBUG_ONLY_THIS_PROCESS
+        DEBUG_PROCESS
+        DETACHED_PROCESS
+        HIGH_PRIORITY_CLASS
+        IDLE_PRIORITY_CLASS
+        INFINITE
+        NORMAL_PRIORITY_CLASS
+        REALTIME_PRIORITY_CLASS
+        THREAD_PRIORITY_ABOVE_NORMAL
+        THREAD_PRIORITY_BELOW_NORMAL
+        THREAD_PRIORITY_ERROR_RETURN
+        THREAD_PRIORITY_HIGHEST
+        THREAD_PRIORITY_IDLE
+        THREAD_PRIORITY_LOWEST
+        THREAD_PRIORITY_NORMAL
+        THREAD_PRIORITY_TIME_CRITICAL</PRE>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::Process - Create and manipulate processes.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

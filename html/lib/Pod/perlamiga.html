@@ -1,0 +1,280 @@
+<HTML>
+<HEAD>
+<TITLE>perlamiga - Perl under Amiga OS</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlamiga - Perl under Amiga OS</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#prerequisites">Prerequisites</A></LI>
+		<LI><A HREF="#starting perl programs under amigaos">Starting Perl programs under AmigaOS</A></LI>
+		<LI><A HREF="#shortcomings of perl under amigaos">Shortcomings of Perl under AmigaOS</A></LI>
+	</UL>
+
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<LI><A HREF="#accessing documentation">Accessing documentation</A></LI>
+	<UL>
+
+		<LI><A HREF="#manpages">Manpages</A></LI>
+		<LI><A HREF="#html"><STRONG>HTML</STRONG></A></LI>
+		<LI><A HREF="#gnu info files"><STRONG>GNU</STRONG> <CODE>info</CODE> files</A></LI>
+		<LI><A HREF="#latex docs"><CODE>LaTeX</CODE> docs</A></LI>
+	</UL>
+
+	<LI><A HREF="#build">BUILD</A></LI>
+	<UL>
+
+		<LI><A HREF="#prerequisites">Prerequisites</A></LI>
+		<LI><A HREF="#getting the perl source">Getting the perl source</A></LI>
+		<LI><A HREF="#making">Making</A></LI>
+		<LI><A HREF="#testing">Testing</A></LI>
+		<LI><A HREF="#installing the built perl">Installing the built perl</A></LI>
+	</UL>
+
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlamiga - Perl under Amiga OS</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>One can read this document in the following formats:</P>
+<PRE>
+        man <A HREF="../../lib/Pod/perlamiga.html">perlamiga</A>
+        multiview <A HREF="../../lib/Pod/perlamiga.html">perlamiga</A>.guide</PRE>
+<P>to list some (not all may be available simultaneously), or it may
+be read <EM>as is</EM>: either as <EM>README.amiga</EM>, or <EM>pod/perlamiga.pod</EM>.</P>
+<P>A recent version of perl for the Amiga can be found at the Geek Gadgets
+section of the Aminet:
+</P>
+<PRE>
+
+      <A HREF="http://www.aminet.net/~aminet/dirs/dev_gg.html">http://www.aminet.net/~aminet/dirs/dev_gg.html</A></PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>
+<H2><A NAME="prerequisites">Prerequisites</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Unix_emulation_for_AmigaOS%3A_ixemul%2Elibrary"><STRONG>Unix emulation for AmigaOS: ixemul.library</STRONG></A></STRONG><BR>
+<DD>
+You need the Unix emulation for AmigaOS, whose most important part is
+<STRONG>ixemul.library</STRONG>. For a minimum setup, get the latest versions
+of the following packages from the Aminet archives (http://www.aminet.net/~aminet/):
+<PRE>
+        ixemul-bin
+        ixemul-env-bin
+        pdksh-bin</PRE>
+<P>Note also that this is a minimum setup; you might want to add other
+packages of <STRONG>ADE</STRONG> (the <EM>Amiga Developers Environment</EM>).</P>
+<P></P>
+<DT><STRONG><A NAME="item_Version_of_Amiga_OS"><STRONG>Version of Amiga OS</STRONG></A></STRONG><BR>
+<DD>
+You need at the very least AmigaOS version 2.0. Recommended is version 3.1.
+<P></P></DL>
+<P>
+<H2><A NAME="starting perl programs under amigaos">Starting Perl programs under AmigaOS</A></H2>
+<P>Start your Perl program <EM>foo</EM> with arguments <CODE>arg1 arg2 arg3</CODE> the
+same way as on any other platform, by</P>
+<PRE>
+        perl foo arg1 arg2 arg3</PRE>
+<P>If you want to specify perl options <CODE>-my_opts</CODE> to the perl itself (as
+opposed to to your program), use</P>
+<PRE>
+        perl -my_opts foo arg1 arg2 arg3</PRE>
+<P>Alternately, you can try to get a replacement for the system's <STRONG>Execute</STRONG>
+command that honors the #!/usr/bin/perl syntax in scripts and set the s-Bit
+of your scripts. Then you can invoke your scripts like under UNIX with</P>
+<PRE>
+        foo arg1 arg2 arg3</PRE>
+<P>(Note that having *nixish full path to perl <EM>/usr/bin/perl</EM> is not
+necessary, <EM>perl</EM> would be enough, but having full path would make it
+easier to use your script under *nix.)</P>
+<P>
+<H2><A NAME="shortcomings of perl under amigaos">Shortcomings of Perl under AmigaOS</A></H2>
+<P>Perl under AmigaOS lacks some features of perl under UNIX because of
+deficiencies in the UNIX-emulation, most notably:</P>
+<UL>
+<LI>
+<A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A>
+<P></P>
+<LI>
+some features of the UNIX filesystem regarding link count and file dates
+<P></P>
+<LI>
+inplace operation (the <STRONG>-i</STRONG> switch) without backup file
+<P></P>
+<LI>
+<A HREF="../../lib/Pod/perlfunc.html#item_umask"><CODE>umask()</CODE></A> works, but the correct permissions are only set when the file is
+finally close()d
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<P>Change to the installation directory (most probably ADE:), and
+extract the binary distribution:</P>
+<P>lha -mraxe x perl-$VERSION-bin.lha</P>
+<P>or</P>
+<P>tar xvzpf perl-$VERSION-bin.tgz</P>
+<P>(Of course you need lha or tar and gunzip for this.)</P>
+<P>For installation of the Unix emulation, read the appropriate docs.</P>
+<P>
+<HR>
+<H1><A NAME="accessing documentation">Accessing documentation</A></H1>
+<P>
+<H2><A NAME="manpages">Manpages</A></H2>
+<P>If you have <CODE>man</CODE> installed on your system, and you installed perl
+manpages, use something like this:</P>
+<PRE>
+        man <A HREF="../../lib/Pod/perlfunc.html">perlfunc</A>
+        man less
+        man ExtUtils.MakeMaker</PRE>
+<P>to access documentation for different components of Perl. Start with</P>
+<PRE>
+        man perl</PRE>
+<P>Note: You have to modify your man.conf file to search for manpages
+in the /ade/lib/perl5/man/man3 directory, or the man pages for the
+perl library will not be found.</P>
+<P>Note that dot (<EM>.</EM>) is used as a package separator for documentation
+for packages, and as usual, sometimes you need to give the section - <CODE>3</CODE>
+above - to avoid shadowing by the <EM>less(1) manpage</EM>.</P>
+<P>
+<H2><A NAME="html"><STRONG>HTML</STRONG></A></H2>
+<P>If you have some WWW browser available, you can build <STRONG>HTML</STRONG> docs.
+Cd to directory with <EM>.pod</EM> files, and do like this</P>
+<PRE>
+        cd /ade/lib/perl5/pod
+        pod2html</PRE>
+<P>After this you can direct your browser the file <EM>perl.html</EM> in this
+directory, and go ahead with reading docs.</P>
+<P>Alternatively you may be able to get these docs prebuilt from <CODE>CPAN</CODE>.</P>
+<P>
+<H2><A NAME="gnu info files"><STRONG>GNU</STRONG> <CODE>info</CODE> files</A></H2>
+<P>Users of <CODE>Emacs</CODE> would appreciate it very much, especially with
+<CODE>CPerl</CODE> mode loaded. You need to get latest <CODE>pod2info</CODE> from <CODE>CPAN</CODE>,
+or, alternately, prebuilt info pages.</P>
+<P>
+<H2><A NAME="latex docs"><CODE>LaTeX</CODE> docs</A></H2>
+<P>can be constructed using <CODE>pod2latex</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="build">BUILD</A></H1>
+<P>Here we discuss how to build Perl under AmigaOS.</P>
+<P>
+<H2><A NAME="prerequisites">Prerequisites</A></H2>
+<P>You need to have the latest <STRONG>ixemul</STRONG> (Unix emulation for Amiga)
+from Aminet.</P>
+<P>
+<H2><A NAME="getting the perl source">Getting the perl source</A></H2>
+<P>You can either get the latest perl-for-amiga source from Ninemoons
+and extract it with:</P>
+<PRE>
+  tar xvzpf perl-$VERSION-src.tgz</PRE>
+<P>or get the official source from CPAN:</P>
+<PRE>
+  <A HREF="http://www.perl.com/CPAN/src/5.0">http://www.perl.com/CPAN/src/5.0</A></PRE>
+<P>Extract it like this</P>
+<PRE>
+  tar xvzpf perl-$VERSION.tar.gz</PRE>
+<P>You will see a message about errors while extracting <EM>Configure</EM>. This
+is normal and expected. (There is a conflict with a similarly-named file
+<EM>configure</EM>, but it causes no harm.)</P>
+<P>
+<H2><A NAME="making">Making</A></H2>
+<UL>
+<LI>
+remember to use a healthy sized stack (I used 2000000)
+<P></P>
+<LI>
+your PATH environment variable must include /bin (e.g. ``.:/bin'' is good)
+(or, more precisely, it must include the directory where you have your
+basic UNIX utilities like test, cat, sed, and so on)
+<P></P>
+<LI>
+<PRE>
+
+  sh Configure -Dprefix=/ade -Dloclibpth=/ade/lib</PRE>
+<LI>
+fix makedepend
+<PRE>
+        In the file 'makedepend' there are three spots like this `$cat ...`:
+        a for loop near line 75, an egrep near line 161, and a for loop near
+        line 175.  In all those spots using an editor change the $cat to
+        /bin/cat.</PRE>
+<P></P>
+<LI>
+now type make depend
+<PRE>
+        When the make depend has ended load the gnumakefile into
+        an editor and go to the end of the file.</PRE>
+<PRE>
+        Move upwards in the file until you reach av.o: EXTERN.h
+        and delete all lines down to # WARNING: Put....</PRE>
+<P></P>
+<LI>
+now go to the x2p directory
+<PRE>
+        Load the gnumakefile into an editor.</PRE>
+<PRE>
+        Go to the end moveup until you reach hash.o: EXTERN.h
+        and delete all lines dowonwards until you reach a line saying</PRE>
+<PRE>
+        # WARNING: Put nothing....</PRE>
+<P></P>
+<LI>
+Now!
+<PRE>
+  make</PRE>
+<P></P></UL>
+<P>
+<H2><A NAME="testing">Testing</A></H2>
+<P>Now run</P>
+<PRE>
+  make test</PRE>
+<P>Some tests will be skipped because they need the <A HREF="../../lib/Pod/perlfunc.html#item_fork"><CODE>fork()</CODE></A> function:</P>
+<P><EM>io/pipe.t</EM>, <EM>op/fork.t</EM>, <EM>lib/filehand.t</EM>, <EM>lib/open2.t</EM>, <EM>lib/open3.t</EM>, 
+<EM>lib/io_pipe.t</EM>, <EM>lib/io_sock.t</EM></P>
+<P>
+<H2><A NAME="installing the built perl">Installing the built perl</A></H2>
+<P>Run</P>
+<PRE>
+  make install</PRE>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Norbert Pueschel, <A HREF="mailto:pueschel@imsdd.meb.uni-bonn.de">pueschel@imsdd.meb.uni-bonn.de</A>
+Jan-Erik Karlsson, <A HREF="mailto:trg@privat.utfors.se">trg@privat.utfors.se</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlamiga - Perl under Amiga OS</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

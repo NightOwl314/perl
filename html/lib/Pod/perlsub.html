@@ -1,0 +1,1182 @@
+<HTML>
+<HEAD>
+<TITLE>perlsub - Perl subroutines</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlsub - Perl subroutines</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#private variables via my()">Private Variables via <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A></A></LI>
+		<LI><A HREF="#persistent private variables">Persistent Private Variables</A></LI>
+		<LI><A HREF="#temporary values via local()">Temporary Values via <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A></A></LI>
+		<LI><A HREF="#lvalue subroutines">Lvalue subroutines</A></LI>
+		<LI><A HREF="#passing symbol table entries (typeglobs)">Passing Symbol Table Entries (typeglobs)</A></LI>
+		<LI><A HREF="#when to still use local()">When to Still Use <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A></A></LI>
+		<LI><A HREF="#pass by reference">Pass by Reference</A></LI>
+		<LI><A HREF="#prototypes">Prototypes</A></LI>
+		<LI><A HREF="#constant functions">Constant Functions</A></LI>
+		<LI><A HREF="#overriding builtin functions">Overriding Built-in Functions</A></LI>
+		<LI><A HREF="#autoloading">Autoloading</A></LI>
+		<LI><A HREF="#subroutine attributes">Subroutine Attributes</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>perlsub - Perl subroutines</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>To declare subroutines:</P>
+<PRE>
+    sub NAME;                     # A &quot;forward&quot; declaration.
+    sub NAME(PROTO);              #  ditto, but with prototypes
+    sub NAME : ATTRS;             #  with attributes
+    sub NAME(PROTO) : ATTRS;      #  with attributes and prototypes</PRE>
+<PRE>
+    sub NAME BLOCK                # A declaration and a definition.
+    sub NAME(PROTO) BLOCK         #  ditto, but with prototypes
+    sub NAME : ATTRS BLOCK        #  with attributes
+    sub NAME(PROTO) : ATTRS BLOCK #  with prototypes and attributes</PRE>
+<P>To define an anonymous subroutine at runtime:</P>
+<PRE>
+    $subref = sub BLOCK;                 # no proto
+    $subref = sub (PROTO) BLOCK;         # with proto
+    $subref = sub : ATTRS BLOCK;         # with attributes
+    $subref = sub (PROTO) : ATTRS BLOCK; # with proto and attributes</PRE>
+<P>To import subroutines:</P>
+<PRE>
+    use MODULE qw(NAME1 NAME2 NAME3);</PRE>
+<P>To call subroutines:</P>
+<PRE>
+    NAME(LIST);    # &amp; is optional with parentheses.
+    NAME LIST;     # Parentheses optional if predeclared/imported.
+    &amp;NAME(LIST);   # Circumvent prototypes.
+    &amp;NAME;         # Makes current @_ visible to called subroutine.</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Like many languages, Perl provides for user-defined subroutines.
+These may be located anywhere in the main program, loaded in from
+other files via the <A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> keywords, or
+generated on the fly using <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A> or anonymous subroutines.
+You can even call a function indirectly using a variable containing
+its name or a CODE reference.</P>
+<P>The Perl model for function call and return values is simple: all
+functions are passed as parameters one single flat list of scalars, and
+all functions likewise return to their caller one single flat list of
+scalars.  Any arrays or hashes in these call and return lists will
+collapse, losing their identities--but you may always use
+pass-by-reference instead to avoid this.  Both call and return lists may
+contain as many or as few scalar elements as you'd like.  (Often a
+function without an explicit return statement is called a subroutine, but
+there's really no difference from Perl's perspective.)</P>
+<P>Any arguments passed in show up in the array <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A>.  Therefore, if
+you called a function with two arguments, those would be stored in
+<CODE>$_[0]</CODE> and <CODE>$_[1]</CODE>.  The array <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> is a local array, but its
+elements are aliases for the actual scalar parameters.  In particular,
+if an element <CODE>$_[0]</CODE> is updated, the corresponding argument is
+updated (or an error occurs if it is not updatable).  If an argument
+is an array or hash element which did not exist when the function
+was called, that element is created only when (and if) it is modified
+or a reference to it is taken.  (Some earlier versions of Perl
+created the element whether or not the element was assigned to.)
+Assigning to the whole array <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> removes that aliasing, and does
+not update any arguments.</P>
+<P>The return value of a subroutine is the value of the last expression
+evaluated.  More explicitly, a <A HREF="../../lib/Pod/perlfunc.html#item_return"><CODE>return</CODE></A> statement may be used to exit the
+subroutine, optionally specifying the returned value, which will be
+evaluated in the appropriate context (list, scalar, or void) depending
+on the context of the subroutine call.  If you specify no return value,
+the subroutine returns an empty list in list context, the undefined
+value in scalar context, or nothing in void context.  If you return
+one or more aggregates (arrays and hashes), these will be flattened
+together into one large indistinguishable list.</P>
+<P>Perl does not have named formal parameters.  In practice all you
+do is assign to a <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A> list of these.  Variables that aren't
+declared to be private are global variables.  For gory details
+on creating private variables, see <A HREF="#private variables via my()">Private Variables via my()</A>
+and <A HREF="#temporary values via local()">Temporary Values via local()</A>.  To create protected
+environments for a set of functions in a separate package (and
+probably a separate file), see <A HREF="../../lib/Pod/perlmod.html#packages">Packages in the perlmod manpage</A>.</P>
+<P>Example:</P>
+<PRE>
+    sub max {
+        my $max = shift(@_);
+        foreach $foo (@_) {
+            $max = $foo if $max &lt; $foo;
+        }
+        return $max;
+    }
+    $bestday = max($mon,$tue,$wed,$thu,$fri);</PRE>
+<P>Example:</P>
+<PRE>
+    # get a line, combining continuation lines
+    #  that start with whitespace</PRE>
+<PRE>
+    sub get_line {
+        $thisline = $lookahead;  # global variables!
+        LINE: while (defined($lookahead = &lt;STDIN&gt;)) {
+            if ($lookahead =~ /^[ \t]/) {
+                $thisline .= $lookahead;
+            }
+            else {
+                last LINE;
+            }
+        }
+        return $thisline;
+    }</PRE>
+<PRE>
+    $lookahead = &lt;STDIN&gt;;       # get first line
+    while (defined($line = get_line())) {
+        ...
+    }</PRE>
+<P>Assigning to a list of private variables to name your arguments:</P>
+<PRE>
+    sub maybeset {
+        my($key, $value) = @_;
+        $Foo{$key} = $value unless $Foo{$key};
+    }</PRE>
+<P>Because the assignment copies the values, this also has the effect
+of turning call-by-reference into call-by-value.  Otherwise a
+function is free to do in-place modifications of <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> and change
+its caller's values.</P>
+<PRE>
+    upcase_in($v1, $v2);  # this changes $v1 and $v2
+    sub upcase_in {
+        for (@_) { tr/a-z/A-Z/ }
+    }</PRE>
+<P>You aren't allowed to modify constants in this way, of course.  If an
+argument were actually literal and you tried to change it, you'd take a
+(presumably fatal) exception.   For example, this won't work:</P>
+<PRE>
+    upcase_in(&quot;frederick&quot;);</PRE>
+<P>It would be much safer if the <CODE>upcase_in()</CODE> function
+were written to return a copy of its parameters instead
+of changing them in place:</P>
+<PRE>
+    ($v3, $v4) = upcase($v1, $v2);  # this doesn't change $v1 and $v2
+    sub upcase {
+        return unless defined wantarray;  # void context, do nothing
+        my @parms = @_;
+        for (@parms) { tr/a-z/A-Z/ }
+        return wantarray ? @parms : $parms[0];
+    }</PRE>
+<P>Notice how this (unprototyped) function doesn't care whether it was
+passed real scalars or arrays.  Perl sees all arguments as one big,
+long, flat parameter list in <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A>.  This is one area where
+Perl's simple argument-passing style shines.  The <CODE>upcase()</CODE>
+function would work perfectly well without changing the <CODE>upcase()</CODE>
+definition even if we fed it things like this:</P>
+<PRE>
+    @newlist   = upcase(@list1, @list2);
+    @newlist   = upcase( split /:/, $var );</PRE>
+<P>Do not, however, be tempted to do this:</P>
+<PRE>
+    (@a, @b)   = upcase(@list1, @list2);</PRE>
+<P>Like the flattened incoming parameter list, the return list is also
+flattened on return.  So all you have managed to do here is stored
+everything in <CODE>@a</CODE> and made <CODE>@b</CODE> an empty list.  See 
+<A HREF="#pass by reference">Pass by Reference</A> for alternatives.</P>
+<P>A subroutine may be called using an explicit <CODE>&amp;</CODE> prefix.  The
+<CODE>&amp;</CODE> is optional in modern Perl, as are parentheses if the
+subroutine has been predeclared.  The <CODE>&amp;</CODE> is <EM>not</EM> optional
+when just naming the subroutine, such as when it's used as
+an argument to <A HREF="../../lib/Pod/perlfunc.html#item_defined"><CODE>defined()</CODE></A> or undef().  Nor is it optional when you
+want to do an indirect subroutine call with a subroutine name or
+reference using the <CODE>&amp;$subref()</CODE> or <CODE>&amp;{$subref}()</CODE> constructs,
+although the <CODE>$subref-&gt;()</CODE> notation solves that problem.
+See <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A> for more about all that.</P>
+<P>Subroutines may be called recursively.  If a subroutine is called
+using the <CODE>&amp;</CODE> form, the argument list is optional, and if omitted,
+no <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> array is set up for the subroutine: the <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> array at the
+time of the call is visible to subroutine instead.  This is an
+efficiency mechanism that new users may wish to avoid.</P>
+<PRE>
+    &amp;foo(1,2,3);        # pass three arguments
+    foo(1,2,3);         # the same</PRE>
+<PRE>
+    foo();              # pass a null list
+    &amp;foo();             # the same</PRE>
+<PRE>
+    &amp;foo;               # foo() get current args, like foo(@_) !!
+    foo;                # like foo() IFF sub foo predeclared, else &quot;foo&quot;</PRE>
+<P>Not only does the <CODE>&amp;</CODE> form make the argument list optional, it also
+disables any prototype checking on arguments you do provide.  This
+is partly for historical reasons, and partly for having a convenient way
+to cheat if you know what you're doing.  See <EM>Prototypes</EM> below.</P>
+<P>Functions whose names are in all upper case are reserved to the Perl
+core, as are modules whose names are in all lower case.  A
+function in all capitals is a loosely-held convention meaning it
+will be called indirectly by the run-time system itself, usually
+due to a triggered event.  Functions that do special, pre-defined
+things include <CODE>BEGIN</CODE>, <CODE>CHECK</CODE>, <CODE>INIT</CODE>, <CODE>END</CODE>, <CODE>AUTOLOAD</CODE>, and
+<CODE>DESTROY</CODE>--plus all functions mentioned in <A HREF="../../lib/Pod/perltie.html">the perltie manpage</A>.</P>
+<P>
+<H2><A NAME="private variables via my()">Private Variables via <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A></A></H2>
+<P>Synopsis:</P>
+<PRE>
+    my $foo;            # declare $foo lexically local
+    my (@wid, %get);    # declare list of variables local
+    my $foo = &quot;flurp&quot;;  # declare $foo lexical, and init it
+    my @oof = @bar;     # declare @oof lexical, and init it
+    my $x : Foo = $y;   # similar, with an attribute applied</PRE>
+<P><STRONG>WARNING</STRONG>: The use of attribute lists on <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> declarations is
+experimental.  This feature should not be relied upon.  It may
+change or disappear in future releases of Perl.  See <A HREF="../../lib/attributes.html">the attributes manpage</A>.</P>
+<P>The <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> operator declares the listed variables to be lexically
+confined to the enclosing block, conditional (<CODE>if/unless/elsif/else</CODE>),
+loop (<CODE>for/foreach/while/until/continue</CODE>), subroutine, <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>,
+or <CODE>do/require/use</CODE>'d file.  If more than one value is listed, the
+list must be placed in parentheses.  All listed elements must be
+legal lvalues.  Only alphanumeric identifiers may be lexically
+scoped--magical built-ins like <A HREF="../../lib/Pod/perlvar.html#item_%24%2F"><CODE>$/</CODE></A> must currently be <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ize
+with <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> instead.</P>
+<P>Unlike dynamic variables created by the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> operator, lexical
+variables declared with <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> are totally hidden from the outside
+world, including any called subroutines.  This is true if it's the
+same subroutine called from itself or elsewhere--every call gets
+its own copy.</P>
+<P>This doesn't mean that a <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> variable declared in a statically
+enclosing lexical scope would be invisible.  Only dynamic scopes
+are cut off.   For example, the <CODE>bumpx()</CODE> function below has access
+to the lexical $x variable because both the <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> and the <A HREF="../../lib/Pod/perlfunc.html#item_sub"><CODE>sub</CODE></A>
+occurred at the same scope, presumably file scope.</P>
+<PRE>
+    my $x = 10;
+    sub bumpx { $x++ }</PRE>
+<P>An <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A>, however, can see lexical variables of the scope it is
+being evaluated in, so long as the names aren't hidden by declarations within
+the <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> itself.  See <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A>.</P>
+<P>The parameter list to <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my()</CODE></A> may be assigned to if desired, which allows you
+to initialize your variables.  (If no initializer is given for a
+particular variable, it is created with the undefined value.)  Commonly
+this is used to name input parameters to a subroutine.  Examples:</P>
+<PRE>
+    $arg = &quot;fred&quot;;        # &quot;global&quot; variable
+    $n = cube_root(27);
+    print &quot;$arg thinks the root is $n\n&quot;;
+ fred thinks the root is 3</PRE>
+<PRE>
+    sub cube_root {
+        my $arg = shift;  # name doesn't matter
+        $arg **= 1/3;
+        return $arg;
+    }</PRE>
+<P>The <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> is simply a modifier on something you might assign to.  So when
+you do assign to variables in its argument list, <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> doesn't
+change whether those variables are viewed as a scalar or an array.  So</P>
+<PRE>
+    my ($foo) = &lt;STDIN&gt;;                # WRONG?
+    my @FOO = &lt;STDIN&gt;;</PRE>
+<P>both supply a list context to the right-hand side, while</P>
+<PRE>
+    my $foo = &lt;STDIN&gt;;</PRE>
+<P>supplies a scalar context.  But the following declares only one variable:</P>
+<PRE>
+    my $foo, $bar = 1;                  # WRONG</PRE>
+<P>That has the same effect as</P>
+<PRE>
+    my $foo;
+    $bar = 1;</PRE>
+<P>The declared variable is not introduced (is not visible) until after
+the current statement.  Thus,</P>
+<PRE>
+    my $x = $x;</PRE>
+<P>can be used to initialize a new $x with the value of the old $x, and
+the expression</P>
+<PRE>
+    my $x = 123 and $x == 123</PRE>
+<P>is false unless the old $x happened to have the value <CODE>123</CODE>.</P>
+<P>Lexical scopes of control structures are not bounded precisely by the
+braces that delimit their controlled blocks; control expressions are
+part of that scope, too.  Thus in the loop</P>
+<PRE>
+    while (my $line = &lt;&gt;) {
+        $line = lc $line;
+    } continue {
+        print $line;
+    }</PRE>
+<P>the scope of $line extends from its declaration throughout the rest of
+the loop construct (including the <A HREF="../../lib/Pod/perlfunc.html#item_continue"><CODE>continue</CODE></A> clause), but not beyond
+it.  Similarly, in the conditional</P>
+<PRE>
+    if ((my $answer = &lt;STDIN&gt;) =~ /^yes$/i) {
+        user_agrees();
+    } elsif ($answer =~ /^no$/i) {
+        user_disagrees();
+    } else {
+        chomp $answer;
+        die &quot;'$answer' is neither 'yes' nor 'no'&quot;;
+    }</PRE>
+<P>the scope of $answer extends from its declaration through the rest
+of that conditional, including any <CODE>elsif</CODE> and <CODE>else</CODE> clauses, 
+but not beyond it.</P>
+<P>None of the foregoing text applies to <CODE>if/unless</CODE> or <CODE>while/until</CODE>
+modifiers appended to simple statements.  Such modifiers are not
+control structures and have no effect on scoping.</P>
+<P>The <CODE>foreach</CODE> loop defaults to scoping its index variable dynamically
+in the manner of <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>.  However, if the index variable is
+prefixed with the keyword <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>, or if there is already a lexical
+by that name in scope, then a new lexical is created instead.  Thus
+in the loop</P>
+<PRE>
+    for my $i (1, 2, 3) {
+        some_function();
+    }</PRE>
+<P>the scope of $i extends to the end of the loop, but not beyond it,
+rendering the value of $i inaccessible within <CODE>some_function()</CODE>.</P>
+<P>Some users may wish to encourage the use of lexically scoped variables.
+As an aid to catching implicit uses to package variables,
+which are always global, if you say</P>
+<PRE>
+    use strict 'vars';</PRE>
+<P>then any variable mentioned from there to the end of the enclosing
+block must either refer to a lexical variable, be predeclared via
+<A HREF="../../lib/Pod/perlfunc.html#item_our"><CODE>our</CODE></A> or <CODE>use vars</CODE>, or else must be fully qualified with the package name.
+A compilation error results otherwise.  An inner block may countermand
+this with <CODE>no strict 'vars'</CODE>.</P>
+<P>A <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> has both a compile-time and a run-time effect.  At compile
+time, the compiler takes notice of it.  The principal usefulness
+of this is to quiet <CODE>use strict 'vars'</CODE>, but it is also essential
+for generation of closures as detailed in <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A>.  Actual
+initialization is delayed until run time, though, so it gets executed
+at the appropriate time, such as each time through a loop, for
+example.</P>
+<P>Variables declared with <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> are not part of any package and are therefore
+never fully qualified with the package name.  In particular, you're not
+allowed to try to make a package variable (or other global) lexical:</P>
+<PRE>
+    my $pack::var;      # ERROR!  Illegal syntax
+    my $_;              # also illegal (currently)</PRE>
+<P>In fact, a dynamic variable (also known as package or global variables)
+are still accessible using the fully qualified <CODE>::</CODE> notation even while a
+lexical of the same name is also visible:</P>
+<PRE>
+    package main;
+    local $x = 10;
+    my    $x = 20;
+    print &quot;$x and $::x\n&quot;;</PRE>
+<P>That will print out <CODE>20</CODE> and <CODE>10</CODE>.</P>
+<P>You may declare <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> variables at the outermost scope of a file
+to hide any such identifiers from the world outside that file.  This
+is similar in spirit to C's static variables when they are used at
+the file level.  To do this with a subroutine requires the use of
+a closure (an anonymous function that accesses enclosing lexicals).
+If you want to create a private subroutine that cannot be called
+from outside that block, it can declare a lexical variable containing
+an anonymous sub reference:</P>
+<PRE>
+    my $secret_version = '1.001-beta';
+    my $secret_sub = sub { print $secret_version };
+    &amp;$secret_sub();</PRE>
+<P>As long as the reference is never returned by any function within the
+module, no outside module can see the subroutine, because its name is not in
+any package's symbol table.  Remember that it's not <EM>REALLY</EM> called
+<CODE>$some_pack::secret_version</CODE> or anything; it's just $secret_version,
+unqualified and unqualifiable.</P>
+<P>This does not work with object methods, however; all object methods
+have to be in the symbol table of some package to be found.  See
+<A HREF="../../lib/Pod/perlref.html#function templates">Function Templates in the perlref manpage</A> for something of a work-around to
+this.</P>
+<P>
+<H2><A NAME="persistent private variables">Persistent Private Variables</A></H2>
+<P>Just because a lexical variable is lexically (also called statically)
+scoped to its enclosing block, <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do</CODE></A> FILE, this doesn't mean that
+within a function it works like a C static.  It normally works more
+like a C auto, but with implicit garbage collection.</P>
+<P>Unlike local variables in C or C++, Perl's lexical variables don't
+necessarily get recycled just because their scope has exited.
+If something more permanent is still aware of the lexical, it will
+stick around.  So long as something else references a lexical, that
+lexical won't be freed--which is as it should be.  You wouldn't want
+memory being free until you were done using it, or kept around once you
+were done.  Automatic garbage collection takes care of this for you.</P>
+<P>This means that you can pass back or save away references to lexical
+variables, whereas to return a pointer to a C auto is a grave error.
+It also gives us a way to simulate C's function statics.  Here's a
+mechanism for giving a function private variables with both lexical
+scoping and a static lifetime.  If you do want to create something like
+C's static variables, just enclose the whole function in an extra block,
+and put the static variable outside the function but in the block.</P>
+<PRE>
+    {
+        my $secret_val = 0;
+        sub gimme_another {
+            return ++$secret_val;
+        }
+    }
+    # $secret_val now becomes unreachable by the outside
+    # world, but retains its value between calls to gimme_another</PRE>
+<P>If this function is being sourced in from a separate file
+via <A HREF="../../lib/Pod/perlfunc.html#item_require"><CODE>require</CODE></A> or <A HREF="../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A>, then this is probably just fine.  If it's
+all in the main program, you'll need to arrange for the <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>
+to be executed early, either by putting the whole block above
+your main program, or more likely, placing merely a <CODE>BEGIN</CODE>
+sub around it to make sure it gets executed before your program
+starts to run:</P>
+<PRE>
+    sub BEGIN {
+        my $secret_val = 0;
+        sub gimme_another {
+            return ++$secret_val;
+        }
+    }</PRE>
+<P>See <A HREF="../../lib/Pod/perlmod.html#package constructors and destructors">Package Constructors and Destructors in the perlmod manpage</A> about the
+special triggered functions, <CODE>BEGIN</CODE>, <CODE>CHECK</CODE>, <CODE>INIT</CODE> and <CODE>END</CODE>.</P>
+<P>If declared at the outermost scope (the file scope), then lexicals
+work somewhat like C's file statics.  They are available to all
+functions in that same file declared below them, but are inaccessible
+from outside that file.  This strategy is sometimes used in modules
+to create private variables that the whole module can see.</P>
+<P>
+<H2><A NAME="temporary values via local()">Temporary Values via <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A></A></H2>
+<P><STRONG>WARNING</STRONG>: In general, you should be using <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A> instead of <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>, because
+it's faster and safer.  Exceptions to this include the global punctuation
+variables, filehandles and formats, and direct manipulation of the Perl
+symbol table itself.  Format variables often use <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> though, as do
+other variables whose current value must be visible to called
+subroutines.</P>
+<P>Synopsis:</P>
+<PRE>
+    local $foo;                 # declare $foo dynamically local
+    local (@wid, %get);         # declare list of variables local
+    local $foo = &quot;flurp&quot;;       # declare $foo dynamic, and init it
+    local @oof = @bar;          # declare @oof dynamic, and init it</PRE>
+<PRE>
+    local *FH;                  # localize $FH, @FH, %FH, &amp;FH  ...
+    local *merlyn = *randal;    # now $merlyn is really $randal, plus
+                                #     @merlyn is really @randal, etc
+    local *merlyn = 'randal';   # SAME THING: promote 'randal' to *randal
+    local *merlyn = \$randal;   # just alias $merlyn, not @merlyn etc</PRE>
+<P>A <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> modifies its listed variables to be ``local'' to the
+enclosing block, <A HREF="../../lib/Pod/perlfunc.html#item_eval"><CODE>eval</CODE></A>, or <A HREF="../../lib/Pod/perlfunc.html#item_do"><CODE>do FILE</CODE></A>--and to <EM>any subroutine
+called from within that block</EM>.  A <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> just gives temporary
+values to global (meaning package) variables.  It does <EM>not</EM> create
+a local variable.  This is known as dynamic scoping.  Lexical scoping
+is done with <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>, which works more like C's auto declarations.</P>
+<P>If more than one variable is given to <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>, they must be placed in
+parentheses.  All listed elements must be legal lvalues.  This operator works
+by saving the current values of those variables in its argument list on a
+hidden stack and restoring them upon exiting the block, subroutine, or
+eval.  This means that called subroutines can also reference the local
+variable, but not the global one.  The argument list may be assigned to if
+desired, which allows you to initialize your local variables.  (If no
+initializer is given for a particular variable, it is created with an
+undefined value.)  Commonly this is used to name the parameters to a
+subroutine.  Examples:</P>
+<PRE>
+    for $i ( 0 .. 9 ) {
+        $digits{$i} = $i;
+    }
+    # assume this function uses global %digits hash
+    parse_num();</PRE>
+<PRE>
+    # now temporarily add to %digits hash
+    if ($base12) {
+        # (NOTE: not claiming this is efficient!)
+        local %digits  = (%digits, 't' =&gt; 10, 'e' =&gt; 11);
+        parse_num();  # parse_num gets this new %digits!
+    }
+    # old %digits restored here</PRE>
+<P>Because <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> is a run-time operator, it gets executed each time
+through a loop.  In releases of Perl previous to 5.0, this used more stack
+storage each time until the loop was exited.  Perl now reclaims the space
+each time through, but it's still more efficient to declare your variables
+outside the loop.</P>
+<P>A <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> is simply a modifier on an lvalue expression.  When you assign to
+a <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ized variable, the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> doesn't change whether its list is viewed
+as a scalar or an array.  So</P>
+<PRE>
+    local($foo) = &lt;STDIN&gt;;
+    local @FOO = &lt;STDIN&gt;;</PRE>
+<P>both supply a list context to the right-hand side, while</P>
+<PRE>
+    local $foo = &lt;STDIN&gt;;</PRE>
+<P>supplies a scalar context.</P>
+<P>A note about <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> and composite types is in order.  Something
+like <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local(%foo)</CODE></A> works by temporarily placing a brand new hash in
+the symbol table.  The old hash is left alone, but is hidden ``behind''
+the new one.</P>
+<P>This means the old variable is completely invisible via the symbol
+table (i.e. the hash entry in the <CODE>*foo</CODE> typeglob) for the duration
+of the dynamic scope within which the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> was seen.  This
+has the effect of allowing one to temporarily occlude any magic on
+composite types.  For instance, this will briefly alter a tied
+hash to some other implementation:</P>
+<PRE>
+    tie %ahash, 'APackage';
+    [...]
+    {
+       local %ahash;
+       tie %ahash, 'BPackage';
+       [..called code will see %ahash tied to 'BPackage'..]
+       {
+          local %ahash;
+          [..%ahash is a normal (untied) hash here..]
+       }
+    }
+    [..%ahash back to its initial tied self again..]</PRE>
+<P>As another example, a custom implementation of <A HREF="../../lib/Pod/perlvar.html#item_%ENV"><CODE>%ENV</CODE></A> might look
+like this:</P>
+<PRE>
+    {
+        local %ENV;
+        tie %ENV, 'MyOwnEnv';
+        [..do your own fancy %ENV manipulation here..]
+    }
+    [..normal %ENV behavior here..]</PRE>
+<P>It's also worth taking a moment to explain what happens when you
+<A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ize a member of a composite type (i.e. an array or hash element).
+In this case, the element is <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ized <EM>by name</EM>. This means that
+when the scope of the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> ends, the saved value will be
+restored to the hash element whose key was named in the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A>, or
+the array element whose index was named in the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A>.  If that
+element was deleted while the <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> was in effect (e.g. by a
+<A HREF="../../lib/Pod/perlfunc.html#item_delete"><CODE>delete()</CODE></A> from a hash or a <A HREF="../../lib/Pod/perlfunc.html#item_shift"><CODE>shift()</CODE></A> of an array), it will spring
+back into existence, possibly extending an array and filling in the
+skipped elements with <A HREF="../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>.  For instance, if you say</P>
+<PRE>
+    %hash = ( 'This' =&gt; 'is', 'a' =&gt; 'test' );
+    @ary  = ( 0..5 );
+    {
+         local($ary[5]) = 6;
+         local($hash{'a'}) = 'drill';
+         while (my $e = pop(@ary)) {
+             print &quot;$e . . .\n&quot;;
+             last unless $e &gt; 3;
+         }
+         if (@ary) {
+             $hash{'only a'} = 'test';
+             delete $hash{'a'};
+         }
+    }
+    print join(' ', map { &quot;$_ $hash{$_}&quot; } sort keys %hash),&quot;.\n&quot;;
+    print &quot;The array has &quot;,scalar(@ary),&quot; elements: &quot;,
+          join(', ', map { defined $_ ? $_ : 'undef' } @ary),&quot;\n&quot;;</PRE>
+<P>Perl will print</P>
+<PRE>
+    6 . . .
+    4 . . .
+    3 . . .
+    This is a test only a test.
+    The array has 6 elements: 0, 1, 2, undef, undef, 5</PRE>
+<P>The behavior of <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> on non-existent members of composite
+types is subject to change in future.</P>
+<P>
+<H2><A NAME="lvalue subroutines">Lvalue subroutines</A></H2>
+<P><STRONG>WARNING</STRONG>: Lvalue subroutines are still experimental and the implementation
+may change in future versions of Perl.</P>
+<P>It is possible to return a modifiable value from a subroutine.
+To do this, you have to declare the subroutine to return an lvalue.</P>
+<PRE>
+    my $val;
+    sub canmod : lvalue {
+        $val;
+    }
+    sub nomod {
+        $val;
+    }</PRE>
+<PRE>
+    canmod() = 5;   # assigns to $val
+    nomod()  = 5;   # ERROR</PRE>
+<P>The scalar/list context for the subroutine and for the right-hand
+side of assignment is determined as if the subroutine call is replaced
+by a scalar. For example, consider:</P>
+<PRE>
+    data(2,3) = get_data(3,4);</PRE>
+<P>Both subroutines here are called in a scalar context, while in:</P>
+<PRE>
+    (data(2,3)) = get_data(3,4);</PRE>
+<P>and in:</P>
+<PRE>
+    (data(2),data(3)) = get_data(3,4);</PRE>
+<P>all the subroutines are called in a list context.</P>
+<P>
+<H2><A NAME="passing symbol table entries (typeglobs)">Passing Symbol Table Entries (typeglobs)</A></H2>
+<P><STRONG>WARNING</STRONG>: The mechanism described in this section was originally
+the only way to simulate pass-by-reference in older versions of
+Perl.  While it still works fine in modern versions, the new reference
+mechanism is generally easier to work with.  See below.</P>
+<P>Sometimes you don't want to pass the value of an array to a subroutine
+but rather the name of it, so that the subroutine can modify the global
+copy of it rather than working with a local copy.  In perl you can
+refer to all objects of a particular name by prefixing the name
+with a star: <CODE>*foo</CODE>.  This is often known as a ``typeglob'', because the
+star on the front can be thought of as a wildcard match for all the
+funny prefix characters on variables and subroutines and such.</P>
+<P>When evaluated, the typeglob produces a scalar value that represents
+all the objects of that name, including any filehandle, format, or
+subroutine.  When assigned to, it causes the name mentioned to refer to
+whatever <CODE>*</CODE> value was assigned to it.  Example:</P>
+<PRE>
+    sub doubleary {
+        local(*someary) = @_;
+        foreach $elem (@someary) {
+            $elem *= 2;
+        }
+    }
+    doubleary(*foo);
+    doubleary(*bar);</PRE>
+<P>Scalars are already passed by reference, so you can modify
+scalar arguments without using this mechanism by referring explicitly
+to <CODE>$_[0]</CODE> etc.  You can modify all the elements of an array by passing
+all the elements as scalars, but you have to use the <CODE>*</CODE> mechanism (or
+the equivalent reference mechanism) to <A HREF="../../lib/Pod/perlfunc.html#item_push"><CODE>push</CODE></A>, <A HREF="../../lib/Pod/perlfunc.html#item_pop"><CODE>pop</CODE></A>, or change the size of
+an array.  It will certainly be faster to pass the typeglob (or reference).</P>
+<P>Even if you don't want to modify an array, this mechanism is useful for
+passing multiple arrays in a single LIST, because normally the LIST
+mechanism will merge all the array values so that you can't extract out
+the individual arrays.  For more on typeglobs, see
+<A HREF="../../lib/Pod/perldata.html#typeglobs and filehandles">Typeglobs and Filehandles in the perldata manpage</A>.</P>
+<P>
+<H2><A NAME="when to still use local()">When to Still Use <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A></A></H2>
+<P>Despite the existence of <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>, there are still three places where the
+<A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> operator still shines.  In fact, in these three places, you
+<EM>must</EM> use <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A> instead of <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>.</P>
+<OL>
+<LI>
+You need to give a global variable a temporary value, especially $_.
+<P>The global variables, like <A HREF="../../lib/Pod/perlvar.html#item_%40ARGV"><CODE>@ARGV</CODE></A> or the punctuation variables, must be 
+<A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ized with <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A>.  This block reads in <EM>/etc/motd</EM>, and splits
+it up into chunks separated by lines of equal signs, which are placed
+in <CODE>@Fields</CODE>.</P>
+<PRE>
+    {
+        local @ARGV = (&quot;/etc/motd&quot;);
+        local $/ = undef;
+        local $_ = &lt;&gt;;  
+        @Fields = split /^\s*=+\s*$/;
+    }</PRE>
+<P>It particular, it's important to <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ize $_ in any routine that assigns
+to it.  Look out for implicit assignments in <CODE>while</CODE> conditionals.</P>
+<P></P>
+<LI>
+You need to create a local file or directory handle or a local function.
+<P>A function that needs a filehandle of its own must use
+<A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local()</CODE></A> on a complete typeglob.   This can be used to create new symbol
+table entries:</P>
+<PRE>
+    sub ioqueue {
+        local  (*READER, *WRITER);    # not my!
+        pipe    (READER,  WRITER);    or die &quot;pipe: $!&quot;;
+        return (*READER, *WRITER);
+    }
+    ($head, $tail) = ioqueue();</PRE>
+<P>See the Symbol module for a way to create anonymous symbol table
+entries.</P>
+<P>Because assignment of a reference to a typeglob creates an alias, this
+can be used to create what is effectively a local function, or at least,
+a local alias.</P>
+<PRE>
+    {
+        local *grow = \&amp;shrink; # only until this block exists
+        grow();                 # really calls shrink()
+        move();                 # if move() grow()s, it shrink()s too
+    }
+    grow();                     # get the real grow() again</PRE>
+<P>See <A HREF="../../lib/Pod/perlref.html#function templates">Function Templates in the perlref manpage</A> for more about manipulating
+functions by name in this way.</P>
+<P></P>
+<LI>
+You want to temporarily change just one element of an array or hash.
+<P>You can <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>ize just one element of an aggregate.  Usually this
+is done on dynamics:</P>
+<PRE>
+    {
+        local $SIG{INT} = 'IGNORE';
+        funct();                            # uninterruptible
+    } 
+    # interruptibility automatically restored here</PRE>
+<P>But it also works on lexically declared aggregates.  Prior to 5.005,
+this operation could on occasion misbehave.</P>
+<P></P></OL>
+<P>
+<H2><A NAME="pass by reference">Pass by Reference</A></H2>
+<P>If you want to pass more than one array or hash into a function--or
+return them from it--and have them maintain their integrity, then
+you're going to have to use an explicit pass-by-reference.  Before you
+do that, you need to understand references as detailed in <A HREF="../../lib/Pod/perlref.html">the perlref manpage</A>.
+This section may not make much sense to you otherwise.</P>
+<P>Here are a few simple examples.  First, let's pass in several arrays
+to a function and have it <A HREF="../../lib/Pod/perlfunc.html#item_pop"><CODE>pop</CODE></A> all of then, returning a new list
+of all their former last elements:</P>
+<PRE>
+    @tailings = popmany ( \@a, \@b, \@c, \@d );</PRE>
+<PRE>
+    sub popmany {
+        my $aref;
+        my @retlist = ();
+        foreach $aref ( @_ ) {
+            push @retlist, pop @$aref;
+        }
+        return @retlist;
+    }</PRE>
+<P>Here's how you might write a function that returns a
+list of keys occurring in all the hashes passed to it:</P>
+<PRE>
+    @common = inter( \%foo, \%bar, \%joe );
+    sub inter {
+        my ($k, $href, %seen); # locals
+        foreach $href (@_) {
+            while ( $k = each %$href ) {
+                $seen{$k}++;
+            }
+        }
+        return grep { $seen{$_} == @_ } keys %seen;
+    }</PRE>
+<P>So far, we're using just the normal list return mechanism.
+What happens if you want to pass or return a hash?  Well,
+if you're using only one of them, or you don't mind them
+concatenating, then the normal calling convention is ok, although
+a little expensive.</P>
+<P>Where people get into trouble is here:</P>
+<PRE>
+    (@a, @b) = func(@c, @d);
+or
+    (%a, %b) = func(%c, %d);</PRE>
+<P>That syntax simply won't work.  It sets just <CODE>@a</CODE> or <CODE>%a</CODE> and
+clears the <CODE>@b</CODE> or <CODE>%b</CODE>.  Plus the function didn't get passed
+into two separate arrays or hashes: it got one long list in <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A>,
+as always.</P>
+<P>If you can arrange for everyone to deal with this through references, it's
+cleaner code, although not so nice to look at.  Here's a function that
+takes two array references as arguments, returning the two array elements
+in order of how many elements they have in them:</P>
+<PRE>
+    ($aref, $bref) = func(\@c, \@d);
+    print &quot;@$aref has more than @$bref\n&quot;;
+    sub func {
+        my ($cref, $dref) = @_;
+        if (@$cref &gt; @$dref) {
+            return ($cref, $dref);
+        } else {
+            return ($dref, $cref);
+        }
+    }</PRE>
+<P>It turns out that you can actually do this also:</P>
+<PRE>
+    (*a, *b) = func(\@c, \@d);
+    print &quot;@a has more than @b\n&quot;;
+    sub func {
+        local (*c, *d) = @_;
+        if (@c &gt; @d) {
+            return (\@c, \@d);
+        } else {
+            return (\@d, \@c);
+        }
+    }</PRE>
+<P>Here we're using the typeglobs to do symbol table aliasing.  It's
+a tad subtle, though, and also won't work if you're using <A HREF="../../lib/Pod/perlfunc.html#item_my"><CODE>my</CODE></A>
+variables, because only globals (even in disguise as <A HREF="../../lib/Pod/perlfunc.html#item_local"><CODE>local</CODE></A>s)
+are in the symbol table.</P>
+<P>If you're passing around filehandles, you could usually just use the bare
+typeglob, like <CODE>*STDOUT</CODE>, but typeglobs references work, too.
+For example:</P>
+<PRE>
+    splutter(\*STDOUT);
+    sub splutter {
+        my $fh = shift;
+        print $fh &quot;her um well a hmmm\n&quot;;
+    }</PRE>
+<PRE>
+    $rec = get_rec(\*STDIN);
+    sub get_rec {
+        my $fh = shift;
+        return scalar &lt;$fh&gt;;
+    }</PRE>
+<P>If you're planning on generating new filehandles, you could do this.
+Notice to pass back just the bare *FH, not its reference.</P>
+<PRE>
+    sub openit {
+        my $path = shift;
+        local *FH;
+        return open (FH, $path) ? *FH : undef;
+    }</PRE>
+<P>
+<H2><A NAME="prototypes">Prototypes</A></H2>
+<P>Perl supports a very limited kind of compile-time argument checking
+using function prototyping.  If you declare</P>
+<PRE>
+    sub mypush (\@@)</PRE>
+<P>then <CODE>mypush()</CODE> takes arguments exactly like <A HREF="../../lib/Pod/perlfunc.html#item_push"><CODE>push()</CODE></A> does.  The
+function declaration must be visible at compile time.  The prototype
+affects only interpretation of new-style calls to the function,
+where new-style is defined as not using the <CODE>&amp;</CODE> character.  In
+other words, if you call it like a built-in function, then it behaves
+like a built-in function.  If you call it like an old-fashioned
+subroutine, then it behaves like an old-fashioned subroutine.  It
+naturally falls out from this rule that prototypes have no influence
+on subroutine references like <CODE>\&amp;foo</CODE> or on indirect subroutine
+calls like <CODE>&amp;{$subref}</CODE> or <CODE>$subref-&gt;()</CODE>.</P>
+<P>Method calls are not influenced by prototypes either, because the
+function to be called is indeterminate at compile time, since
+the exact code called depends on inheritance.</P>
+<P>Because the intent of this feature is primarily to let you define
+subroutines that work like built-in functions, here are prototypes
+for some other functions that parse almost exactly like the
+corresponding built-in.</P>
+<PRE>
+    Declared as                 Called as</PRE>
+<PRE>
+    sub mylink ($$)          mylink $old, $new
+    sub myvec ($$$)          myvec $var, $offset, 1
+    sub myindex ($$;$)       myindex &amp;getstring, &quot;substr&quot;
+    sub mysyswrite ($$$;$)   mysyswrite $buf, 0, length($buf) - $off, $off
+    sub myreverse (@)        myreverse $a, $b, $c
+    sub myjoin ($@)          myjoin &quot;:&quot;, $a, $b, $c
+    sub mypop (\@)           mypop @array
+    sub mysplice (\@$$@)     mysplice @array, @array, 0, @pushme
+    sub mykeys (\%)          mykeys %{$hashref}
+    sub myopen (*;$)         myopen HANDLE, $name
+    sub mypipe (**)          mypipe READHANDLE, WRITEHANDLE
+    sub mygrep (&amp;@)          mygrep { /foo/ } $a, $b, $c
+    sub myrand ($)           myrand 42
+    sub mytime ()            mytime</PRE>
+<P>Any backslashed prototype character represents an actual argument
+that absolutely must start with that character.  The value passed
+as part of <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> will be a reference to the actual argument given
+in the subroutine call, obtained by applying <CODE>\</CODE> to that argument.</P>
+<P>Unbackslashed prototype characters have special meanings.  Any
+unbackslashed <CODE>@</CODE> or <CODE>%</CODE> eats all remaining arguments, and forces
+list context.  An argument represented by <CODE>$</CODE> forces scalar context.  An
+<CODE>&amp;</CODE> requires an anonymous subroutine, which, if passed as the first
+argument, does not require the <A HREF="../../lib/Pod/perlfunc.html#item_sub"><CODE>sub</CODE></A> keyword or a subsequent comma.</P>
+<P>A <CODE>*</CODE> allows the subroutine to accept a bareword, constant, scalar expression,
+typeglob, or a reference to a typeglob in that slot.  The value will be
+available to the subroutine either as a simple scalar, or (in the latter
+two cases) as a reference to the typeglob.  If you wish to always convert
+such arguments to a typeglob reference, use Symbol::qualify_to_ref() as
+follows:</P>
+<PRE>
+    use Symbol 'qualify_to_ref';</PRE>
+<PRE>
+    sub foo (*) {
+        my $fh = qualify_to_ref(shift, caller);
+        ...
+    }</PRE>
+<P>A semicolon separates mandatory arguments from optional arguments.
+It is redundant before <CODE>@</CODE> or <CODE>%</CODE>, which gobble up everything else.</P>
+<P>Note how the last three examples in the table above are treated
+specially by the parser.  <CODE>mygrep()</CODE> is parsed as a true list
+operator, <CODE>myrand()</CODE> is parsed as a true unary operator with unary
+precedence the same as <A HREF="../../lib/Pod/perlfunc.html#item_rand"><CODE>rand()</CODE></A>, and <CODE>mytime()</CODE> is truly without
+arguments, just like <A HREF="../../lib/Pod/perlfunc.html#item_time"><CODE>time()</CODE></A>.  That is, if you say</P>
+<PRE>
+    mytime +2;</PRE>
+<P>you'll get <CODE>mytime() + 2</CODE>, not <CODE>mytime(2)</CODE>, which is how it would be parsed
+without a prototype.</P>
+<P>The interesting thing about <CODE>&amp;</CODE> is that you can generate new syntax with it,
+provided it's in the initial position:</P>
+<PRE>
+    sub try (&amp;@) {
+        my($try,$catch) = @_;
+        eval { &amp;$try };
+        if ($@) {
+            local $_ = $@;
+            &amp;$catch;
+        }
+    }
+    sub catch (&amp;) { $_[0] }</PRE>
+<PRE>
+    try {
+        die &quot;phooey&quot;;
+    } catch {
+        /phooey/ and print &quot;unphooey\n&quot;;
+    };</PRE>
+<P>That prints <CODE>&quot;unphooey&quot;</CODE>.  (Yes, there are still unresolved
+issues having to do with visibility of <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A>.  I'm ignoring that
+question for the moment.  (But note that if we make <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> lexically
+scoped, those anonymous subroutines can act like closures... (Gee,
+is this sounding a little Lispish?  (Never mind.))))</P>
+<P>And here's a reimplementation of the Perl <A HREF="../../lib/Pod/perlfunc.html#item_grep"><CODE>grep</CODE></A> operator:</P>
+<PRE>
+    sub mygrep (&amp;@) {
+        my $code = shift;
+        my @result;
+        foreach $_ (@_) {
+            push(@result, $_) if &amp;$code;
+        }
+        @result;
+    }</PRE>
+<P>Some folks would prefer full alphanumeric prototypes.  Alphanumerics have
+been intentionally left out of prototypes for the express purpose of
+someday in the future adding named, formal parameters.  The current
+mechanism's main goal is to let module writers provide better diagnostics
+for module users.  Larry feels the notation quite understandable to Perl
+programmers, and that it will not intrude greatly upon the meat of the
+module, nor make it harder to read.  The line noise is visually
+encapsulated into a small pill that's easy to swallow.</P>
+<P>It's probably best to prototype new functions, not retrofit prototyping
+into older ones.  That's because you must be especially careful about
+silent impositions of differing list versus scalar contexts.  For example,
+if you decide that a function should take just one parameter, like this:</P>
+<PRE>
+    sub func ($) {
+        my $n = shift;
+        print &quot;you gave me $n\n&quot;;
+    }</PRE>
+<P>and someone has been calling it with an array or expression
+returning a list:</P>
+<PRE>
+    func(@foo);
+    func( split /:/ );</PRE>
+<P>Then you've just supplied an automatic <A HREF="../../lib/Pod/perlfunc.html#item_scalar"><CODE>scalar</CODE></A> in front of their
+argument, which can be more than a bit surprising.  The old <CODE>@foo</CODE>
+which used to hold one thing doesn't get passed in.  Instead,
+<CODE>func()</CODE> now gets passed in a <CODE>1</CODE>; that is, the number of elements
+in <CODE>@foo</CODE>.  And the <A HREF="../../lib/Pod/perlfunc.html#item_split"><CODE>split</CODE></A> gets called in scalar context so it
+starts scribbling on your <A HREF="../../lib/Pod/perlvar.html#item_%40_"><CODE>@_</CODE></A> parameter list.  Ouch!</P>
+<P>This is all very powerful, of course, and should be used only in moderation
+to make the world a better place.</P>
+<P>
+<H2><A NAME="constant functions">Constant Functions</A></H2>
+<P>Functions with a prototype of <CODE>()</CODE> are potential candidates for
+inlining.  If the result after optimization and constant folding
+is either a constant or a lexically-scoped scalar which has no other
+references, then it will be used in place of function calls made
+without <CODE>&amp;</CODE>.  Calls made using <CODE>&amp;</CODE> are never inlined.  (See
+<EM>constant.pm</EM> for an easy way to declare most constants.)</P>
+<P>The following functions would all be inlined:</P>
+<PRE>
+    sub pi ()           { 3.14159 }             # Not exact, but close.
+    sub PI ()           { 4 * atan2 1, 1 }      # As good as it gets,
+                                                # and it's inlined, too!
+    sub ST_DEV ()       { 0 }
+    sub ST_INO ()       { 1 }</PRE>
+<PRE>
+    sub FLAG_FOO ()     { 1 &lt;&lt; 8 }
+    sub FLAG_BAR ()     { 1 &lt;&lt; 9 }
+    sub FLAG_MASK ()    { FLAG_FOO | FLAG_BAR }</PRE>
+<PRE>
+    sub OPT_BAZ ()      { not (0x1B58 &amp; FLAG_MASK) }
+    sub BAZ_VAL () {
+        if (OPT_BAZ) {
+            return 23;
+        }
+        else {
+            return 42;
+        }
+    }</PRE>
+<PRE>
+    sub N () { int(BAZ_VAL) / 3 }
+    BEGIN {
+        my $prod = 1;
+        for (1..N) { $prod *= $_ }
+        sub N_FACTORIAL () { $prod }
+    }</PRE>
+<P>If you redefine a subroutine that was eligible for inlining, you'll get
+a mandatory warning.  (You can use this warning to tell whether or not a
+particular subroutine is considered constant.)  The warning is
+considered severe enough not to be optional because previously compiled
+invocations of the function will still be using the old value of the
+function.  If you need to be able to redefine the subroutine, you need to
+ensure that it isn't inlined, either by dropping the <CODE>()</CODE> prototype
+(which changes calling semantics, so beware) or by thwarting the
+inlining mechanism in some other way, such as</P>
+<PRE>
+    sub not_inlined () {
+        23 if $];
+    }</PRE>
+<P>
+<H2><A NAME="overriding builtin functions">Overriding Built-in Functions</A></H2>
+<P>Many built-in functions may be overridden, though this should be tried
+only occasionally and for good reason.  Typically this might be
+done by a package attempting to emulate missing built-in functionality
+on a non-Unix system.</P>
+<P>Overriding may be done only by importing the name from a
+module--ordinary predeclaration isn't good enough.  However, the
+<CODE>use subs</CODE> pragma lets you, in effect, predeclare subs
+via the import syntax, and these names may then override built-in ones:</P>
+<PRE>
+    use subs 'chdir', 'chroot', 'chmod', 'chown';
+    chdir $somewhere;
+    sub chdir { ... }</PRE>
+<P>To unambiguously refer to the built-in form, precede the
+built-in name with the special package qualifier <CODE>CORE::</CODE>.  For example,
+saying <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>CORE::open()</CODE></A> always refers to the built-in <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open()</CODE></A>, even
+if the current package has imported some other subroutine called
+<A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>&amp;open()</CODE></A> from elsewhere.  Even though it looks like a regular
+function call, it isn't: you can't take a reference to it, such as
+the incorrect <CODE>\&amp;CORE::open</CODE> might appear to produce.</P>
+<P>Library modules should not in general export built-in names like <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A>
+or <A HREF="../../lib/Pod/perlfunc.html#item_chdir"><CODE>chdir</CODE></A> as part of their default <CODE>@EXPORT</CODE> list, because these may
+sneak into someone else's namespace and change the semantics unexpectedly.
+Instead, if the module adds that name to <CODE>@EXPORT_OK</CODE>, then it's
+possible for a user to import the name explicitly, but not implicitly.
+That is, they could say</P>
+<PRE>
+    use Module 'open';</PRE>
+<P>and it would import the <A HREF="../../lib/Pod/perlfunc.html#item_open"><CODE>open</CODE></A> override.  But if they said</P>
+<PRE>
+    use Module;</PRE>
+<P>they would get the default imports without overrides.</P>
+<P>The foregoing mechanism for overriding built-in is restricted, quite
+deliberately, to the package that requests the import.  There is a second
+method that is sometimes applicable when you wish to override a built-in
+everywhere, without regard to namespace boundaries.  This is achieved by
+importing a sub into the special namespace <CODE>CORE::GLOBAL::</CODE>.  Here is an
+example that quite brazenly replaces the <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A> operator with something
+that understands regular expressions.</P>
+<PRE>
+    package REGlob;
+    require Exporter;
+    @ISA = 'Exporter';
+    @EXPORT_OK = 'glob';</PRE>
+<PRE>
+    sub import {
+        my $pkg = shift;
+        return unless @_;
+        my $sym = shift;
+        my $where = ($sym =~ s/^GLOBAL_// ? 'CORE::GLOBAL' : caller(0));
+        $pkg-&gt;export($where, $sym, @_);
+    }</PRE>
+<PRE>
+    sub glob {
+        my $pat = shift;
+        my @got;
+        local *D;
+        if (opendir D, '.') { 
+            @got = grep /$pat/, readdir D; 
+            closedir D;   
+        }
+        return @got;
+    }
+    1;</PRE>
+<P>And here's how it could be (ab)used:</P>
+<PRE>
+    #use REGlob 'GLOBAL_glob';      # override glob() in ALL namespaces
+    package Foo;
+    use REGlob 'glob';              # override glob() in Foo:: only
+    print for &lt;^[a-z_]+\.pm\$&gt;;     # show all pragmatic modules</PRE>
+<P>The initial comment shows a contrived, even dangerous example.
+By overriding <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A> globally, you would be forcing the new (and
+subversive) behavior for the <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A> operator for <EM>every</EM> namespace,
+without the complete cognizance or cooperation of the modules that own
+those namespaces.  Naturally, this should be done with extreme caution--if
+it must be done at all.</P>
+<P>The <CODE>REGlob</CODE> example above does not implement all the support needed to
+cleanly override perl's <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A> operator.  The built-in <A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A> has
+different behaviors depending on whether it appears in a scalar or list
+context, but our <CODE>REGlob</CODE> doesn't.  Indeed, many perl built-in have such
+context sensitive behaviors, and these must be adequately supported by
+a properly written override.  For a fully functional example of overriding
+<A HREF="../../lib/Pod/perlfunc.html#item_glob"><CODE>glob</CODE></A>, study the implementation of <CODE>File::DosGlob</CODE> in the standard
+library.</P>
+<P>
+<H2><A NAME="autoloading">Autoloading</A></H2>
+<P>If you call a subroutine that is undefined, you would ordinarily
+get an immediate, fatal error complaining that the subroutine doesn't
+exist.  (Likewise for subroutines being used as methods, when the
+method doesn't exist in any base class of the class's package.)
+However, if an <CODE>AUTOLOAD</CODE> subroutine is defined in the package or
+packages used to locate the original subroutine, then that
+<CODE>AUTOLOAD</CODE> subroutine is called with the arguments that would have
+been passed to the original subroutine.  The fully qualified name
+of the original subroutine magically appears in the global $AUTOLOAD
+variable of the same package as the <CODE>AUTOLOAD</CODE> routine.  The name
+is not passed as an ordinary argument because, er, well, just
+because, that's why...</P>
+<P>Many <CODE>AUTOLOAD</CODE> routines load in a definition for the requested
+subroutine using eval(), then execute that subroutine using a special
+form of <A HREF="../../lib/Pod/perlfunc.html#item_goto"><CODE>goto()</CODE></A> that erases the stack frame of the <CODE>AUTOLOAD</CODE> routine
+without a trace.  (See the source to the standard module documented
+in <A HREF="../../lib/AutoLoader.html">the AutoLoader manpage</A>, for example.)  But an <CODE>AUTOLOAD</CODE> routine can
+also just emulate the routine and never define it.   For example,
+let's pretend that a function that wasn't defined should just invoke
+<A HREF="../../lib/Pod/perlfunc.html#item_system"><CODE>system</CODE></A> with those arguments.  All you'd do is:</P>
+<PRE>
+    sub AUTOLOAD {
+        my $program = $AUTOLOAD;
+        $program =~ s/.*:://;
+        system($program, @_);
+    }
+    date();
+    who('am', 'i');
+    ls('-l');</PRE>
+<P>In fact, if you predeclare functions you want to call that way, you don't
+even need parentheses:</P>
+<PRE>
+    use subs qw(date who ls);
+    date;
+    who &quot;am&quot;, &quot;i&quot;;
+    ls -l;</PRE>
+<P>A more complete example of this is the standard Shell module, which
+can treat undefined subroutine calls as calls to external programs.</P>
+<P>Mechanisms are available to help modules writers split their modules
+into autoloadable files.  See the standard AutoLoader module
+described in <A HREF="../../lib/AutoLoader.html">the AutoLoader manpage</A> and in <A HREF="../../lib/AutoSplit.html">the AutoSplit manpage</A>, the standard
+SelfLoader modules in <A HREF="../../lib/SelfLoader.html">the SelfLoader manpage</A>, and the document on adding C
+functions to Perl code in <A HREF="../../lib/Pod/perlxs.html">the perlxs manpage</A>.</P>
+<P>
+<H2><A NAME="subroutine attributes">Subroutine Attributes</A></H2>
+<P>A subroutine declaration or definition may have a list of attributes
+associated with it.  If such an attribute list is present, it is
+broken up at space or colon boundaries and treated as though a
+<CODE>use attributes</CODE> had been seen.  See <A HREF="../../lib/attributes.html">the attributes manpage</A> for details
+about what attributes are currently supported.
+Unlike the limitation with the obsolescent <CODE>use attrs</CODE>, the
+<CODE>sub : ATTRLIST</CODE> syntax works to associate the attributes with
+a pre-declaration, and not just with a subroutine definition.</P>
+<P>The attributes must be valid as simple identifier names (without any
+punctuation other than the '_' character).  They may have a parameter
+list appended, which is only checked for whether its parentheses ('(',')')
+nest properly.</P>
+<P>Examples of valid syntax (even though the attributes are unknown):</P>
+<PRE>
+    sub fnord (&amp;\%) : switch(10,foo(7,3))  :  expensive ;
+    sub plugh () : Ugly('\(&quot;) :Bad ;
+    sub xyzzy : _5x5 { ... }</PRE>
+<P>Examples of invalid syntax:</P>
+<PRE>
+    sub fnord : switch(10,foo() ; # ()-string not balanced
+    sub snoid : Ugly('(') ;       # ()-string not balanced
+    sub xyzzy : 5x5 ;             # &quot;5x5&quot; not a valid identifier
+    sub plugh : Y2::north ;       # &quot;Y2::north&quot; not a simple identifier
+    sub snurt : foo + bar ;       # &quot;+&quot; not a colon or space</PRE>
+<P>The attribute list is passed as a list of constant strings to the code
+which associates them with the subroutine.  In particular, the second example
+of valid syntax above currently looks like this in terms of how it's
+parsed and invoked:</P>
+<PRE>
+    use attributes __PACKAGE__, \&amp;plugh, q[Ugly('\(&quot;)], 'Bad';</PRE>
+<P>For further details on attribute lists and their manipulation,
+see <A HREF="../../lib/attributes.html">the attributes manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>See <A HREF="../../lib/Pod/perlref.html#function templates">Function Templates in the perlref manpage</A> for more about references and closures.
+See <A HREF="../../lib/Pod/perlxs.html">the perlxs manpage</A> if you'd like to learn about calling C subroutines from Perl.  
+See <A HREF="../../lib/Pod/perlembed.html">the perlembed manpage</A> if you'd like to learn about calling Perl subroutines from C.  
+See <A HREF="../../lib/Pod/perlmod.html">the perlmod manpage</A> to learn about bundling up your functions in separate files.
+See <A HREF="../../lib/Pod/perlmodlib.html">the perlmodlib manpage</A> to learn what library modules come standard on your system.
+See <A HREF="../../lib/Pod/perltoot.html">the perltoot manpage</A> to learn how to make object method calls.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;perlsub - Perl subroutines</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

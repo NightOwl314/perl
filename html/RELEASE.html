@@ -1,0 +1,482 @@
+<HTML>
+<HEAD>
+<TITLE>ActivePerl 5.6.1.626 -- Release Notes</TITLE>
+<LINK REL="stylesheet" HREF="Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#activeperl 5.6.1.626  release notes">ActivePerl 5.6.1.626 - Release Notes</A></LI>
+	<LI><A HREF="#installing activeperl">Installing ActivePerl</A></LI>
+	<UL>
+
+		<LI><A HREF="#linux (x86)">Linux (x86)</A></LI>
+		<LI><A HREF="#solaris (sparc)">Solaris (sparc)</A></LI>
+		<LI><A HREF="#activeperl generic installer for linux (x86) and solaris (sparc)">ActivePerl Generic Installer for Linux (x86) and Solaris (sparc)</A></LI>
+		<LI><A HREF="#windows (x86)">Windows (x86)</A></LI>
+	</UL>
+
+	<LI><A HREF="#configuration">Configuration</A></LI>
+	<LI><A HREF="#incompatibilities">Incompatibilities</A></LI>
+	<LI><A HREF="#known issues">Known Issues</A></LI>
+	<UL>
+
+		<LI><A HREF="#all platforms">All Platforms</A></LI>
+		<LI><A HREF="#linux and solaris">Linux and Solaris</A></LI>
+		<LI><A HREF="#windows">Windows</A></LI>
+		<LI><A HREF="#further information">Further Information</A></LI>
+	</UL>
+
+	<LI><A HREF="#reporting problems">Reporting Problems</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="activeperl 5.6.1.626  release notes">ActivePerl 5.6.1.626 -- Release Notes</A></H1>
+<P>Welcome, and thanks for downloading ActivePerl.  This release corresponds
+to Perl version 5.6.1.</P>
+<P>This is the first release of ActivePerl based on this new maintenance release
+of Perl.  This release is meant for use in production systems.  However,
+owing to the sheer volume of changes between Perl 5.6.0 and 5.6.1 that have
+been incorporated, please be sure to test it thoroughly in a non-critical
+environment before you upgrade your production systems.</P>
+<P>Please note that ActivePerl 600 series builds are NOT binary-compatible with
+the older 500 series builds.  In particular, do not attempt to use extensions
+or PPM packages built for the 500 series builds with ActivePerl 600 series
+builds and vice versa.  This build is binary compatible with previous 600
+series builds.</P>
+<P>Binaries for the following platforms are available:</P>
+<UL>
+<LI>
+Linux x86 for Red Hat 6.2 or later
+<P></P>
+<LI>
+Linux x86 for Debian 2.2 or later
+<P></P>
+<LI>
+Solaris sparc for Solaris 2.6 or later
+<P></P>
+<LI>
+Windows x86 for Windows NT and Windows 2000
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="installing activeperl">Installing ActivePerl</A></H1>
+<P>ActivePerl can be easily installed in each platform's native format.</P>
+<P>
+<H2><A NAME="linux (x86)">Linux (x86)</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Red_Hat_6%2E2_or_later">Red Hat 6.2 or later</A></STRONG><BR>
+<DD>
+The Red Hat compatible package is in RPM format.  This should be installed
+as root, using the following command:
+<PRE>
+    % rpm -i ActivePerl-5.6.1.626-i686-linux-thread-multi.rpm</PRE>
+<P>This will install ActivePerl into /usr/local/ActivePerl-5.6.  If you
+wish to change the default install location, you may want to add the
+<CODE>--prefix</CODE> option to the above command.  For example:</P>
+<PRE>
+    % rpm -i --prefix /opt/ActivePerl-5.6 ActivePerl-5.6.1.626-i686-linux-thread-multi.rpm</PRE>
+<P>If you wish to uninstall this package at a later time, you can run:</P>
+<PRE>
+    % rpm -e ActivePerl</PRE>
+<P>to do so.</P>
+<P>The RPM package has only been tested with Red Hat 6.2, but is expected to be
+compatible with other Red Hat 6.2 compatible installations as well.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Debian_2%2E2">Debian 2.2</A></STRONG><BR>
+<DD>
+The Debian-compatible package is in dpkg format.  This should be installed
+as root, using the following command:
+<PRE>
+    % dpkg -i ActivePerl-5.6.1.626-i686-linux-thread-multi.deb</PRE>
+<P>This will install ActivePerl into /usr/local/ActivePerl-5.6.  The dpkg
+installation package has no mechanism to change the default installation
+location.  Consider installing ActivePerl using the ActivePerl Generic
+Installer or the RPM package if you need this.</P>
+<P>If you wish to uninstall this package at a later time, you can run:</P>
+<PRE>
+    % dpkg -r ActivePerl</PRE>
+<P>to do so.</P>
+<P>The Debian package has only been tested with Debian 2.2, but is expected
+to be compatible with other Debian 2.2 compatible installations as well.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="solaris (sparc)">Solaris (sparc)</A></H2>
+<P>The Solaris package is in pkgadd format.  This should be installed
+as root, using the following commands:</P>
+<PRE>
+    % gunzip ActivePerl-5.6.1.626-sun4-solaris-thread-multi.gz
+    % pkgadd -d ActivePerl-5.6.1.626-sun4-solaris-thread-multi</PRE>
+<P>pkgadd will query you for the installation location, which can be
+changed from the default of /usr/local/ActivePerl-5.6.</P>
+<P>If you wish to uninstall this package at a later time, you can run:</P>
+<PRE>
+    % pkgrm ASperl</PRE>
+<P>to do so.</P>
+<P>This package has only been tested with Solaris 2.6, but is expected to be
+compatible with other Solaris 2.6 compatible installations as well,
+including Solaris 2.7 and Solaris 2.8.</P>
+<P>
+<H2><A NAME="activeperl generic installer for linux (x86) and solaris (sparc)">ActivePerl Generic Installer for Linux (x86) and Solaris (sparc)</A></H2>
+<P>The Generic Installer allows installation as an unprivileged user, and
+into a user-specified path.</P>
+<P>Download the distribution to a temporary directory, extract the files,
+chdir to the ActivePerl directory and then run the script ``install.sh''.
+The installation script will prompt you for the target installation
+directory.</P>
+<PRE>
+    % tar zxf ActivePerl-5.6.1.626-sun4-solaris-thread-multi.tar.gz
+    % cd ActivePerl-5.6.1.626
+    % ./install.sh</PRE>
+<P>GNU tar is required for extracting the files, especially on Solaris.
+See the ``Known Issues'' section below for details.</P>
+<P>
+<H2><A NAME="windows (x86)">Windows (x86)</A></H2>
+<P>The Windows package is in Microsoft Windows Installer format.  On Windows NT
+and Windows9x, you may need to download and install the MSI support package in
+order to begin the install process.  Windows 2000 users do not need any
+additional software to install the package.</P>
+<P>To install the package, simply find the directory containing the package
+with Explorer, and double-click on the MSI file.</P>
+<P>Before you can install ActivePerl, Windows NT and 9x users will need to 
+download and install Windows Installer 1.1 from:</P>
+<PRE>
+    <A HREF="http://www.ActiveState.com/download/contrib/Microsoft/NT/InstMsi.exe">http://www.ActiveState.com/download/contrib/Microsoft/NT/InstMsi.exe</A>
+    <A HREF="http://www.ActiveState.com/download/contrib/Microsoft/9x/InstMsi.exe">http://www.ActiveState.com/download/contrib/Microsoft/9x/InstMsi.exe</A></PRE>
+<P>If you are installing Perl on behalf of other users, we recommend running
+the installer with administrative privileges.  Running without
+administrative privileges has the following limitations:</P>
+<UL>
+<LI>
+The PerlScript feature will be unavailable.
+<P></P>
+<LI>
+ActivePerl applications will not write messages to the event log.
+<P></P>
+<LI>
+Environment variables are set only for the current user.
+<P></P>
+<LI>
+The option to create a file association for Perl files is disabled.
+<P></P>
+<LI>
+Any registry entries created are under HKEY_CURRENT_USER and not under
+HKEY_LOCAL_MACHINE.
+<P></P></UL>
+<P><STRONG>NOTE: DO NOT</STRONG> launch the installation package from a directory for which
+the ``System'' account does not have read permission.  If you do, the Windows
+Installer Service will not be able to access the MSI file in order to
+perform the installation.  You may get an error message to this effect
+or it may fail mysteriously.</P>
+<P><STRONG>NOTE: DO NOT</STRONG> attempt to install over a 500 series build of 
+ActivePerl.  This package must be installed into a separate directory.</P>
+<P>
+<HR>
+<H1><A NAME="configuration">Configuration</A></H1>
+<P>The Red Hat, Debian and Sun packages are installed into the
+/usr/local/ActivePerl-5.6 directory.  Add the /usr/local/ActivePerl-5.6/bin
+directory to your PATH environment variable to conveniently access it.
+For example, in the C shell:</P>
+<PRE>
+    % setenv PATH /usr/local/ActivePerl-5.6/bin:$PATH</PRE>
+<P>The ActivePerl Generic installer allows you to install the package anywhere
+that the user has write permission.  Add the bin directory to your PATH
+environment variable to conveniently access it.  For example, in the
+C shell (assuming you installed into /home/larry/ActivePerl-5.6):</P>
+<PRE>
+    % setenv PATH /home/larry/ActivePerl-5.6/bin:$PATH</PRE>
+<P>On Windows, the installer allows the package to be installed anywhere.
+We recommend not installing over an existing Perl installation.</P>
+<P>
+<HR>
+<H1><A NAME="incompatibilities">Incompatibilities</A></H1>
+<P>The following list is a general summary of the known incompatibilities
+between the 5.6.1 source code release and earlier releases.  Be sure to
+consider these very carefully before upgrading.</P>
+<UL>
+<LI>
+Compatibility macros for global variables are not available by
+default, to control namespace pollution.  If older extensions don't
+build because of missing symbols, try ``perl Makefile.PL POLLUTE=1''
+first.
+<P></P>
+<LI>
+Subroutines named CHECK are considered special, and will be
+automatically executed when the compilation of the main program ends.
+Rename such functions to lower/mixed case.
+<P></P>
+<LI>
+$English::PERL_VERSION is now an alias for $^V (a string) rather
+than $] (a number).  You may need to use the ``%vd'' sprintf format
+to display this correctly.
+<P></P>
+<LI>
+Literals of the form 1.2.3 parse as <CODE>chr(1) . chr(2) . chr(3)</CODE>
+rather than as <CODE>&quot;1.2&quot; . 3</CODE>.
+<P></P>
+<LI>
+<CODE>rand()</CODE> may yield a different (but usually more random) sequence due
+to internal changes.
+<P></P>
+<LI>
+Iterating over hashes may yield a different order than before due
+to changes in the hashing function used.
+<P></P>
+<LI>
+The <CODE>undef</CODE> operator raises an exception when applied to read-only
+values.
+<P></P>
+<LI>
+The close-on-exec bit is now set on pipe and socket handles as well,
+if you set $^F high enough.
+<P></P>
+<LI>
+<CODE>&quot;$$1&quot;</CODE> always means <CODE>&quot;${$1}&quot;</CODE> now, rather than <CODE>$$ . &quot;1&quot;</CODE> (which
+was deprecated in 5.004).
+<P></P>
+<LI>
+delete(), each(), <CODE>values()</CODE> and \(%h) operate on aliases to values,
+instead of on copies.  You may need to copy the values explicitly
+where needed.
+<P></P>
+<LI>
+<CODE>vec()</CODE> will raise an exception if the BITS argument is not a
+power-of-two integer.
+<P></P>
+<LI>
+<CODE>not</CODE> followed by parentheses behaves like a list operator.  This
+allows <CODE>grep not($_), @things</CODE> to work as expected, but also changes
+<CODE>not (1,2,3)[0]</CODE> to mean <CODE>(not(1,2,3))[0]</CODE> instead of
+<CODE>not((1,2,3)[0])</CODE>.
+<P></P>
+<LI>
+The semantics of the bareword prototype (*) have changed to make it
+possible to pass barewords, as in many builtins.
+<P></P>
+<LI>
+Bitwise operators on 64-bit platforms operate on the entire native
+width rather than just the lower 32 bits.  (You must mask off the
+excess bits if you don't want them.)
+<P></P>
+<LI>
+More builtins taint their results due to higher security paranoia,
+when perl is running under taint mode (enabled via the -T switch).
+<P></P>
+<LI>
+If you have a perl installation older than 5.005, note that 5.6.1
+won't be binary compatible with it.  You will need to recompile
+all extensions when upgrading from installations older than 5.005.
+(This only applies when building from the source code--ActivePerl
+builds based on 5.6.1 are not binary compatible with builds based
+on 5.005 and earlier.)
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="known issues">Known Issues</A></H1>
+<P>
+<H2><A NAME="all platforms">All Platforms</A></H2>
+<UL>
+<LI>
+A definitive summary of platform-independent changes and known issues in
+this release is available in <EM>perldelta</EM> and in the CHANGES log that
+comes with the ActivePerl distribution.
+<P></P>
+<LI>
+Unicode support still has various known bugs. Please refer to the 
+<EM>perlunicode</EM> documentation.
+<P></P></UL>
+<P>
+<H2><A NAME="linux and solaris">Linux and Solaris</A></H2>
+<UL>
+<LI>
+Some versions of tar on Solaris have bugs that prevent proper extraction
+of files in a package that has long path names.  Most other versions
+of tar on Solaris use a different method than GNU tar to encode pathnames
+longer than 100 characters.  GNU tar is therefore required to extract the
+package into the filesystem correctly.  A precompiled version of GNU tar
+for the sparc platform is available from:
+<PRE>
+    <A HREF="http://www.sunfreeware.com/">http://www.sunfreeware.com/</A></PRE>
+<P>You can also get the source package for GNU tar from:</P>
+<PRE>
+    <A HREF="http://www.gnu.org/">http://www.gnu.org/</A></PRE>
+<P></P>
+<LI>
+If you are upgrading from build 613, the default location for the
+ActivePerl installation when using the native installations on
+Unix (Red Hat RPM, Debian dpkg, or Solaris pkgadd) has changed.
+Build 613 and earlier installed ActivePerl at /usr/local/perl-5.6,
+whereas later builds are installed at /usr/local/ActivePerl-5.6.
+This one-time change avoids confusion with locally installed versions
+built from the sources, and also avoids installing on top of existing
+binary-incompatible installations.
+<P></P>
+<LI>
+This build is not binary compatible with build 613 and earlier.  If
+you installed any extensions containing XS code with build 613 or
+earlier builds (via PPM or otherwise), you will need to reinstall
+them again.
+<P></P>
+<LI>
+The suidperl executable is not included in this package due to potential
+security issues.  If you wish to use suidperl in your installation, we
+recommend building Perl from source.  The source code for ActivePerl is
+available at <A HREF="http://www.ActiveState.com/.">http://www.ActiveState.com/.</A>
+<P></P></UL>
+<P>
+<H2><A NAME="windows">Windows</A></H2>
+<UL>
+<LI>
+ActivePerl depends on MSVCRT.DLL being installed on the target system.
+This file ships with Windows 98, Windows NT and Windows 2000 but not with 
+Windows 95. If you do not have this file installed on your system you may
+experience problems installing and/or running components within ActivePerl.
+<P>You can download a self extracting executable that contains MSVCRT.DLL
+from:</P>
+<PRE>
+    <A HREF="ftp://ftp.microsoft.com/softlib/mslfiles/msvcrt.exe">ftp://ftp.microsoft.com/softlib/mslfiles/msvcrt.exe</A></PRE>
+<P>Save the file in a temporary directory and double click on it to 
+extract the files. Follow the instructions in the ReadMe.txt file 
+contained in the package in order to install the missing file.</P>
+<P></P>
+<LI>
+The <CODE>fork()</CODE> emulation has known limitations.  See <EM>perlfork</EM> for a
+detailed summary.  In particular, <CODE>fork()</CODE> emulation will not work
+correctly with extensions that are either not thread-safe, or maintain
+internal state that cannot be cloned in the psuedo-child process.  This
+caveat currently applies to extensions such as Tk and Storable.
+<P></P>
+<LI>
+It seems that numerous people are being bitten by this error from the 
+ActivePerl MSI installer. The full text of the error message probably looks 
+something lke this:
+<PRE>
+    Installer Information
+    Internal Error 2744. PPM_CONFI, C:\perl\bin.
+    &quot;C:\Perl\bin\wPerl.exe&quot; &quot;C:\Perlbin\configPPM.pl&quot;
+    &quot;C:\Perl\site\lib\ppm.xml&quot; &quot;D:\downloads\perl\\&quot;
+    &quot;C:\Perl\site\lib\ppm.xml~&quot;</PRE>
+<P>The first thing to note is that you CANNOT install ActivePerl 5.6 over
+an older version of ActivePerl based on 5.005, such as build 522 or any 
+500 series build.</P>
+<P>We have determined that one cause of this error message is due to other 
+installations of Perl that may be pointed at by something in the 
+environment.</P>
+<P><STRONG>Workaround</STRONG></P>
+<P>The sure-fire solution is to make absolutely certain that no other 
+installations of Perl are on the target machine. Realizing that this is not 
+always possible, you can follow these steps to ensure the other 
+installations will not interfere.</P>
+<P>1) Stop the ``Windows Installer'' service. This can be accomplished from the 
+command prompt using the following command:</P>
+<PRE>
+    c:\&gt; net stop &quot;Windows Installer&quot;</PRE>
+<P>2) Temporarily remove or rename PERLLIB and PERL5LIB environment 
+variables in the system environment.</P>
+<P>3) Temporarily remove or rename the following registry values:</P>
+<PRE>
+    [\\HKEY_LOCAL_MACHINE\Software\Perl] lib = &lt;directory&gt; (REG_SV)
+    [\\HKEY_LOCAL_MACHINE\Software\Perl] sitelib = &lt;directory&gt; (REG_SV)
+    [\\HKEY_LOCAL_MACHINE\Software\Perl] lib-&lt;PerlVersion&gt; = &lt;directory&gt; (REG_SV)
+    [\\HKEY_LOCAL_MACHINE\Software\Perl] sitelib-&lt;PerlVersion&gt; = &lt;directory&gt;(REG_SV)</PRE>
+<P>4) Proceed with the installation.</P>
+<P>Once the installation has completed successfully, the above actions may be 
+undone although restoring the environment variables or the registry values 
+may interfere with the proper operation of your new ActivePerl 
+installation.</P>
+<P>In order to perform all of the above steps, you will need to have 
+Administrative privileges on the target machine. If you do not have the 
+required privileges you should contact you Administrator.</P>
+<P>The next version of ActivePerl has a fix for this issue so none of the 
+above actions will have to be taken.</P>
+<P></P>
+<LI>
+Norton AntiVirus 2000 detects VBS.NewLove.A in the file ActivePerl-Winfaq12.html.
+<P><STRONG>Workaround</STRONG></P>
+<P>This is a false positive by Norton AntiVirus.  ActivePerl-Winfaq12.html has
+been examined by hand, and it is likely that the following example code is
+what causes the false report.</P>
+<PRE>
+    &lt;BLOCKQUOTE&gt;
+    &lt;P&gt;&lt;CODE&gt;use strict;&lt;BR&gt;
+      use Win32::OLE;&lt;BR&gt;
+      use Win32::OLE::Const 'Microsoft Outlook';&lt;BR&gt;
+      &lt;BR&gt;
+      my $Outlook = Win32::OLE-&amp;gt;new('Outlook.Application', 'Quit');&lt;BR&gt;
+      my $ol = Win32::OLE::Const-&amp;gt;Load($Outlook);&lt;BR&gt;
+      &lt;BR&gt;
+      my $namespace = $Outlook-&amp;gt;GetNamespace(&amp;quot;MAPI&amp;quot;);&lt;BR&gt;
+      my $Folder = $namespace-&amp;gt;GetDefaultFolder(olFolderInbox);&lt;BR&gt;
+      my $NewFolder = $Folder-&amp;gt;Folders-&amp;gt;Add(&amp;quot;Test1&amp;quot;);&lt;/CODE&gt;&lt;/P&gt;
+    &lt;/BLOCKQUOTE&gt;</PRE>
+<P>This can be tested by removing the above code from the ActivePerl-Winfaq12.html
+file and rescanning with Norton AntiVirus.  Norton AntiVirus will no longer
+detect VBS.NewLove.A.</P>
+<P>Symantec has been notified of this issue.</P>
+<P></P>
+<LI>
+The following Microsoft knowledge base articles may be helpful in solving MSI 
+problems:
+<P>Q236597 - OFF2000: Error Message: The Installation Package Could Not Be Opened ...
+<A HREF="http://support.microsoft.com/support/kb/articles/Q236/5/97.ASP">http://support.microsoft.com/support/kb/articles/Q236/5/97.ASP</A></P>
+<P>Q224094 - OFF2000: Error Message: This Application Requires the Windows Installer to Run
+<A HREF="http://support.microsoft.com/support/kb/articles/Q224/0/94.ASP">http://support.microsoft.com/support/kb/articles/Q224/0/94.ASP</A></P>
+<P>Q247532 - Works 2000 Err Msg: Installer Terminated Prematurely
+<A HREF="http://support.microsoft.com/support/kb/articles/Q247/5/32.ASP">http://support.microsoft.com/support/kb/articles/Q247/5/32.ASP</A></P>
+<P>``Error 1303. The installer has insufficient privileges...'' Running Office Setup 
+<A HREF="http://support.microsoft.com/support/kb/articles/Q228/6/58.ASP">http://support.microsoft.com/support/kb/articles/Q228/6/58.ASP</A></P>
+<P>Error Message: Error 1316 Running Setup for Admin Installation 
+<A HREF="http://support.microsoft.com/support/kb/articles/Q228/5/92.ASP">http://support.microsoft.com/support/kb/articles/Q228/5/92.ASP</A></P>
+<P>Error 1327 Invalid Drive During Office Installation 
+<A HREF="http://support.microsoft.com/support/kb/articles/Q217/6/66.ASP">http://support.microsoft.com/support/kb/articles/Q217/6/66.ASP</A></P>
+<P></P>
+<LI>
+On Windows 9x, the system must be rebooted for the PATH environment variable 
+to take effect.
+<P>On Windows 9x, the PATH environment variable settings are not removed after an
+uninstall.</P>
+<P></P></UL>
+<P>
+<H2><A NAME="further information">Further Information</A></H2>
+<P>The Perl distribution comes with extensive documentation.  On Unix platforms,
+all the standard documentation is installed as man pages under the Perl
+install location.  The location of the man pages may need to be added to the
+MANPATH environment variable in order to access them.  For example, in
+the C shell:</P>
+<PRE>
+    % setenv MANPATH /usr/local/ActivePerl-5.6/man:$MANPATH</PRE>
+<P>The documentation is installed in HTML format on all platforms. If ActivePerl
+was installed in /usr/local/ActivePerl-5.6 then the HTML documentation
+would be located in /usr/local/ActivePerl-5.6/html.</P>
+<P>On Windows, the standard documentation along with Windows-specific Perl
+documentation is installed in HTML format, and is accessible from the
+``Start'' menu.</P>
+<P>Updated versions of the HTML documentation will always be available at
+the ActiveState website:</P>
+<PRE>
+    <A HREF="http://www.ActiveState.com/ActivePerl/">http://www.ActiveState.com/ActivePerl/</A></PRE>
+<P>
+<HR>
+<H1><A NAME="reporting problems">Reporting Problems</A></H1>
+<P>Please report any problems you encounter with this release at the
+following location:</P>
+<PRE>
+    <A HREF="http://bugs.ActiveState.com/ActivePerl/">http://bugs.ActiveState.com/ActivePerl/</A></PRE>
+<P>If you do not have web access, reports can be also sent via email to
+<A HREF="mailto:ActivePerl-Bugs@ActiveState.com.">ActivePerl-Bugs@ActiveState.com.</A>  Please be sure to include detailed
+information about the platform in your message.</P>
+<P>As far as possible, please ensure that there is enough information in
+the report to reproduce the bug elsewhere.  It also helps to submit a
+minimal test case that exhibits the bug.</P>
+
+</BODY>
+
+</HTML>

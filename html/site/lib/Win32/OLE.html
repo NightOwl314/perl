@@ -1,0 +1,871 @@
+
+<HTML>
+<HEAD>
+<TITLE>Win32::OLE - OLE Automation extensions</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE - OLE Automation extensions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#methods">Methods</A></LI>
+		<LI><A HREF="#object methods and properties">Object methods and properties</A></LI>
+		<LI><A HREF="#functions">Functions</A></LI>
+		<LI><A HREF="#overloading">Overloading</A></LI>
+		<LI><A HREF="#events">Events</A></LI>
+		<LI><A HREF="#module options">Module Options</A></LI>
+	</UL>
+
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#notes">NOTES</A></LI>
+	<UL>
+
+		<LI><A HREF="#hints for microsoft office automation">Hints for Microsoft Office automation</A></LI>
+		<LI><A HREF="#incompatibilities">Incompatibilities</A></LI>
+		<LI><A HREF="#bugs and limitations">Bugs and Limitations</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::OLE - OLE Automation extensions</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    $ex = Win32::OLE-&gt;new('Excel.Application') or die &quot;oops\n&quot;;
+    $ex-&gt;Amethod(&quot;arg&quot;)-&gt;Bmethod-&gt;{'Property'} = &quot;foo&quot;;
+    $ex-&gt;Cmethod(undef,undef,$Arg3);
+    $ex-&gt;Dmethod($RequiredArg1, {NamedArg1 =&gt; $Value1, NamedArg2 =&gt; $Value2});</PRE>
+<PRE>
+    $wd = Win32::OLE-&gt;GetObject(&quot;D:\\Data\\Message.doc&quot;);
+    $xl = Win32::OLE-&gt;GetActiveObject(&quot;Excel.Application&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module provides an interface to OLE Automation from Perl.
+OLE Automation brings VisualBasic like scripting capabilities and
+offers powerful extensibility and the ability to control many Win32
+applications from Perl scripts.</P>
+<P>The Win32::OLE module uses the IDispatch interface exclusively.  It is
+not possible to access a custom OLE interface.  OLE events and OCX's are
+currently not supported.</P>
+<P>Actually, that's no longer strictly true.  This module now contains
+<STRONG>ALPHA</STRONG> level support for OLE events.  This is largely untested and the
+specific interface might still change in the future.</P>
+<P>
+<H2><A NAME="methods">Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">Win32::OLE-&gt;new(PROGID[, DESTRUCTOR])</A></STRONG><BR>
+<DD>
+The <A HREF="#item_new"><CODE>new()</CODE></A> class method starts a new instance of an OLE Automation object.
+It returns a reference to this object or <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if the creation failed.
+<P>The PROGID argument must be either the OLE <EM>program id</EM> or the <EM>class id</EM>
+of the required application.  The optional DESTRUCTOR specifies a DESTROY-like
+method.  This can be either a CODE reference or a string containing an OLE
+method name.  It can be used to cleanly terminate OLE applications in case the
+Perl program dies.</P>
+<P>To create an object via DCOM on a remote server you can use an array
+reference in place of PROGID.  The referenced array must contain the
+machine name and the <EM>program id</EM> or <EM>class id</EM>.  For example:</P>
+<PRE>
+        my $obj = Win32::OLE-&gt;new(['my.machine.com', 'Program.Id']);</PRE>
+<P>If the PROGID is a <EM>program id</EM> then Win32::OLE will try to resolve the
+corresponding <EM>class id</EM> locally.  If the <EM>program id</EM> is not registered
+locally then the remote registry is queried.  This will only succeed if
+the local process has read access to the remote registry.  The safest
+(and fastest) method is to specify the <CODE>class id</CODE> directly.</P>
+<P></P>
+<DT><STRONG><A NAME="item_EnumAllObjects">Win32::OLE-&gt;<CODE>EnumAllObjects([CALLBACK])</CODE></A></STRONG><BR>
+<DD>
+This class method returns the number Win32::OLE objects currently in
+existance.  It will call the optional CALLBACK function for each of
+these objects:
+<PRE>
+        $Count = Win32::OLE-&gt;EnumAllObjects(sub {
+            my $Object = shift;
+            my $Class = Win32::OLE-&gt;QueryObjectType($Object);
+            printf &quot;# Object=%s Class=%s\n&quot;, $Object, $Class;
+        });</PRE>
+<P>The <A HREF="#item_EnumAllObjects"><CODE>EnumAllObjects()</CODE></A> method is primarily a debugging tool.  It can be
+used e.g. in an END block to check if all external connections have
+been properly destroyed.</P>
+<P></P>
+<DT><STRONG><A NAME="item_FreeUnusedLibraries">Win32::OLE-&gt;<CODE>FreeUnusedLibraries()</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_FreeUnusedLibraries"><CODE>FreeUnusedLibraries()</CODE></A> class method unloads all unused OLE
+resources.  These are the libraries of those classes of which all
+existing objects have been destroyed.  The unloading of object
+libraries is really only important for long running processes that
+might instantiate a huge number of <STRONG>different</STRONG> objects over time.
+<P>Be aware that objects implemented in Visual Basic have a buggy
+implementation of this functionality: They pretend to be unloadable
+while they are actually still running their cleanup code.  Unloading
+the DLL at that moment typically produces an access violation.  The
+probability for this problem can be reduced by calling the
+<A HREF="#item_SpinMessageLoop"><CODE>SpinMessageLoop()</CODE></A> method and sleep()ing for a few seconds.</P>
+<P></P>
+<DT><STRONG><A NAME="item_GetActiveObject">Win32::OLE-&gt;GetActiveObject(CLASS[, DESTRUCTOR])</A></STRONG><BR>
+<DD>
+The <A HREF="#item_GetActiveObject"><CODE>GetActiveObject()</CODE></A> class method returns an OLE reference to a
+running instance of the specified OLE automation server.  It returns
+<A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> if the server is not currently active.  It will croak if
+the class is not even registered.  The optional DESTRUCTOR method takes
+either a method name or a code reference.  It is executed when the last
+reference to this object goes away.  It is generally considered <CODE>impolite</CODE>
+to stop applications that you did not start yourself.
+<P></P>
+<DT><STRONG><A NAME="item_GetObject">Win32::OLE-&gt;GetObject(MONIKER[, DESTRUCTOR])</A></STRONG><BR>
+<DD>
+The <A HREF="#item_GetObject"><CODE>GetObject()</CODE></A> class method returns an OLE reference to the specified
+object.  The object is specified by a pathname optionally followed by
+additional item subcomponent separated by exclamation marks '!'.  The
+optional DESTRUCTOR argument has the same semantics as the DESTRUCTOR in
+<A HREF="#item_new"><CODE>new()</CODE></A> or GetActiveObject().
+<P></P>
+<DT><STRONG><A NAME="item_Initialize">Win32::OLE-&gt;<CODE>Initialize([COINIT])</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Initialize"><CODE>Initialize()</CODE></A> class method can be used to specify an alternative
+apartment model for the Perl thread.  It must be called <STRONG>before</STRONG> the
+first OLE object is created.  If the <CODE>Win32::OLE::Const</CODE> module is
+used then the call to the <A HREF="#item_Initialize"><CODE>Initialize()</CODE></A> method must be made from a BEGIN
+block before the first <A HREF="../../../lib/Pod/perlfunc.html#item_use"><CODE>use</CODE></A> statement for the <CODE>Win32::OLE::Const</CODE>
+module.
+<P>Valid values for COINIT are:</P>
+<PRE>
+  Win32::OLE::COINIT_APARTMENTTHREADED  - single threaded
+  Win32::OLE::COINIT_MULTITHREADED      - the default
+  Win32::OLE::COINIT_OLEINITIALIZE      - single threaded, additional OLE stuff</PRE>
+<P>COINIT_OLEINITIALIZE is sometimes needed when an OLE object uses
+additional OLE compound document technologies not available from the
+normal COM subsystem (for example MAPI.Session seems to require it).
+Both COINIT_OLEINITIALIZE and COINIT_APARTMENTTHREADED create a hidden
+top level window and a message queue for the Perl process.  This may
+create problems with other application, because Perl normally doesn't
+process its message queue.  This means programs using synchronous
+communication between applications (such as DDE initiation), may hang
+until Perl makes another OLE method call/property access or terminates.
+This applies to InstallShield setups and many things started to shell
+associations.  Please try to utilize the <A HREF="#item_SpinMessageLoop"><CODE>Win32::OLE-&gt;SpinMessageLoop</CODE></A>
+and <A HREF="#item_Uninitialize"><CODE>Win32::OLE-&gt;Uninitialize</CODE></A> methods if you can not use the default
+COINIT_MULTITHREADED model.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Invoke">OBJECT-&gt;Invoke(METHOD[, ARGS])</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Invoke"><CODE>Invoke()</CODE></A> object method is an alternate way to invoke OLE
+methods.  It is normally equivalent to <CODE>$OBJECT-</CODE>METHOD(@ARGS)&gt;.  This
+function must be used if the METHOD name contains characters not valid
+in a Perl variable name (like foreign language characters).  It can
+also be used to invoke the default method of an object even if the
+default method has not been given a name in the type library.  In this
+case use &lt;undef&gt; or <CODE>''</CODE> as the method name.  To invoke an OLE objects
+native <A HREF="#item_Invoke"><CODE>Invoke()</CODE></A> method (if such a thing exists), please use:
+<PRE>
+        $Object-&gt;Invoke('Invoke', @Args);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LastError">Win32::OLE-&gt;<CODE>LastError()</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_LastError"><CODE>LastError()</CODE></A> class method returns the last recorded OLE
+error.  This is a dual value like the <A HREF="../../../lib/Pod/perlvar.html#item_%24%21"><CODE>$!</CODE></A> variable: in a numeric
+context it returns the error number and in a string context it returns
+the error message.  The error number is a signed HRESULT value.  Please
+use the <A HREF="#item_HRESULT">HRESULT(ERROR)</A> function to convert an unsigned hexadecimal
+constant to a signed HRESULT.
+<P>The last OLE error is automatically reset by a successful OLE
+call.  The numeric value can also explicitly be set by a call (which will
+discard the string value):</P>
+<PRE>
+        Win32::OLE-&gt;LastError(0);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_LetProperty">OBJECT-&gt;<CODE>LetProperty(NAME,ARGS,VALUE)</CODE></A></STRONG><BR>
+<DD>
+In Win32::OLE property assignment using the hash syntax is equivalent
+to the Visual Basic <CODE>Set</CODE> syntax (<EM>by reference</EM> assignment):
+<PRE>
+        $Object-&gt;{Property} = $OtherObject;</PRE>
+<P>corresponds to this Visual Basic statement:</P>
+<PRE>
+        Set Object.Property = OtherObject</PRE>
+<P>To get the <EM>by value</EM> treatment of the Visual Basic <CODE>Let</CODE> statement</P>
+<PRE>
+        Object.Property = OtherObject</PRE>
+<P>you have to use the <A HREF="#item_LetProperty"><CODE>LetProperty()</CODE></A> object method in Perl:</P>
+<PRE>
+        $Object-&gt;LetProperty($Property, $OtherObject);</PRE>
+<P><A HREF="#item_LetProperty"><CODE>LetProperty()</CODE></A> also supports optional arguments for the property assignment.
+See <EM>OBJECT-</EM>SetProperty(NAME,ARGS,VALUE)&gt; for details.</P>
+<P></P>
+<DT><STRONG><A NAME="item_MessageLoop">Win32::OLE-&gt;<CODE>MessageLoop()</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_MessageLoop"><CODE>MessageLoop()</CODE></A> class method will run a standard Windows message
+loop, dispatching messages until the <A HREF="#item_QuitMessageLoop"><CODE>QuitMessageLoop()</CODE></A> class method is
+called.  It is used to wait for OLE events.
+<P></P>
+<DT><STRONG><A NAME="item_Option">Win32::OLE-&gt;<CODE>Option(OPTION)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_Option"><CODE>Option()</CODE></A> class method can be used to inspect and modify
+<A HREF="#module options">Module Options</A>.  The single argument form retrieves the value of
+an option:
+<PRE>
+        my $CP = Win32::OLE-&gt;Option('CP');</PRE>
+<P>A single call can be used to set multiple options simultaneously:</P>
+<PRE>
+        Win32::OLE-&gt;Option(CP =&gt; CP_ACP, Warn =&gt; 3);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_QueryObjectType">Win32::OLE-&gt;<CODE>QueryObjectType(OBJECT)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_QueryObjectType"><CODE>QueryObjectType()</CODE></A> class method returns a list of the type library
+name and the objects class name.  In a scalar context it returns the
+class name only.  It returns <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A> when the type information is not
+available.
+<P></P>
+<DT><STRONG><A NAME="item_QuitMessageLoop">Win32::OLE-&gt;<CODE>QuitMessageLoop()</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_QuitMessageLoop"><CODE>QuitMessageLoop()</CODE></A> class method posts a (user-level) ``Quit'' message
+to the current threads message loop.  <A HREF="#item_QuitMessageLoop"><CODE>QuitMessageLoop()</CODE></A> is typically
+called from an event handler.  The <A HREF="#item_MessageLoop"><CODE>MessageLoop()</CODE></A> class method will
+return when it receives this ``Quit'' method.
+<P></P>
+<DT><STRONG><A NAME="item_SetProperty">OBJECT-&gt;<CODE>SetProperty(NAME,ARGS,VALUE)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_SetProperty"><CODE>SetProperty()</CODE></A> method allows to modify properties with arguments,
+which is not supported by the hash syntax.  The hash form
+<PRE>
+        $Object-&gt;{Property} = $Value;</PRE>
+<P>is equivalent to</P>
+<PRE>
+        $Object-&gt;SetProperty('Property', $Value);</PRE>
+<P>Arguments must be specified between the property name and the new value:</P>
+<PRE>
+        $Object-&gt;SetProperty('Property', @Args, $Value);</PRE>
+<P>It is not possible to use ``named argument'' syntax with this function
+because the new value must be the last argument to SetProperty().</P>
+<P>This method hides any native OLE object method called SetProperty().
+The native method will still be available through the <A HREF="#item_Invoke"><CODE>Invoke()</CODE></A> method:</P>
+<PRE>
+        $Object-&gt;Invoke('SetProperty', @Args);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_SpinMessageLoop">Win32::OLE-&gt;SpinMessageLoop</A></STRONG><BR>
+<DD>
+This class method retrieves all pending messages from the message queue
+and dispatches them to their respective window procedures.  Calling this
+method is only necessary when not using the COINIT_MULTITHREADED model.
+All OLE method calls and property accesses automatically process the
+message queue.
+<P></P>
+<DT><STRONG><A NAME="item_Uninitialize">Win32::OLE-&gt;Uninitialize</A></STRONG><BR>
+<DD>
+The <A HREF="#item_Uninitialize"><CODE>Uninitialize()</CODE></A> class method uninitializes the OLE subsystem.  It
+also destroys the hidden top level window created by OLE for single
+threaded apartments.  All OLE objects will become invalid after this call!
+It is possible to call the <A HREF="#item_Initialize"><CODE>Initialize()</CODE></A> class method again with a different
+apartment model after shutting down OLE with Uninitialize().
+<P></P>
+<DT><STRONG><A NAME="item_WithEvents">Win32::OLE-&gt;WithEvents(OBJECT[, HANDLER[, INTERFACE]])</A></STRONG><BR>
+<DD>
+This class method enables and disables the firing of events by the
+specified OBJECT.  If no HANDLER is specified, then events are
+disconnected.  For some objects Win32::OLE is not able to
+automatically determine the correct event interface.  In this case the
+INTERFACE argument must contain either the COCLASS name of the OBJECT
+or the name of the event DISPATCH interface.  Please read the <EM>Events</EM>
+section below for detailed explanation of the Win32::OLE event
+support.
+<P></P></DL>
+<P>Whenever Perl does not find a method name in the Win32::OLE package it
+is automatically used as the name of an OLE method and this method call
+is dispatched to the OLE server.</P>
+<P>There is one special hack built into the module: If a method or property
+name could not be resolved with the OLE object, then the default method
+of the object is called with the method name as its first parameter.  So</P>
+<PRE>
+        my $Sheet = $Worksheets-&gt;Table1;
+or
+        my $Sheet = $Worksheets-&gt;{Table1};</PRE>
+<P>is resolved as</P>
+<PRE>
+        my $Sheet = $Worksheet-&gt;Item('Table1');</PRE>
+<P>provided that the $Worksheets object doesnot have a <CODE>Table1</CODE> method
+or property.  This hack has been introduced to call the default method
+of collections which did not name the method in their type library.  The
+recommended way to call the ``unnamed'' default method is:</P>
+<PRE>
+        my $Sheet = $Worksheets-&gt;Invoke('', 'Table1');</PRE>
+<P>This special hack is disabled under <CODE>use strict 'subs';</CODE>.</P>
+<P>
+<H2><A NAME="object methods and properties">Object methods and properties</A></H2>
+<P>The object returned by the <A HREF="#item_new"><CODE>new()</CODE></A> method can be used to invoke
+methods or retrieve properties in the same fashion as described
+in the documentation for the particular OLE class (eg. Microsoft
+Excel documentation describes the object hierarchy along with the
+properties and methods exposed for OLE access).</P>
+<P>Optional parameters on method calls can be omitted by using <A HREF="../../../lib/Pod/perlfunc.html#item_undef"><CODE>undef</CODE></A>
+as a placeholder.  A better way is to use named arguments, as the
+order of optional parameters may change in later versions of the OLE
+server application.  Named parameters can be specified in a reference
+to a hash as the last parameter to a method call.</P>
+<P>Properties can be retrieved or set using hash syntax, while methods
+can be invoked with the usual perl method call syntax.  The <A HREF="../../../lib/Pod/perlfunc.html#item_keys"><CODE>keys</CODE></A>
+and <A HREF="../../../lib/Pod/perlfunc.html#item_each"><CODE>each</CODE></A> functions can be used to enumerate an object's properties.
+Beware that a property is not always writable or even readable (sometimes
+raising exceptions when read while being undefined).</P>
+<P>If a method or property returns an embedded OLE object, method
+and property access can be chained as shown in the examples below.</P>
+<P>
+<H2><A NAME="functions">Functions</A></H2>
+<P>The following functions are not exported by default.</P>
+<DL>
+<DT><STRONG><A NAME="item_HRESULT"><CODE>HRESULT(ERROR)</CODE></A></STRONG><BR>
+<DD>
+The <A HREF="#item_HRESULT"><CODE>HRESULT()</CODE></A> function converts an unsigned number into a signed HRESULT
+error value as used by OLE internally.  This is necessary because Perl
+treats all hexadecimal constants as unsigned.  To check if the last OLE
+function returned ``Member not found'' (0x80020003) you can write:
+<PRE>
+        if (Win32::OLE-&gt;LastError == HRESULT(0x80020003)) {
+            # your error recovery here
+        }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_in"><CODE>in(COLLECTION)</CODE></A></STRONG><BR>
+<DD>
+If COLLECTION is an OLE collection object then <CODE>in $COLLECTION</CODE>
+returns a list of all members of the collection.  This is a shortcut
+for <CODE>Win32::OLE::Enum-</CODE>All($COLLECTION)&gt;.  It is most commonly used in
+a <CODE>foreach</CODE> loop:
+<PRE>
+        foreach my $value (in $collection) {
+            # do something with $value here
+        }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_valof"><CODE>valof(OBJECT)</CODE></A></STRONG><BR>
+<DD>
+Normal assignment of Perl OLE objects creates just another reference
+to the OLE object.  The <A HREF="#item_valof"><CODE>valof()</CODE></A> function explictly dereferences the
+object (through the default method) and returns the value of the object.
+<PRE>
+        my $RefOf = $Object;
+        my $ValOf = valof $Object;
+        $Object-&gt;{Value} = $NewValue;</PRE>
+<P>Now $ValOf still contains the old value wheras $RefOf would
+resolve to the $NewValue because it is still a reference to
+$Object.</P>
+<P>The <A HREF="#item_valof"><CODE>valof()</CODE></A> function can also be used to convert Win32::OLE::Variant
+objects to Perl values.</P>
+<P></P>
+<DT><STRONG><A NAME="item_with">with(OBJECT, PROPERTYNAME =&gt; VALUE, ...)</A></STRONG><BR>
+<DD>
+This function provides a concise way to set the values of multiple
+properties of an object.  It iterates over its arguments doing
+<CODE>$OBJECT-</CODE>{PROPERTYNAME} = $VALUE&gt; on each trailing pair.
+<P></P></DL>
+<P>
+<H2><A NAME="overloading">Overloading</A></H2>
+<P>The Win32::OLE objects can be overloaded to automatically convert to
+their values whenever they are used in a bool, numeric or string
+context.  This is not enabled by default.  You have to request it
+through the OVERLOAD pseudoexport:</P>
+<PRE>
+        use Win32::OLE qw(in valof with OVERLOAD);</PRE>
+<P>You can still get the original string representation of an object
+(<CODE>Win32::OLE=0xDEADBEEF</CODE>), e.g. for debugging, by using the
+<CODE>overload::StrVal()</CODE> method:</P>
+<PRE>
+        print overload::StrVal($object), &quot;\n&quot;;</PRE>
+<P>Please note that <CODE>OVERLOAD</CODE> is a global setting.  If any module enables
+Win32::OLE overloading then it's active everywhere.</P>
+<P>
+<H2><A NAME="events">Events</A></H2>
+<P>The Win32::OLE module now contains <STRONG>ALPHA</STRONG> level event support.  This
+support is only available when Perl is running in a single threaded
+apartment.  This can most easily be assured by using the <CODE>EVENTS</CODE>
+pseudo-import:</P>
+<PRE>
+        use Win32::OLE qw(EVENTS);</PRE>
+<P>which implicitly does something like:</P>
+<PRE>
+        use Win32::OLE;
+        Win32::OLE-&gt;Initialize(Win32::OLE::COINIT_OLEINITIALIZE);</PRE>
+<P>The current interface to OLE events should be considered experimental
+and is subject to change.  It works as expected for normal OLE
+applications, but OLE control events often don't seem to work yet.</P>
+<P>Events must be enabled explicitly for an OLE object through the
+Win32::OLE-&gt;<A HREF="#item_WithEvents"><CODE>WithEvents()</CODE></A> class method.  The Win32::OLE module uses the
+IProvideClassInfo2 interface to determine the default event source of
+the object.  If this interface is not supported, then the user must
+specify the name of the event source explicitly in the <A HREF="#item_WithEvents"><CODE>WithEvents()</CODE></A>
+method call.  It is also possible to specify the class name of the
+object as the third parameter.  In this case Win32::OLE will try to
+look up the default source interface for this COCLASS.</P>
+<P>The HANDLER argument to Win32::OLE-&gt;<A HREF="#item_WithEvents"><CODE>WithEvents()</CODE></A> can either be a CODE
+reference or a package name.  In the first case, all events will invoke
+this particular function.  The first two arguments to this function will
+be the OBJECT itself and the name of the event.  The remaining arguments
+will be event specific.</P>
+<PRE>
+        sub Event {
+            my ($Obj,$Event,@Args) = @_;
+            print &quot;Event triggered: '$Event'\n&quot;;
+        }
+        Win32::OLE-&gt;WithEvents($Obj, \&amp;Event);</PRE>
+<P>Alternatively the HANDLER argument can specify a package name.  When the
+OBJECT fires an event, Win32::OLE will try to find a function of the same
+name as the event in this package.  This function will be called with the
+OBJECT as the first argument followed again by the event specific parameters:</P>
+<PRE>
+        package MyEvents;
+        sub EventName1 {
+            my ($Obj,@Args) = @_;
+            print &quot;EventName1 event triggered\n&quot;;
+        }</PRE>
+<PRE>
+        package main;
+        Win32::OLE-&gt;WithEvents($Obj, 'MyEvents', 'IEventInterface');</PRE>
+<P>If Win32::OLE doesn't find a function with the name of the event then nothing
+happens.</P>
+<P>Event parameters passed <EM>by reference</EM> are handled specially.  They are not
+converted to the corresponding Perl datatype but passed as Win32::OLE::Variant
+objects.  You can assign a new value to these objects with the help of the
+<CODE>Put()</CODE> method.  This value will be passed back to the object when the event
+function returns:</P>
+<PRE>
+        package MyEvents;
+        sub BeforeClose {
+            my ($self,$Cancel) = @_;
+            $Cancel-&gt;Put(1) unless $MayClose;
+        }</PRE>
+<P>Direct assignment to $Cancel would have no effect on the original value and
+would therefore not command the object to abort the closing action.</P>
+<P>
+<H2><A NAME="module options">Module Options</A></H2>
+<P>The following module options can be accessed and modified with the
+<CODE>Win32::OLE-</CODE>Option&gt; class method.  In earlier versions of the Win32::OLE
+module these options were manipulated directly as class variables.  This
+practice is now deprecated.</P>
+<DL>
+<DT><STRONG><A NAME="item_CP">CP</A></STRONG><BR>
+<DD>
+This variable is used to determine the codepage used by all
+translations between Perl strings and Unicode strings used by the OLE
+interface.  The default value is CP_ACP, which is the default ANSI
+codepage.  Other possible values are CP_OEMCP, CP_MACCP, CP_UTF7 and
+CP_UTF8.  These constants are not exported by default.
+<P></P>
+<DT><STRONG><A NAME="item_LCID">LCID</A></STRONG><BR>
+<DD>
+This variable controls the locale idnetifier used for all OLE calls.
+It is set to LOCALE_NEUTRAL by default.  Please check the
+<A HREF="../../../site/lib/Win32/OLE/NLS.html">the Win32::OLE::NLS manpage</A> module for other locale related information.
+<P></P>
+<DT><STRONG><A NAME="item_Warn">Warn</A></STRONG><BR>
+<DD>
+This variable determines the behavior of the Win32::OLE module when
+an error happens.  Valid values are:
+<PRE>
+        0       Ignore error, return undef
+        1       Carp::carp if $^W is set (-w option)
+        2       always Carp::carp
+        3       Carp::croak</PRE>
+<P>The error number and message (without Carp line/module info) are
+available through the <CODE>Win32::OLE-</CODE>LastError&gt; class method.</P>
+<P>Alternatively the Warn option can be set to a CODE reference.  E.g.</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt; 3);</PRE>
+<P>is equivalent to</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt; \&amp;Carp::croak);</PRE>
+<P>This can even be used to emulate the VisualBasic <CODE>On Error Goto
+Label</CODE> construct:</P>
+<PRE>
+    Win32::OLE-&gt;Option(Warn =&gt;  sub {goto CheckError});
+    # ... your normal OLE code here ...</PRE>
+<PRE>
+  CheckError:
+    # ... your error handling code here ...</PRE>
+<P></P>
+<DT><STRONG><A NAME="item__NewEnum">_NewEnum</A></STRONG><BR>
+<DD>
+This option enables additional enumeration support for collection
+objects.  When the <A HREF="#item__NewEnum"><CODE>_NewEnum</CODE></A> option is set, all collections will
+receive one additional property: <A HREF="#item__NewEnum"><CODE>_NewEnum</CODE></A>.  The value of this
+property will be a reference to an array containing all the elements
+of the collection.  This option can be useful when used in conjunction
+with an automatic tree traversal program, like <CODE>Data::Dumper</CODE> or an
+object tree browser.  The value of this option should be either 1
+(enabled) or 0 (disabled, default).
+<PRE>
+    Win32::OLE-&gt;Option(_NewEnum =&gt; 1);
+    # ...
+    my @sheets = @{$Excel-&gt;Worksheets-&gt;{_NewEnum}};</PRE>
+<P>In normal application code, this would be better written as:</P>
+<PRE>
+    use Win32::OLE qw(in);
+    # ...
+    my @sheets = in $Excel-&gt;Worksheets;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item__Unique">_Unique</A></STRONG><BR>
+<DD>
+The <A HREF="#item__Unique"><CODE>_Unique</CODE></A> options guarantees that Win32::OLE will maintain a
+one-to-one mapping between Win32::OLE objects and the native COM/OLE
+objects.  Without this option, you can query the same property twice
+and get two different Win32::OLE objects for the same underlying COM
+object.
+<P>Using a unique proxy makes life easier for tree traversal algorithms
+to recognize they already visited a particular node.  This option
+comes at a price: Win32::OLE has to maintain a global hash of all
+outstanding objects and their corresponding proxies.  Identity checks
+on COM objects can also be expensive if the objects reside
+out-of-process or even on a different computer.  Therefore this option
+is off by default unless the program is being run in the debugger.</P>
+<P>Unfortunately, this option doesn't always help.  Some programs will
+return new COM objects for even the same property when asked for it
+multiple times (especially for collections).  In this case, there is
+nothing Win32::OLE can do to detect that these objects are in fact
+identical (because they aren't at the COM level).</P>
+<P>The <A HREF="#item__Unique"><CODE>_Unique</CODE></A> option can be set to either 1 (enabled) or 0 (disabled,
+default).</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Here is a simple Microsoft Excel application.</P>
+<PRE>
+        use Win32::OLE;</PRE>
+<PRE>
+        # use existing instance if Excel is already running
+        eval {$ex = Win32::OLE-&gt;GetActiveObject('Excel.Application')};
+        die &quot;Excel not installed&quot; if $@;
+        unless (defined $ex) {
+            $ex = Win32::OLE-&gt;new('Excel.Application', sub {$_[0]-&gt;Quit;})
+                    or die &quot;Oops, cannot start Excel&quot;;
+        }</PRE>
+<PRE>
+        # get a new workbook
+        $book = $ex-&gt;Workbooks-&gt;Add;</PRE>
+<PRE>
+        # write to a particular cell
+        $sheet = $book-&gt;Worksheets(1);
+        $sheet-&gt;Cells(1,1)-&gt;{Value} = &quot;foo&quot;;</PRE>
+<PRE>
+        # write a 2 rows by 3 columns range
+        $sheet-&gt;Range(&quot;A8:C9&quot;)-&gt;{Value} = [[ undef, 'Xyzzy', 'Plugh' ],
+                                           [ 42,    'Perl',  3.1415  ]];</PRE>
+<PRE>
+        # print &quot;XyzzyPerl&quot;
+        $array = $sheet-&gt;Range(&quot;A8:C9&quot;)-&gt;{Value};
+        for (@$array) {
+            for (@$_) {
+                print defined($_) ? &quot;$_|&quot; : &quot;&lt;undef&gt;|&quot;;
+            }
+            print &quot;\n&quot;;
+        }</PRE>
+<PRE>
+        # save and exit
+        $book-&gt;SaveAs( 'test.xls' );
+        undef $book;
+        undef $ex;</PRE>
+<P>Please note the destructor specified on the Win32::OLE-&gt;new method.  It ensures
+that Excel will shutdown properly even if the Perl program dies.  Otherwise
+there could be a process leak if your application dies after having opened
+an OLE instance of Excel.  It is the responsibility of the module user to
+make sure that all OLE objects are cleaned up properly!</P>
+<P>Here is an example of using Variant data types.</P>
+<PRE>
+        use Win32::OLE;
+        use Win32::OLE::Variant;
+        $ex = Win32::OLE-&gt;new('Excel.Application', \&amp;OleQuit) or die &quot;oops\n&quot;;
+        $ex-&gt;{Visible} = 1;
+        $ex-&gt;Workbooks-&gt;Add;
+        # should generate a warning under -w
+        $ovR8 = Variant(VT_R8, &quot;3 is a good number&quot;);
+        $ex-&gt;Range(&quot;A1&quot;)-&gt;{Value} = $ovR8;
+        $ex-&gt;Range(&quot;A2&quot;)-&gt;{Value} = Variant(VT_DATE, 'Jan 1,1970');</PRE>
+<PRE>
+        sub OleQuit {
+            my $self = shift;
+            $self-&gt;Quit;
+        }</PRE>
+<P>The above will put value ``3'' in cell A1 rather than the string
+``3 is a good number''.  Cell A2 will contain the date.</P>
+<P>Similarly, to invoke a method with some binary data, you can
+do the following:</P>
+<PRE>
+        $obj-&gt;Method( Variant(VT_UI1, &quot;foo\000b\001a\002r&quot;) );</PRE>
+<P>Here is a wrapper class that basically delegates everything but
+<A HREF="#item_new"><CODE>new()</CODE></A> and DESTROY().  The wrapper class shown here is another way to
+properly shut down connections if your application is liable to die
+without proper cleanup.  Your own wrappers will probably do something
+more specific to the particular OLE object you may be dealing with,
+like overriding the methods that you may wish to enhance with your
+own.</P>
+<PRE>
+        package Excel;
+        use Win32::OLE;</PRE>
+<PRE>
+        sub new {
+            my $s = {};
+            if ($s-&gt;{Ex} = Win32::OLE-&gt;new('Excel.Application')) {
+                return bless $s, shift;
+            }
+            return undef;
+        }</PRE>
+<PRE>
+        sub DESTROY {
+            my $s = shift;
+            if (exists $s-&gt;{Ex}) {
+                print &quot;# closing connection\n&quot;;
+                $s-&gt;{Ex}-&gt;Quit;
+                return undef;
+            }
+        }</PRE>
+<PRE>
+        sub AUTOLOAD {
+            my $s = shift;
+            $AUTOLOAD =~ s/^.*:://;
+            $s-&gt;{Ex}-&gt;$AUTOLOAD(@_);
+        }</PRE>
+<PRE>
+        1;</PRE>
+<P>The above module can be used just like Win32::OLE, except that
+it takes care of closing connections in case of abnormal exits.
+Note that the effect of this specific example can be easier accomplished
+using the optional destructor argument of Win32::OLE::new:</P>
+<PRE>
+        my $Excel = Win32::OLE-&gt;new('Excel.Application', sub {$_[0]-&gt;Quit;});</PRE>
+<P>Note that the delegation shown in the earlier example is not the same as
+true subclassing with respect to further inheritance of method calls in your
+specialized object.  See <A HREF="../../../lib/Pod/perlobj.html">the perlobj manpage</A>, <A HREF="../../../lib/Pod/perltoot.html">the perltoot manpage</A> and <A HREF="../../../lib/Pod/perlbot.html">the perlbot manpage</A> for details.
+True subclassing (available by setting <CODE>@ISA</CODE>) is also feasible,
+as the following example demonstrates:</P>
+<PRE>
+        #
+        # Add error reporting to Win32::OLE
+        #</PRE>
+<PRE>
+        package Win32::OLE::Strict;
+        use Carp;
+        use Win32::OLE;</PRE>
+<PRE>
+        use strict qw(vars);
+        use vars qw($AUTOLOAD @ISA);
+        @ISA = qw(Win32::OLE);</PRE>
+<PRE>
+        sub AUTOLOAD {
+            my $obj = shift;
+            $AUTOLOAD =~ s/^.*:://;
+            my $meth = $AUTOLOAD;
+            $AUTOLOAD = &quot;SUPER::&quot; . $AUTOLOAD;
+            my $retval = $obj-&gt;$AUTOLOAD(@_);
+            unless (defined($retval) || $AUTOLOAD eq 'DESTROY') {
+                my $err = Win32::OLE::LastError();
+                croak(sprintf(&quot;$meth returned OLE error 0x%08x&quot;,$err))
+                  if $err;
+            }
+            return $retval;
+        }</PRE>
+<PRE>
+        1;</PRE>
+<P>This package inherits the constructor <A HREF="#item_new"><CODE>new()</CODE></A> from the Win32::OLE
+package.  It is important to note that you cannot later rebless a
+Win32::OLE object as some information about the package is cached by
+the object.  Always invoke the <A HREF="#item_new"><CODE>new()</CODE></A> constructor through the right
+package!</P>
+<P>Here's how the above class will be used:</P>
+<PRE>
+        use Win32::OLE::Strict;
+        my $Excel = Win32::OLE::Strict-&gt;new('Excel.Application', 'Quit');
+        my $Books = $Excel-&gt;Workbooks;
+        $Books-&gt;UnknownMethod(42);</PRE>
+<P>In the sample above the call to <CODE>UnknownMethod()</CODE> will be caught with</P>
+<PRE>
+        UnknownMethod returned OLE error 0x80020009 at test.pl line 5</PRE>
+<P>because the Workbooks object inherits the class <CODE>Win32::OLE::Strict</CODE> from the
+<CODE>$Excel</CODE> object.</P>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<P>
+<H2><A NAME="hints for microsoft office automation">Hints for Microsoft Office automation</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_Documentation">Documentation</A></STRONG><BR>
+<DD>
+The object model for the Office applications is defined in the Visual Basic
+reference guides for the various applications.  These are typically not
+installed by default during the standard installation.  They can be added
+later by rerunning the setup program with the custom install option.
+<P></P>
+<DT><STRONG><A NAME="item_Class%2C_Method_and_Property_names">Class, Method and Property names</A></STRONG><BR>
+<DD>
+The names have been changed between different versions of Office.  For
+example <CODE>Application</CODE> was a method in Office 95 and is a property in
+Office97.  Therefore it will not show up in the list of property names
+<CODE>keys %$object</CODE> when querying an Office 95 object.
+<P>The class names are not always identical to the method/property names
+producing the object.  E.g. the <CODE>Workbook</CODE> method returns an object of
+type <CODE>Workbook</CODE> in Office 95 and <CODE>_Workbook</CODE> in Office 97.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Moniker">Moniker (GetObject support)</A></STRONG><BR>
+<DD>
+Office applications seem to implement file monikers only.  For example
+it seems to be impossible to retrieve a specific worksheet object through
+<A HREF="#item_GetObject"><CODE>GetObject(&quot;File.XLS!Sheet&quot;)</CODE></A>.  Furthermore, in Excel 95 the moniker starts
+a Worksheet object and in Excel 97 it returns a Workbook object.  You can use
+either the Win32::OLE::QueryObjectType class method or the $object-&gt;{Version}
+property to write portable code.
+<P></P>
+<DT><STRONG><A NAME="item_Enumeration_of_collection_objects">Enumeration of collection objects</A></STRONG><BR>
+<DD>
+Enumerations seem to be incompletely implemented.  Office 95 application don't
+seem to support neither the <CODE>Reset()</CODE> nor the <CODE>Clone()</CODE> methods.  The <CODE>Clone()</CODE>
+method is still unimplemented in Office 97.  A single walk through the
+collection similar to Visual Basics <CODE>for each</CODE> construct does work however.
+<P></P>
+<DT><STRONG><A NAME="item_Localization">Localization</A></STRONG><BR>
+<DD>
+Starting with Office 97 Microsoft has changed the localized class, method and
+property names back into English.  Note that string, date and currency
+arguments are still subject to locale specific interpretation.  Perl uses the
+system default locale for all OLE transaction whereas Visual Basic uses a
+type library specific locale.  A Visual Basic script would use ``R1C1'' in string
+arguments to specify relative references.  A Perl script running on a German
+language Windows would have to use ``Z1S1''.  Set the LCID module option
+to an English locale to write portable scripts.  This variable should
+not be changed after creating the OLE objects; some methods seem to randomly
+fail if the locale is changed on the fly.
+<P></P>
+<DT><STRONG><A NAME="item_SaveAs_method_in_Word_97_doesn%27t_work">SaveAs method in Word 97 doesn't work</A></STRONG><BR>
+<DD>
+This is an known bug in Word 97.  Search the MS knowledge base for Word /
+Foxpro incompatibility.  That problem applies to the Perl OLE interface as
+well.  A workaround is to use the WordBasic compatibility object.  It doesn't
+support all the options of the native method though.
+<PRE>
+    $Word-&gt;WordBasic-&gt;FileSaveAs($file);</PRE>
+<P>The problem seems to be fixed by applying the Office 97 Service Release 1.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Randomly_failing_method_calls">Randomly failing method calls</A></STRONG><BR>
+<DD>
+It seems like modifying objects that are not selected/activated is sometimes
+fragile.  Most of these problems go away if the chart/sheet/document is
+selected or activated before being manipulated (just like an interactive
+user would automatically do it).
+<P></P></DL>
+<P>
+<H2><A NAME="incompatibilities">Incompatibilities</A></H2>
+<P>There are some incompatibilities with the version distributed by Activeware
+(as of build 306).</P>
+<OL>
+<LI>
+The package name has changed from ``OLE'' to ``Win32::OLE''.
+<P></P>
+<LI>
+All functions of the form ``Win32::OLEFoo'' are now ``Win32::OLE::Foo'',
+though the old names are temporarily accomodated.  Win32::OLECreateObject()
+was changed to Win32::OLE::CreateObject(), and is now called
+Win32::OLE::new() bowing to established convention for naming constructors.
+The old names should be considered deprecated, and will be removed in the
+next version.
+<P></P>
+<LI>
+Package ``OLE::Variant'' is now ``Win32::OLE::Variant''.
+<P></P>
+<LI>
+The Variant function is new, and is exported by default.  So are
+all the VT_XXX type constants.
+<P></P>
+<LI>
+The support for collection objects has been moved into the package
+Win32::OLE::Enum.  The <CODE>keys %$object</CODE> method is now used to enumerate
+the properties of the object.
+<P></P></OL>
+<P>
+<H2><A NAME="bugs and limitations">Bugs and Limitations</A></H2>
+<UL>
+<LI>
+To invoke a native OLE method with the same name as one of the
+Win32::OLE methods (<CODE>Dispatch</CODE>, <A HREF="#item_Invoke"><CODE>Invoke</CODE></A>, <A HREF="#item_SetProperty"><CODE>SetProperty</CODE></A>, <CODE>DESTROY</CODE>,
+etc.), you have to use the <A HREF="#item_Invoke"><CODE>Invoke</CODE></A> method:
+<PRE>
+        $Object-&gt;Invoke('Dispatch', @AdditionalArgs);</PRE>
+<P>The same is true for names exported by the Exporter or the Dynaloader
+modules, e.g.: <CODE>export</CODE>, <CODE>export_to_level</CODE>, <A HREF="../../../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A>,
+<CODE>_push_tags</CODE>, <CODE>export_tags</CODE>, <CODE>export_ok_tags</CODE>, <CODE>export_fail</CODE>,
+<CODE>require_version</CODE>, <CODE>dl_load_flags</CODE>,
+<CODE>croak</CODE>, <CODE>bootstrap</CODE>, <CODE>dl_findfile</CODE>, <CODE>dl_expandspec</CODE>,
+<CODE>dl_find_symbol_anywhere</CODE>, <CODE>dl_load_file</CODE>, <CODE>dl_find_symbol</CODE>,
+<CODE>dl_undef_symbols</CODE>, <CODE>dl_install_xsub</CODE> and <CODE>dl_error</CODE>.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>The documentation for <A HREF="../../../site/lib/Win32/OLE/Const.html">the Win32::OLE::Const manpage</A>, <A HREF="../../../site/lib/Win32/OLE/Enum.html">the Win32::OLE::Enum manpage</A>,
+<A HREF="../../../site/lib/Win32/OLE/NLS.html">the Win32::OLE::NLS manpage</A> and <A HREF="../../../site/lib/Win32/OLE/Variant.html">the Win32::OLE::Variant manpage</A> contains additional
+information about OLE support for Perl on Win32.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Originally put together by the kind people at Hip and Activeware.</P>
+<P>Gurusamy Sarathy &lt;<A HREF="mailto:gsar@activestate.com">gsar@activestate.com</A>&gt; subsequently fixed several
+major bugs, memory leaks, and reliability problems, along with some
+redesign of the code.</P>
+<P>Jan Dubois &lt;<A HREF="mailto:jand@activestate.com">jand@activestate.com</A>&gt; pitched in with yet more massive redesign,
+added support for named parameters, and other significant enhancements.
+He's been hacking on it ever since.</P>
+<P>Please send questions about problems with this module to the
+Perl-Win32-Users mailinglist at ActiveState.com.  The mailinglist charter
+requests that you put an [OLE] tag somewhere on the subject line (for OLE
+related questions only, of course).</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<PRE>
+    (c) 1995 Microsoft Corporation. All rights reserved.
+    Developed by ActiveWare Internet Corp., now known as
+    ActiveState Tool Corp., <A HREF="http://www.ActiveState.com">http://www.ActiveState.com</A></PRE>
+<PRE>
+    Other modifications Copyright (c) 1997-2000 by Gurusamy Sarathy
+    &lt;gsar@activestate.com&gt; and Jan Dubois &lt;jand@activestate.com&gt;</PRE>
+<PRE>
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the README file.</PRE>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Version 0.1501	  6 February 2001</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::OLE - OLE Automation extensions</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

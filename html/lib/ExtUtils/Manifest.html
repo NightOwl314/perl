@@ -1,0 +1,182 @@
+
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::Manifest - utilities to write and check a MANIFEST file</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Manifest - utilities to write and check a MANIFEST file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#manifest.skip">MANIFEST.SKIP</A></LI>
+	<LI><A HREF="#export_ok">EXPORT_OK</A></LI>
+	<LI><A HREF="#global variables">GLOBAL VARIABLES</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::Manifest - utilities to write and check a MANIFEST file</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    require ExtUtils::Manifest;</PRE>
+<PRE>
+    ExtUtils::Manifest::mkmanifest;</PRE>
+<PRE>
+    ExtUtils::Manifest::manicheck;</PRE>
+<PRE>
+    ExtUtils::Manifest::filecheck;</PRE>
+<PRE>
+    ExtUtils::Manifest::fullcheck;</PRE>
+<PRE>
+    ExtUtils::Manifest::skipcheck;</PRE>
+<PRE>
+    ExtUtils::Manifest::manifind();</PRE>
+<PRE>
+    ExtUtils::Manifest::maniread($file);</PRE>
+<PRE>
+    ExtUtils::Manifest::manicopy($read,$target,$how);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>mkmanifest()</CODE> writes all files in and below the current directory to a
+file named in the global variable $ExtUtils::Manifest::MANIFEST (which
+defaults to <CODE>MANIFEST</CODE>) in the current directory. It works similar to</P>
+<PRE>
+    find . -print</PRE>
+<P>but in doing so checks each line in an existing <CODE>MANIFEST</CODE> file and
+includes any comments that are found in the existing <CODE>MANIFEST</CODE> file
+in the new one. Anything between white space and an end of line within
+a <CODE>MANIFEST</CODE> file is considered to be a comment. Filenames and
+comments are separated by one or more TAB characters in the
+output. All files that match any regular expression in a file
+<CODE>MANIFEST.SKIP</CODE> (if such a file exists) are ignored.</P>
+<P><CODE>manicheck()</CODE> checks if all the files within a <CODE>MANIFEST</CODE> in the
+current directory really do exist. It only reports discrepancies and
+exits silently if MANIFEST and the tree below the current directory
+are in sync.</P>
+<P><CODE>filecheck()</CODE> finds files below the current directory that are not
+mentioned in the <CODE>MANIFEST</CODE> file. An optional file <CODE>MANIFEST.SKIP</CODE>
+will be consulted. Any file matching a regular expression in such a
+file will not be reported as missing in the <CODE>MANIFEST</CODE> file.</P>
+<P><CODE>fullcheck()</CODE> does both a <CODE>manicheck()</CODE> and a filecheck().</P>
+<P><CODE>skipcheck()</CODE> lists all the files that are skipped due to your
+<CODE>MANIFEST.SKIP</CODE> file.</P>
+<P><CODE>manifind()</CODE> returns a hash reference. The keys of the hash are the
+files found below the current directory.</P>
+<P><CODE>maniread($file)</CODE> reads a named <CODE>MANIFEST</CODE> file (defaults to
+<CODE>MANIFEST</CODE> in the current directory) and returns a HASH reference
+with files being the keys and comments being the values of the HASH.
+Blank lines and lines which start with <CODE>#</CODE> in the <CODE>MANIFEST</CODE> file
+are discarded.</P>
+<P><CODE>manicopy($read,$target,$how)</CODE> copies the files that are the keys in
+the HASH <EM>%$read</EM> to the named target directory. The HASH reference
+$read is typically returned by the <CODE>maniread()</CODE> function. This
+function is useful for producing a directory tree identical to the
+intended distribution tree. The third parameter $how can be used to
+specify a different methods of ``copying''. Valid values are <CODE>cp</CODE>,
+which actually copies the files, <CODE>ln</CODE> which creates hard links, and
+<CODE>best</CODE> which mostly links the files but copies any symbolic link to
+make a tree without any symbolic link. Best is the default.</P>
+<P>
+<HR>
+<H1><A NAME="manifest.skip">MANIFEST.SKIP</A></H1>
+<P>The file MANIFEST.SKIP may contain regular expressions of files that
+should be ignored by <CODE>mkmanifest()</CODE> and filecheck(). The regular
+expressions should appear one on each line. Blank lines and lines
+which start with <CODE>#</CODE> are skipped.  Use <CODE>\#</CODE> if you need a regular
+expression to start with a sharp character. A typical example:</P>
+<PRE>
+    \bRCS\b
+    ^MANIFEST\.
+    ^Makefile$
+    ~$
+    \.html$
+    \.old$
+    ^blib/
+    ^MakeMaker-\d</PRE>
+<P>
+<HR>
+<H1><A NAME="export_ok">EXPORT_OK</A></H1>
+<P><CODE>&amp;mkmanifest</CODE>, <CODE>&amp;manicheck</CODE>, <CODE>&amp;filecheck</CODE>, <CODE>&amp;fullcheck</CODE>,
+<CODE>&amp;maniread</CODE>, and <CODE>&amp;manicopy</CODE> are exportable.</P>
+<P>
+<HR>
+<H1><A NAME="global variables">GLOBAL VARIABLES</A></H1>
+<P><CODE>$ExtUtils::Manifest::MANIFEST</CODE> defaults to <CODE>MANIFEST</CODE>. Changing it
+results in both a different <CODE>MANIFEST</CODE> and a different
+<CODE>MANIFEST.SKIP</CODE> file. This is useful if you want to maintain
+different distributions for different audiences (say a user version
+and a developer version including RCS).</P>
+<P><CODE>$ExtUtils::Manifest::Quiet</CODE> defaults to 0. If set to a true value,
+all functions act silently.</P>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<P>All diagnostic output is sent to <CODE>STDERR</CODE>.</P>
+<DL>
+<DT><STRONG><A NAME="item_Not_in_MANIFEST%3A_file"><CODE>Not in MANIFEST:</CODE> <EM>file</EM></A></STRONG><BR>
+<DD>
+is reported if a file is found, that is missing in the <CODE>MANIFEST</CODE>
+file which is excluded by a regular expression in the file
+<CODE>MANIFEST.SKIP</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_No_such_file%3A_file"><CODE>No such file:</CODE> <EM>file</EM></A></STRONG><BR>
+<DD>
+is reported if a file mentioned in a <CODE>MANIFEST</CODE> file does not
+exist.
+<P></P>
+<DT><STRONG><A NAME="item_MANIFEST%3A_%24%21"><CODE>MANIFEST:</CODE> <EM>$!</EM></A></STRONG><BR>
+<DD>
+is reported if <CODE>MANIFEST</CODE> could not be opened.
+<P></P>
+<DT><STRONG><A NAME="item_Added_to_MANIFEST%3A_file"><CODE>Added to MANIFEST:</CODE> <EM>file</EM></A></STRONG><BR>
+<DD>
+is reported by <CODE>mkmanifest()</CODE> if $Verbose is set and a file is added
+to MANIFEST. $Verbose is set to 1 by default.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/ExtUtils/MakeMaker.html">the ExtUtils::MakeMaker manpage</A> which has handy targets for most of the functionality.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Andreas Koenig &lt;<EM><A HREF="mailto:koenig@franz.ww.TU-Berlin.DE">koenig@franz.ww.TU-Berlin.DE</A></EM>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;ExtUtils::Manifest - utilities to write and check a MANIFEST file</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

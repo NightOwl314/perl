@@ -1,0 +1,89 @@
+
+<HTML>
+<HEAD>
+<TITLE>Fatal - replace functions with equivalents which succeed or die</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Fatal - replace functions with equivalents which succeed or die</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Fatal - replace functions with equivalents which succeed or die</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Fatal qw(open close);</PRE>
+<PRE>
+    sub juggle { . . . }
+    import Fatal 'juggle';</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Fatal</CODE> provides a way to conveniently replace functions which normally
+return a false value when they fail with equivalents which raise exceptions
+if they are not successful.  This lets you use these functions without
+having to test their return values explicitly on each call.  Exceptions
+can be caught using <A HREF="../lib/Pod/perlfunc.html#item_eval"><CODE>eval{}</CODE></A>.  See <A HREF="../lib/Pod/perlfunc.html">the perlfunc manpage</A> and <A HREF="../lib/Pod/perlvar.html">the perlvar manpage</A> for details.</P>
+<P>The do-or-die equivalents are set up simply by calling Fatal's
+<A HREF="../lib/Pod/perlfunc.html#item_import"><CODE>import</CODE></A> routine, passing it the names of the functions to be
+replaced.  You may wrap both user-defined functions and overridable
+CORE operators (except <A HREF="../lib/Pod/perlfunc.html#item_exec"><CODE>exec</CODE></A>, <A HREF="../lib/Pod/perlfunc.html#item_system"><CODE>system</CODE></A> which cannot be expressed
+via prototypes) in this way.</P>
+<P>If the symbol <CODE>:void</CODE> appears in the import list, then functions
+named later in that import list raise an exception only when
+these are called in void context--that is, when their return
+values are ignored.  For example</P>
+<PRE>
+        use Fatal qw/:void open close/;</PRE>
+<PRE>
+        # properly checked, so no exception raised on error
+        if(open(FH, &quot;&lt; /bogotic&quot;) {
+                warn &quot;bogo file, dude: $!&quot;;
+        }</PRE>
+<PRE>
+        # not checked, so error raises an exception
+        close FH;</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P><A HREF="mailto:Lionel.Cons@cern.ch">Lionel.Cons@cern.ch</A></P>
+<P>prototype updates by Ilya Zakharevich <A HREF="mailto:ilya@math.ohio-state.edu">ilya@math.ohio-state.edu</A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Fatal - replace functions with equivalents which succeed or die</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

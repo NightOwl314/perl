@@ -1,0 +1,130 @@
+
+<HTML>
+<HEAD>
+<TITLE>LWP::RobotUA - A class for Web Robots</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::RobotUA - A class for Web Robots</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>LWP::RobotUA - A class for Web Robots</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  require LWP::RobotUA;
+  $ua = new LWP::RobotUA 'my-robot/0.1', 'me@foo.com';
+  $ua-&gt;delay(10);  # be very nice, go slowly
+  ...
+  # just use it just like a normal LWP::UserAgent
+  $res = $ua-&gt;request($req);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class implements a user agent that is suitable for robot
+applications.  Robots should be nice to the servers they visit.  They
+should consult the <EM>/robots.txt</EM> file to ensure that they are welcomed
+and they should not make requests too frequently.</P>
+<P>But, before you consider writing a robot take a look at
+&lt;URL:http://info.webcrawler.com/mak/projects/robots/robots.html&gt;.</P>
+<P>When you use a <EM>LWP::RobotUA</EM> as your user agent, then you do not
+really have to think about these things yourself.  Just send requests
+as you do when you are using a normal <EM>LWP::UserAgent</EM> and this
+special agent will make sure you are nice.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>The LWP::RobotUA is a sub-class of LWP::UserAgent and implements the
+same methods. In addition the following methods are provided:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$ua = LWP::RobotUA-&gt;new($agent_name, $from, [$rules])</A></STRONG><BR>
+<DD>
+Your robot's name and the mail address of the human responsible for
+the robot (i.e. you) are required by the constructor.
+<P>Optionally it allows you to specify the <EM>WWW::RobotRules</EM> object to
+use.</P>
+<P></P>
+<DT><STRONG><A NAME="item_delay">$ua-&gt;<CODE>delay([$minutes])</CODE></A></STRONG><BR>
+<DD>
+Set the minimum delay between requests to the same server.  The
+default is 1 minute.
+<P></P>
+<DT><STRONG><A NAME="item_use_sleep">$ua-&gt;<CODE>use_sleep([$boolean])</CODE></A></STRONG><BR>
+<DD>
+Get/set a value indicating whether the UA should <A HREF="../../../lib/Pod/perlfunc.html#item_sleep"><CODE>sleep()</CODE></A> if requests
+arrive too fast (before $ua-&gt;delay minutes has passed).  The default is
+TRUE.  If this value is FALSE then an internal SERVICE_UNAVAILABLE
+response will be generated.  It will have an Retry-After header that
+indicates when it is OK to send another request to this server.
+<P></P>
+<DT><STRONG><A NAME="item_rules">$ua-&gt;<CODE>rules([$rules])</CODE></A></STRONG><BR>
+<DD>
+Set/get which <EM>WWW::RobotRules</EM> object to use.
+<P></P>
+<DT><STRONG><A NAME="item_no_visits">$ua-&gt;<CODE>no_visits($netloc)</CODE></A></STRONG><BR>
+<DD>
+Returns the number of documents fetched from this server host. Yes I
+know, this method should probably have been named <CODE>num_visits()</CODE> or
+something like that. :-(
+<P></P>
+<DT><STRONG><A NAME="item_host_wait">$ua-&gt;<CODE>host_wait($netloc)</CODE></A></STRONG><BR>
+<DD>
+Returns the number of seconds (from now) you must wait before you can
+make a new request to this host.
+<P></P>
+<DT><STRONG><A NAME="item_as_string">$ua-&gt;as_string</A></STRONG><BR>
+<DD>
+Returns a string that describes the state of the UA.
+Mainly useful for debugging.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../site/lib/LWP/UserAgent.html">the LWP::UserAgent manpage</A>, <A HREF="../../../site/lib/WWW/RobotRules.html">the WWW::RobotRules manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1996-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LWP::RobotUA - A class for Web Robots</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

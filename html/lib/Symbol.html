@@ -1,0 +1,100 @@
+
+<HTML>
+<HEAD>
+<TITLE>Symbol - manipulate Perl symbols and their names</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Symbol - manipulate Perl symbols and their names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Symbol - manipulate Perl symbols and their names</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Symbol;</PRE>
+<PRE>
+    $sym = gensym;
+    open($sym, &quot;filename&quot;);
+    $_ = &lt;$sym&gt;;
+    # etc.</PRE>
+<PRE>
+    ungensym $sym;      # no effect</PRE>
+<PRE>
+    print qualify(&quot;x&quot;), &quot;\n&quot;;              # &quot;Test::x&quot;
+    print qualify(&quot;x&quot;, &quot;FOO&quot;), &quot;\n&quot;        # &quot;FOO::x&quot;
+    print qualify(&quot;BAR::x&quot;), &quot;\n&quot;;         # &quot;BAR::x&quot;
+    print qualify(&quot;BAR::x&quot;, &quot;FOO&quot;), &quot;\n&quot;;  # &quot;BAR::x&quot;
+    print qualify(&quot;STDOUT&quot;, &quot;FOO&quot;), &quot;\n&quot;;  # &quot;main::STDOUT&quot; (global)
+    print qualify(\*x), &quot;\n&quot;;              # returns \*x
+    print qualify(\*x, &quot;FOO&quot;), &quot;\n&quot;;       # returns \*x</PRE>
+<PRE>
+    use strict refs;
+    print { qualify_to_ref $fh } &quot;foo!\n&quot;;
+    $ref = qualify_to_ref $name, $pkg;</PRE>
+<PRE>
+    use Symbol qw(delete_package);
+    delete_package('Foo::Bar');
+    print &quot;deleted\n&quot; unless exists $Foo::{'Bar::'};</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><CODE>Symbol::gensym</CODE> creates an anonymous glob and returns a reference
+to it.  Such a glob reference can be used as a file or directory
+handle.</P>
+<P>For backward compatibility with older implementations that didn't
+support anonymous globs, <CODE>Symbol::ungensym</CODE> is also provided.
+But it doesn't do anything.</P>
+<P><CODE>Symbol::qualify</CODE> turns unqualified symbol names into qualified
+variable names (e.g. ``myvar'' -&gt; ``MyPackage::myvar'').  If it is given a
+second parameter, <CODE>qualify</CODE> uses it as the default package;
+otherwise, it uses the package of its caller.  Regardless, global
+variable names (e.g. ``STDOUT'', ``ENV'', ``SIG'') are always qualified with
+``main::''.</P>
+<P>Qualification applies only to symbol names (strings).  References are
+left unchanged under the assumption that they are glob references,
+which are qualified by their nature.</P>
+<P><CODE>Symbol::qualify_to_ref</CODE> is just like <CODE>Symbol::qualify</CODE> except that it
+returns a glob ref rather than a symbol name, so you can use the result
+even if <CODE>use strict 'refs'</CODE> is in effect.</P>
+<P><CODE>Symbol::delete_package</CODE> wipes out a whole package namespace.  Note
+this routine is not exported by default--you may want to import it
+explicitly.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Symbol - manipulate Perl symbols and their names</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,86 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::Text::Color - Convert POD data to formatted color ASCII text</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Text::Color - Convert POD data to formatted color ASCII text</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Text::Color - Convert POD data to formatted color ASCII text</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::Text::Color;
+    my $parser = Pod::Text::Color-&gt;new (sentence =&gt; 0, width =&gt; 78);</PRE>
+<PRE>
+    # Read POD from STDIN and write to STDOUT.
+    $parser-&gt;parse_from_filehandle;</PRE>
+<PRE>
+    # Read POD from file.pod and write to file.txt.
+    $parser-&gt;parse_from_file ('file.pod', 'file.txt');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Pod::Text::Color is a simple subclass of Pod::Text that highlights output
+text using ANSI color escape sequences.  Apart from the color, it in all
+ways functions like Pod::Text.  See <A HREF="../../../lib/Pod/Text.html">the Pod::Text manpage</A> for details and available
+options.</P>
+<P>Term::ANSIColor is used to get colors and therefore must be installed to use
+this module.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This is just a basic proof of concept.  It should be seriously expanded to
+support configurable coloration via options passed to the constructor, and
+<STRONG>pod2text</STRONG> should be taught about those.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../lib/Pod/Text.html">Pod::Text</A>, <A HREF="../../../lib/Pod/Parser.html">Pod::Parser</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Russ Allbery &lt;<A HREF="mailto:rra@stanford.edu">rra@stanford.edu</A>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Text::Color - Convert POD data to formatted color ASCII text</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

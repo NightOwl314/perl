@@ -1,0 +1,184 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::TokeParser - Alternative HTML::Parser interface</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::TokeParser - Alternative HTML::Parser interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::TokeParser - Alternative HTML::Parser interface</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require HTML::TokeParser;
+ $p = HTML::TokeParser-&gt;new(&quot;index.html&quot;) || die &quot;Can't open: $!&quot;;
+ while (my $token = $p-&gt;get_token) {
+     #...
+ }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The HTML::TokeParser is an alternative interface to the HTML::Parser class.
+It basically turns the HTML::Parser inside out.  You associate a file
+(or any IO::Handle object or string) with the parser at construction time and
+then repeatedly call $parser-&gt;get_token to obtain the tags and text
+found in the parsed document.</P>
+<P>Calling the methods defined by the HTML::Parser base class will be
+confusing, so don't do that.  Use the following methods instead:</P>
+<DL>
+<DT><STRONG><A NAME="item_new">$p = HTML::TokeParser-&gt;new( $file_or_doc );</A></STRONG><BR>
+<DD>
+The object constructor argument is either a file name, a file handle
+object, or the complete document to be parsed.
+<P>If the argument is a plain scalar, then it is taken as the name of a
+file to be opened and parsed.  If the file can't be opened for
+reading, then the constructor will return an undefined value and $!
+will tell you why it failed.</P>
+<P>If the argument is a reference to a plain scalar, then this scalar is
+taken to be the literal document to parse.  The value of this
+scalar should not be changed before all tokens have been extracted.</P>
+<P>Otherwise the argument is taken to be some object that the
+<CODE>HTML::TokeParser</CODE> can <CODE>read()</CODE> from when it needs more data.  Typically
+it will be a filehandle of some kind.  The stream will be <CODE>read()</CODE> until
+EOF, but not closed.</P>
+<P></P>
+<DT><STRONG><A NAME="item_get_token">$p-&gt;get_token</A></STRONG><BR>
+<DD>
+This method will return the next <EM>token</EM> found in the HTML document,
+or <CODE>undef</CODE> at the end of the document.  The token is returned as an
+array reference.  The first element of the array will be a (mostly)
+single character string denoting the type of this token: ``S'' for start
+tag, ``E'' for end tag, ``T'' for text, ``C'' for comment, ``D'' for
+declaration, and ``PI'' for process instructions.  The rest of the array
+is the same as the arguments passed to the corresponding HTML::Parser
+v2 compatible callbacks (see <A HREF="../../lib/HTML/Parser.html">the HTML::Parser manpage</A>).  In summary, returned
+tokens look like this:
+<PRE>
+  [&quot;S&quot;,  $tag, %$attr, @$attrseq, $text]
+  [&quot;E&quot;,  $tag, $text]
+  [&quot;T&quot;,  $text, $is_data]
+  [&quot;C&quot;,  $text]
+  [&quot;D&quot;,  $text]
+  [&quot;PI&quot;, $token0, $text]</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_unget_token">$p-&gt;<CODE>unget_token($token,...)</CODE></A></STRONG><BR>
+<DD>
+If you find out you have read too many tokens you can push them back,
+so that they are returned the next time $p-&gt;get_token is called.
+<P></P>
+<DT><STRONG><A NAME="item_get_tag">$p-&gt;get_tag( [$tag] )</A></STRONG><BR>
+<DD>
+This method returns the next start or end tag (skipping any other
+tokens), or <CODE>undef</CODE> if there are no more tags in the document.  If an
+argument is given, then we skip tokens until the specified tag type is
+found.  The tag is returned as an array reference in the same form as
+for $p-&gt;get_token above, but the type code (first element) is missing
+and the name of end tags are prefixed with ``/''.  This means that the
+tags returned look like this:
+<PRE>
+  [$tag, %$attr, @$attrseq, $text]
+  [&quot;/$tag&quot;, $text]</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_get_text">$p-&gt;get_text( [$endtag] )</A></STRONG><BR>
+<DD>
+This method returns all text found at the current position. It will
+return a zero length string if the next token is not text.  The
+optional $endtag argument specifies that any text occurring before the
+given tag is to be returned.  Any entities will be converted to their
+corresponding character.
+<P>The $p-&gt;{textify} attribute is a hash that defines how certain tags can
+be treated as text.  If the name of a start tag matches a key in this
+hash then this tag is converted to text.  The hash value is used to
+specify which tag attribute to obtain the text from.  If this tag
+attribute is missing, then the upper case name of the tag enclosed in
+brackets is returned, e.g. ``[IMG]''.  The hash value can also be a
+subroutine reference.  In this case the routine is called with the
+start tag token content as its argument and the return value is treated
+as the text.</P>
+<P>The default $p-&gt;{textify} value is:</P>
+<PRE>
+  {img =&gt; &quot;alt&quot;, applet =&gt; &quot;alt&quot;}</PRE>
+<P>This means that &lt;IMG&gt; and &lt;APPLET&gt; tags are treated as text, and that
+the text to substitute can be found in the ALT attribute.</P>
+<P></P>
+<DT><STRONG><A NAME="item_get_trimmed_text">$p-&gt;get_trimmed_text( [$endtag] )</A></STRONG><BR>
+<DD>
+Same as $p-&gt;get_text above, but will collapse any sequences of white
+space to a single space character.  Leading and trailing white space is
+removed.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>This example extracts all links from a document.  It will print one
+line for each link, containing the URL and the textual description
+between the &lt;A&gt;...&lt;/A&gt; tags:</P>
+<PRE>
+  use HTML::TokeParser;
+  $p = HTML::TokeParser-&gt;new(shift||&quot;index.html&quot;);</PRE>
+<PRE>
+  while (my $token = $p-&gt;get_tag(&quot;a&quot;)) {
+      my $url = $token-&gt;[1]{href} || &quot;-&quot;;
+      my $text = $p-&gt;get_trimmed_text(&quot;/a&quot;);
+      print &quot;$url\t$text\n&quot;;
+  }</PRE>
+<P>This example extract the &lt;TITLE&gt; from the document:</P>
+<PRE>
+  use HTML::TokeParser;
+  $p = HTML::TokeParser-&gt;new(shift||&quot;index.html&quot;);
+  if ($p-&gt;get_tag(&quot;title&quot;)) {
+      my $title = $p-&gt;get_trimmed_text;
+      print &quot;Title: $title\n&quot;;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/HTML/Parser.html">the HTML::Parser manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1998-2000 Gisle Aas.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::TokeParser - Alternative HTML::Parser interface</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

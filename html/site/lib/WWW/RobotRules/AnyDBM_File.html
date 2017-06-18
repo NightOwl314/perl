@@ -1,0 +1,81 @@
+
+<HTML>
+<HEAD>
+<TITLE>WWW::RobotRules::AnyDBM_File - Persistent RobotRules</TITLE>
+<LINK REL="stylesheet" HREF="../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;WWW::RobotRules::AnyDBM_File - Persistent RobotRules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>WWW::RobotRules::AnyDBM_File - Persistent RobotRules</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ require WWW::RobotRules::AnyDBM_File;
+ require LWP::RobotUA;</PRE>
+<PRE>
+ # Create a robot useragent that uses a diskcaching RobotRules
+ my $rules = new WWW::RobotRules::AnyDBM_File 'my-robot/1.0', 'cachefile';
+ my $ua = new WWW::RobotUA 'my-robot/1.0', 'me@foo.com', $rules;</PRE>
+<PRE>
+ # Then just use $ua as usual
+ $res = $ua-&gt;request($req);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a subclass of <EM>WWW::RobotRules</EM> that uses the AnyDBM_File
+package to implement persistent diskcaching of <EM>robots.txt</EM> and host
+visit information.</P>
+<P>The constructor (the <CODE>new()</CODE> method) takes an extra argument specifying
+the name of the DBM file to use.  If the DBM file already exists, then
+you can specify undef as agent name as the name can be obtained from
+the DBM database.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../../site/lib/WWW/RobotRules.html">the WWW::RobotRules manpage</A>, <A HREF="../../../../site/lib/LWP/RobotUA.html">the LWP::RobotUA manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Hakan Ardo &lt;<A HREF="mailto:hakan@munin.ub2.lu.se>">hakan@munin.ub2.lu.se></A>, Gisle Aas &lt;<A HREF="mailto:aas@sn.no>">aas@sn.no></A></P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;WWW::RobotRules::AnyDBM_File - Persistent RobotRules</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

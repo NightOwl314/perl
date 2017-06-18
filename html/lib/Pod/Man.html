@@ -1,0 +1,267 @@
+
+<HTML>
+<HEAD>
+<TITLE>Pod::Man - Convert POD data to formatted *roff input</TITLE>
+<LINK REL="stylesheet" HREF="../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Man - Convert POD data to formatted *roff input</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#diagnostics">DIAGNOSTICS</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Pod::Man - Convert POD data to formatted *roff input</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Pod::Man;
+    my $parser = Pod::Man-&gt;new (release =&gt; $VERSION, section =&gt; 8);</PRE>
+<PRE>
+    # Read POD from STDIN and write to STDOUT.
+    $parser-&gt;parse_from_filehandle;</PRE>
+<PRE>
+    # Read POD from file.pod and write to file.1.
+    $parser-&gt;parse_from_file ('file.pod', 'file.1');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Pod::Man is a module to convert documentation in the POD format (the
+preferred language for documenting Perl) into *roff input using the man
+macro set.  The resulting *roff code is suitable for display on a terminal
+using nroff(1), normally via man(1), or printing using troff(1).  It is
+conventionally invoked using the driver script <STRONG>pod2man</STRONG>, but it can also
+be used directly.</P>
+<P>As a derived class from Pod::Parser, Pod::Man supports the same methods and
+interfaces.  See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A> for all the details; briefly, one creates a
+new parser with <CODE>Pod::Man-&gt;new()</CODE> and then calls either
+<CODE>parse_from_filehandle()</CODE> or parse_from_file().</P>
+<P><CODE>new()</CODE> can take options, in the form of key/value pairs that control the
+behavior of the parser.  See below for details.</P>
+<P>If no options are given, Pod::Man uses the name of the input file with any
+trailing <CODE>.pod</CODE>, <CODE>.pm</CODE>, or <CODE>.pl</CODE> stripped as the man page title, to
+section 1 unless the file ended in <CODE>.pm</CODE> in which case it defaults to
+section 3, to a centered title of ``User Contributed Perl Documentation'', to
+a centered footer of the Perl version it is run with, and to a left-hand
+footer of the modification date of its input (or the current date if given
+STDIN for input).</P>
+<P>Pod::Man assumes that your *roff formatters have a fixed-width font named
+CW.  If yours is called something else (like CR), use the <A HREF="#item_fixed"><CODE>fixed</CODE></A> option to
+specify it.  This generally only matters for troff output for printing.
+Similarly, you can set the fonts used for bold, italic, and bold italic
+fixed-width output.</P>
+<P>Besides the obvious pod conversions, Pod::Man also takes care of formatting
+func(), func(n), and simple variable references like $foo or @bar so you
+don't have to use code escapes for them; complex expressions like
+<CODE>$fred{'stuff'}</CODE> will still need to be escaped, though.  It also translates
+dashes that aren't used as hyphens into en dashes, makes long dashes--like
+this--into proper em dashes, fixes ``paired quotes,'' makes C++ and PI look
+right, puts a little space between double underbars, makes ALLCAPS a teeny
+bit smaller in troff(1), and escapes stuff that *roff treats as special so
+that you don't have to.</P>
+<P>The recognized options to <CODE>new()</CODE> are as follows.  All options take a single
+argument.</P>
+<DL>
+<DT><STRONG><A NAME="item_center">center</A></STRONG><BR>
+<DD>
+Sets the centered page header to use instead of ``User Contributed Perl
+Documentation''.
+<P></P>
+<DT><STRONG><A NAME="item_date">date</A></STRONG><BR>
+<DD>
+Sets the left-hand footer.  By default, the modification date of the input
+file will be used, or the current date if <A HREF="../../lib/Pod/perlfunc.html#item_stat"><CODE>stat()</CODE></A> can't find that file (the
+case if the input is from STDIN), and the date will be formatted as
+YYYY-MM-DD.
+<P></P>
+<DT><STRONG><A NAME="item_fixed">fixed</A></STRONG><BR>
+<DD>
+The fixed-width font to use for vertabim text and code.  Defaults to CW.
+Some systems may want CR instead.  Only matters for <CODE>troff(1)</CODE> output.
+<P></P>
+<DT><STRONG><A NAME="item_fixedbold">fixedbold</A></STRONG><BR>
+<DD>
+Bold version of the fixed-width font.  Defaults to CB.  Only matters for
+<CODE>troff(1)</CODE> output.
+<P></P>
+<DT><STRONG><A NAME="item_fixeditalic">fixeditalic</A></STRONG><BR>
+<DD>
+Italic version of the fixed-width font (actually, something of a misnomer,
+since most fixed-width fonts only have an oblique version, not an italic
+version).  Defaults to CI.  Only matters for <CODE>troff(1)</CODE> output.
+<P></P>
+<DT><STRONG><A NAME="item_fixedbolditalic">fixedbolditalic</A></STRONG><BR>
+<DD>
+Bold italic (probably actually oblique) version of the fixed-width font.
+Pod::Man doesn't assume you have this, and defaults to CB.  Some systems
+(such as Solaris) have this font available as CX.  Only matters for <CODE>troff(1)</CODE>
+output.
+<P></P>
+<DT><STRONG><A NAME="item_quotes">quotes</A></STRONG><BR>
+<DD>
+Sets the quote marks used to surround C&lt;&gt; text.  If the value is a
+single character, it is used as both the left and right quote; if it is two
+characters, the first character is used as the left quote and the second as
+the right quoted; and if it is four characters, the first two are used as
+the left quote and the second two as the right quote.
+<P>This may also be set to the special value <CODE>none</CODE>, in which case no quote
+marks are added around C&lt;&gt; text (but the font is still changed for troff
+output).</P>
+<P></P>
+<DT><STRONG><A NAME="item_release">release</A></STRONG><BR>
+<DD>
+Set the centered footer.  By default, this is the version of Perl you run
+Pod::Man under.  Note that some system an macro sets assume that the
+centered footer will be a modification date and will prepend something like
+``Last modified: ''; if this is the case, you may want to set <A HREF="#item_release"><CODE>release</CODE></A> to
+the last modified date and <A HREF="#item_date"><CODE>date</CODE></A> to the version number.
+<P></P>
+<DT><STRONG><A NAME="item_section">section</A></STRONG><BR>
+<DD>
+Set the section for the <CODE>.TH</CODE> macro.  The standard section numbering
+convention is to use 1 for user commands, 2 for system calls, 3 for
+functions, 4 for devices, 5 for file formats, 6 for games, 7 for
+miscellaneous information, and 8 for administrator commands.  There is a lot
+of variation here, however; some systems (like Solaris) use 4 for file
+formats, 5 for miscellaneous information, and 7 for devices.  Still others
+use 1m instead of 8, or some mix of both.  About the only section numbers
+that are reliably consistent are 1, 2, and 3.
+<P>By default, section 1 will be used unless the file ends in .pm in which case
+section 3 will be selected.</P>
+<P></P></DL>
+<P>The standard Pod::Parser method <CODE>parse_from_filehandle()</CODE> takes up to two
+arguments, the first being the file handle to read POD from and the second
+being the file handle to write the formatted output to.  The first defaults
+to STDIN if not given, and the second defaults to STDOUT.  The method
+<CODE>parse_from_file()</CODE> is almost identical, except that its two arguments are the
+input and output disk files instead.  See <A HREF="../../lib/Pod/Parser.html">the Pod::Parser manpage</A> for the specific
+details.</P>
+<P>
+<HR>
+<H1><A NAME="diagnostics">DIAGNOSTICS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_roff_font_should_be_1_or_2_chars%2C_not_%22%25s%22">roff font should be 1 or 2 chars, not ``%s''</A></STRONG><BR>
+<DD>
+(F) You specified a *roff font (using <A HREF="#item_fixed"><CODE>fixed</CODE></A>, <A HREF="#item_fixedbold"><CODE>fixedbold</CODE></A>, etc.) that
+wasn't either one or two characters.  Pod::Man doesn't support *roff fonts
+longer than two characters, although some *roff extensions do (the canonical
+versions of <CODE>nroff(1)</CODE> and <CODE>troff(1)</CODE> don't either).
+<P></P>
+<DT><STRONG><A NAME="item_Invalid_link_%25s">Invalid link %s</A></STRONG><BR>
+<DD>
+(W) The POD source contained a <CODE>L&lt;&gt;</CODE> sequence that Pod::Man was
+unable to parse.  You should never see this error message; it probably
+indicates a bug in Pod::Man.
+<P></P>
+<DT><STRONG><A NAME="item_Invalid_quote_specification_%22%25s%22">Invalid quote specification ``%s''</A></STRONG><BR>
+<DD>
+(F) The quote specification given (the quotes option to the constructor) was
+invalid.  A quote specification must be one, two, or four characters long.
+<P></P>
+<DT><STRONG><A NAME="item_%s:%d:">%s:%d: Unknown command paragraph ``%s''.</A></STRONG><BR>
+<DD>
+(W) The POD source contained a non-standard command paragraph (something of
+the form <CODE>=command args</CODE>) that Pod::Man didn't know about.  It was ignored.
+<P></P>
+<DT><STRONG><A NAME="item_Unknown_escape_E%3C%25s%3E">Unknown escape E&lt;%s&gt;</A></STRONG><BR>
+<DD>
+(W) The POD source contained an <CODE>E&lt;&gt;</CODE> escape that Pod::Man didn't
+know about.  <CODE>E&lt;%s&gt;</CODE> was printed verbatim in the output.
+<P></P>
+<DT><STRONG><A NAME="item_Unknown_sequence_%25s">Unknown sequence %s</A></STRONG><BR>
+<DD>
+(W) The POD source contained a non-standard interior sequence (something of
+the form <CODE>X&lt;&gt;</CODE>) that Pod::Man didn't know about.  It was ignored.
+<P></P>
+<DT><STRONG><A NAME="item_%s:">%s: Unknown command paragraph ``%s'' on line %d.</A></STRONG><BR>
+<DD>
+(W) The POD source contained a non-standard command paragraph (something of
+the form <CODE>=command args</CODE>) that Pod::Man didn't know about. It was ignored.
+<P></P>
+<DT><STRONG><A NAME="item_Unmatched_%3Dback">Unmatched =back</A></STRONG><BR>
+<DD>
+(W) Pod::Man encountered a <CODE>=back</CODE> command that didn't correspond to an
+<CODE>=over</CODE> command.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>The lint-like features and strict POD format checking done by <STRONG>pod2man</STRONG> are
+not yet implemented and should be, along with the corresponding <CODE>lax</CODE>
+option.</P>
+<P>The NAME section should be recognized specially and index entries emitted
+for everything in that section.  This would have to be deferred until the
+next section, since extraneous things in NAME tends to confuse various man
+page processors.</P>
+<P>The handling of hyphens, en dashes, and em dashes is somewhat fragile, and
+one may get the wrong one under some circumstances.  This should only matter
+for <CODE>troff(1)</CODE> output.</P>
+<P>When and whether to use small caps is somewhat tricky, and Pod::Man doesn't
+necessarily get it right.</P>
+<P>Pod::Man doesn't handle font names longer than two characters.  Neither do
+most <CODE>troff(1)</CODE> implementations, but GNU troff does as an extension.  It would
+be nice to support as an option for those who want to use it.</P>
+<P>The preamble added to each output file is rather verbose, and most of it is
+only necessary in the presence of E&lt;&gt; escapes for non-ASCII
+characters.  It would ideally be nice if all of those definitions were only
+output if needed, perhaps on the fly as the characters are used.</P>
+<P>Some of the automagic applied to file names assumes Unix directory
+separators.</P>
+<P>Pod::Man is excessively slow.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/Pod/Parser.html">Pod::Parser</A>, perlpod(1), pod2man(1), nroff(1), troff(1),
+man(1), <CODE>man(7)</CODE></P>
+<P>Ossanna, Joseph F., and Brian W. Kernighan.  ``Troff User's Manual,''
+Computing Science Technical Report No. 54, AT&amp;T Bell Laboratories.  This is
+the best documentation of standard <CODE>nroff(1)</CODE> and troff(1).  At the time of
+this writing, it's available at <A HREF="http://www.cs.bell-labs.com/cm/cs/cstr.html.">http://www.cs.bell-labs.com/cm/cs/cstr.html.</A></P>
+<P>The man page documenting the man macro set may be <CODE>man(5)</CODE> instead of <CODE>man(7)</CODE>
+on your system.  Also, please see <CODE>pod2man(1)</CODE> for extensive documentation on
+writing manual pages if you've not done it before and aren't familiar with
+the conventions.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Russ Allbery &lt;<A HREF="mailto:rra@stanford.edu">rra@stanford.edu</A>&gt;, based <EM>very</EM> heavily on the
+original <STRONG>pod2man</STRONG> by Tom Christiansen &lt;<A HREF="mailto:tchrist@mox.perl.com">tchrist@mox.perl.com</A>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Pod::Man - Convert POD data to formatted *roff input</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

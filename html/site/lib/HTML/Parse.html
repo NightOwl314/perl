@@ -1,0 +1,130 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::Parse - Deprecated, a wrapper around HTML::TreeBuilder</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:ActivePerl@ActiveState.com">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Parse - Deprecated, a wrapper around HTML::TreeBuilder</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+<LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#remember!">REMEMBER!</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Parse - Deprecated, a wrapper around HTML::TreeBuilder</P>
+<P>
+
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  See the documentation for HTML::TreeBuilder</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Disclaimer: This module is provided only for backwards compatibility
+with earlier versions of this library.  New code should <EM>not</EM> use
+this module, and should really use the HTML::Parser and
+HTML::TreeBuilder modules directly, instead.</P>
+<P>The <CODE>HTML::Parse</CODE> module provides functions to parse HTML documents.
+There are two functions exported by this module:</P>
+<DL>
+<DT><STRONG><A NAME="item_parse_html"><CODE>parse_html($html)</CODE> or parse_html($html, $obj)</A></STRONG><BR>
+<DD>
+This function is really just a synonym for $obj-&gt;<CODE>parse($html)</CODE> and $obj
+is assumed to be a subclass of <CODE>HTML::Parser</CODE>.  Refer to
+<A HREF="../../lib/HTML/Parser.html">the HTML::Parser manpage</A> for more documentation.
+<P>If $obj is not specified, the $obj will default to an internally
+created new <CODE>HTML::TreeBuilder</CODE> object configured with <CODE>strict_comment()</CODE>
+turned on.  That class implements a parser that builds (and is) a HTML
+syntax tree with HTML::Element objects as nodes.</P>
+<P>The return value from <A HREF="#item_parse_html"><CODE>parse_html()</CODE></A> is $obj.</P>
+<P></P>
+<DT><STRONG><A NAME="item_parse_htmlfile">parse_htmlfile($file, [$obj])</A></STRONG><BR>
+<DD>
+Same as parse_html(), but pulls the HTML to parse, from the named file.
+<P>Returns <CODE>undef</CODE> if the file could not be opened, or $obj otherwise.</P>
+<P></P></DL>
+<P>When a <CODE>HTML::TreeBuilder</CODE> object is created, the following variables
+control how parsing takes place:</P>
+<DL>
+<DT><STRONG><A NAME="item_%24HTML%3A%3AParse%3A%3AIMPLICIT_TAGS">$HTML::Parse::IMPLICIT_TAGS</A></STRONG><BR>
+<DD>
+Setting this variable to true will instruct the parser to try to
+deduce implicit elements and implicit end tags.  If this variable is
+false you get a parse tree that just reflects the text as it stands.
+Might be useful for quick &amp; dirty parsing.  Default is true.
+<P>Implicit elements have the <CODE>implicit()</CODE> attribute set.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24HTML%3A%3AParse%3A%3AIGNORE_UNKNOWN">$HTML::Parse::IGNORE_UNKNOWN</A></STRONG><BR>
+<DD>
+This variable contols whether unknow tags should be represented as
+elements in the parse tree.  Default is true.
+<P></P>
+<DT><STRONG><A NAME="item_%24HTML%3A%3AParse%3A%3AIGNORE_TEXT">$HTML::Parse::IGNORE_TEXT</A></STRONG><BR>
+<DD>
+Do not represent the text content of elements.  This saves space if
+all you want is to examine the structure of the document.  Default is
+false.
+<P></P>
+<DT><STRONG><A NAME="item_%24HTML%3A%3AParse%3A%3AWARN">$HTML::Parse::WARN</A></STRONG><BR>
+<DD>
+Call <CODE>warn()</CODE> with an apropriate message for syntax errors.  Default is
+false.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="remember!">REMEMBER!</A></H1>
+<P>HTML::TreeBuilder objects should be explicitly destroyed when you're
+finished with them.  See <A HREF="../../lib/HTML/TreeBuilder.html">the HTML::TreeBuilder manpage</A>.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../lib/HTML/Parser.html">the HTML::Parser manpage</A>, <A HREF="../../lib/HTML/TreeBuilder.html">the HTML::TreeBuilder manpage</A>, <A HREF="../../lib/HTML/Element.html">the HTML::Element manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright 1995-1998 Gisle Aas. All rights reserved.</P>
+<P>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Gisle Aas &lt;<A HREF="mailto:gisle@aas.no">gisle@aas.no</A>&gt;.  Current maintainer
+Sean M. Burke &lt;<A HREF="mailto:sburke@cpan.org">sburke@cpan.org</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HTML::Parse - Deprecated, a wrapper around HTML::TreeBuilder</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

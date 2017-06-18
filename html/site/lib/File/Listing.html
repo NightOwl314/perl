@@ -1,0 +1,99 @@
+
+<HTML>
+<HEAD>
+<TITLE>parse_dir - parse directory listing</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;parse_dir - parse directory listing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#credits">CREDITS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>parse_dir - parse directory listing</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use File::Listing;
+ for (parse_dir(`ls -l`)) {
+     ($name, $type, $size, $mtime, $mode) = @$_;
+     next if $type ne 'f'; # plain file
+     #...
+ }</PRE>
+<PRE>
+ # directory listing can also be read from a file
+ open(LISTING, &quot;zcat ls-lR.gz|&quot;);
+ $dir = parse_dir(\*LISTING, '+0000');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <CODE>parse_dir()</CODE> routine can be used to parse directory
+listings. Currently it only understand Unix <CODE>'ls -l'</CODE> and <CODE>'ls -lR'</CODE>
+format.  It should eventually be able to most things you might get
+back from a ftp server file listing (LIST command), i.e. VMS listings,
+NT listings, DOS listings,...</P>
+<P>The first parameter to <CODE>parse_dir()</CODE> is the directory listing to parse.
+It can be a scalar, a reference to an array of directory lines or a
+glob representing a filehandle to read the directory listing from.</P>
+<P>The second parameter is the time zone to use when parsing time stamps
+in the listing. If this value is undefined, then the local time zone is
+assumed.</P>
+<P>The third parameter is the type of listing to assume.  The values will
+be strings like 'unix', 'vms', 'dos'.  Currently only 'unix' is
+implemented and this is also the default value.  Ideally, the listing
+type should be determined automatically.</P>
+<P>The fourth parameter specifies how unparseable lines should be treated.
+Values can be 'ignore', 'warn' or a code reference.  Warn means that
+the perl <A HREF="../../../lib/Pod/perlfunc.html#item_warn"><CODE>warn()</CODE></A> function will be called.  If a code reference is
+passed, then this routine will be called and the return value from it
+will be incorporated in the listing.  The default is 'ignore'.</P>
+<P>Only the first parameter is mandatory.</P>
+<P>The return value from <CODE>parse_dir()</CODE> is a list of directory entries.  In
+a scalar context the return value is a reference to the list.  The
+directory entries are represented by an array consisting of [
+$filename, $filetype, $filesize, $filetime, $filemode ].  The
+$filetype value is one of the letters 'f', 'd', 'l' or '?'.  The
+$filetime value is the seconds since Jan 1, 1970.  The
+$filemode is a bitmask like the mode returned by stat().</P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Based on lsparse.pl (from Lee McLoughlin's ftp mirror package) and
+Net::FTP's parse_dir (Graham Barr).</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;parse_dir - parse directory listing</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

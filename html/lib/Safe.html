@@ -1,0 +1,321 @@
+
+<HTML>
+<HEAD>
+<TITLE>Safe - Compile and execute code in restricted compartments</TITLE>
+<LINK REL="stylesheet" HREF="../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Safe - Compile and execute code in restricted compartments</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI><LI><A HREF="#supportedplatforms">SUPPORTED PLATFORMS</A></LI>
+
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#warning">WARNING</A></LI>
+	<UL>
+
+		<LI><A HREF="#recent changes">RECENT CHANGES</A></LI>
+		<LI><A HREF="#methods in class safe">Methods in class Safe</A></LI>
+		<LI><A HREF="#some safety issues">Some Safety Issues</A></LI>
+		<LI><A HREF="#author">AUTHOR</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Safe - Compile and execute code in restricted compartments</P>
+<P>
+<HR>
+<H1><A NAME="supportedplatforms">SUPPORTED PLATFORMS</A></H1>
+<UL>
+<LI>Linux</LI>
+<LI>Solaris</LI>
+<LI>Windows</LI>
+</UL>
+
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Safe;</PRE>
+<PRE>
+  $compartment = new Safe;</PRE>
+<PRE>
+  $compartment-&gt;permit(qw(time sort :browse));</PRE>
+<PRE>
+  $result = $compartment-&gt;reval($unsafe_code);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Safe extension module allows the creation of compartments
+in which perl code can be evaluated. Each compartment has</P>
+<DL>
+<DT><STRONG><A NAME="item_a_new_namespace">a new namespace</A></STRONG><BR>
+<DD>
+The ``root'' of the namespace (i.e. ``main::'') is changed to a
+different package and code evaluated in the compartment cannot
+refer to variables outside this namespace, even with run-time
+glob lookups and other tricks.
+<P>Code which is compiled outside the compartment can choose to place
+variables into (or <EM>share</EM> variables with) the compartment's namespace
+and only that data will be visible to code evaluated in the
+compartment.</P>
+<P>By default, the only variables shared with compartments are the
+``underscore'' variables $_ and @_ (and, technically, the less frequently
+used %_, the _ filehandle and so on). This is because otherwise perl
+operators which default to $_ will not work and neither will the
+assignment of arguments to @_ on subroutine entry.</P>
+<P></P>
+<DT><STRONG><A NAME="item_an_operator_mask">an operator mask</A></STRONG><BR>
+<DD>
+Each compartment has an associated ``operator mask''. Recall that
+perl code is compiled into an internal format before execution.
+Evaluating perl code (e.g. via ``eval'' or ``do 'file''') causes
+the code to be compiled into an internal format and then,
+provided there was no error in the compilation, executed.
+Code evaluated in a compartment compiles subject to the
+compartment's operator mask. Attempting to evaluate code in a
+compartment which contains a masked operator will cause the
+compilation to fail with an error. The code will not be executed.
+<P>The default operator mask for a newly created compartment is
+the ':default' optag.</P>
+<P>It is important that you read the <CODE>Opcode(3)</CODE> module documentation
+for more information, especially for detailed definitions of opnames,
+optags and opsets.</P>
+<P>Since it is only at the compilation stage that the operator mask
+applies, controlled access to potentially unsafe operations can
+be achieved by having a handle to a wrapper subroutine (written
+outside the compartment) placed into the compartment. For example,</P>
+<PRE>
+    $cpt = new Safe;
+    sub wrapper {
+        # vet arguments and perform potentially unsafe operations
+    }
+    $cpt-&gt;share('&amp;wrapper');</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="warning">WARNING</A></H1>
+<P>The authors make <STRONG>no warranty</STRONG>, implied or otherwise, about the
+suitability of this software for safety or security purposes.</P>
+<P>The authors shall not in any case be liable for special, incidental,
+consequential, indirect or other similar damages arising from the use
+of this software.</P>
+<P>Your mileage will vary. If in any doubt <STRONG>do not use it</STRONG>.</P>
+<P>
+<H2><A NAME="recent changes">RECENT CHANGES</A></H2>
+<P>The interface to the Safe module has changed quite dramatically since
+version 1 (as supplied with Perl5.002). Study these pages carefully if
+you have code written to use Safe version 1 because you will need to
+makes changes.</P>
+<P>
+<H2><A NAME="methods in class safe">Methods in class Safe</A></H2>
+<P>To create a new compartment, use</P>
+<PRE>
+    $cpt = new Safe;</PRE>
+<P>Optional argument is (NAMESPACE), where NAMESPACE is the root namespace
+to use for the compartment (defaults to ``Safe::Root0'', incremented for
+each new compartment).</P>
+<P>Note that version 1.00 of the Safe module supported a second optional
+parameter, MASK.  That functionality has been withdrawn pending deeper
+consideration. Use the permit and deny methods described below.</P>
+<P>The following methods can then be used on the compartment
+object returned by the above constructor. The object argument
+is implicit in each case.</P>
+<DL>
+<DT><STRONG><A NAME="item_permit">permit (OP, ...)</A></STRONG><BR>
+<DD>
+Permit the listed operators to be used when compiling code in the
+compartment (in <EM>addition</EM> to any operators already permitted).
+<P></P>
+<DT><STRONG><A NAME="item_permit_only">permit_only (OP, ...)</A></STRONG><BR>
+<DD>
+Permit <EM>only</EM> the listed operators to be used when compiling code in
+the compartment (<EM>no</EM> other operators are permitted).
+<P></P>
+<DT><STRONG><A NAME="item_deny">deny (OP, ...)</A></STRONG><BR>
+<DD>
+Deny the listed operators from being used when compiling code in the
+compartment (other operators may still be permitted).
+<P></P>
+<DT><STRONG><A NAME="item_deny_only">deny_only (OP, ...)</A></STRONG><BR>
+<DD>
+Deny <EM>only</EM> the listed operators from being used when compiling code
+in the compartment (<EM>all</EM> other operators will be permitted).
+<P></P>
+<DT><STRONG><A NAME="item_trap">trap (OP, ...)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_untrap">untrap (OP, ...)</A></STRONG><BR>
+<DD>
+The trap and untrap methods are synonyms for deny and permit
+respectfully.
+<P></P>
+<DT><STRONG><A NAME="item_share">share (NAME, ...)</A></STRONG><BR>
+<DD>
+This shares the <CODE>variable(s)</CODE> in the argument list with the compartment.
+This is almost identical to exporting variables using the <EM>Exporter(3)</EM>
+module.
+<P>Each NAME must be the <STRONG>name</STRONG> of a variable, typically with the leading
+type identifier included. A bareword is treated as a function name.</P>
+<P>Examples of legal names are '$foo' for a scalar, '@foo' for an
+array, '%foo' for a hash, '&amp;foo' or 'foo' for a subroutine and '*foo'
+for a glob (i.e.  all symbol table entries associated with ``foo'',
+including scalar, array, hash, sub and filehandle).</P>
+<P>Each NAME is assumed to be in the calling package. See share_from
+for an alternative method (which share uses).</P>
+<P></P>
+<DT><STRONG><A NAME="item_share_from">share_from (PACKAGE, ARRAYREF)</A></STRONG><BR>
+<DD>
+This method is similar to <A HREF="#item_share"><CODE>share()</CODE></A> but allows you to explicitly name the
+package that symbols should be shared from. The symbol names (including
+type characters) are supplied as an array reference.
+<PRE>
+    $safe-&gt;share_from('main', [ '$foo', '%bar', 'func' ]);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_varglob">varglob (VARNAME)</A></STRONG><BR>
+<DD>
+This returns a glob reference for the symbol table entry of VARNAME in
+the package of the compartment. VARNAME must be the <STRONG>name</STRONG> of a
+variable without any leading type marker. For example,
+<PRE>
+    $cpt = new Safe 'Root';
+    $Root::foo = &quot;Hello world&quot;;
+    # Equivalent version which doesn't need to know $cpt's package name:
+    ${$cpt-&gt;varglob('foo')} = &quot;Hello world&quot;;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_reval">reval (STRING)</A></STRONG><BR>
+<DD>
+This evaluates STRING as perl code inside the compartment.
+<P>The code can only see the compartment's namespace (as returned by the
+<STRONG>root</STRONG> method). The compartment's root package appears to be the
+<CODE>main::</CODE> package to the code inside the compartment.</P>
+<P>Any attempt by the code in STRING to use an operator which is not permitted
+by the compartment will cause an error (at run-time of the main program
+but at compile-time for the code in STRING).  The error is of the form
+``%s trapped by operation mask operation...''.</P>
+<P>If an operation is trapped in this way, then the code in STRING will
+not be executed. If such a trapped operation occurs or any other
+compile-time or return error, then $@ is set to the error message, just
+as with an eval().</P>
+<P>If there is no error, then the method returns the value of the last
+expression evaluated, or a return statement may be used, just as with
+subroutines and <STRONG>eval()</STRONG>. The context (list or scalar) is determined
+by the caller as usual.</P>
+<P>This behaviour differs from the beta distribution of the Safe extension
+where earlier versions of perl made it hard to mimic the return
+behaviour of the <A HREF="../lib/Pod/perlfunc.html#item_eval"><CODE>eval()</CODE></A> command and the context was always scalar.</P>
+<P>Some points to note:</P>
+<P>If the entereval op is permitted then the code can use eval ``...'' to
+'hide' code which might use denied ops. This is not a major problem
+since when the code tries to execute the eval it will fail because the
+opmask is still in effect. However this technique would allow clever,
+and possibly harmful, code to 'probe' the boundaries of what is
+possible.</P>
+<P>Any string eval which is executed by code executing in a compartment,
+or by code called from code executing in a compartment, will be eval'd
+in the namespace of the compartment. This is potentially a serious
+problem.</P>
+<P>Consider a function <CODE>foo()</CODE> in package pkg compiled outside a compartment
+but shared with it. Assume the compartment has a root package called
+'Root'. If <CODE>foo()</CODE> contains an eval statement like eval '$foo = 1' then,
+normally, $pkg::foo will be set to 1.  If <CODE>foo()</CODE> is called from the
+compartment (by whatever means) then instead of setting $pkg::foo, the
+eval will actually set $Root::pkg::foo.</P>
+<P>This can easily be demonstrated by using a module, such as the Socket
+module, which uses eval ``...'' as part of an AUTOLOAD function. You can
+'use' the module outside the compartment and share an (autoloaded)
+function with the compartment. If an autoload is triggered by code in
+the compartment, or by any code anywhere that is called by any means
+from the compartment, then the eval in the Socket module's AUTOLOAD
+function happens in the namespace of the compartment. Any variables
+created or used by the eval'd code are now under the control of
+the code in the compartment.</P>
+<P>A similar effect applies to <EM>all</EM> runtime symbol lookups in code
+called from a compartment but not compiled within it.</P>
+<P></P>
+<DT><STRONG><A NAME="item_rdo">rdo (FILENAME)</A></STRONG><BR>
+<DD>
+This evaluates the contents of file FILENAME inside the compartment.
+See above documentation on the <STRONG>reval</STRONG> method for further details.
+<P></P>
+<DT><STRONG><A NAME="item_root">root (NAMESPACE)</A></STRONG><BR>
+<DD>
+This method returns the name of the package that is the root of the
+compartment's namespace.
+<P>Note that this behaviour differs from version 1.00 of the Safe module
+where the root module could be used to change the namespace. That
+functionality has been withdrawn pending deeper consideration.</P>
+<P></P>
+<DT><STRONG><A NAME="item_mask">mask (MASK)</A></STRONG><BR>
+<DD>
+This is a get-or-set method for the compartment's operator mask.
+<P>With no MASK argument present, it returns the current operator mask of
+the compartment.</P>
+<P>With the MASK argument present, it sets the operator mask for the
+compartment (equivalent to calling the deny_only method).</P>
+<P></P></DL>
+<P>
+<H2><A NAME="some safety issues">Some Safety Issues</A></H2>
+<P>This section is currently just an outline of some of the things code in
+a compartment might do (intentionally or unintentionally) which can
+have an effect outside the compartment.</P>
+<DL>
+<DT><STRONG><A NAME="item_Memory">Memory</A></STRONG><BR>
+<DD>
+Consuming all (or nearly all) available memory.
+<P></P>
+<DT><STRONG><A NAME="item_CPU">CPU</A></STRONG><BR>
+<DD>
+Causing infinite loops etc.
+<P></P>
+<DT><STRONG><A NAME="item_Snooping">Snooping</A></STRONG><BR>
+<DD>
+Copying private information out of your system. Even something as
+simple as your user name is of value to others. Much useful information
+could be gleaned from your environment variables for example.
+<P></P>
+<DT><STRONG><A NAME="item_Signals">Signals</A></STRONG><BR>
+<DD>
+Causing signals (especially SIGFPE and SIGALARM) to affect your process.
+<P>Setting up a signal handler will need to be carefully considered
+and controlled.  What mask is in effect when a signal handler
+gets called?  If a user can get an imported function to get an
+exception and call the user's signal handler, does that user's
+restricted mask get re-instated before the handler is called?
+Does an imported handler get called with its original mask or
+the user's one?</P>
+<P></P>
+<DT><STRONG><A NAME="item_State_Changes">State Changes</A></STRONG><BR>
+<DD>
+Ops such as chdir obviously effect the process as a whole and not just
+the code in the compartment. Ops such as rand and srand have a similar
+but more subtle effect.
+<P></P></DL>
+<P>
+<H2><A NAME="author">AUTHOR</A></H2>
+<P>Originally designed and implemented by Malcolm Beattie,
+<A HREF="mailto:mbeattie@sable.ox.ac.uk.">mbeattie@sable.ox.ac.uk.</A></P>
+<P>Reworked to use the Opcode module and other changes added by Tim Bunce
+&lt;<EM><A HREF="mailto:Tim.Bunce@ig.co.uk">Tim.Bunce@ig.co.uk</A></EM>&gt;.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Safe - Compile and execute code in restricted compartments</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>
